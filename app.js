@@ -1268,28 +1268,43 @@ async function reverseGeocode(
     lat,
     lng
 ) {
+    return new Promise((resolve) => {
 
-    const url =
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&language=ja&key=${CONFIG.GOOGLE_MAPS_API_KEY}`;
+        const geocoder =
+            new google.maps.Geocoder();
 
-    const response =
-        await fetch(url);
+        geocoder.geocode(
+            {
+                location: {
+                    lat: lat,
+                    lng: lng
+                }
+            },
+            (results, status) => {
 
-    const data =
-        await response.json();
+                console.log(
+                    "Geocoder結果",
+                    status,
+                    results
+                );
 
-    if (
-        data.results &&
-        data.results.length > 0
-    ) {
+                if (
+                    status === "OK" &&
+                    results &&
+                    results.length > 0
+                ) {
+                    resolve(
+                        results[0].formatted_address
+                    );
+                    return;
+                }
 
-        return data.results[0]
-            .formatted_address;
-
-    }
-
-    return "位置不明";
+                resolve("位置不明");
+            }
+        );
+    });
 }
+
 
 function startGpsUpdate() {
 

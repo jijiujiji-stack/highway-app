@@ -46,7 +46,7 @@
                 <div class="time-box">
 
                     <div class="time-label">
-                        🚗高速
+                        🚗高速のみ
                     </div>
 
                     <div id="dashboardHighway" class="time-value">
@@ -55,12 +55,17 @@
 
                     </div>
 
+                    <div id="dashboardHighwayDetail" class="time-detail">
+                        距離：-- / ETC：--
+                    </div>
+
+
                 </div>
 
                 <div class="time-box">
 
                     <div class="time-label">
-                        🚗下道
+                        🚗下道のみ
                     </div>
 
                     <div id="dashboardLocal" class="time-value">
@@ -68,6 +73,12 @@
                         --
 
                     </div>
+
+                    <div id="dashboardLocalDetail" class="time-detail">
+                        距離：--
+                    </div>
+
+
 
                 </div>
 
@@ -97,26 +108,7 @@
 
             </div>
 
-            <div class="dashboard-mini-grid">
-
-                <div>
-                    最新比較
-                    <span id="autoSearchTime">未実行</span>
-                </div>
-
-                <div>
-                    最終計算
-                    <span id="lastRouteSearchTime">未実行</span>
-                </div>
-
-                <div>
-                    再検索条件
-                    <span id="autoSearchCondition">未判定</span>
-                </div>
-
-            </div>
-
-            <div class="dashboard-mini-grid">
+            <div class="dashboard-mini-grid main-status-grid">
 
                 <div>
                     現在地
@@ -126,16 +118,16 @@
                 </div>
 
                 <div>
-                    GPS更新
-                    <span id="gpsTime">
-                        --
+                    最新比較
+                    <span id="lastRouteSearchTime">
+                        未実行
                     </span>
                 </div>
 
                 <div>
-                    判定地点
-                    <span id="lastSearchLocation">
-                        未実行
+                    次回更新
+                    <span id="nextUpdateInfo">
+                        --
                     </span>
                 </div>
 
@@ -255,6 +247,16 @@
         </section>
 
 
+        <div class="card multi-exit-ic-card">
+            <h2>複数IC比較</h2>
+
+            <div id="multiExitIcResult">
+                まだ比較していません
+            </div>
+        </div>
+
+
+
 
         <section class="results">
 
@@ -314,6 +316,32 @@
                     <span id="valueJudge">--</span>
                 </div>
 
+                <details class="debug-info">
+
+                    <summary>詳細情報</summary>
+
+                    <div class="score-row">
+                        <span>最新比較</span>
+                        <span id="autoSearchTime">未実行</span>
+                    </div>
+
+                    <div class="score-row">
+                        <span>GPS更新</span>
+                        <span id="gpsTime">--</span>
+                    </div>
+
+                    <div class="score-row">
+                        <span>判定地点</span>
+                        <span id="lastSearchLocation">未実行</span>
+                    </div>
+
+                    <div class="score-row">
+                        <span>再検索条件</span>
+                        <span id="autoSearchCondition">未判定</span>
+                    </div>
+
+                </details>
+
             </div>
 
             <div class="card exit-ic-card">
@@ -346,13 +374,6 @@
             </div>
 
 
-            <div class="card multi-exit-ic-card">
-                <h2>複数IC比較</h2>
-
-                <div id="multiExitIcResult">
-                    まだ比較していません
-                </div>
-            </div>
 
             <div class="card nearby-ic-card">
                 <h2>周辺IC候補</h2>

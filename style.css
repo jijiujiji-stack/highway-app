@@ -532,3 +532,29 @@ details#searchPanel .auto-compare-toggle input {
     width: auto;
     margin: 0;
 }
+
+.time-detail {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #ccc;
+    line-height: 1.4;
+}
+
+.main-status-grid {
+    grid-template-columns: 1fr 1fr;
+}
+
+.debug-info {
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid #444;
+    font-size: 12px;
+    color: #aaa;
+}
+
+.debug-info summary {
+    cursor: pointer;
+    font-weight: bold;
+    color: #ddd;
+    margin-bottom: 8px;
+}

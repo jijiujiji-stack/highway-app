@@ -605,6 +605,13 @@ window.addEventListener("load", () => {
     updateAutoCompareToggleState();
 
 
+    document
+        .getElementById(
+            "nextUpdateInfo"
+        ).textContent =
+        "2km移動 または 3分経過";
+
+
 
 
     /*
@@ -1125,6 +1132,24 @@ function displayRouteComparison(
         formatMinutes(
             localMinutes
         );
+
+    document
+        .getElementById("dashboardHighwayDetail")
+        .textContent =
+        "距離：" +
+        highwayKm +
+        "km / ETC：約" +
+        estimatedToll.toLocaleString() +
+        "円";
+
+    document
+        .getElementById("dashboardLocalDetail")
+        .textContent =
+        "距離：" +
+        localKm +
+        "km";
+
+
 
     let recommendation =
         "どちらでも可";
@@ -1712,28 +1737,58 @@ function checkAutoReSearch() {
         lastSearchLongitude === null
     ) {
 
+        document
+            .getElementById("nextUpdateInfo")
+            .textContent =
+            "比較後に表示";
+
         return;
     }
 
     const distance =
-
         calculateDistance(
-
             lastSearchLatitude,
             lastSearchLongitude,
-
             currentLatitude,
             currentLongitude
-
         );
 
     const elapsedSeconds =
-
         (
             Date.now()
             -
             lastSearchTime
         ) / 1000;
+
+    const remainingDistance =
+        Math.max(
+            0,
+            2000 - Math.round(distance)
+        );
+
+    const remainingSeconds =
+        Math.max(
+            0,
+            180 - Math.round(elapsedSeconds)
+        );
+
+    document
+        .getElementById("nextUpdateInfo")
+        .textContent =
+        "あと" +
+        remainingDistance +
+        "m または " +
+        remainingSeconds +
+        "秒";
+
+    document
+        .getElementById("autoSearchCondition")
+        .textContent =
+        "あと " +
+        remainingDistance +
+        "m / あと " +
+        remainingSeconds +
+        "秒";
 
     console.log(
         "移動距離",
@@ -1747,29 +1802,8 @@ function checkAutoReSearch() {
         "秒"
     );
 
-    const remainingDistance =
-        Math.max(
-            0,
-            500 - distance
-        );
-
-    const remainingSeconds =
-        Math.max(
-            0,
-            180 - elapsedSeconds
-        );
-
-    document
-        .getElementById("autoSearchCondition")
-        .textContent =
-        "あと " +
-        Math.round(remainingDistance) +
-        "m / あと " +
-        Math.round(remainingSeconds) +
-        "秒";
-
     if (
-        distance >= 500 &&
+        distance >= 2000 ||
         elapsedSeconds >= 180
     ) {
 
@@ -1787,6 +1821,7 @@ function checkAutoReSearch() {
         }
     }
 }
+
 
 function shortenLocationName(address) {
 

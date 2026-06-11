@@ -563,6 +563,13 @@ let lastSearchLocationName = "";
 let lastNearestIcName = "";
 let lastNearestIcDistanceKm = null;
 
+let lastGpsReceivedTime = null;
+
+let gpsErrorBlinkShown = false;
+
+let lastRecommendationText = "";
+
+
 
 
 console.log("高速・下道コスパナビ起動");
@@ -1133,6 +1140,12 @@ function displayRouteComparison(
             localMinutes
         );
 
+    updateDashboardTimeColors(
+        highwayMinutes,
+        localMinutes
+    );
+
+
     document
         .getElementById("dashboardHighwayDetail")
         .textContent =
@@ -1167,12 +1180,27 @@ function displayRouteComparison(
 
     }
 
-    document
-        .getElementById(
+    const dashboardRecommendationElement =
+        document.getElementById(
             "dashboardRecommendation"
-        )
-        .textContent =
+        );
+
+    if (
+        lastRecommendationText &&
+        lastRecommendationText !== recommendation
+    ) {
+        blinkElementById(
+            "dashboardRecommendation",
+            "recommendation-blink"
+        );
+    }
+
+    dashboardRecommendationElement.textContent =
         recommendation;
+
+    lastRecommendationText =
+        recommendation;
+
 
     const dashboardCard =
         document.querySelector(".dashboard-card");
@@ -1238,6 +1266,9 @@ async function getCurrentLocation() {
 
             currentLatitude = lat;
             currentLongitude = lng;
+
+            lastGpsReceivedTime = Date.now();
+            updateGpsStatus();
 
             checkAutoReSearch();
 
@@ -1340,8 +1371,15 @@ function startGpsUpdate() {
         );
 
         getCurrentLocation();
+        updateGpsStatus();
 
     }, 60000);
+
+    setInterval(() => {
+
+        updateGpsStatus();
+
+    }, 5000);
 
 }
 
@@ -2741,6 +2779,12 @@ async function searchAutoExitIcComparison() {
         .textContent =
         "あと2000m または 180秒";
 
+    blinkElementById(
+        "nextUpdateInfo",
+        "update-blink"
+    );
+
+
 
     if (
         autoCompareCheckbox &&
@@ -3222,5 +3266,122 @@ function closeSearchPanel() {
 
     if (searchPanel) {
         searchPanel.open = false;
+    }
+}
+
+function updateGpsStatus() {
+
+    const gpsStatus =
+        document.getElementById("gpsStatus");
+
+    if (!gpsStatus) {
+        return;
+    }
+
+    if (!lastGpsReceivedTime) {
+        gpsStatus.textContent = "未受信";
+        gpsStatus.className = "gps-status-warning";
+        return;
+    }
+
+    const elapsedSeconds =
+        Math.round(
+            (Date.now() - lastGpsReceivedTime) / 1000
+        );
+
+    if (elapsedSeconds >= 60) {
+
+        gpsStatus.textContent =
+            "異常（" + elapsedSeconds + "秒受信なし）";
+
+        if (!gpsErrorBlinkShown) {
+
+            gpsStatus.className =
+                "gps-status-error gps-status-blink";
+
+            gpsErrorBlinkShown = true;
+
+            setTimeout(() => {
+                gpsStatus.classList.remove("gps-status-blink");
+            }, 3000);
+
+        }
+        else {
+            gpsStatus.className =
+                "gps-status-error";
+        }
+
+        return;
+    }
+
+    gpsStatus.textContent = "正常";
+    gpsStatus.className = "gps-status-normal";
+
+    gpsErrorBlinkShown = false;
+}
+
+
+
+function blinkElementById(id, className) {
+
+    const element =
+        document.getElementById(id);
+
+    if (!element) {
+        return;
+    }
+
+    element.classList.remove(className);
+
+    void element.offsetWidth;
+
+    element.classList.add(className);
+}
+
+function updateDashboardTimeColors(
+    highwayMinutes,
+    localMinutes
+) {
+    const highwayElement =
+        document.getElementById("dashboardHighway");
+
+    const localElement =
+        document.getElementById("dashboardLocal");
+
+    if (!highwayElement || !localElement) {
+        return;
+    }
+
+    const acceptableDelay =
+        Number(
+            document.getElementById("acceptableDelay")?.value
+        ) || 30;
+
+    const timeDifference =
+        localMinutes - highwayMinutes;
+
+    highwayElement.classList.remove(
+        "time-good",
+        "time-bad",
+        "time-neutral"
+    );
+
+    localElement.classList.remove(
+        "time-good",
+        "time-bad",
+        "time-neutral"
+    );
+
+    if (timeDifference < acceptableDelay) {
+        highwayElement.classList.add("time-bad");
+        localElement.classList.add("time-good");
+    }
+    else if (timeDifference >= acceptableDelay * 2) {
+        highwayElement.classList.add("time-good");
+        localElement.classList.add("time-bad");
+    }
+    else {
+        highwayElement.classList.add("time-neutral");
+        localElement.classList.add("time-neutral");
     }
 }

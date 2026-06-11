@@ -541,8 +541,9 @@ details#searchPanel .auto-compare-toggle input {
 }
 
 .main-status-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
 }
+
 
 .debug-info {
     margin-top: 14px;
@@ -557,4 +558,69 @@ details#searchPanel .auto-compare-toggle input {
     font-weight: bold;
     color: #ddd;
     margin-bottom: 8px;
+}
+
+.gps-status-normal {
+    color: #2ecc71 !important;
+    font-weight: bold;
+}
+
+.gps-status-warning {
+    color: #f1c40f !important;
+    font-weight: bold;
+}
+
+.gps-status-error {
+    color: #e74c3c !important;
+    font-weight: bold;
+}
+
+.gps-status-blink {
+    animation: gpsBlink 0.5s linear 6;
+}
+
+@keyframes gpsBlink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+
+.update-blink,
+.recommendation-blink {
+    animation: noticeBlink 0.5s linear 6;
+}
+
+@keyframes noticeBlink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.time-good {
+    color: #2ecc71 !important;
+}
+
+.time-bad {
+    color: #e74c3c !important;
+}
+
+.time-neutral {
+    color: white !important;
 }

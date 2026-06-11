@@ -118,16 +118,16 @@
                 </div>
 
                 <div>
-                    最新比較
-                    <span id="lastRouteSearchTime">
-                        未実行
+                    データ更新
+                    <span id="nextUpdateInfo">
+                        比較後に表示
                     </span>
                 </div>
 
                 <div>
-                    次回更新
-                    <span id="nextUpdateInfo">
-                        --
+                    GPS更新
+                    <span id="gpsStatus" class="gps-status-normal">
+                        正常
                     </span>
                 </div>
 
@@ -319,6 +319,11 @@
                 <details class="debug-info">
 
                     <summary>詳細情報</summary>
+
+                    <div class="score-row">
+                        <span>最新比較時刻</span>
+                        <span id="lastRouteSearchTime">未実行</span>
+                    </div>
 
                     <div class="score-row">
                         <span>最新比較</span>

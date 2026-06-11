@@ -1,3 +1,3 @@
 const CONFIG = {
-    GOOGLE_MAPS_API_KEY: "AIzaSyB3Igk8wHXMBiOqLcMjQ7lMo_uichQr45w"
+    GOOGLE_MAPS_API_KEY: "AIzaSyCnOl8vZssyLiUmu0g0L_tboi6kq7Cizr8"
 };

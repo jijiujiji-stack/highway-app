@@ -594,6 +594,19 @@ window.addEventListener("load", () => {
             searchAutoExitIcComparison
         );
 
+
+    document
+        .getElementById("origin")
+        .addEventListener(
+            "input",
+            updateAutoCompareToggleState
+        );
+
+    updateAutoCompareToggleState();
+
+
+
+
     /*
     
             const findNearbyIcButton =
@@ -702,6 +715,8 @@ async function searchRoute() {
             .getElementById("lastRouteSearchTime")
             .textContent =
             new Date().toLocaleTimeString("ja-JP");
+
+        closeSearchPanel();
 
 
     } catch (error) {
@@ -1394,6 +1409,8 @@ async function searchFromCurrentLocation() {
             .textContent =
             new Date().toLocaleTimeString("ja-JP");
 
+        closeSearchPanel();
+
     } catch (error) {
 
         console.error(error);
@@ -1745,7 +1762,14 @@ function checkAutoReSearch() {
             "自動再検索実行"
         );
 
-        searchFromCurrentLocation();
+        if (
+            document.getElementById("autoCompareEnabled")?.checked
+        ) {
+            searchAutoExitIcComparison();
+        }
+        else {
+            searchFromCurrentLocation();
+        }
     }
 }
 
@@ -2633,7 +2657,20 @@ async function searchAutoExitIcComparison() {
         autoExitIcList.join(", ");
 
     await searchMultiExitIcComparison();
+
+    const autoCompareCheckbox =
+        document.getElementById("autoCompareEnabled");
+
+    if (
+        autoCompareCheckbox &&
+        !autoCompareCheckbox.disabled
+    ) {
+        autoCompareCheckbox.checked = true;
+    }
+
+    closeSearchPanel();
 }
+
 
 function findNearbyInterchanges() {
 
@@ -3069,4 +3106,40 @@ function checkSuggestIcArea() {
             })
         )
     );
+}
+
+
+
+function updateAutoCompareToggleState() {
+
+    const originInput =
+        document.getElementById("origin");
+
+    const autoCompareCheckbox =
+        document.getElementById("autoCompareEnabled");
+
+    if (!originInput || !autoCompareCheckbox) {
+        return;
+    }
+
+    if (originInput.value.trim() !== "") {
+
+        autoCompareCheckbox.checked = false;
+        autoCompareCheckbox.disabled = true;
+
+    }
+    else {
+
+        autoCompareCheckbox.disabled = false;
+
+    }
+}
+
+function closeSearchPanel() {
+    const searchPanel =
+        document.getElementById("searchPanel");
+
+    if (searchPanel) {
+        searchPanel.open = false;
+    }
 }

@@ -413,3 +413,122 @@ button {
     font-size: 14px;
     margin-top: 6px;
 }
+
+
+.auto-compare-toggle {
+    display: block;
+    margin: 10px 0;
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.auto-compare-toggle input {
+    margin-right: 6px;
+}
+
+
+.origin-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.origin-row input {
+    flex: 1;
+}
+
+.small-button {
+    width: auto;
+    padding: 10px 14px;
+    white-space: nowrap;
+}
+
+details#searchPanel {
+    background: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 12px;
+}
+
+details#searchPanel summary {
+    font-weight: bold;
+    cursor: pointer;
+    padding: 6px 0;
+}
+
+details#searchPanel {
+    background: #222;
+    border: 1px solid #444;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 12px;
+}
+
+details#searchPanel summary {
+    color: white;
+}
+
+details#searchPanel label {
+    color: #ddd;
+}
+
+details#searchPanel input,
+details#searchPanel select {
+    background: #111;
+    color: white;
+    border: 1px solid #555;
+}
+
+details#searchPanel button {
+    background: #3498db;
+    color: white;
+    font-weight: bold;
+}
+
+details#searchPanel label {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 4px;
+}
+
+details#searchPanel input,
+details#searchPanel select {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 8px;
+}
+
+details#searchPanel button {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+details#searchPanel .origin-row {
+    display: flex;
+    gap: 8px;
+}
+
+details#searchPanel .origin-row input {
+    flex: 1;
+    width: auto;
+}
+
+details#searchPanel .origin-row button {
+    width: auto;
+    margin: 0;
+}
+
+details#searchPanel .auto-compare-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+details#searchPanel .auto-compare-toggle input {
+    width: auto;
+    margin: 0;
+}

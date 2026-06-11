@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高速・下道コスパナビ</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header>
+            <h1>🚗 高速・下道コスパナビ</h1>
+            <p>高速料金に見合う時間短縮かを判断するツール</p>
+        </header>
+
+
+        <section class="dashboard-card">
+
+            <div class="recommendation">
+
+                <div id="dashboardStars">
+                    ★★★☆☆
+                </div>
+
+                <div id="dashboardRecommendation">
+                    判定待ち
+                </div>
+
+                <div id="dashboardReason">
+                    ルート検索してください
+                </div>
+
+                <div id="dashboardValueJudge">
+                    判定待ち
+                </div>
+
+            </div>
+
+            <div class="dashboard-times">
+
+                <div class="time-box">
+
+                    <div class="time-label">
+                        🚗高速
+                    </div>
+
+                    <div id="dashboardHighway" class="time-value">
+
+                        --
+
+                    </div>
+
+                </div>
+
+                <div class="time-box">
+
+                    <div class="time-label">
+                        🚗下道
+                    </div>
+
+                    <div id="dashboardLocal" class="time-value">
+
+                        --
+
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="dashboard-info">
+
+                <div>
+                    目的地
+                    <span id="dashboardDestination">
+                        未設定
+                    </span>
+                </div>
+
+                <div>
+                    効率率
+                    <span id="dashboardEfficiency">
+                        --
+                    </span>
+                </div>
+
+                <div>
+                    単価
+                    <span id="dashboardCost">
+                        --
+                    </span>
+                </div>
+
+            </div>
+
+            <div class="dashboard-mini-grid">
+
+                <div>
+                    最新比較
+                    <span id="autoSearchTime">未実行</span>
+                </div>
+
+                <div>
+                    最終計算
+                    <span id="lastRouteSearchTime">未実行</span>
+                </div>
+
+                <div>
+                    再検索条件
+                    <span id="autoSearchCondition">未判定</span>
+                </div>
+
+            </div>
+
+            <div class="dashboard-mini-grid">
+
+                <div>
+                    現在地
+                    <span id="currentLocation">
+                        取得中...
+                    </span>
+                </div>
+
+                <div>
+                    GPS更新
+                    <span id="gpsTime">
+                        --
+                    </span>
+                </div>
+
+                <div>
+                    判定地点
+                    <span id="lastSearchLocation">
+                        未実行
+                    </span>
+                </div>
+
+            </div>
+
+
+
+
+        </section>
+
+
+        <section class="search-area">
+
+
+
+
+
+            <label for="origin">
+                出発地
+            </label>
+            <input type="text" id="origin" placeholder="例：東京都荒川区">
+
+            <label for="destination">
+                目的地
+            </label>
+            <input type="text" id="destination" placeholder="例：スパリゾートハワイアンズ">
+
+            <button id="searchButton">
+                ルート比較
+            </button>
+
+            <button id="gpsSearchButton">
+                現在地から再検索
+            </button>
+
+            <!--
+
+            <label for="exitIc">
+                降りるIC
+            </label>
+            <input type="text" id="exitIc" placeholder="例：流山IC">
+
+            <button id="exitIcCompareButton">
+                指定ICで降りる比較
+            </button>
+
+-->
+
+            <label for="exitIcList">
+                降りるIC候補
+            </label>
+
+
+            <input type="text" id="exitIcList" placeholder="例：流山IC, 柏IC, 三郷IC">
+
+            <label for="acceptableDelay">
+                許容できる遅れ時間（分）
+            </label>
+            <input type="number" id="acceptableDelay" value="30" min="0">
+
+            <!--
+
+
+            <button id="multiExitIcCompareButton">
+                複数ICを比較
+            </button>
+
+
+            <button id="findNearbyIcButton">
+                周辺IC候補を探す
+            </button>
+
+-->
+
+            <label for="icArea">
+                IC候補エリア
+            </label>
+            <select id="icArea">
+                <option value="joban">常磐道方面</option>
+                <option value="keiyo">京葉道路方面</option>
+                <option value="tokan">東関東道方面</option>
+                <option value="aqualine">アクアライン方面</option>
+                <option value="tateyama">館山道方面</option>
+                <option value="tohoku">東北道方面</option>
+                <option value="kanetsu">関越道方面</option>
+                <option value="chuo">中央道方面</option>
+                <option value="tomei">東名道方面</option>
+            </select>
+
+            <div id="icAreaReason" class="ic-area-reason">
+                方面：手動選択
+            </div>
+
+            <div id="candidateReason" class="ic-area-reason">
+                候補選定：未実行
+            </div>
+
+            <button id="autoExitIcCompareButton">
+                候補IC自動比較
+            </button>
+
+
+        </section>
+
+
+
+        <section class="results">
+
+            <div class="card highway-card">
+                <h2>高速のみ</h2>
+
+                <div class="value" id="highwayTime">
+                    -- 分
+                </div>
+
+                <div class="sub">
+                    距離：--
+                </div>
+
+                <div class="sub">
+                    ETC料金：--
+                </div>
+            </div>
+
+            <div class="card local-card">
+                <h2>下道のみ</h2>
+
+                <div class="value" id="localTime">
+                    -- 分
+                </div>
+
+                <div class="sub">
+                    距離：--
+                </div>
+
+                <div class="sub">
+                    料金：0円
+                </div>
+            </div>
+
+            <div class="card score-card">
+
+                <h2>評価</h2>
+
+                <div class="score-row">
+                    <span>高速効率率</span>
+                    <span id="efficiencyRate">--</span>
+                </div>
+
+                <div class="score-row">
+                    <span>星評価</span>
+                    <span id="starRating">--</span>
+                </div>
+
+                <div class="score-row">
+                    <span>時間短縮単価</span>
+                    <span id="costPerMinute">--</span>
+                </div>
+
+                <div class="score-row">
+                    <span>コスパ判定</span>
+                    <span id="valueJudge">--</span>
+                </div>
+
+            </div>
+
+            <div class="card exit-ic-card">
+                <h2>指定ICで降りる比較</h2>
+
+                <div class="score-row">
+                    <span>降りるIC</span>
+                    <span id="exitIcName">--</span>
+                </div>
+
+                <div class="score-row">
+                    <span>高速継続</span>
+                    <span id="keepHighwayTime">--</span>
+                </div>
+
+                <div class="score-row">
+                    <span>ICで降りる</span>
+                    <span id="exitIcTime">--</span>
+                </div>
+
+                <div class="score-row">
+                    <span>差</span>
+                    <span id="exitIcDifference">--</span>
+                </div>
+
+                <div class="score-row">
+                    <span>判定</span>
+                    <span id="exitIcJudge">--</span>
+                </div>
+            </div>
+
+
+            <div class="card multi-exit-ic-card">
+                <h2>複数IC比較</h2>
+
+                <div id="multiExitIcResult">
+                    まだ比較していません
+                </div>
+            </div>
+
+            <div class="card nearby-ic-card">
+                <h2>周辺IC候補</h2>
+
+                <div id="nearbyIcResult">
+                    まだ検索していません
+                </div>
+            </div>
+
+
+        </section>
+
+    </div>
+
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+
+</body>
+
+</html>

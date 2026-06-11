@@ -2711,6 +2711,37 @@ async function searchAutoExitIcComparison() {
     const autoCompareCheckbox =
         document.getElementById("autoCompareEnabled");
 
+
+    lastSearchLatitude =
+        currentLatitude;
+
+    lastSearchLongitude =
+        currentLongitude;
+
+    lastSearchTime =
+        Date.now();
+
+    lastSearchLocationName =
+        document
+            .getElementById("currentLocation")
+            .textContent;
+
+    document
+        .getElementById("lastSearchLocation")
+        .textContent =
+        lastSearchLocationName;
+
+    document
+        .getElementById("lastRouteSearchTime")
+        .textContent =
+        new Date().toLocaleTimeString("ja-JP");
+
+    document
+        .getElementById("nextUpdateInfo")
+        .textContent =
+        "あと2000m または 180秒";
+
+
     if (
         autoCompareCheckbox &&
         !autoCompareCheckbox.disabled

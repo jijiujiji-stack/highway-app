@@ -46,7 +46,11 @@
                 <div class="time-box">
 
                     <div class="time-label">
-                        🚗高速のみ
+                        🚗 高速利用
+
+                        <div class="time-sub-label">
+                            （有料道路あり）
+                        </div>
                     </div>
 
                     <div id="dashboardHighway" class="time-value">
@@ -65,7 +69,11 @@
                 <div class="time-box">
 
                     <div class="time-label">
-                        🚗下道のみ
+                        🚙 有料回避
+
+                        <div class="time-sub-label">
+                            （有料道路なし）
+                        </div>
                     </div>
 
                     <div id="dashboardLocal" class="time-value">
@@ -131,12 +139,16 @@
                     </span>
                 </div>
 
+
+                <!--
                 <div>
                     走行判定
                     <span id="routeModeJudge" class="route-mode-unknown">
                         判定中
                     </span>
                 </div>
+            -->
+
 
             </div>
 
@@ -264,7 +276,7 @@
         <section class="results">
 
             <div class="card highway-card">
-                <h2>高速のみ</h2>
+                <h2>🚗 高速利用</h2>
 
                 <div class="value" id="highwayTime">
                     -- 分
@@ -280,7 +292,7 @@
             </div>
 
             <div class="card local-card">
-                <h2>下道のみ</h2>
+                <h2>🚙 有料回避</h2>
 
                 <div class="value" id="localTime">
                     -- 分

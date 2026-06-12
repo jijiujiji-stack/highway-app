@@ -659,7 +659,7 @@ details#searchPanel .auto-compare-toggle input {
 }
 
 .main-status-grid {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
 }
 
 .route-mode-highway {
@@ -680,4 +680,17 @@ details#searchPanel .auto-compare-toggle input {
 .route-mode-unknown {
     color: #aaa !important;
     font-weight: bold;
+}
+
+
+.time-sub-label {
+
+    font-size: 0.65em;
+
+    color: #cccccc;
+
+    margin-top: 2px;
+
+    line-height: 1.2;
+
 }

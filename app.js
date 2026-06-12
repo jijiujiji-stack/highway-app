@@ -1376,6 +1376,13 @@ function startGpsUpdate() {
 
         updateGpsStatus();
 
+        if (
+            currentLatitude !== null &&
+            currentLongitude !== null
+        ) {
+            checkAutoReSearch();
+        }
+
     }, 5000);
 
 }
@@ -1814,12 +1821,50 @@ function checkAutoReSearch() {
             180 - Math.round(elapsedSeconds)
         );
 
+    let displayTimeText = "";
+
+    if (remainingSeconds > 60) {
+
+        const roundedSeconds =
+            Math.ceil(remainingSeconds / 30) * 30;
+
+        const minutes =
+            Math.floor(roundedSeconds / 60);
+
+        const seconds =
+            roundedSeconds % 60;
+
+        if (seconds === 0) {
+            displayTimeText =
+                minutes + "分";
+        }
+        else {
+            displayTimeText =
+                minutes + "分" + seconds + "秒";
+        }
+
+    }
+    else if (remainingSeconds > 10) {
+
+        const roundedSeconds =
+            Math.ceil(remainingSeconds / 10) * 10;
+
+        displayTimeText =
+            roundedSeconds + "秒";
+
+    }
+    else {
+
+        displayTimeText =
+            remainingSeconds + "秒";
+
+    }
+
     setDataUpdateStatus(
         "あと" +
         remainingDistance +
         "m または " +
-        remainingSeconds +
-        "秒",
+        displayTimeText,
         "data-update-normal"
     );
 
@@ -2793,7 +2838,7 @@ async function searchAutoExitIcComparison() {
     document
         .getElementById("nextUpdateInfo")
         .textContent =
-        "あと2000m または 180秒";
+        "あと2000m または 3分";
 
     blinkElementById(
         "nextUpdateInfo",

@@ -1388,7 +1388,9 @@ function startGpsUpdate() {
 }
 
 
-async function searchFromCurrentLocation() {
+async function searchFromCurrentLocation(
+    shouldClosePanel = true
+) {
 
     if (
         currentLatitude === null ||
@@ -1499,7 +1501,9 @@ async function searchFromCurrentLocation() {
             .textContent =
             new Date().toLocaleTimeString("ja-JP");
 
-        closeSearchPanel();
+        if (shouldClosePanel) {
+            closeSearchPanel();
+        }
 
     } catch (error) {
 
@@ -1906,7 +1910,7 @@ function checkAutoReSearch() {
         if (
             document.getElementById("autoCompareEnabled")?.checked
         ) {
-            searchAutoExitIcComparison();
+            searchAutoExitIcComparison(false);
         }
         else {
             searchFromCurrentLocation();
@@ -2668,7 +2672,9 @@ function shortenIcName(name) {
 }
 
 
-async function searchAutoExitIcComparison() {
+async function searchAutoExitIcComparison(
+    shouldClosePanel = true
+) {
 
     if (
         currentLatitude === null ||
@@ -2695,7 +2701,7 @@ async function searchAutoExitIcComparison() {
         return;
     }
 
-    await searchFromCurrentLocation();
+    await searchFromCurrentLocation(false);
 
     let icArea =
         document
@@ -2854,7 +2860,9 @@ async function searchAutoExitIcComparison() {
         autoCompareCheckbox.checked = true;
     }
 
-    closeSearchPanel();
+    if (shouldClosePanel) {
+        closeSearchPanel();
+    }
 }
 
 

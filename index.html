@@ -182,12 +182,8 @@
 
 -->
 
-                <label for="exitIcList">
-                    降りるIC候補
-                </label>
+                <input type="hidden" id="exitIcList">
 
-
-                <input type="text" id="exitIcList" placeholder="例：流山IC, 柏IC, 三郷IC">
 
                 <label for="acceptableDelay">
                     許容できる遅れ時間（分）
@@ -338,6 +334,11 @@
                     <div class="score-row">
                         <span>判定地点</span>
                         <span id="lastSearchLocation">未実行</span>
+                    </div>
+
+                    <div class="score-row">
+                        <span>候補選定</span>
+                        <span id="candidateReason">未実行</span>
                     </div>
 
                     <div class="score-row">

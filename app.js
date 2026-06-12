@@ -1419,6 +1419,14 @@ async function searchFromCurrentLocation() {
         return;
     }
 
+    const autoCompareCheckbox =
+        document.getElementById("autoCompareEnabled");
+
+    if (autoCompareCheckbox) {
+        autoCompareCheckbox.checked = false;
+    }
+
+
     try {
 
         document
@@ -2635,6 +2643,8 @@ async function searchAutoExitIcComparison() {
         alert("目的地を入力してください");
         return;
     }
+
+    await searchFromCurrentLocation();
 
     let icArea =
         document

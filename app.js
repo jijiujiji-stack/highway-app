@@ -911,7 +911,8 @@ async function getLocalRoute(
 
 function displayRouteComparison(
     highway,
-    local
+    local,
+    suppressDashboardSummary = false
 ) {
 
     const highwayMinutes =
@@ -1086,45 +1087,8 @@ function displayRouteComparison(
         .textContent =
         valueJudge;
 
-    const dashboardValueJudge =
-        document.getElementById("dashboardValueJudge");
-
-    dashboardValueJudge.textContent =
-        valueJudge;
-
-    dashboardValueJudge.className = "";
-
-    if (valueJudge === "超お得") {
-        dashboardValueJudge.classList.add("value-super");
-    }
-    else if (valueJudge === "かなりお得") {
-        dashboardValueJudge.classList.add("value-good");
-    }
-    else if (valueJudge === "普通") {
-        dashboardValueJudge.classList.add("value-normal");
-    }
-    else if (valueJudge === "少し高い") {
-        dashboardValueJudge.classList.add("value-expensive");
-    }
-    else {
-        dashboardValueJudge.classList.add("value-high");
-    }
 
 
-    document
-        .getElementById("dashboardStars")
-        .textContent =
-        stars;
-
-    document
-        .getElementById("dashboardEfficiency")
-        .textContent =
-        efficiencyRate;
-
-    document
-        .getElementById("dashboardCost")
-        .textContent =
-        costPerMinute + "円/分";
 
     document
         .getElementById("dashboardHighway")
@@ -1145,11 +1109,15 @@ function displayRouteComparison(
         localMinutes
     );
 
-    updateRouteModeJudge(
-        highwayMinutes,
-        localMinutes
-    );
+    document
+        .getElementById("dashboardEfficiency")
+        .textContent =
+        efficiencyRate;
 
+    document
+        .getElementById("dashboardCost")
+        .textContent =
+        costPerMinute + "円/分";
 
     document
         .getElementById("dashboardHighwayDetail")
@@ -1168,83 +1136,155 @@ function displayRouteComparison(
         "km";
 
 
+    if (!suppressDashboardSummary) {
 
-    let recommendation =
-        "どちらでも可";
+        const dashboardValueJudge =
+            document.getElementById(
+                "dashboardValueJudge"
+            );
 
-    if (efficiencyRate >= 2.5) {
+        dashboardValueJudge.textContent =
+            valueJudge;
 
-        recommendation =
-            "高速推奨";
+        dashboardValueJudge.className = "";
 
-    }
-    else if (efficiencyRate < 1.5) {
+        if (valueJudge === "超お得") {
 
-        recommendation =
-            "下道推奨";
+            dashboardValueJudge.classList.add(
+                "value-super"
+            );
 
-    }
+        }
+        else if (
+            valueJudge === "かなりお得"
+        ) {
 
-    const dashboardRecommendationElement =
-        document.getElementById(
-            "dashboardRecommendation"
-        );
+            dashboardValueJudge.classList.add(
+                "value-good"
+            );
 
-    if (
-        lastRecommendationText &&
-        lastRecommendationText !== recommendation
-    ) {
-        blinkElementById(
-            "dashboardRecommendation",
-            "recommendation-blink"
-        );
-    }
+        }
+        else if (
+            valueJudge === "普通"
+        ) {
 
-    dashboardRecommendationElement.textContent =
-        recommendation;
+            dashboardValueJudge.classList.add(
+                "value-normal"
+            );
 
-    lastRecommendationText =
-        recommendation;
+        }
+        else if (
+            valueJudge === "少し高い"
+        ) {
 
+            dashboardValueJudge.classList.add(
+                "value-expensive"
+            );
 
-    const dashboardCard =
-        document.querySelector(".dashboard-card");
+        }
+        else {
 
-    dashboardCard.classList.remove(
-        "recommend-highway",
-        "recommend-neutral",
-        "recommend-local"
-    );
+            dashboardValueJudge.classList.add(
+                "value-high"
+            );
 
-    if (recommendation === "高速推奨") {
+        }
 
-        dashboardCard.classList.add(
-            "recommend-highway"
-        );
+        document
+            .getElementById(
+                "dashboardStars"
+            )
+            .textContent =
+            stars;
 
-    }
-    else if (recommendation === "下道推奨") {
+        let recommendation =
+            "どちらでも可";
 
-        dashboardCard.classList.add(
+        if (efficiencyRate >= 2.5) {
+
+            recommendation =
+                "高速推奨";
+
+        }
+        else if (
+            efficiencyRate < 1.5
+        ) {
+
+            recommendation =
+                "下道推奨";
+
+        }
+
+        const dashboardRecommendationElement =
+            document.getElementById(
+                "dashboardRecommendation"
+            );
+
+        if (
+            lastRecommendationText &&
+            lastRecommendationText !== recommendation
+        ) {
+
+            blinkElementById(
+                "dashboardRecommendation",
+                "recommendation-blink"
+            );
+
+        }
+
+        dashboardRecommendationElement.textContent =
+            recommendation;
+
+        lastRecommendationText =
+            recommendation;
+
+        const dashboardCard =
+            document.querySelector(
+                ".dashboard-card"
+            );
+
+        dashboardCard.classList.remove(
+            "recommend-highway",
+            "recommend-neutral",
             "recommend-local"
         );
 
+        if (
+            recommendation ===
+            "高速推奨"
+        ) {
+
+            dashboardCard.classList.add(
+                "recommend-highway"
+            );
+
+        }
+        else if (
+            recommendation ===
+            "下道推奨"
+        ) {
+
+            dashboardCard.classList.add(
+                "recommend-local"
+            );
+
+        }
+        else {
+
+            dashboardCard.classList.add(
+                "recommend-neutral"
+            );
+
+        }
+
+        document
+            .getElementById(
+                "dashboardReason"
+            )
+            .textContent =
+            reasonText;
+
     }
-    else {
-
-        dashboardCard.classList.add(
-            "recommend-neutral"
-        );
-
-    }
-
-    document
-        .getElementById(
-            "dashboardReason"
-        )
-        .textContent =
-        reasonText;
-
 
 }
 
@@ -1389,7 +1429,8 @@ function startGpsUpdate() {
 
 
 async function searchFromCurrentLocation(
-    shouldClosePanel = true
+    shouldClosePanel = true,
+    suppressDashboardSummary = false
 ) {
 
     if (
@@ -1464,7 +1505,8 @@ async function searchFromCurrentLocation(
 
         displayRouteComparison(
             highwayRoute,
-            localRoute
+            localRoute,
+            suppressDashboardSummary
         );
 
         lastSearchLatitude =
@@ -2470,6 +2512,45 @@ function displayMultiExitIcComparison(
         .textContent =
         getExitIcJudge(best.score);
 
+    const dashboardValueJudge =
+        document.getElementById("dashboardValueJudge");
+
+    dashboardValueJudge.className = "";
+
+    if (best.score >= 300) {
+        dashboardValueJudge.classList.add("value-super");
+    }
+    else if (best.score >= 200) {
+        dashboardValueJudge.classList.add("value-good");
+    }
+    else if (best.score >= 100) {
+        dashboardValueJudge.classList.add("value-normal");
+    }
+    else if (best.score >= 50) {
+        dashboardValueJudge.classList.add("value-expensive");
+    }
+    else {
+        dashboardValueJudge.classList.add("value-high");
+    }
+
+
+    const dashboardCard =
+        document.querySelector(".dashboard-card");
+
+    dashboardCard.classList.remove(
+        "recommend-highway",
+        "recommend-neutral",
+        "recommend-local"
+    );
+
+    if (acceptableResults.length > 0) {
+        dashboardCard.classList.add("recommend-highway");
+    }
+    else {
+        dashboardCard.classList.add("recommend-local");
+    }
+
+
     document
         .getElementById("dashboardCost")
         .textContent =
@@ -2705,7 +2786,7 @@ async function searchAutoExitIcComparison(
         return;
     }
 
-    await searchFromCurrentLocation(false);
+    await searchFromCurrentLocation(false, true);
 
     let icArea =
         document

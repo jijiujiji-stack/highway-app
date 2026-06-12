@@ -568,6 +568,8 @@ let lastGpsReceivedTime = null;
 let gpsErrorBlinkShown = false;
 
 let lastRecommendationText = "";
+let lastIcAreaDecisionType = "";
+
 
 
 
@@ -592,6 +594,68 @@ window.addEventListener("load", () => {
             "click",
             searchFromCurrentLocation
         );
+
+
+    const destinationInput =
+        document.getElementById("destination");
+
+    const clearDestinationButton =
+        document.getElementById("clearDestination");
+
+    const originInput =
+        document.getElementById("origin");
+
+    const clearOriginButton =
+        document.getElementById("clearOrigin");
+
+    destinationInput.addEventListener(
+        "input",
+        function () {
+
+            clearDestinationButton.style.display =
+                this.value.trim()
+                    ? "block"
+                    : "none";
+        }
+    );
+
+    originInput.addEventListener(
+        "input",
+        function () {
+
+            clearOriginButton.style.display =
+                this.value.trim()
+                    ? "block"
+                    : "none";
+        }
+    );
+
+    clearDestinationButton.addEventListener(
+        "click",
+        function () {
+
+            destinationInput.value = "";
+
+            this.style.display = "none";
+
+            destinationInput.focus();
+        }
+    );
+
+    clearOriginButton.addEventListener(
+        "click",
+        function () {
+
+            originInput.value = "";
+
+            this.style.display = "none";
+
+            originInput.focus();
+
+            updateAutoCompareToggleState();
+        }
+    );
+
 
 
     document
@@ -1114,10 +1178,14 @@ function displayRouteComparison(
         .textContent =
         efficiencyRate;
 
-    document
-        .getElementById("dashboardCost")
-        .textContent =
-        costPerMinute + "円/分";
+    if (!suppressDashboardSummary) {
+
+        document
+            .getElementById("dashboardCost")
+            .textContent =
+            costPerMinute + "円/分";
+
+    }
 
     document
         .getElementById("dashboardHighwayDetail")
@@ -2472,6 +2540,9 @@ function displayMultiExitIcComparison(
             "±0分";
     }
 
+    const bestTotalTimeText =
+        formatMinutes(best.totalMinutes);
+
 
     document
         .getElementById("dashboardRecommendation")
@@ -2483,13 +2554,34 @@ function displayMultiExitIcComparison(
         ) +
         getIcDisplayName(best.exitIc);
 
+    let arrivalClass = "arrival-normal";
+
+    if (best.difference <= 0) {
+        arrivalClass = "arrival-good";
+    }
+    else if (best.difference > acceptableDelay) {
+        arrivalClass = "arrival-bad";
+    }
+
     let dashboardReasonText =
+        "<div class='" +
+        arrivalClass +
+        "'>" +
+        "⏱ 到着 " +
+        bestTotalTimeText +
+        "</div>" +
+
+        "<div class='arrival-diff'>" +
+        "差 " +
+        bestShortDifferenceText +
+        "</div>" +
+
+        "<div>" +
         "💰 約" +
         best.savedToll.toLocaleString() +
         "円節約" +
-        "<br>" +
-        "⏱ " +
-        bestShortDifferenceText;
+        "</div>";
+
 
     if (acceptableResults.length === 0) {
         dashboardReasonText +=
@@ -2566,12 +2658,16 @@ function displayMultiExitIcComparison(
         getExitIcStars(best.score) +
         "</div>" +
         "<div class='multi-best-main-reason'>" +
+        "⏱ 到着 " +
+        bestTotalTimeText +
+        "</div>" +
+        "<div class='multi-best-main-reason'>" +
         "💰 約" +
         best.savedToll.toLocaleString() +
         "円節約" +
         "</div>" +
         "<div class='multi-best-main-reason'>" +
-        "⏱ " +
+        "差 " +
         bestShortDifferenceText +
         "</div>" +
 
@@ -2687,39 +2783,43 @@ function displayMultiExitIcComparison(
 
     function getExitIcStars(score) {
 
-        if (score >= 300) {
+        if (score >= 999999) {
             return "★★★★★";
         }
-        else if (score >= 200) {
+        else if (score >= 300) {
             return "★★★★☆";
         }
-        else if (score >= 100) {
+        else if (score >= 200) {
             return "★★★☆☆";
         }
-        else if (score >= 50) {
+        else if (score >= 100) {
             return "★★☆☆☆";
         }
+        else if (score >= 50) {
+            return "★☆☆☆☆";
+        }
 
-        return "★☆☆☆☆";
+        return "☆☆☆☆☆";
     }
 
     function getExitIcJudge(score) {
 
         if (score >= 300) {
-            return "かなり有力";
+            return "降りる価値大";
         }
         else if (score >= 200) {
-            return "有力";
+            return "降りる価値あり";
         }
         else if (score >= 100) {
-            return "検討あり";
+            return "状況次第";
         }
         else if (score >= 50) {
-            return "メリット小";
+            return "高速継続でもOK";
         }
 
-        return "高速継続推奨";
+        return "降りない方が良い";
     }
+
 
     function getRankLabel(index) {
 
@@ -2800,7 +2900,7 @@ async function searchAutoExitIcComparison(
 
 
     const suggestedIcArea =
-        suggestIcArea(origin, destination);
+        await suggestIcArea(origin, destination);
 
     const icAreaReason =
         document.getElementById("icAreaReason");
@@ -2813,10 +2913,27 @@ async function searchAutoExitIcComparison(
             .value =
             suggestedIcArea;
 
-        icAreaReason.textContent =
-            "目的地から " +
-            IC_MASTER[suggestedIcArea].label +
-            " と判断";
+        if (
+            lastIcAreaDecisionType ===
+            "keyword"
+        ) {
+
+            icAreaReason.innerHTML =
+                "<span style='color:#4CAF50'>" +
+                "方面判定：" +
+                IC_MASTER[suggestedIcArea].label +
+                "（キーワード判定）" +
+                "</span>";
+        }
+        else {
+
+            icAreaReason.innerHTML =
+                "<span style='color:#4DA3FF'>" +
+                "方面判定：" +
+                IC_MASTER[suggestedIcArea].label +
+                "（方角推定・首都圏向け）" +
+                "</span>";
+        }
     }
     else {
         icAreaReason.textContent =
@@ -3051,143 +3168,88 @@ function findNearbyInterchanges() {
     );
 }
 
-function suggestIcArea(origin, destination) {
+async function suggestIcArea(origin, destination) {
+
+
 
     const searchText =
         (origin || "") +
         " " +
         (destination || "");
 
-
     if (!destination) {
         return null;
     }
 
-    if (
-        searchText.includes("船橋") ||
-        searchText.includes("幕張") ||
-        searchText.includes("稲毛") ||
-        searchText.includes("千葉市") ||
-        searchText.includes("蘇我") ||
-        searchText.includes("市川") ||
-        searchText.includes("原木") ||
-        searchText.includes("習志野")
-    ) {
-        return "keiyo";
+    const areaKeywords = {
+        keiyo: [
+            "船橋", "幕張", "幕張メッセ", "稲毛", "千葉市",
+            "蘇我", "市川", "原木", "習志野", "津田沼",
+            "船橋市", "市川市", "浦安", "舞浜", "ディズニー"
+        ],
+
+        tokan: [
+            "成田", "成田空港", "佐倉", "酒々井", "富里",
+            "八街", "香取", "佐原", "潮来", "鹿嶋", "鹿島",
+            "銚子", "旭", "匝瑳", "東金", "九十九里"
+        ],
+
+        tateyama: [
+            "館山", "南房総", "富浦", "鋸南", "保田",
+            "富津", "君津", "木更津", "鴨川", "勝浦",
+            "御宿", "大多喜", "いすみ", "養老渓谷",
+            "マザー牧場", "東京ドイツ村", "鴨川シーワールド"
+        ],
+
+        aqualine: [
+            "アクアライン", "海ほたる", "木更津金田",
+            "三井アウトレットパーク木更津", "アウトレット木更津",
+            "袖ケ浦", "袖ヶ浦"
+        ],
+
+        joban: [
+            "ハワイアンズ", "いわき", "水戸", "日立",
+            "三郷", "流山", "柏", "守谷", "谷和原",
+            "谷田部", "つくば", "筑波", "筑波山",
+            "土浦", "石岡", "千代田石岡", "笠間", "岩間"
+        ],
+
+        tohoku: [
+            "日光", "宇都宮", "那須", "福島", "郡山",
+            "白河", "佐野", "栃木"
+        ],
+
+        kanetsu: [
+            "軽井沢", "高崎", "前橋", "草津", "川越",
+            "所沢", "秩父", "長瀞", "水上", "沼田"
+        ],
+
+        chuo: [
+            "河口湖", "山梨", "甲府", "八王子", "相模湖",
+            "大月", "富士急", "富士山", "清里"
+        ],
+
+        tomei: [
+            "御殿場", "箱根", "沼津", "静岡", "厚木",
+            "海老名", "小田原", "熱海", "伊豆"
+        ]
+    };
+
+    for (const areaKey in areaKeywords) {
+
+        if (
+            areaKeywords[areaKey].some(keyword =>
+                searchText.includes(keyword)
+            )
+        ) {
+            lastIcAreaDecisionType =
+                "keyword";
+
+            return areaKey;
+        }
     }
 
-
-    if (
-        searchText.includes("成田") ||
-        searchText.includes("佐倉") ||
-        searchText.includes("酒々井") ||
-        searchText.includes("富里") ||
-        searchText.includes("八街") ||
-        searchText.includes("香取") ||
-        searchText.includes("佐原") ||
-        searchText.includes("潮来") ||
-        searchText.includes("鹿嶋") ||
-        searchText.includes("鹿島")
-    ) {
-        return "tokan";
-    }
-
-
-    if (
-        searchText.includes("ハワイアンズ") ||
-        searchText.includes("いわき") ||
-        searchText.includes("水戸") ||
-        searchText.includes("日立") ||
-        searchText.includes("三郷") ||
-        searchText.includes("流山") ||
-        searchText.includes("柏") ||
-        searchText.includes("守谷") ||
-        searchText.includes("谷和原") ||
-        searchText.includes("谷田部") ||
-        searchText.includes("つくば") ||
-        searchText.includes("筑波") ||
-        searchText.includes("筑波山") ||
-        searchText.includes("土浦") ||
-        searchText.includes("石岡") ||
-        searchText.includes("千代田石岡") ||
-        searchText.includes("笠間") ||
-        searchText.includes("岩間")
-    ) {
-        return "joban";
-    }
-
-
-    if (
-        searchText.includes("日光") ||
-        searchText.includes("宇都宮") ||
-        searchText.includes("那須") ||
-        searchText.includes("福島")
-    ) {
-        return "tohoku";
-    }
-
-    if (
-        searchText.includes("軽井沢") ||
-        searchText.includes("高崎") ||
-        searchText.includes("前橋") ||
-        searchText.includes("草津")
-    ) {
-        return "kanetsu";
-    }
-
-    if (
-        searchText.includes("河口湖") ||
-        searchText.includes("山梨") ||
-        searchText.includes("甲府") ||
-        searchText.includes("八王子")
-    ) {
-        return "chuo";
-    }
-
-    if (
-        searchText.includes("御殿場") ||
-        searchText.includes("箱根") ||
-        searchText.includes("沼津") ||
-        searchText.includes("静岡")
-    ) {
-        return "tomei";
-    }
-
-
-    if (
-        searchText.includes("館山") ||
-        searchText.includes("南房総") ||
-        searchText.includes("富浦") ||
-        searchText.includes("鋸南") ||
-        searchText.includes("保田") ||
-        searchText.includes("富津") ||
-        searchText.includes("竹岡") ||
-        searchText.includes("君津") ||
-        searchText.includes("木更津南") ||
-        searchText.includes("木更津北") ||
-        searchText.includes("マザー牧場") ||
-        searchText.includes("東京ドイツ村")
-    ) {
-        return "tateyama";
-    }
-
-
-
-    if (
-        searchText.includes("アクアライン") ||
-        searchText.includes("海ほたる") ||
-        searchText.includes("木更津金田") ||
-        searchText.includes("三井アウトレットパーク木更津") ||
-        searchText.includes("アウトレット木更津") ||
-        searchText.includes("袖ケ浦") ||
-        searchText.includes("袖ヶ浦")
-    ) {
-        return "aqualine";
-    }
-
-
-
-    return null;
+    return await suggestIcAreaByDirection(destination);
 }
 
 function getIcDisplayName(googleName) {
@@ -3633,4 +3695,140 @@ function updateRouteModeJudge(
         routeModeJudge.textContent = "中立";
         routeModeJudge.classList.add("route-mode-neutral");
     }
+}
+
+function getLatLngFromAddress(address) {
+
+    return new Promise((resolve) => {
+
+        const geocoder =
+            new google.maps.Geocoder();
+
+        geocoder.geocode(
+            { address: address },
+            (results, status) => {
+
+                if (
+                    status === "OK" &&
+                    results &&
+                    results.length > 0
+                ) {
+                    const location =
+                        results[0].geometry.location;
+
+                    resolve({
+                        lat: location.lat(),
+                        lng: location.lng()
+                    });
+
+                    return;
+                }
+
+                resolve(null);
+            }
+        );
+    });
+}
+
+function calculateBearing(lat1, lng1, lat2, lng2) {
+
+    const toRad = deg => deg * Math.PI / 180;
+    const toDeg = rad => rad * 180 / Math.PI;
+
+    const y =
+        Math.sin(toRad(lng2 - lng1)) *
+        Math.cos(toRad(lat2));
+
+    const x =
+        Math.cos(toRad(lat1)) *
+        Math.sin(toRad(lat2)) -
+        Math.sin(toRad(lat1)) *
+        Math.cos(toRad(lat2)) *
+        Math.cos(toRad(lng2 - lng1));
+
+    return (
+        toDeg(Math.atan2(y, x)) +
+        360
+    ) % 360;
+}
+
+async function suggestIcAreaByDirection(destination) {
+
+    if (
+        currentLatitude === null ||
+        currentLongitude === null
+    ) {
+        return null;
+    }
+
+    const destinationLatLng =
+        await getLatLngFromAddress(destination);
+
+    if (!destinationLatLng) {
+        return null;
+    }
+
+    const bearing =
+        calculateBearing(
+            currentLatitude,
+            currentLongitude,
+            destinationLatLng.lat,
+            destinationLatLng.lng
+        );
+
+    console.log(
+        "目的地方角",
+        Math.round(bearing),
+        "度"
+    );
+
+    if (bearing >= 20 && bearing < 70) {
+
+        lastIcAreaDecisionType =
+            "direction";
+
+        return "joban";
+    }
+
+    if (bearing >= 70 && bearing < 120) {
+
+        lastIcAreaDecisionType =
+            "direction";
+
+        return "tokan";
+    }
+
+    if (bearing >= 120 && bearing < 180) {
+
+        lastIcAreaDecisionType =
+            "direction";
+
+        return "tateyama";
+    }
+
+    if (bearing >= 180 && bearing < 235) {
+
+        lastIcAreaDecisionType =
+            "direction";
+
+        return "tomei";
+    }
+
+    if (bearing >= 235 && bearing < 285) {
+
+        lastIcAreaDecisionType =
+            "direction";
+
+        return "chuo";
+    }
+
+    if (bearing >= 285 && bearing < 335) {
+
+        lastIcAreaDecisionType =
+            "direction";
+
+        return "kanetsu";
+    }
+
+    return "tohoku";
 }

@@ -717,3 +717,111 @@ details#searchPanel .auto-compare-toggle input {
 .dashboard-card {
     overflow: hidden;
 }
+
+
+.arrival-good {
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+.arrival-normal {
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.arrival-bad {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.arrival-good,
+.arrival-normal,
+.arrival-bad {
+
+    font-size: 1.8em;
+
+    font-weight: bold;
+
+    line-height: 1.1;
+
+    margin-bottom: 2px;
+}
+
+.arrival-diff {
+
+    font-size: 0.85em;
+
+    opacity: 0.85;
+
+    margin-bottom: 4px;
+}
+
+.destination-wrapper {
+
+    position: relative;
+}
+
+.destination-wrapper input {
+
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.clear-button {
+
+    position: absolute;
+
+    right: 10px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    border: none;
+
+    background: transparent;
+
+    font-size: 22px;
+
+    color: #999;
+
+    cursor: pointer;
+
+    display: none;
+
+    padding: 0 8px;
+}
+
+.clear-button:hover {
+
+    color: #ff6666;
+}
+
+
+details#searchPanel .clear-button {
+    display: none;
+    width: auto;
+    margin: 0;
+    padding: 0 8px;
+
+    position: absolute;
+    right: 10px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    background: transparent;
+    border: none;
+
+    color: #999;
+    font-size: 22px;
+    line-height: 1;
+
+    z-index: 2;
+}
+
+.origin-wrapper {
+
+    position: relative;
+
+    flex: 1;
+}

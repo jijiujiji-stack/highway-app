@@ -171,17 +171,36 @@
                 </label>
 
                 <div class="origin-row">
-                    <input type="text" id="origin" placeholder="例：東京都荒川区">
+
+                    <div class="origin-wrapper">
+
+                        <input type="text" id="origin" placeholder="例：東京都荒川区">
+
+                        <button id="clearOrigin" class="clear-button" type="button">
+                            ×
+                        </button>
+
+                    </div>
 
                     <button id="searchButton" class="small-button">
                         検索
                     </button>
+
                 </div>
 
                 <label for="destination">
                     目的地
                 </label>
-                <input type="text" id="destination" placeholder="例：スパリゾートハワイアンズ">
+
+                <div class="destination-wrapper">
+
+                    <input type="text" id="destination" placeholder="例：スパリゾートハワイアンズ">
+
+                    <button id="clearDestination" class="clear-button" type="button">
+                        ×
+                    </button>
+
+                </div>
 
 
                 <button id="gpsSearchButton">

@@ -540,9 +540,6 @@ details#searchPanel .auto-compare-toggle input {
     line-height: 1.4;
 }
 
-.main-status-grid {
-    grid-template-columns: 1fr 1fr 1fr;
-}
 
 
 .debug-info {
@@ -631,4 +628,56 @@ details#searchPanel .auto-compare-toggle input {
     padding: 8px 10px;
     font-size: 16px;
     border-radius: 8px;
+}
+
+.location-normal {
+    color: white !important;
+}
+
+.location-warning {
+    color: #f1c40f !important;
+    font-weight: bold;
+}
+
+.location-error {
+    color: #e74c3c !important;
+    font-weight: bold;
+}
+
+.data-update-normal {
+    color: white !important;
+}
+
+.data-update-working {
+    color: #f1c40f !important;
+    font-weight: bold;
+}
+
+.data-update-error {
+    color: #e74c3c !important;
+    font-weight: bold;
+}
+
+.main-status-grid {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+.route-mode-highway {
+    color: #3498db !important;
+    font-weight: bold;
+}
+
+.route-mode-local {
+    color: white !important;
+    font-weight: bold;
+}
+
+.route-mode-neutral {
+    color: #f1c40f !important;
+    font-weight: bold;
+}
+
+.route-mode-unknown {
+    color: #aaa !important;
+    font-weight: bold;
 }

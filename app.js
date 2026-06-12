@@ -1145,6 +1145,11 @@ function displayRouteComparison(
         localMinutes
     );
 
+    updateRouteModeJudge(
+        highwayMinutes,
+        localMinutes
+    );
+
 
     document
         .getElementById("dashboardHighwayDetail")
@@ -1283,12 +1288,9 @@ async function getCurrentLocation() {
                     lng
                 );
 
-            document
-                .getElementById(
-                    "currentLocation"
-                )
-                .textContent =
-                shortenLocationName(locationName);
+            setCurrentLocationText(
+                shortenLocationName(locationName)
+            );
 
             const now =
                 new Date();
@@ -1308,12 +1310,7 @@ async function getCurrentLocation() {
 
             console.error(error);
 
-            document
-                .getElementById(
-                    "currentLocation"
-                )
-                .textContent =
-                "取得失敗";
+            setCurrentLocationText("取得失敗");
 
         }
 
@@ -1501,11 +1498,10 @@ async function searchFromCurrentLocation() {
 
         console.error(error);
 
-        alert(
-            "GPSルート検索失敗\n\n" +
-            error.message
+        setDataUpdateStatus(
+            "更新失敗",
+            "data-update-error"
         );
-
 
 
 
@@ -1818,14 +1814,14 @@ function checkAutoReSearch() {
             180 - Math.round(elapsedSeconds)
         );
 
-    document
-        .getElementById("nextUpdateInfo")
-        .textContent =
+    setDataUpdateStatus(
         "あと" +
         remainingDistance +
         "m または " +
         remainingSeconds +
-        "秒";
+        "秒",
+        "data-update-normal"
+    );
 
     document
         .getElementById("autoSearchCondition")
@@ -1855,6 +1851,11 @@ function checkAutoReSearch() {
 
         console.log(
             "自動再検索実行"
+        );
+
+        setDataUpdateStatus(
+            "更新中...",
+            "data-update-working"
         );
 
         if (
@@ -2270,6 +2271,11 @@ async function searchMultiExitIcComparison() {
     } catch (error) {
 
         console.error(error);
+
+        setDataUpdateStatus(
+            "更新失敗",
+            "data-update-error"
+        );
 
         alert(
             "複数IC比較に失敗しました\n\n" +
@@ -3393,5 +3399,100 @@ function updateDashboardTimeColors(
     else {
         highwayElement.classList.add("time-neutral");
         localElement.classList.add("time-neutral");
+    }
+}
+
+function setCurrentLocationText(text) {
+
+    const currentLocation =
+        document.getElementById("currentLocation");
+
+    if (!currentLocation) {
+        return;
+    }
+
+    currentLocation.textContent = text;
+
+    currentLocation.classList.remove(
+        "location-normal",
+        "location-warning",
+        "location-error"
+    );
+
+    if (
+        text === "位置不明" ||
+        text === "取得失敗"
+    ) {
+        currentLocation.classList.add("location-error");
+    }
+    else if (
+        text === "取得中..." ||
+        text === "GPS待機中"
+    ) {
+        currentLocation.classList.add("location-warning");
+    }
+    else {
+        currentLocation.classList.add("location-normal");
+    }
+}
+
+function setDataUpdateStatus(text, statusClass) {
+
+    const nextUpdateInfo =
+        document.getElementById("nextUpdateInfo");
+
+    if (!nextUpdateInfo) {
+        return;
+    }
+
+    nextUpdateInfo.textContent = text;
+
+    nextUpdateInfo.classList.remove(
+        "data-update-normal",
+        "data-update-working",
+        "data-update-error"
+    );
+
+    nextUpdateInfo.classList.add(statusClass);
+}
+
+
+function updateRouteModeJudge(
+    highwayMinutes,
+    localMinutes
+) {
+    const routeModeJudge =
+        document.getElementById("routeModeJudge");
+
+    if (!routeModeJudge) {
+        return;
+    }
+
+    routeModeJudge.classList.remove(
+        "route-mode-highway",
+        "route-mode-local",
+        "route-mode-neutral",
+        "route-mode-unknown"
+    );
+
+    const acceptableDelay =
+        Number(
+            document.getElementById("acceptableDelay")?.value
+        ) || 30;
+
+    const difference =
+        localMinutes - highwayMinutes;
+
+    if (difference >= acceptableDelay * 2) {
+        routeModeJudge.textContent = "高速前提";
+        routeModeJudge.classList.add("route-mode-highway");
+    }
+    else if (difference < acceptableDelay) {
+        routeModeJudge.textContent = "下道前提";
+        routeModeJudge.classList.add("route-mode-local");
+    }
+    else {
+        routeModeJudge.textContent = "中立";
+        routeModeJudge.classList.add("route-mode-neutral");
     }
 }

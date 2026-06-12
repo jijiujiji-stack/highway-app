@@ -638,6 +638,15 @@ window.addEventListener("load", () => {
 
             this.style.display = "none";
 
+            resetAutoUpdateState();
+
+            const autoCompareCheckbox =
+                document.getElementById("autoCompareEnabled");
+
+            if (autoCompareCheckbox) {
+                autoCompareCheckbox.checked = false;
+            }
+
             destinationInput.focus();
         }
     );
@@ -650,12 +659,13 @@ window.addEventListener("load", () => {
 
             this.style.display = "none";
 
+            resetAutoUpdateState();
+
             originInput.focus();
 
             updateAutoCompareToggleState();
         }
     );
-
 
 
     document
@@ -2899,47 +2909,60 @@ async function searchAutoExitIcComparison(
             .value;
 
 
-    const suggestedIcArea =
-        await suggestIcArea(origin, destination);
+    const autoIcAreaEnabled =
+        document.getElementById("autoIcAreaEnabled")?.checked;
 
     const icAreaReason =
         document.getElementById("icAreaReason");
 
-    if (suggestedIcArea) {
-        icArea = suggestedIcArea;
+    if (autoIcAreaEnabled) {
 
-        document
-            .getElementById("icArea")
-            .value =
-            suggestedIcArea;
+        const suggestedIcArea =
+            await suggestIcArea(origin, destination);
 
-        if (
-            lastIcAreaDecisionType ===
-            "keyword"
-        ) {
+        if (suggestedIcArea) {
 
-            icAreaReason.innerHTML =
-                "<span style='color:#4CAF50'>" +
-                "方面判定：" +
-                IC_MASTER[suggestedIcArea].label +
-                "（キーワード判定）" +
-                "</span>";
+            icArea = suggestedIcArea;
+
+            document
+                .getElementById("icArea")
+                .value =
+                suggestedIcArea;
+
+            if (lastIcAreaDecisionType === "keyword") {
+
+                icAreaReason.innerHTML =
+                    "<span style='color:#4CAF50'>" +
+                    "方面判定：" +
+                    IC_MASTER[suggestedIcArea].label +
+                    "（キーワード判定）" +
+                    "</span>";
+            }
+            else {
+
+                icAreaReason.innerHTML =
+                    "<span style='color:#4DA3FF'>" +
+                    "方面判定：" +
+                    IC_MASTER[suggestedIcArea].label +
+                    "（方角推定・首都圏向け）" +
+                    "</span>";
+            }
         }
         else {
-
-            icAreaReason.innerHTML =
-                "<span style='color:#4DA3FF'>" +
-                "方面判定：" +
-                IC_MASTER[suggestedIcArea].label +
-                "（方角推定・首都圏向け）" +
-                "</span>";
+            icAreaReason.textContent =
+                "方面判定：未判定";
         }
+
     }
     else {
-        icAreaReason.textContent =
-            "方面：手動選択";
-    }
 
+        icAreaReason.innerHTML =
+            "<span style='color:#f1c40f'>" +
+            "方面判定：手動選択を使用（" +
+            IC_MASTER[icArea].label +
+            "）" +
+            "</span>";
+    }
 
     const startIndex =
         getCandidateStartIndex(origin, icArea);
@@ -3831,4 +3854,22 @@ async function suggestIcAreaByDirection(destination) {
     }
 
     return "tohoku";
+}
+
+function resetAutoUpdateState() {
+
+    lastSearchLatitude = null;
+    lastSearchLongitude = null;
+    lastSearchTime = null;
+    lastSearchLocationName = "";
+
+    document
+        .getElementById("nextUpdateInfo")
+        .textContent =
+        "比較後に表示";
+
+    document
+        .getElementById("autoSearchCondition")
+        .textContent =
+        "未判定";
 }

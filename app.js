@@ -1864,10 +1864,14 @@ function checkAutoReSearch() {
 
     }
 
+    const displayDistanceText =
+        remainingDistance >= 1000
+            ? (remainingDistance / 1000).toFixed(1) + "km"
+            : remainingDistance + "m";
+
     setDataUpdateStatus(
-        "あと" +
-        remainingDistance +
-        "m または " +
+        displayDistanceText +
+        " / " +
         displayTimeText,
         "data-update-normal"
     );
@@ -2844,7 +2848,7 @@ async function searchAutoExitIcComparison(
     document
         .getElementById("nextUpdateInfo")
         .textContent =
-        "あと2000m または 3分";
+        "2.0km / 3分";
 
     blinkElementById(
         "nextUpdateInfo",

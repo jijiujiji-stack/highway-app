@@ -694,3 +694,26 @@ details#searchPanel .auto-compare-toggle input {
     line-height: 1.2;
 
 }
+
+
+#dashboardStars {
+    min-height: 48px;
+}
+
+#dashboardRecommendation {
+    min-height: 38px;
+    line-height: 1.2;
+}
+
+#dashboardReason {
+    min-height: 44px;
+    line-height: 1.35;
+}
+
+#dashboardValueJudge {
+    min-height: 26px;
+}
+
+.dashboard-card {
+    overflow: hidden;
+}

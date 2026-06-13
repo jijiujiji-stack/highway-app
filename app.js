@@ -2023,7 +2023,7 @@ function checkAutoReSearch() {
             searchAutoExitIcComparison(false);
         }
         else {
-            searchFromCurrentLocation();
+            searchFromCurrentLocation(false);
         }
     }
 }

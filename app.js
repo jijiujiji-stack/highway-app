@@ -3035,7 +3035,7 @@ async function searchAutoExitIcComparison(
     document
         .getElementById("nextUpdateInfo")
         .textContent =
-        "2.0km / 3分";
+        "2.0km / 3:00";
 
     blinkElementById(
         "nextUpdateInfo",

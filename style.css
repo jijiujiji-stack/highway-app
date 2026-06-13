@@ -825,3 +825,41 @@ details#searchPanel .clear-button {
 
     flex: 1;
 }
+
+details#searchPanel .destination-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+details#searchPanel .destination-wrapper {
+    position: relative;
+    flex: 1;
+}
+
+details#searchPanel .destination-row input {
+    width: 100%;
+}
+
+details#searchPanel .destination-row button.small-button {
+    width: auto;
+    margin: 0;
+    padding: 10px 14px;
+    white-space: nowrap;
+}
+
+
+
+
+details#searchPanel .origin-wrapper {
+    position: relative;
+    flex: 1;
+}
+
+details#searchPanel .origin-row input {
+    width: 100%;
+}
+
+.active-search {
+    background: #27ae60 !important;
+}

@@ -152,51 +152,33 @@ const IC_MASTER = {
     tohoku: {
         label: "東北道方面",
         exits: [
-            {
-                order: 1,
-                displayName: "浦和IC",
-                googleName: "東北自動車道 浦和インターチェンジ"
-            },
-            {
-                order: 2,
-                displayName: "岩槻IC",
-                googleName: "東北自動車道 岩槻インターチェンジ"
-            },
-            {
-                order: 3,
-                displayName: "蓮田SIC",
-                googleName: "東北自動車道 蓮田スマートインターチェンジ"
-            },
-            {
-                order: 4,
-                displayName: "久喜IC",
-                googleName: "東北自動車道 久喜インターチェンジ"
-            }
+            { order: 1, displayName: "浦和IC", googleName: "東北自動車道 浦和インターチェンジ" },
+            { order: 2, displayName: "岩槻IC", googleName: "東北自動車道 岩槻インターチェンジ" },
+            { order: 3, displayName: "蓮田SIC", googleName: "東北自動車道 蓮田スマートインターチェンジ" },
+            { order: 4, displayName: "久喜IC", googleName: "東北自動車道 久喜インターチェンジ" },
+            { order: 5, displayName: "加須IC", googleName: "東北自動車道 加須インターチェンジ" },
+            { order: 6, displayName: "羽生IC", googleName: "東北自動車道 羽生インターチェンジ" },
+            { order: 7, displayName: "館林IC", googleName: "東北自動車道 館林インターチェンジ" },
+            { order: 8, displayName: "佐野藤岡IC", googleName: "東北自動車道 佐野藤岡インターチェンジ" },
+            { order: 9, displayName: "栃木IC", googleName: "東北自動車道 栃木インターチェンジ" },
+            { order: 10, displayName: "鹿沼IC", googleName: "東北自動車道 鹿沼インターチェンジ" },
+            { order: 11, displayName: "宇都宮IC", googleName: "東北自動車道 宇都宮インターチェンジ" }
         ]
     },
     kanetsu: {
         label: "関越道方面",
         exits: [
-            {
-                order: 1,
-                displayName: "練馬IC",
-                googleName: "関越自動車道 練馬インターチェンジ"
-            },
-            {
-                order: 2,
-                displayName: "所沢IC",
-                googleName: "関越自動車道 所沢インターチェンジ"
-            },
-            {
-                order: 3,
-                displayName: "川越IC",
-                googleName: "関越自動車道 川越インターチェンジ"
-            },
-            {
-                order: 4,
-                displayName: "鶴ヶ島IC",
-                googleName: "関越自動車道 鶴ヶ島インターチェンジ"
-            }
+            { order: 1, displayName: "練馬IC", googleName: "関越自動車道 練馬インターチェンジ" },
+            { order: 2, displayName: "大泉IC", googleName: "関越自動車道 大泉インターチェンジ" },
+            { order: 3, displayName: "所沢IC", googleName: "関越自動車道 所沢インターチェンジ" },
+            { order: 4, displayName: "三芳SIC", googleName: "関越自動車道 三芳スマートインターチェンジ" },
+            { order: 5, displayName: "川越IC", googleName: "関越自動車道 川越インターチェンジ" },
+            { order: 6, displayName: "鶴ヶ島IC", googleName: "関越自動車道 鶴ヶ島インターチェンジ" },
+            { order: 7, displayName: "坂戸西SIC", googleName: "関越自動車道 坂戸西スマートインターチェンジ" },
+            { order: 8, displayName: "東松山IC", googleName: "関越自動車道 東松山インターチェンジ" },
+            { order: 9, displayName: "嵐山小川IC", googleName: "関越自動車道 嵐山小川インターチェンジ" },
+            { order: 10, displayName: "花園IC", googleName: "関越自動車道 花園インターチェンジ" },
+            { order: 11, displayName: "本庄児玉IC", googleName: "関越自動車道 本庄児玉インターチェンジ" }
         ]
     },
 
@@ -204,26 +186,17 @@ const IC_MASTER = {
     chuo: {
         label: "中央道方面",
         exits: [
-            {
-                order: 1,
-                displayName: "調布IC",
-                googleName: "中央自動車道 調布インターチェンジ"
-            },
-            {
-                order: 2,
-                displayName: "稲城IC",
-                googleName: "中央自動車道 稲城インターチェンジ"
-            },
-            {
-                order: 3,
-                displayName: "府中SIC",
-                googleName: "中央自動車道 府中スマートインターチェンジ"
-            },
-            {
-                order: 4,
-                displayName: "八王子IC",
-                googleName: "中央自動車道 八王子インターチェンジ"
-            }
+            { order: 1, displayName: "高井戸IC", googleName: "中央自動車道 高井戸インターチェンジ" },
+            { order: 2, displayName: "調布IC", googleName: "中央自動車道 調布インターチェンジ" },
+            { order: 3, displayName: "稲城IC", googleName: "中央自動車道 稲城インターチェンジ" },
+            { order: 4, displayName: "府中SIC", googleName: "中央自動車道 府中スマートインターチェンジ" },
+            { order: 5, displayName: "国立府中IC", googleName: "中央自動車道 国立府中インターチェンジ" },
+            { order: 6, displayName: "八王子IC", googleName: "中央自動車道 八王子インターチェンジ" },
+            { order: 7, displayName: "相模湖IC", googleName: "中央自動車道 相模湖インターチェンジ" },
+            { order: 8, displayName: "上野原IC", googleName: "中央自動車道 上野原インターチェンジ" },
+            { order: 9, displayName: "大月IC", googleName: "中央自動車道 大月インターチェンジ" },
+            { order: 10, displayName: "勝沼IC", googleName: "中央自動車道 勝沼インターチェンジ" },
+            { order: 11, displayName: "一宮御坂IC", googleName: "中央自動車道 一宮御坂インターチェンジ" }
         ]
 
     },
@@ -233,26 +206,17 @@ const IC_MASTER = {
     tomei: {
         label: "東名道方面",
         exits: [
-            {
-                order: 1,
-                displayName: "東京IC",
-                googleName: "東名高速道路 東京インターチェンジ"
-            },
-            {
-                order: 2,
-                displayName: "東名川崎IC",
-                googleName: "東名高速道路 東名川崎インターチェンジ"
-            },
-            {
-                order: 3,
-                displayName: "横浜青葉IC",
-                googleName: "東名高速道路 横浜青葉インターチェンジ"
-            },
-            {
-                order: 4,
-                displayName: "厚木IC",
-                googleName: "東名高速道路 厚木インターチェンジ"
-            }
+            { order: 1, displayName: "東京IC", googleName: "東名高速道路 東京インターチェンジ" },
+            { order: 2, displayName: "東名川崎IC", googleName: "東名高速道路 東名川崎インターチェンジ" },
+            { order: 3, displayName: "横浜青葉IC", googleName: "東名高速道路 横浜青葉インターチェンジ" },
+            { order: 4, displayName: "横浜町田IC", googleName: "東名高速道路 横浜町田インターチェンジ" },
+            { order: 5, displayName: "綾瀬SIC", googleName: "東名高速道路 綾瀬スマートインターチェンジ" },
+            { order: 6, displayName: "厚木IC", googleName: "東名高速道路 厚木インターチェンジ" },
+            { order: 7, displayName: "秦野中井IC", googleName: "東名高速道路 秦野中井インターチェンジ" },
+            { order: 8, displayName: "大井松田IC", googleName: "東名高速道路 大井松田インターチェンジ" },
+            { order: 9, displayName: "御殿場IC", googleName: "東名高速道路 御殿場インターチェンジ" },
+            { order: 10, displayName: "裾野IC", googleName: "東名高速道路 裾野インターチェンジ" },
+            { order: 11, displayName: "沼津IC", googleName: "東名高速道路 沼津インターチェンジ" }
         ]
     },
 
@@ -570,6 +534,8 @@ let gpsErrorBlinkShown = false;
 let lastRecommendationText = "";
 let lastIcAreaDecisionType = "";
 
+let lastSearchMode = "";
+
 
 
 
@@ -592,7 +558,12 @@ window.addEventListener("load", () => {
         .getElementById("gpsSearchButton")
         .addEventListener(
             "click",
-            searchFromCurrentLocation
+            () => {
+
+                updateSearchMode("gpsSearchButton");
+
+                searchFromCurrentLocation();
+            }
         );
 
 
@@ -784,6 +755,8 @@ async function searchRoute() {
         alert("出発地と目的地を入力してください");
         return;
     }
+
+    updateSearchMode("searchButton");
 
     console.log("検索開始");
     console.log("出発地:", origin);
@@ -1522,6 +1495,7 @@ async function searchFromCurrentLocation(
 
         return;
     }
+
 
     const destination =
         document
@@ -2871,6 +2845,8 @@ async function searchAutoExitIcComparison(
     shouldClosePanel = true
 ) {
 
+    updateSearchMode("autoExitIcCompareButton");
+
     if (
         currentLatitude === null ||
         currentLongitude === null
@@ -2896,16 +2872,21 @@ async function searchAutoExitIcComparison(
         return;
     }
 
-    await searchFromCurrentLocation(false, true);
+    const origin =
+        document
+            .getElementById("origin")
+            .value;
+
+    if (origin) {
+        await getRoutes(origin, destination);
+    }
+    else {
+        await searchFromCurrentLocation(false, true);
+    }
 
     let icArea =
         document
             .getElementById("icArea")
-            .value;
-
-    const origin =
-        document
-            .getElementById("origin")
             .value;
 
 
@@ -2965,7 +2946,7 @@ async function searchAutoExitIcComparison(
     }
 
     const startIndex =
-        getCandidateStartIndex(origin, icArea);
+        await getCandidateStartIndexByLocation(origin, icArea);
 
     const sortedExits =
         IC_MASTER[icArea].exits
@@ -3007,7 +2988,7 @@ async function searchAutoExitIcComparison(
         "〜" +
         endIcName;
 
-    if (!origin && lastNearestIcName) {
+    if (lastNearestIcName) {
         reasonText +=
             " / 最寄りIC：" +
             lastNearestIcName +
@@ -3872,4 +3853,115 @@ function resetAutoUpdateState() {
         .getElementById("autoSearchCondition")
         .textContent =
         "未判定";
+}
+
+
+function updateSearchMode(mode) {
+
+    document
+        .getElementById("searchButton")
+        ?.classList.remove("active-search");
+
+    document
+        .getElementById("gpsSearchButton")
+        ?.classList.remove("active-search");
+
+    document
+        .getElementById("autoExitIcCompareButton")
+        ?.classList.remove("active-search");
+
+    document
+        .getElementById(mode)
+        ?.classList.add("active-search");
+
+    lastSearchMode = mode;
+}
+
+
+async function getCandidateStartIndexByLocation(origin, icArea) {
+
+    let baseLat = currentLatitude;
+    let baseLng = currentLongitude;
+
+    if (origin) {
+
+        const originLatLng =
+            await getLatLngFromAddress(origin);
+
+        if (originLatLng) {
+            baseLat = originLatLng.lat;
+            baseLng = originLatLng.lng;
+        }
+    }
+
+    return await findNearestIcIndexByPoint(
+        icArea,
+        baseLat,
+        baseLng
+    );
+}
+
+async function findNearestIcIndexByPoint(
+    icArea,
+    baseLat,
+    baseLng
+) {
+
+    const exits =
+        IC_MASTER[icArea].exits
+            .slice()
+            .sort((a, b) =>
+                (a.order ?? 999) - (b.order ?? 999)
+            );
+
+    let nearestIndex = 0;
+    let nearestDistance = Infinity;
+
+    for (let index = 0; index < exits.length; index++) {
+
+        const exit = exits[index];
+
+        let exitLat = exit.lat;
+        let exitLng = exit.lng;
+
+        if (
+            exitLat === undefined ||
+            exitLng === undefined
+        ) {
+
+            const exitLatLng =
+                await getLatLngFromAddress(exit.googleName);
+
+            if (!exitLatLng) {
+                continue;
+            }
+
+            exit.lat = exitLatLng.lat;
+            exit.lng = exitLatLng.lng;
+
+            exitLat = exit.lat;
+            exitLng = exit.lng;
+        }
+
+        const distance =
+            calculateDistance(
+                baseLat,
+                baseLng,
+                exitLat,
+                exitLng
+            );
+
+        if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearestIndex = index;
+        }
+    }
+
+    lastNearestIcName =
+        exits[nearestIndex].displayName;
+
+    lastNearestIcDistanceKm =
+        Math.round(nearestDistance / 1000);
+
+    return Math.max(0, nearestIndex - 2);
 }

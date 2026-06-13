@@ -863,3 +863,9 @@ details#searchPanel .origin-row input {
 .active-search {
     background: #27ae60 !important;
 }
+
+#nextUpdateInfo {
+    display: inline-block;
+    min-width: 95px;
+    text-align: center;
+}

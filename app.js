@@ -1931,49 +1931,22 @@ function checkAutoReSearch() {
             180 - Math.round(elapsedSeconds)
         );
 
-    let displayTimeText = "";
+    let displaySeconds = remainingSeconds;
 
     if (remainingSeconds > 60) {
-
-        const roundedSeconds =
+        displaySeconds =
             Math.ceil(remainingSeconds / 30) * 30;
-
-        const minutes =
-            Math.floor(roundedSeconds / 60);
-
-        const seconds =
-            roundedSeconds % 60;
-
-        if (seconds === 0) {
-            displayTimeText =
-                minutes + "分";
-        }
-        else {
-            displayTimeText =
-                minutes + "分" + seconds + "秒";
-        }
-
     }
     else if (remainingSeconds > 10) {
-
-        const roundedSeconds =
+        displaySeconds =
             Math.ceil(remainingSeconds / 10) * 10;
-
-        displayTimeText =
-            roundedSeconds + "秒";
-
     }
-    else {
 
-        displayTimeText =
-            remainingSeconds + "秒";
-
-    }
+    const displayTimeText =
+        formatCountdownSeconds(displaySeconds);
 
     const displayDistanceText =
-        remainingDistance >= 1000
-            ? (remainingDistance / 1000).toFixed(1) + "km"
-            : remainingDistance + "m";
+        (remainingDistance / 1000).toFixed(1) + "km";
 
     setDataUpdateStatus(
         displayDistanceText +
@@ -3997,4 +3970,19 @@ function scrollToTopPanel() {
         top: 0,
         behavior: "smooth"
     });
+}
+
+function formatCountdownSeconds(seconds) {
+
+    const minutes =
+        Math.floor(seconds / 60);
+
+    const secs =
+        seconds % 60;
+
+    return (
+        minutes +
+        ":" +
+        String(secs).padStart(2, "0")
+    );
 }

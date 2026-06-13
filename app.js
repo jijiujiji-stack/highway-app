@@ -562,6 +562,8 @@ window.addEventListener("load", () => {
 
                 updateSearchMode("gpsSearchButton");
 
+                resetMultiExitIcResult();
+
                 searchFromCurrentLocation();
             }
         );
@@ -757,6 +759,9 @@ async function searchRoute() {
     }
 
     updateSearchMode("searchButton");
+
+    resetMultiExitIcResult();
+
 
     console.log("検索開始");
     console.log("出発地:", origin);
@@ -3964,4 +3969,12 @@ async function findNearestIcIndexByPoint(
         Math.round(nearestDistance / 1000);
 
     return Math.max(0, nearestIndex - 2);
+}
+
+function resetMultiExitIcResult() {
+
+    document
+        .getElementById("multiExitIcResult")
+        .textContent =
+        "候補IC自動比較は未実行です";
 }

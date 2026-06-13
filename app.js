@@ -784,6 +784,8 @@ async function searchRoute() {
 
         closeSearchPanel();
 
+        scrollToTopPanel();
+
 
     } catch (error) {
 
@@ -1603,6 +1605,11 @@ async function searchFromCurrentLocation(
         if (shouldClosePanel) {
             closeSearchPanel();
         }
+
+        if (shouldClosePanel) {
+            scrollToTopPanel();
+        }
+
 
     } catch (error) {
 
@@ -3074,6 +3081,11 @@ async function searchAutoExitIcComparison(
     if (shouldClosePanel) {
         closeSearchPanel();
     }
+
+    if (shouldClosePanel) {
+        scrollToTopPanel();
+    }
+
 }
 
 
@@ -3977,4 +3989,12 @@ function resetMultiExitIcResult() {
         .getElementById("multiExitIcResult")
         .textContent =
         "候補IC自動比較は未実行です";
+}
+
+function scrollToTopPanel() {
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
 }

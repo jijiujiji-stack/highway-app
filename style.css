@@ -899,3 +899,33 @@ details#searchPanel .origin-row input {
     color: #ffffff;
     font-weight: bold;
 }
+
+.multi-best-reason.value-good {
+    color: #2ecc71 !important;
+    font-weight: bold;
+}
+
+.multi-best-reason.value-high {
+    color: #e74c3c !important;
+    font-weight: bold;
+}
+
+.multi-best-reason.value-normal {
+    color: #ffffff !important;
+    font-weight: bold;
+}
+
+.multi-best-reason.value-expensive {
+    color: #e67e22 !important;
+    font-weight: bold;
+}
+
+.reason-green {
+    color: #2ecc71 !important;
+    font-weight: bold;
+}
+
+.reason-red {
+    color: #e74c3c !important;
+    font-weight: bold;
+}

@@ -2773,34 +2773,64 @@ function displayMultiExitIcComparison(
         formatMinutes(best.totalMinutes);
 
 
-    const isBestSlowerThanLocal =
-        lastLocalRouteMinutes !== null &&
-        best.totalMinutes > lastLocalRouteMinutes;
+    const localComparisonMinutes =
+        lastLocalRouteMinutes !== null
+            ? lastLocalRouteMinutes - best.totalMinutes
+            : null;
 
-    let localOnlyDifferenceText = "";
+    let localComparisonText = "";
 
-    if (isBestSlowerThanLocal) {
-        localOnlyDifferenceText =
+    let localComparisonClass = "value-normal";
+
+    if (localComparisonMinutes > 0) {
+
+        localComparisonText =
+            "🚙有料回避より " +
+            "<span class='reason-green'>" +
+            formatMinutes(localComparisonMinutes) +
+            "早着" +
+            "</span>";
+
+        localComparisonClass =
+            "value-good";
+
+    }
+    else if (localComparisonMinutes < 0) {
+
+        localComparisonText =
+            "🚙有料回避より " +
+            "<span class='reason-red'>" +
             formatMinutes(
-                best.totalMinutes - lastLocalRouteMinutes
-            );
+                Math.abs(localComparisonMinutes)
+            ) +
+            "遅着" +
+            "</span>";
+
+        localComparisonClass =
+            "value-high";
+
+    }
+    else if (localComparisonMinutes === 0) {
+
+        localComparisonText =
+            "🚙有料回避と同着";
+
+        localComparisonClass =
+            "value-normal";
+
     }
 
     document
         .getElementById("dashboardRecommendation")
         .textContent =
-        isBestSlowerThanLocal
-            ? "下道のみがおすすめ"
-            : (
-                (
-                    acceptableResults.length > 0
-                        ? "おすすめ："
-                        : "条件外の最良候補："
-                ) +
-                (tollStartIcName || "起点IC") +
-                "→" +
-                getIcDisplayName(best.exitIc)
-            );
+        (
+            acceptableResults.length > 0
+                ? "おすすめ："
+                : "条件外の最良候補："
+        ) +
+        (tollStartIcName || "起点IC") +
+        "→" +
+        getIcDisplayName(best.exitIc);
 
     let arrivalClass = "arrival-normal";
 
@@ -2844,20 +2874,57 @@ function displayMultiExitIcComparison(
         "円節約" +
         "</div>";
 
-    if (isBestSlowerThanLocal) {
+    let highwayComparisonText = "";
+    let highwayComparisonClass = "value-normal";
+
+    if (best.difference > 0) {
+
+        highwayComparisonText =
+            "全高速より " +
+            "<span class='reason-red'>" +
+            formatMinutes(best.difference) +
+            "遅い" +
+            "</span>";
+
+        highwayComparisonClass =
+            "value-high";
+
+    }
+    else if (best.difference < 0) {
+
+        highwayComparisonText =
+            "全高速より" +
+            formatMinutes(
+                Math.abs(best.difference)
+            ) +
+            "早着";
+
+        highwayComparisonClass =
+            "value-good";
+
+    }
+    else {
+
+        highwayComparisonText =
+            "全高速と同着";
+
+        highwayComparisonClass =
+            "value-normal";
+
+    }
+
+    dashboardReasonText +=
+        "<div class='multi-best-reason'>" +
+        highwayComparisonText +
+        "</div>";
+
+    if (localComparisonText) {
         dashboardReasonText +=
-            "<div class='multi-best-reason value-high'>" +
-            "全下道より" +
-            localOnlyDifferenceText +
-            "遅いため、下道のみ推奨" +
+            "<div class='multi-best-reason'>" +
+            localComparisonText +
             "</div>";
     }
 
-    if (acceptableResults.length === 0) {
-        dashboardReasonText +=
-            "<br>" +
-            "⚠ 許容遅れ超過";
-    }
 
     document
         .getElementById("dashboardReason")
@@ -2872,9 +2939,7 @@ function displayMultiExitIcComparison(
     document
         .getElementById("dashboardValueJudge")
         .textContent =
-        isBestSlowerThanLocal
-            ? "下道のみ推奨"
-            : getExitIcJudge(best.score);
+        getExitIcJudge(best.score);
 
 
     const dashboardValueJudge =
@@ -2908,14 +2973,11 @@ function displayMultiExitIcComparison(
         "recommend-local"
     );
 
-    if (isBestSlowerThanLocal) {
-        dashboardCard.classList.add("recommend-local");
-    }
-    else if (acceptableResults.length > 0) {
+    if (acceptableResults.length > 0) {
         dashboardCard.classList.add("recommend-highway");
     }
     else {
-        dashboardCard.classList.add("recommend-local");
+        dashboardCard.classList.add("recommend-neutral");
     }
 
 

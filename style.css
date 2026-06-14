@@ -170,6 +170,8 @@ button {
 
     font-size: 14px;
 
+    white-space: pre-line;
+
 }
 
 .recommend-highway {
@@ -868,4 +870,16 @@ details#searchPanel .origin-row input {
     display: inline-block;
     min-width: 95px;
     text-align: center;
+}
+
+.dashboard-route-info {
+    font-size: 18px;
+    font-weight: 700;
+    color: #cccccc;
+    margin-top: 8px;
+    margin-bottom: 10px;
+}
+
+.old-feature-hidden {
+    display: none;
 }

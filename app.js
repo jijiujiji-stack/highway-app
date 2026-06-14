@@ -527,6 +527,14 @@ let lastSearchLocationName = "";
 let lastNearestIcName = "";
 let lastNearestIcDistanceKm = null;
 
+let lastTollStartIcName = "";
+let lastTollStartIcGoogleName = "";
+let lastTollStartIcOrder = null;
+let lastTollEndIcName = "";
+let lastTollEndIcGoogleName = "";
+let lastTollEndIcOrder = null;
+
+
 let lastGpsReceivedTime = null;
 
 let gpsErrorBlinkShown = false;
@@ -535,7 +543,7 @@ let lastRecommendationText = "";
 let lastIcAreaDecisionType = "";
 
 let lastSearchMode = "";
-
+let lastLocalRouteMinutes = null;
 
 
 
@@ -546,7 +554,7 @@ window.addEventListener("load", () => {
 
     loadGoogleMaps();
 
-    getCurrentLocation();
+    getCurrentLocation(true);
 
     startGpsUpdate();
 
@@ -798,7 +806,11 @@ async function searchRoute() {
     }
 }
 
-async function getRoutes(origin, destination) {
+async function getRoutes(
+    origin,
+    destination,
+    suppressDashboardSummary = false
+) {
 
     const [highwayRoute, localRoute] =
         await Promise.all([
@@ -808,7 +820,8 @@ async function getRoutes(origin, destination) {
 
     displayRouteComparison(
         highwayRoute,
-        localRoute
+        localRoute,
+        suppressDashboardSummary
     );
 
     lastSearchLatitude =
@@ -983,6 +996,8 @@ function displayRouteComparison(
             ) / 60
         );
 
+    lastLocalRouteMinutes = localMinutes;
+
     const highwayKm =
         (
             highway.distanceMeters / 1000
@@ -1095,10 +1110,10 @@ function displayRouteComparison(
     const reasonText =
         "高速で " +
         formatMinutes(savedMinutes) +
-        "短縮 / " +
+        "早着\n" +
+        "1分短縮あたり " +
         costPerMinute +
-        "円/分";
-
+        "円";
 
     highwayCard
         .querySelectorAll(".sub")[1]
@@ -1113,27 +1128,19 @@ function displayRouteComparison(
         costPerMinute +
         " 円/分";
 
-    let valueJudge = "高い";
+    let valueJudge = "料金を払う価値：低い";
 
     if (costPerMinute <= 20) {
-
-        valueJudge = "超お得";
-
+        valueJudge = "料金を払う価値：非常に高い";
     }
     else if (costPerMinute <= 40) {
-
-        valueJudge = "かなりお得";
-
+        valueJudge = "料金を払う価値：高い";
     }
     else if (costPerMinute <= 60) {
-
-        valueJudge = "普通";
-
+        valueJudge = "料金を払う価値：普通";
     }
     else if (costPerMinute <= 100) {
-
-        valueJudge = "少し高い";
-
+        valueJudge = "料金を払う価値：やや低い";
     }
 
     document
@@ -1206,7 +1213,9 @@ function displayRouteComparison(
 
         dashboardValueJudge.className = "";
 
-        if (valueJudge === "超お得") {
+        if (
+            valueJudge === "料金を払う価値：非常に高い"
+        ) {
 
             dashboardValueJudge.classList.add(
                 "value-super"
@@ -1214,7 +1223,7 @@ function displayRouteComparison(
 
         }
         else if (
-            valueJudge === "かなりお得"
+            valueJudge === "料金を払う価値：高い"
         ) {
 
             dashboardValueJudge.classList.add(
@@ -1223,7 +1232,7 @@ function displayRouteComparison(
 
         }
         else if (
-            valueJudge === "普通"
+            valueJudge === "料金を払う価値：普通"
         ) {
 
             dashboardValueJudge.classList.add(
@@ -1232,7 +1241,7 @@ function displayRouteComparison(
 
         }
         else if (
-            valueJudge === "少し高い"
+            valueJudge === "料金を払う価値：やや低い"
         ) {
 
             dashboardValueJudge.classList.add(
@@ -1261,7 +1270,7 @@ function displayRouteComparison(
         if (efficiencyRate >= 2.5) {
 
             recommendation =
-                "高速推奨";
+                "高速がお得";
 
         }
         else if (
@@ -1269,7 +1278,7 @@ function displayRouteComparison(
         ) {
 
             recommendation =
-                "下道推奨";
+                "下道がお得";
 
         }
 
@@ -1309,7 +1318,7 @@ function displayRouteComparison(
 
         if (
             recommendation ===
-            "高速推奨"
+            "高速がお得"
         ) {
 
             dashboardCard.classList.add(
@@ -1319,7 +1328,7 @@ function displayRouteComparison(
         }
         else if (
             recommendation ===
-            "下道推奨"
+            "下道がお得"
         ) {
 
             dashboardCard.classList.add(
@@ -1346,7 +1355,9 @@ function displayRouteComparison(
 
 }
 
-async function getCurrentLocation() {
+async function getCurrentLocation(
+    updateAddress = true
+) {
 
     if (!navigator.geolocation) {
 
@@ -1380,15 +1391,18 @@ async function getCurrentLocation() {
                 currentLongitude
             );
 
-            const locationName =
-                await reverseGeocode(
-                    lat,
-                    lng
-                );
+            if (updateAddress) {
 
-            setCurrentLocationText(
-                shortenLocationName(locationName)
-            );
+                const locationName =
+                    await reverseGeocode(
+                        lat,
+                        lng
+                    );
+
+                setCurrentLocationText(
+                    shortenLocationName(locationName)
+                );
+            }
 
             const now =
                 new Date();
@@ -1459,16 +1473,31 @@ async function reverseGeocode(
 
 function startGpsUpdate() {
 
+    // GPSだけ更新（30秒ごと）
     setInterval(() => {
 
         console.log(
             "GPS自動更新"
         );
 
-        getCurrentLocation();
+        getCurrentLocation(false);
+
         updateGpsStatus();
 
-    }, 60000);
+    }, 30000);
+
+
+    // 住所更新（3分ごと）
+    setInterval(() => {
+
+        console.log(
+            "住所更新"
+        );
+
+        getCurrentLocation(true);
+
+    }, 180000);
+
 
     setInterval(() => {
 
@@ -1528,7 +1557,7 @@ async function searchFromCurrentLocation(
     const autoCompareCheckbox =
         document.getElementById("autoCompareEnabled");
 
-    if (autoCompareCheckbox) {
+    if (autoCompareCheckbox && shouldClosePanel) {
         autoCompareCheckbox.checked = false;
     }
 
@@ -1985,19 +2014,46 @@ function checkAutoReSearch() {
             "自動再検索実行"
         );
 
+        console.log(
+            "[AUTO DEBUG]",
+            "lastSearchMode=",
+            lastSearchMode,
+            "autoCompare=",
+            document.getElementById("autoCompareEnabled")?.checked,
+            "origin=",
+            document.getElementById("origin")?.value,
+            "destination=",
+            document.getElementById("destination")?.value
+        );
+
+
         setDataUpdateStatus(
             "更新中...",
             "data-update-working"
         );
 
         if (
+            lastSearchMode === "autoExitIcCompareButton" ||
             document.getElementById("autoCompareEnabled")?.checked
         ) {
+
+            console.log(
+                "[AUTO DEBUG]",
+                "候補IC自動比較ルートへ"
+            );
+
             searchAutoExitIcComparison(false);
         }
         else {
+
+            console.log(
+                "[AUTO DEBUG]",
+                "現在地から再検索ルートへ"
+            );
+
             searchFromCurrentLocation(false);
         }
+
     }
 }
 
@@ -2302,6 +2358,26 @@ async function searchMultiExitIcComparison() {
                 ) / 60
             );
 
+        let keepHighwayToll = 0;
+
+        if (
+            lastTollStartIcGoogleName &&
+            lastTollEndIcGoogleName &&
+            lastTollStartIcGoogleName !== lastTollEndIcGoogleName
+        ) {
+
+            const keepHighwayTollRoute =
+                await getHighwayRoute(
+                    lastTollStartIcGoogleName,
+                    lastTollEndIcGoogleName
+                );
+
+            keepHighwayToll =
+                Math.round(
+                    (keepHighwayTollRoute.distanceMeters / 1000) * 24
+                );
+        }
+
         const results = [];
 
         for (const exitIc of exitIcList) {
@@ -2342,20 +2418,35 @@ async function searchMultiExitIcComparison() {
                     totalMinutes -
                     keepHighwayMinutes;
 
-                const keepHighwayKm =
-                    keepHighwayRoute.distanceMeters / 1000;
+                let estimatedToll = 0;
+                let estimatedTollKm = 0;
 
-                const highwayToIcKm =
-                    highwayToIcRoute.distanceMeters / 1000;
+                if (
+                    lastTollStartIcGoogleName &&
+                    exitIc !== lastTollStartIcGoogleName
+                ) {
 
-                const keepHighwayToll =
-                    Math.round(keepHighwayKm * 24);
+                    const exitIcTollRoute =
+                        await getHighwayRoute(
+                            lastTollStartIcGoogleName,
+                            exitIc
+                        );
 
-                const exitIcToll =
-                    Math.round(highwayToIcKm * 24);
+                    estimatedTollKm =
+                        exitIcTollRoute.distanceMeters / 1000;
+
+                    estimatedToll =
+                        Math.round(
+                            estimatedTollKm * 24
+                        );
+                }
 
                 const savedToll =
-                    keepHighwayToll - exitIcToll;
+                    Math.max(
+                        0,
+                        keepHighwayToll - estimatedToll
+                    );
+
 
                 let yenPerExtraMinute = 0;
 
@@ -2368,8 +2459,13 @@ async function searchMultiExitIcComparison() {
                     exitIc: exitIc,
                     totalMinutes: totalMinutes,
                     difference: difference,
+                    estimatedTollKm: estimatedTollKm,
+                    estimatedToll: estimatedToll,
                     savedToll: savedToll,
+                    roadName:
+                        getIcAreaLabelByExitIc(exitIc),
                     yenPerExtraMinute: yenPerExtraMinute
+
                 });
 
             } catch (error) {
@@ -2392,7 +2488,8 @@ async function searchMultiExitIcComparison() {
         displayMultiExitIcComparison(
             keepHighwayMinutes,
             results,
-            acceptableDelay
+            acceptableDelay,
+            lastTollStartIcName
         );
 
         document
@@ -2419,7 +2516,8 @@ async function searchMultiExitIcComparison() {
 function displayMultiExitIcComparison(
     keepHighwayMinutes,
     results,
-    acceptableDelay
+    acceptableDelay,
+    tollStartIcName
 ) {
 
     const sortedResults =
@@ -2513,15 +2611,34 @@ function displayMultiExitIcComparison(
         formatMinutes(best.totalMinutes);
 
 
+    const isBestSlowerThanLocal =
+        lastLocalRouteMinutes !== null &&
+        best.totalMinutes > lastLocalRouteMinutes;
+
+    let localOnlyDifferenceText = "";
+
+    if (isBestSlowerThanLocal) {
+        localOnlyDifferenceText =
+            formatMinutes(
+                best.totalMinutes - lastLocalRouteMinutes
+            );
+    }
+
     document
         .getElementById("dashboardRecommendation")
         .textContent =
-        (
-            acceptableResults.length > 0
-                ? "おすすめ："
-                : "条件外の最良候補："
-        ) +
-        getIcDisplayName(best.exitIc);
+        isBestSlowerThanLocal
+            ? "下道のみがおすすめ"
+            : (
+                (
+                    acceptableResults.length > 0
+                        ? "おすすめ："
+                        : "条件外の最良候補："
+                ) +
+                (tollStartIcName || "起点IC") +
+                "→" +
+                getIcDisplayName(best.exitIc)
+            );
 
     let arrivalClass = "arrival-normal";
 
@@ -2533,6 +2650,14 @@ function displayMultiExitIcComparison(
     }
 
     let dashboardReasonText =
+
+        "<div class='dashboard-route-info'>" +
+        best.roadName +
+        " 約" +
+        best.estimatedTollKm.toFixed(1) +
+        "km" +
+        "</div>" +
+
         "<div class='" +
         arrivalClass +
         "'>" +
@@ -2546,11 +2671,25 @@ function displayMultiExitIcComparison(
         "</div>" +
 
         "<div>" +
-        "💰 約" +
+        "💴 ETC概算 " +
+        best.estimatedToll.toLocaleString() +
+        "円" +
+        "</div>" +
+
+        "<div class='multi-best-reason'>" +
+        "参考：約" +
         best.savedToll.toLocaleString() +
         "円節約" +
         "</div>";
 
+    if (isBestSlowerThanLocal) {
+        dashboardReasonText +=
+            "<div class='multi-best-reason value-high'>" +
+            "全下道より" +
+            localOnlyDifferenceText +
+            "遅いため、下道のみ推奨" +
+            "</div>";
+    }
 
     if (acceptableResults.length === 0) {
         dashboardReasonText +=
@@ -2571,7 +2710,10 @@ function displayMultiExitIcComparison(
     document
         .getElementById("dashboardValueJudge")
         .textContent =
-        getExitIcJudge(best.score);
+        isBestSlowerThanLocal
+            ? "下道のみ推奨"
+            : getExitIcJudge(best.score);
+
 
     const dashboardValueJudge =
         document.getElementById("dashboardValueJudge");
@@ -2604,7 +2746,10 @@ function displayMultiExitIcComparison(
         "recommend-local"
     );
 
-    if (acceptableResults.length > 0) {
+    if (isBestSlowerThanLocal) {
+        dashboardCard.classList.add("recommend-local");
+    }
+    else if (acceptableResults.length > 0) {
         dashboardCard.classList.add("recommend-highway");
     }
     else {
@@ -2618,11 +2763,22 @@ function displayMultiExitIcComparison(
         best.yenPerExtraMinute + "円/分";
 
     html +=
+        html +=
         "<div class='multi-best'>" +
-        "<div class='multi-best-label'>おすすめIC</div>" +
+        "<div class='multi-best-label'>おすすめルート</div>" +
         "<div class='multi-best-ic'>" +
+        (tollStartIcName || "起点IC") +
+        " → " +
         getIcDisplayName(best.exitIc) +
         "</div>" +
+        "<div class='multi-best-reason'>" +
+        "（" +
+        getIcAreaLabelByExitIc(best.exitIc) +
+        " 約" +
+        best.estimatedTollKm.toFixed(1) +
+        "km）" +
+        "</div>" +
+
         "<div class='multi-best-stars'>" +
         getExitIcStars(best.score) +
         "</div>" +
@@ -2661,6 +2817,16 @@ function displayMultiExitIcComparison(
 
     html +=
         "<div class='multi-best-reason'>" +
+        "料金計算起点：" +
+        (tollStartIcName || "不明") +
+        "<br>" +
+        "※節約額は「" +
+        (tollStartIcName || "起点IC") +
+        "→各候補IC」の概算料金で計算" +
+        "</div>";
+
+    html +=
+        "<div class='multi-best-reason'>" +
         "順位は節約効率（円/分）で算出" +
         "</div>";
 
@@ -2668,7 +2834,7 @@ function displayMultiExitIcComparison(
         "<div class='multi-row multi-header'>" +
         "<span>候補IC</span>" +
         "<span>時間差</span>" +
-        "<span>節約額</span>" +
+        "<span>ETC概算</span>" +
         "<span>評価(円/分)</span>" +
         "</div>";
 
@@ -2733,8 +2899,10 @@ function displayMultiExitIcComparison(
             differenceText +
             "</span>" +
             "<span>" +
+            result.estimatedToll.toLocaleString() +
+            "円<br><small>節約 " +
             result.savedToll.toLocaleString() +
-            "円</span>" +
+            "円</small></span>" +
             "<span>" +
             stars +
             "<br>" +
@@ -2774,19 +2942,19 @@ function displayMultiExitIcComparison(
     function getExitIcJudge(score) {
 
         if (score >= 300) {
-            return "降りる価値大";
+            return "節約効果が非常に大きい";
         }
         else if (score >= 200) {
-            return "降りる価値あり";
+            return "節約重視ならおすすめ";
         }
         else if (score >= 100) {
-            return "状況次第";
+            return "時間と料金のバランス型";
         }
         else if (score >= 50) {
-            return "高速継続でもOK";
+            return "節約効果は小さめ";
         }
 
-        return "降りない方が良い";
+        return "下道のみも検討";
     }
 
 
@@ -2830,6 +2998,16 @@ async function searchAutoExitIcComparison(
     shouldClosePanel = true
 ) {
 
+
+    console.log(
+        "[IC DEBUG]",
+        "searchAutoExitIcComparison開始",
+        "shouldClosePanel=",
+        shouldClosePanel,
+        "lastSearchMode=",
+        lastSearchMode
+    );
+
     updateSearchMode("autoExitIcCompareButton");
 
     if (
@@ -2857,13 +3035,19 @@ async function searchAutoExitIcComparison(
         return;
     }
 
+    document
+        .getElementById("dashboardDestination")
+        .textContent =
+        shortenDestinationName(destination);
+
+
     const origin =
         document
             .getElementById("origin")
             .value;
 
     if (origin) {
-        await getRoutes(origin, destination);
+        await getRoutes(origin, destination, true);
     }
     else {
         await searchFromCurrentLocation(false, true);
@@ -2982,10 +3166,40 @@ async function searchAutoExitIcComparison(
             "km）";
     }
 
+    const destinationNearestIc =
+        await findNearestIcInfoByAddress(
+            destination,
+            icArea
+        );
+
+    if (destinationNearestIc) {
+
+        lastTollEndIcName =
+            destinationNearestIc.displayName;
+
+        lastTollEndIcGoogleName =
+            destinationNearestIc.googleName;
+
+        lastTollEndIcOrder =
+            destinationNearestIc.order;
+
+        reasonText +=
+            " / 目的地側IC：" +
+            lastTollEndIcName;
+    }
+
     document
         .getElementById("candidateReason")
         .textContent =
         reasonText;
+
+    const candidateReasonDebug =
+        document.getElementById("candidateReasonDebug");
+
+    if (candidateReasonDebug) {
+        candidateReasonDebug.textContent =
+            reasonText;
+    }
 
     const autoExitIcList =
         selectedExits
@@ -3953,6 +4167,16 @@ async function findNearestIcIndexByPoint(
     lastNearestIcDistanceKm =
         Math.round(nearestDistance / 1000);
 
+    lastTollStartIcName =
+        exits[nearestIndex].displayName;
+
+    lastTollStartIcGoogleName =
+        exits[nearestIndex].googleName;
+
+    lastTollStartIcOrder =
+        exits[nearestIndex].order;
+
+
     return Math.max(0, nearestIndex - 2);
 }
 
@@ -3985,4 +4209,122 @@ function formatCountdownSeconds(seconds) {
         ":" +
         String(secs).padStart(2, "0")
     );
+}
+
+function getIcOrderByGoogleName(googleName) {
+
+    for (const areaKey in IC_MASTER) {
+
+        const found =
+            IC_MASTER[areaKey].exits.find(exit =>
+                exit.googleName === googleName
+            );
+
+        if (found) {
+            return found.order ?? null;
+        }
+    }
+
+    return null;
+}
+
+async function findNearestIcInfoByAddress(address, icArea) {
+
+    const latLng =
+        await getLatLngFromAddress(address);
+
+    if (!latLng) {
+        return null;
+    }
+
+    return await findNearestIcInfoByPoint(
+        icArea,
+        latLng.lat,
+        latLng.lng
+    );
+}
+
+async function findNearestIcInfoByPoint(
+    icArea,
+    baseLat,
+    baseLng
+) {
+
+    const exits =
+        IC_MASTER[icArea].exits
+            .slice()
+            .sort((a, b) =>
+                (a.order ?? 999) - (b.order ?? 999)
+            );
+
+    let nearest = null;
+    let nearestDistance = Infinity;
+
+    for (const exit of exits) {
+
+        let exitLat = exit.lat;
+        let exitLng = exit.lng;
+
+        if (
+            exitLat === undefined ||
+            exitLng === undefined
+        ) {
+
+            const exitLatLng =
+                await getLatLngFromAddress(exit.googleName);
+
+            if (!exitLatLng) {
+                continue;
+            }
+
+            exit.lat = exitLatLng.lat;
+            exit.lng = exitLatLng.lng;
+
+            exitLat = exit.lat;
+            exitLng = exit.lng;
+        }
+
+        const distance =
+            calculateDistance(
+                baseLat,
+                baseLng,
+                exitLat,
+                exitLng
+            );
+
+        if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearest = exit;
+        }
+    }
+
+    if (!nearest) {
+        return null;
+    }
+
+    return {
+        displayName: nearest.displayName,
+        googleName: nearest.googleName,
+        order: nearest.order ?? null,
+        distanceKm: Math.round(nearestDistance / 1000)
+    };
+}
+
+function getIcAreaLabelByExitIc(exitIcGoogleName) {
+
+    for (const areaKey in IC_MASTER) {
+
+        const area = IC_MASTER[areaKey];
+
+        const found =
+            area.exits.find(exit =>
+                exit.googleName === exitIcGoogleName
+            );
+
+        if (found) {
+            return area.label.replace("方面", "");
+        }
+    }
+
+    return "有料道路";
 }

@@ -211,18 +211,6 @@
                 </div>
 
 
-                <!--
-
-            <label for="exitIc">
-                降りるIC
-            </label>
-            <input type="text" id="exitIc" placeholder="例：流山IC">
-
-            <button id="exitIcCompareButton">
-                指定ICで降りる比較
-            </button>
-
--->
 
                 <input type="hidden" id="exitIcList">
 
@@ -232,19 +220,6 @@
                 </label>
                 <input type="number" id="acceptableDelay" value="30" min="0">
 
-                <!--
-
-
-            <button id="multiExitIcCompareButton">
-                複数ICを比較
-            </button>
-
-
-            <button id="findNearbyIcButton">
-                周辺IC候補を探す
-            </button>
-
--->
 
                 <label for="icArea">
                     IC候補エリア
@@ -386,7 +361,7 @@
 
                     <div class="score-row">
                         <span>候補選定</span>
-                        <span id="candidateReason">未実行</span>
+                        <span id="candidateReasonDebug">未実行</span>
                     </div>
 
                     <div class="score-row">
@@ -398,7 +373,7 @@
 
             </div>
 
-            <div class="card exit-ic-card">
+            <div class="card exit-ic-card old-feature-hidden">
                 <h2>指定ICで降りる比較</h2>
 
                 <div class="score-row">
@@ -429,7 +404,7 @@
 
 
 
-            <div class="card nearby-ic-card">
+            <div class="card nearby-ic-card old-feature-hidden">
                 <h2>周辺IC候補</h2>
 
                 <div id="nearbyIcResult">

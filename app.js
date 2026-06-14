@@ -2,6 +2,35 @@ const IC_MASTER = {
     joban: {
         label: "常磐道方面",
         exits: [
+
+            {
+                order: -3,
+                displayName: "堤通（首都高）",
+                googleName: "首都高速6号向島線 堤通出入口",
+                lat: 35.731,
+                lng: 139.817,
+                experimental: true,
+                roadType: "首都高"
+            },
+            {
+                order: -2,
+                displayName: "加平（首都高）",
+                googleName: "首都高速中央環状線 加平出入口",
+                lat: 35.777,
+                lng: 139.820,
+                experimental: true,
+                roadType: "首都高"
+            },
+            {
+                order: -1,
+                displayName: "八潮南（首都高）",
+                googleName: "首都高速6号三郷線 八潮南出入口",
+                lat: 35.805,
+                lng: 139.842,
+                experimental: true,
+                roadType: "首都高"
+            },
+
             {
                 order: 1,
                 displayName: "三郷IC",
@@ -818,10 +847,12 @@ async function getRoutes(
             getLocalRoute(origin, destination)
         ]);
 
-    displayRouteComparison(
+    await displayRouteComparison(
         highwayRoute,
         localRoute,
-        suppressDashboardSummary
+        suppressDashboardSummary,
+        origin,
+        destination
     );
 
     lastSearchLatitude =
@@ -842,14 +873,12 @@ async function getRoutes(
         .textContent =
         lastSearchLocationName;
 
-
     lastSearchTime =
         Date.now();
 
     console.log(
         "検索地点保存"
     );
-
 }
 
 async function getHighwayRoute(
@@ -976,10 +1005,12 @@ async function getLocalRoute(
     return data.routes[0];
 }
 
-function displayRouteComparison(
+async function displayRouteComparison(
     highway,
     local,
-    suppressDashboardSummary = false
+    suppressDashboardSummary = false,
+    origin = "",
+    destination = ""
 ) {
 
     const highwayMinutes =
@@ -1007,6 +1038,16 @@ function displayRouteComparison(
         (
             local.distanceMeters / 1000
         ).toFixed(1);
+
+    const tollEstimate =
+        await estimateMainHighwayToll(
+            highway,
+            origin,
+            destination
+        );
+
+    const estimatedToll =
+        tollEstimate.amount;
 
     document
         .getElementById("highwayTime")
@@ -1045,6 +1086,7 @@ function displayRouteComparison(
         "距離：" +
         localKm +
         " km";
+
     const efficiencyRate =
         (
             localMinutes /
@@ -1054,24 +1096,16 @@ function displayRouteComparison(
     let stars = "★☆☆☆☆";
 
     if (efficiencyRate >= 3.0) {
-
         stars = "★★★★★";
-
     }
     else if (efficiencyRate >= 2.5) {
-
         stars = "★★★★☆";
-
     }
     else if (efficiencyRate >= 2.0) {
-
         stars = "★★★☆☆";
-
     }
     else if (efficiencyRate >= 1.5) {
-
         stars = "★★☆☆☆";
-
     }
 
     document
@@ -1084,27 +1118,17 @@ function displayRouteComparison(
         .textContent =
         stars;
 
-    const estimatedToll =
-        Math.round(
-            Number(highwayKm) * 24
-        );
-
     const savedMinutes =
         localMinutes - highwayMinutes;
-
-
-
 
     let costPerMinute = 0;
 
     if (savedMinutes > 0) {
-
         costPerMinute =
             Math.round(
                 estimatedToll /
                 savedMinutes
             );
-
     }
 
     const reasonText =
@@ -1128,28 +1152,30 @@ function displayRouteComparison(
         costPerMinute +
         " 円/分";
 
-    let valueJudge = "料金を払う価値：低い";
+    let valueJudge =
+        "料金を払う価値：低い";
 
     if (costPerMinute <= 20) {
-        valueJudge = "料金を払う価値：非常に高い";
+        valueJudge =
+            "料金を払う価値：非常に高い";
     }
     else if (costPerMinute <= 40) {
-        valueJudge = "料金を払う価値：高い";
+        valueJudge =
+            "料金を払う価値：高い";
     }
     else if (costPerMinute <= 60) {
-        valueJudge = "料金を払う価値：普通";
+        valueJudge =
+            "料金を払う価値：普通";
     }
     else if (costPerMinute <= 100) {
-        valueJudge = "料金を払う価値：やや低い";
+        valueJudge =
+            "料金を払う価値：やや低い";
     }
 
     document
         .getElementById("valueJudge")
         .textContent =
         valueJudge;
-
-
-
 
     document
         .getElementById("dashboardHighway")
@@ -1176,22 +1202,21 @@ function displayRouteComparison(
         efficiencyRate;
 
     if (!suppressDashboardSummary) {
-
         document
             .getElementById("dashboardCost")
             .textContent =
             costPerMinute + "円/分";
-
     }
 
     document
         .getElementById("dashboardHighwayDetail")
-        .textContent =
+        .innerHTML =
         "距離：" +
         highwayKm +
-        "km / ETC：約" +
+        "km / ETC概算：約" +
         estimatedToll.toLocaleString() +
-        "円";
+        "円<br>" +
+        tollEstimate.label;
 
     document
         .getElementById("dashboardLocalDetail")
@@ -1199,7 +1224,6 @@ function displayRouteComparison(
         "距離：" +
         localKm +
         "km";
-
 
     if (!suppressDashboardSummary) {
 
@@ -1214,53 +1238,45 @@ function displayRouteComparison(
         dashboardValueJudge.className = "";
 
         if (
-            valueJudge === "料金を払う価値：非常に高い"
+            valueJudge ===
+            "料金を払う価値：非常に高い"
         ) {
-
             dashboardValueJudge.classList.add(
                 "value-super"
             );
-
         }
         else if (
-            valueJudge === "料金を払う価値：高い"
+            valueJudge ===
+            "料金を払う価値：高い"
         ) {
-
             dashboardValueJudge.classList.add(
                 "value-good"
             );
-
         }
         else if (
-            valueJudge === "料金を払う価値：普通"
+            valueJudge ===
+            "料金を払う価値：普通"
         ) {
-
             dashboardValueJudge.classList.add(
                 "value-normal"
             );
-
         }
         else if (
-            valueJudge === "料金を払う価値：やや低い"
+            valueJudge ===
+            "料金を払う価値：やや低い"
         ) {
-
             dashboardValueJudge.classList.add(
                 "value-expensive"
             );
-
         }
         else {
-
             dashboardValueJudge.classList.add(
                 "value-high"
             );
-
         }
 
         document
-            .getElementById(
-                "dashboardStars"
-            )
+            .getElementById("dashboardStars")
             .textContent =
             stars;
 
@@ -1268,18 +1284,12 @@ function displayRouteComparison(
             "どちらでも可";
 
         if (efficiencyRate >= 2.5) {
-
             recommendation =
                 "高速がお得";
-
         }
-        else if (
-            efficiencyRate < 1.5
-        ) {
-
+        else if (efficiencyRate < 1.5) {
             recommendation =
                 "下道がお得";
-
         }
 
         const dashboardRecommendationElement =
@@ -1291,12 +1301,10 @@ function displayRouteComparison(
             lastRecommendationText &&
             lastRecommendationText !== recommendation
         ) {
-
             blinkElementById(
                 "dashboardRecommendation",
                 "recommendation-blink"
             );
-
         }
 
         dashboardRecommendationElement.textContent =
@@ -1320,40 +1328,192 @@ function displayRouteComparison(
             recommendation ===
             "高速がお得"
         ) {
-
             dashboardCard.classList.add(
                 "recommend-highway"
             );
-
         }
         else if (
             recommendation ===
             "下道がお得"
         ) {
-
             dashboardCard.classList.add(
                 "recommend-local"
             );
-
         }
         else {
-
             dashboardCard.classList.add(
                 "recommend-neutral"
             );
-
         }
 
         document
-            .getElementById(
-                "dashboardReason"
-            )
+            .getElementById("dashboardReason")
             .textContent =
             reasonText;
-
     }
-
 }
+
+
+async function estimateMainHighwayToll(
+    highwayRoute,
+    origin,
+    destination
+) {
+
+    const fallbackKm =
+        highwayRoute.distanceMeters / 1000;
+
+    const fallbackAmount =
+        Math.round(
+            fallbackKm * 24
+        );
+
+    const fallbackResult = {
+        amount: fallbackAmount,
+        label: "料金計算：ルート総距離ベース"
+    };
+
+    try {
+
+        if (!destination) {
+            return fallbackResult;
+        }
+
+        const autoIcAreaEnabled =
+            document.getElementById(
+                "autoIcAreaEnabled"
+            )?.checked;
+
+        let icArea =
+            document.getElementById("icArea")?.value;
+
+        if (autoIcAreaEnabled) {
+
+            const suggestedIcArea =
+                await suggestIcArea(
+                    origin,
+                    destination
+                );
+
+            if (suggestedIcArea) {
+                icArea = suggestedIcArea;
+            }
+        }
+
+        if (
+            !icArea ||
+            !IC_MASTER[icArea]
+        ) {
+            return fallbackResult;
+        }
+
+        let startIc = null;
+
+        if (origin) {
+
+            startIc =
+                await findNearestIcInfoByAddress(
+                    origin,
+                    icArea
+                );
+
+        }
+        else if (
+            currentLatitude !== null &&
+            currentLongitude !== null
+        ) {
+
+            startIc =
+                await findNearestIcInfoByPoint(
+                    icArea,
+                    currentLatitude,
+                    currentLongitude
+                );
+        }
+
+        const endIc =
+            await findNearestIcInfoByAddress(
+                destination,
+                icArea
+            );
+
+        if (
+            !startIc ||
+            !endIc ||
+            !startIc.googleName ||
+            !endIc.googleName
+        ) {
+            return fallbackResult;
+        }
+
+        lastTollStartIcName =
+            startIc.displayName;
+
+        lastTollStartIcGoogleName =
+            startIc.googleName;
+
+        lastTollStartIcOrder =
+            startIc.order;
+
+        lastTollEndIcName =
+            endIc.displayName;
+
+        lastTollEndIcGoogleName =
+            endIc.googleName;
+
+        lastTollEndIcOrder =
+            endIc.order;
+
+        if (
+            startIc.googleName === endIc.googleName
+        ) {
+            return {
+                amount: 0,
+                label:
+                    "料金計算：" +
+                    startIc.displayName +
+                    "→" +
+                    endIc.displayName
+            };
+        }
+
+        const tollRoute =
+            await getHighwayRoute(
+                startIc.googleName,
+                endIc.googleName
+            );
+
+        const tollKm =
+            tollRoute.distanceMeters / 1000;
+
+        return {
+            amount:
+                Math.round(
+                    tollKm * 24
+                ),
+            label:
+                "料金計算：" +
+                startIc.displayName +
+                "→" +
+                endIc.displayName
+        };
+
+    } catch (error) {
+
+        console.warn(
+            "IC間料金計算に失敗。従来計算に戻します。",
+            error
+        );
+
+        return fallbackResult;
+    }
+}
+
+
+
+
+
+
 
 async function getCurrentLocation(
     updateAddress = true
@@ -1591,10 +1751,12 @@ async function searchFromCurrentLocation(
 
             ]);
 
-        displayRouteComparison(
+        await displayRouteComparison(
             highwayRoute,
             localRoute,
-            suppressDashboardSummary
+            suppressDashboardSummary,
+            "",
+            destination
         );
 
         lastSearchLatitude =
@@ -2828,12 +2990,15 @@ function displayMultiExitIcComparison(
     html +=
         "<div class='multi-best-reason'>" +
         "順位は節約効率（円/分）で算出" +
+        "<br>" +
+        "※到着差は「🚙 有料回避」との到着時間差" +
         "</div>";
+
 
     html +=
         "<div class='multi-row multi-header'>" +
         "<span>候補IC</span>" +
-        "<span>時間差</span>" +
+        "<span>到着差</span>" +
         "<span>ETC概算</span>" +
         "<span>評価(円/分)</span>" +
         "</div>";
@@ -2843,21 +3008,42 @@ function displayMultiExitIcComparison(
 
         let differenceText = "";
 
-        if (result.difference > 0) {
+        const localDifference =
+            lastLocalRouteMinutes -
+            result.totalMinutes;
+
+        let differenceClass = "arrival-diff-same";
+
+        if (localDifference > 0) {
+
             differenceText =
-                "+" +
-                formatMinutes(result.difference);
+                formatMinutes(localDifference) +
+                "早着";
+
+            differenceClass =
+                "arrival-diff-good";
+
         }
-        else if (result.difference < 0) {
+        else if (localDifference < 0) {
+
             differenceText =
-                "-" +
                 formatMinutes(
-                    Math.abs(result.difference)
-                );
+                    Math.abs(localDifference)
+                ) +
+                "遅着";
+
+            differenceClass =
+                "arrival-diff-bad";
+
         }
         else {
+
             differenceText =
-                "同じ";
+                "同着";
+
+            differenceClass =
+                "arrival-diff-same";
+
         }
 
         let yenPerMinuteText = "--";
@@ -2895,7 +3081,9 @@ function displayMultiExitIcComparison(
             " " +
             getIcDisplayName(result.exitIc) +
             "</span>" +
-            "<span>" +
+            "<span class='" +
+            differenceClass +
+            "'>" +
             differenceText +
             "</span>" +
             "<span>" +
@@ -3079,24 +3267,15 @@ async function searchAutoExitIcComparison(
                 .value =
                 suggestedIcArea;
 
-            if (lastIcAreaDecisionType === "keyword") {
+            icAreaReason.innerHTML =
+                "<span style='color:#4CAF50'>" +
+                "方面判定：" +
+                IC_MASTER[suggestedIcArea].label +
+                "（" +
+                getIcAreaDecisionLabel() +
+                "）" +
+                "</span>";
 
-                icAreaReason.innerHTML =
-                    "<span style='color:#4CAF50'>" +
-                    "方面判定：" +
-                    IC_MASTER[suggestedIcArea].label +
-                    "（キーワード判定）" +
-                    "</span>";
-            }
-            else {
-
-                icAreaReason.innerHTML =
-                    "<span style='color:#4DA3FF'>" +
-                    "方面判定：" +
-                    IC_MASTER[suggestedIcArea].label +
-                    "（方角推定・首都圏向け）" +
-                    "</span>";
-            }
         }
         else {
             icAreaReason.textContent =
@@ -3149,6 +3328,12 @@ async function searchAutoExitIcComparison(
             ? selectedExits[selectedExits.length - 1].displayName
             : "不明";
 
+    const experimentalShutoCount =
+        selectedExits.filter(exit =>
+            exit.experimental === true &&
+            exit.roadType === "首都高"
+        ).length;
+
     let reasonText =
         "候補選定：" +
         (origin ? "出発地入力を使用" : "GPS現在地を使用") +
@@ -3156,6 +3341,13 @@ async function searchAutoExitIcComparison(
         startIcName +
         "〜" +
         endIcName;
+
+    if (experimentalShutoCount > 0) {
+        reasonText +=
+            " / 首都高入口テスト中：" +
+            experimentalShutoCount +
+            "件含む";
+    }
 
     if (lastNearestIcName) {
         reasonText +=
@@ -3376,18 +3568,8 @@ function findNearbyInterchanges() {
     );
 }
 
-async function suggestIcArea(origin, destination) {
 
-
-
-    const searchText =
-        (origin || "") +
-        " " +
-        (destination || "");
-
-    if (!destination) {
-        return null;
-    }
+function getIcAreaByKeyword(text) {
 
     const areaKeywords = {
         keiyo: [
@@ -3434,7 +3616,8 @@ async function suggestIcArea(origin, destination) {
 
         chuo: [
             "河口湖", "山梨", "甲府", "八王子", "相模湖",
-            "大月", "富士急", "富士山", "清里"
+            "相模原", "プレジャーフォレスト", "大月",
+            "富士急", "富士山", "清里", "高尾"
         ],
 
         tomei: [
@@ -3447,18 +3630,97 @@ async function suggestIcArea(origin, destination) {
 
         if (
             areaKeywords[areaKey].some(keyword =>
-                searchText.includes(keyword)
+                text.includes(keyword)
             )
         ) {
-            lastIcAreaDecisionType =
-                "keyword";
-
             return areaKey;
         }
     }
 
+    return null;
+}
+
+
+function getIcAreaDecisionLabel() {
+
+    if (lastIcAreaDecisionType === "origin-keyword") {
+        return "出発地キーワード判定";
+    }
+
+    if (lastIcAreaDecisionType === "current-location") {
+        return "現在地から判定";
+    }
+
+    if (lastIcAreaDecisionType === "destination-keyword") {
+        return "目的地キーワード判定";
+    }
+
+    if (lastIcAreaDecisionType === "direction") {
+        return "方角推定・首都圏向け";
+    }
+
+    return "自動判定";
+}
+
+async function suggestIcArea(origin, destination) {
+
+    if (!destination) {
+        return null;
+    }
+
+    const originText =
+        (origin || "").trim();
+
+    const destinationText =
+        (destination || "").trim();
+
+    if (originText) {
+
+        const originArea =
+            getIcAreaByKeyword(originText);
+
+        if (originArea) {
+
+            lastIcAreaDecisionType =
+                "origin-keyword";
+
+            return originArea;
+        }
+    }
+
+    if (!originText) {
+
+        const currentLocationText =
+            document
+                .getElementById("currentLocation")
+                ?.textContent || "";
+
+        const currentArea =
+            getIcAreaByKeyword(currentLocationText);
+
+        if (currentArea) {
+
+            lastIcAreaDecisionType =
+                "current-location";
+
+            return currentArea;
+        }
+    }
+
+    const destinationArea =
+        getIcAreaByKeyword(destinationText);
+
+    if (destinationArea) {
+
+        lastIcAreaDecisionType =
+            "destination-keyword";
+
+        return destinationArea;
+    }
+
     return await suggestIcAreaByDirection(destination);
 }
+
 
 function getIcDisplayName(googleName) {
 

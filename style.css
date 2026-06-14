@@ -883,3 +883,19 @@ details#searchPanel .origin-row input {
 .old-feature-hidden {
     display: none;
 }
+
+
+.arrival-diff-good {
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+.arrival-diff-bad {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.arrival-diff-same {
+    color: #ffffff;
+    font-weight: bold;
+}

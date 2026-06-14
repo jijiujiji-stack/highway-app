@@ -197,17 +197,40 @@ const IC_MASTER = {
     kanetsu: {
         label: "関越道方面",
         exits: [
-            { order: 1, displayName: "練馬IC", googleName: "関越自動車道 練馬インターチェンジ" },
-            { order: 2, displayName: "大泉IC", googleName: "関越自動車道 大泉インターチェンジ" },
-            { order: 3, displayName: "所沢IC", googleName: "関越自動車道 所沢インターチェンジ" },
-            { order: 4, displayName: "三芳SIC", googleName: "関越自動車道 三芳スマートインターチェンジ" },
-            { order: 5, displayName: "川越IC", googleName: "関越自動車道 川越インターチェンジ" },
-            { order: 6, displayName: "鶴ヶ島IC", googleName: "関越自動車道 鶴ヶ島インターチェンジ" },
-            { order: 7, displayName: "坂戸西SIC", googleName: "関越自動車道 坂戸西スマートインターチェンジ" },
-            { order: 8, displayName: "東松山IC", googleName: "関越自動車道 東松山インターチェンジ" },
-            { order: 9, displayName: "嵐山小川IC", googleName: "関越自動車道 嵐山小川インターチェンジ" },
-            { order: 10, displayName: "花園IC", googleName: "関越自動車道 花園インターチェンジ" },
-            { order: 11, displayName: "本庄児玉IC", googleName: "関越自動車道 本庄児玉インターチェンジ" }
+            { order: 1, displayName: "練馬IC", googleName: "関越自動車道 練馬インターチェンジ", lat: 35.753, lng: 139.605 },
+            { order: 2, displayName: "大泉IC", googleName: "関越自動車道 大泉インターチェンジ", lat: 35.771, lng: 139.587 },
+            { order: 3, displayName: "所沢IC", googleName: "関越自動車道 所沢インターチェンジ", lat: 35.801, lng: 139.498 },
+            { order: 4, displayName: "三芳SIC", googleName: "関越自動車道 三芳スマートインターチェンジ", lat: 35.843, lng: 139.518 },
+            { order: 5, displayName: "川越IC", googleName: "関越自動車道 川越インターチェンジ", lat: 35.907, lng: 139.483 },
+            { order: 6, displayName: "鶴ヶ島IC", googleName: "関越自動車道 鶴ヶ島インターチェンジ", lat: 35.944, lng: 139.394 },
+            { order: 7, displayName: "坂戸西SIC", googleName: "関越自動車道 坂戸西スマートインターチェンジ", lat: 35.971, lng: 139.356 },
+            { order: 8, displayName: "東松山IC", googleName: "関越自動車道 東松山インターチェンジ", lat: 36.036, lng: 139.377 },
+            { order: 9, displayName: "嵐山小川IC", googleName: "関越自動車道 嵐山小川インターチェンジ", lat: 36.060, lng: 139.300 },
+            { order: 10, displayName: "花園IC", googleName: "関越自動車道 花園インターチェンジ", lat: 36.115, lng: 139.214 },
+            { order: 11, displayName: "本庄児玉IC", googleName: "関越自動車道 本庄児玉インターチェンジ", lat: 36.223, lng: 139.152 },
+            { order: 12, displayName: "高崎玉村SIC", googleName: "関越自動車道 高崎玉村スマートインターチェンジ", lat: 36.284, lng: 139.101 },
+            { order: 13, displayName: "高崎IC", googleName: "関越自動車道 高崎インターチェンジ", lat: 36.308, lng: 139.063 },
+            { order: 14, displayName: "前橋IC", googleName: "関越自動車道 前橋インターチェンジ", lat: 36.384, lng: 139.055 },
+            { order: 15, displayName: "駒寄SIC", googleName: "関越自動車道 駒寄スマートインターチェンジ", lat: 36.441, lng: 139.010 },
+            { order: 16, displayName: "渋川伊香保IC", googleName: "関越自動車道 渋川伊香保インターチェンジ", lat: 36.493, lng: 139.007 },
+            { order: 17, displayName: "赤城IC", googleName: "関越自動車道 赤城インターチェンジ", lat: 36.558, lng: 139.069 },
+            { order: 18, displayName: "昭和IC", googleName: "関越自動車道 昭和インターチェンジ", lat: 36.634, lng: 139.101 },
+            { order: 19, displayName: "沼田IC", googleName: "関越自動車道 沼田インターチェンジ", lat: 36.663, lng: 139.036 },
+            { order: 20, displayName: "月夜野IC", googleName: "関越自動車道 月夜野インターチェンジ", lat: 36.748, lng: 138.988 },
+            { order: 21, displayName: "水上IC", googleName: "関越自動車道 水上インターチェンジ", lat: 36.801, lng: 138.964 }
+        ]
+    },
+
+    joshinetsu: {
+        label: "上信越道方面",
+        exits: [
+            { order: 1, displayName: "藤岡IC", googleName: "上信越自動車道 藤岡インターチェンジ", lat: 36.269, lng: 139.074 },
+            { order: 2, displayName: "吉井IC", googleName: "上信越自動車道 吉井インターチェンジ", lat: 36.250, lng: 138.986 },
+            { order: 3, displayName: "富岡IC", googleName: "上信越自動車道 富岡インターチェンジ", lat: 36.250, lng: 138.891 },
+            { order: 4, displayName: "下仁田IC", googleName: "上信越自動車道 下仁田インターチェンジ", lat: 36.210, lng: 138.774 },
+            { order: 5, displayName: "松井田妙義IC", googleName: "上信越自動車道 松井田妙義インターチェンジ", lat: 36.309, lng: 138.733 },
+            { order: 6, displayName: "碓氷軽井沢IC", googleName: "上信越自動車道 碓氷軽井沢インターチェンジ", lat: 36.338, lng: 138.640 },
+            { order: 7, displayName: "佐久IC", googleName: "上信越自動車道 佐久インターチェンジ", lat: 36.269, lng: 138.476 }
         ]
     },
 
@@ -215,37 +238,57 @@ const IC_MASTER = {
     chuo: {
         label: "中央道方面",
         exits: [
-            { order: 1, displayName: "高井戸IC", googleName: "中央自動車道 高井戸インターチェンジ" },
-            { order: 2, displayName: "調布IC", googleName: "中央自動車道 調布インターチェンジ" },
-            { order: 3, displayName: "稲城IC", googleName: "中央自動車道 稲城インターチェンジ" },
-            { order: 4, displayName: "府中SIC", googleName: "中央自動車道 府中スマートインターチェンジ" },
-            { order: 5, displayName: "国立府中IC", googleName: "中央自動車道 国立府中インターチェンジ" },
-            { order: 6, displayName: "八王子IC", googleName: "中央自動車道 八王子インターチェンジ" },
-            { order: 7, displayName: "相模湖IC", googleName: "中央自動車道 相模湖インターチェンジ" },
-            { order: 8, displayName: "上野原IC", googleName: "中央自動車道 上野原インターチェンジ" },
-            { order: 9, displayName: "大月IC", googleName: "中央自動車道 大月インターチェンジ" },
-            { order: 10, displayName: "勝沼IC", googleName: "中央自動車道 勝沼インターチェンジ" },
-            { order: 11, displayName: "一宮御坂IC", googleName: "中央自動車道 一宮御坂インターチェンジ" }
+            { order: 1, displayName: "高井戸IC", googleName: "中央自動車道 高井戸インターチェンジ", lat: 35.684, lng: 139.611 },
+            { order: 2, displayName: "調布IC", googleName: "中央自動車道 調布インターチェンジ", lat: 35.650, lng: 139.536 },
+            { order: 3, displayName: "稲城IC", googleName: "中央自動車道 稲城インターチェンジ", lat: 35.638, lng: 139.510 },
+            { order: 4, displayName: "国立府中IC", googleName: "中央自動車道 国立府中インターチェンジ", lat: 35.668, lng: 139.457 },
+            { order: 5, displayName: "八王子IC", googleName: "中央自動車道 八王子インターチェンジ", lat: 35.657, lng: 139.335 },
+            { order: 6, displayName: "相模湖IC", googleName: "中央自動車道 相模湖インターチェンジ", lat: 35.616, lng: 139.190 },
+            { order: 7, displayName: "上野原IC", googleName: "中央自動車道 上野原インターチェンジ", lat: 35.631, lng: 139.109 },
+            { order: 8, displayName: "大月IC", googleName: "中央自動車道 大月インターチェンジ", lat: 35.616, lng: 138.949 },
+            { order: 9, displayName: "勝沼IC", googleName: "中央自動車道 勝沼インターチェンジ", lat: 35.686, lng: 138.739 },
+            { order: 10, displayName: "一宮御坂IC", googleName: "中央自動車道 一宮御坂インターチェンジ", lat: 35.657, lng: 138.688 },
+            { order: 11, displayName: "甲府昭和IC", googleName: "中央自動車道 甲府昭和インターチェンジ", lat: 35.627, lng: 138.553 },
+            { order: 12, displayName: "双葉SIC", googleName: "中央自動車道 双葉スマートインターチェンジ", lat: 35.705, lng: 138.503 },
+            { order: 13, displayName: "韮崎IC", googleName: "中央自動車道 韮崎インターチェンジ", lat: 35.718, lng: 138.445 },
+            { order: 14, displayName: "須玉IC", googleName: "中央自動車道 須玉インターチェンジ", lat: 35.795, lng: 138.406 },
+            { order: 15, displayName: "長坂IC", googleName: "中央自動車道 長坂インターチェンジ", lat: 35.841, lng: 138.366 },
+            { order: 16, displayName: "小淵沢IC", googleName: "中央自動車道 小淵沢インターチェンジ", lat: 35.888, lng: 138.316 },
+            { order: 17, displayName: "諏訪南IC", googleName: "中央自動車道 諏訪南インターチェンジ", lat: 35.973, lng: 138.232 },
+            { order: 18, displayName: "諏訪IC", googleName: "中央自動車道 諏訪インターチェンジ", lat: 36.031, lng: 138.114 },
+            { order: 19, displayName: "岡谷IC", googleName: "長野自動車道 岡谷インターチェンジ", lat: 36.056, lng: 138.050 },
+            { order: 20, displayName: "塩尻IC", googleName: "長野自動車道 塩尻インターチェンジ", lat: 36.093, lng: 137.963 },
+            { order: 21, displayName: "松本IC", googleName: "長野自動車道 松本インターチェンジ", lat: 36.219, lng: 137.940 },
+            { order: 22, displayName: "安曇野IC", googleName: "長野自動車道 安曇野インターチェンジ", lat: 36.300, lng: 137.898 }
         ]
-
     },
-
 
 
     tomei: {
         label: "東名道方面",
         exits: [
-            { order: 1, displayName: "東京IC", googleName: "東名高速道路 東京インターチェンジ" },
-            { order: 2, displayName: "東名川崎IC", googleName: "東名高速道路 東名川崎インターチェンジ" },
-            { order: 3, displayName: "横浜青葉IC", googleName: "東名高速道路 横浜青葉インターチェンジ" },
-            { order: 4, displayName: "横浜町田IC", googleName: "東名高速道路 横浜町田インターチェンジ" },
-            { order: 5, displayName: "綾瀬SIC", googleName: "東名高速道路 綾瀬スマートインターチェンジ" },
-            { order: 6, displayName: "厚木IC", googleName: "東名高速道路 厚木インターチェンジ" },
-            { order: 7, displayName: "秦野中井IC", googleName: "東名高速道路 秦野中井インターチェンジ" },
-            { order: 8, displayName: "大井松田IC", googleName: "東名高速道路 大井松田インターチェンジ" },
-            { order: 9, displayName: "御殿場IC", googleName: "東名高速道路 御殿場インターチェンジ" },
-            { order: 10, displayName: "裾野IC", googleName: "東名高速道路 裾野インターチェンジ" },
-            { order: 11, displayName: "沼津IC", googleName: "東名高速道路 沼津インターチェンジ" }
+            { order: 1, displayName: "東京IC", googleName: "東名高速道路 東京インターチェンジ", lat: 35.625, lng: 139.632 },
+            { order: 2, displayName: "東名川崎IC", googleName: "東名高速道路 東名川崎インターチェンジ", lat: 35.589, lng: 139.587 },
+            { order: 3, displayName: "横浜青葉IC", googleName: "東名高速道路 横浜青葉インターチェンジ", lat: 35.542, lng: 139.537 },
+            { order: 4, displayName: "横浜町田IC", googleName: "東名高速道路 横浜町田インターチェンジ", lat: 35.513, lng: 139.474 },
+            { order: 5, displayName: "綾瀬SIC", googleName: "東名高速道路 綾瀬スマートインターチェンジ", lat: 35.436, lng: 139.429 },
+            { order: 6, displayName: "厚木IC", googleName: "東名高速道路 厚木インターチェンジ", lat: 35.417, lng: 139.364 },
+            { order: 7, displayName: "秦野中井IC", googleName: "東名高速道路 秦野中井インターチェンジ", lat: 35.374, lng: 139.214 },
+            { order: 8, displayName: "大井松田IC", googleName: "東名高速道路 大井松田インターチェンジ", lat: 35.344, lng: 139.152 },
+            { order: 9, displayName: "御殿場IC", googleName: "東名高速道路 御殿場インターチェンジ", lat: 35.300, lng: 138.934 },
+            { order: 10, displayName: "裾野IC", googleName: "東名高速道路 裾野インターチェンジ", lat: 35.190, lng: 138.909 },
+            { order: 11, displayName: "沼津IC", googleName: "東名高速道路 沼津インターチェンジ", lat: 35.156, lng: 138.860 },
+            { order: 12, displayName: "富士IC", googleName: "東名高速道路 富士インターチェンジ", lat: 35.180, lng: 138.671 },
+            { order: 13, displayName: "清水IC", googleName: "東名高速道路 清水インターチェンジ", lat: 35.037, lng: 138.477 },
+            { order: 14, displayName: "静岡IC", googleName: "東名高速道路 静岡インターチェンジ", lat: 34.944, lng: 138.395 },
+            { order: 15, displayName: "焼津IC", googleName: "東名高速道路 焼津インターチェンジ", lat: 34.861, lng: 138.302 },
+            { order: 16, displayName: "吉田IC", googleName: "東名高速道路 吉田インターチェンジ", lat: 34.781, lng: 138.252 },
+            { order: 17, displayName: "相良牧之原IC", googleName: "東名高速道路 相良牧之原インターチェンジ", lat: 34.735, lng: 138.179 },
+            { order: 18, displayName: "菊川IC", googleName: "東名高速道路 菊川インターチェンジ", lat: 34.748, lng: 138.086 },
+            { order: 19, displayName: "掛川IC", googleName: "東名高速道路 掛川インターチェンジ", lat: 34.754, lng: 137.999 },
+            { order: 20, displayName: "袋井IC", googleName: "東名高速道路 袋井インターチェンジ", lat: 34.749, lng: 137.908 },
+            { order: 21, displayName: "磐田IC", googleName: "東名高速道路 磐田インターチェンジ", lat: 34.783, lng: 137.823 },
+            { order: 22, displayName: "浜松IC", googleName: "東名高速道路 浜松インターチェンジ", lat: 34.758, lng: 137.773 }
         ]
     },
 
@@ -573,6 +616,8 @@ let lastIcAreaDecisionType = "";
 
 let lastSearchMode = "";
 let lastLocalRouteMinutes = null;
+
+let invalidIcResults = [];
 
 
 
@@ -1131,13 +1176,47 @@ async function displayRouteComparison(
             );
     }
 
-    const reasonText =
-        "高速で " +
-        formatMinutes(savedMinutes) +
-        "早着\n" +
-        "1分短縮あたり " +
-        costPerMinute +
-        "円";
+    let reasonText = "";
+
+    if (savedMinutes > 0) {
+
+        reasonText =
+            "<div class='main-compare-label'>🚙 高速利用</div>" +
+            "<div class='main-compare-value reason-green'>" +
+            formatMinutes(savedMinutes) +
+            "早い" +
+            "</div>" +
+            "<div class='main-compare-cost'>" +
+            costPerMinute +
+            "円/分" +
+            "</div>";
+
+    }
+    else if (savedMinutes < 0) {
+
+        reasonText =
+            "<div class='main-compare-label'>🚗 有料回避</div>" +
+            "<div class='main-compare-value reason-green'>" +
+            formatMinutes(Math.abs(savedMinutes)) +
+            "早い" +
+            "</div>" +
+            "<div class='main-compare-cost'>" +
+            "高速利用より遅くなりません" +
+            "</div>";
+
+    }
+    else {
+
+        reasonText =
+            "<div class='main-compare-label'>🚙🚗 ほぼ同等</div>" +
+            "<div class='main-compare-value reason-neutral'>" +
+            "同じくらい" +
+            "</div>" +
+            "<div class='main-compare-cost'>" +
+            costPerMinute +
+            "円/分" +
+            "</div>";
+    }
 
     highwayCard
         .querySelectorAll(".sub")[1]
@@ -1348,7 +1427,7 @@ async function displayRouteComparison(
 
         document
             .getElementById("dashboardReason")
-            .textContent =
+            .innerHTML =
             reasonText;
     }
 }
@@ -2502,6 +2581,8 @@ async function searchMultiExitIcComparison() {
 
     try {
 
+        invalidIcResults = [];
+
         document
             .getElementById("multiExitIcResult")
             .textContent =
@@ -2546,6 +2627,20 @@ async function searchMultiExitIcComparison() {
 
             try {
 
+                if (
+                    lastTollStartIcGoogleName &&
+                    exitIc === lastTollStartIcGoogleName
+                ) {
+
+                    invalidIcResults.push({
+                        exitIc: exitIc,
+                        totalMinutes: null,
+                        reason: "入口ICと同じため除外"
+                    });
+
+                    continue;
+                }
+
                 const highwayToIcRoute =
                     await getHighwayRouteFromOrigin(
                         origin,
@@ -2579,6 +2674,18 @@ async function searchMultiExitIcComparison() {
                 const difference =
                     totalMinutes -
                     keepHighwayMinutes;
+
+                if (totalMinutes > keepHighwayMinutes + 180) {
+
+                    invalidIcResults.push({
+                        exitIc: exitIc,
+                        totalMinutes: totalMinutes,
+                        reason: "ルート取得異常"
+                    });
+
+                    continue;
+                }
+
 
                 let estimatedToll = 0;
                 let estimatedTollKm = 0;
@@ -2710,6 +2817,10 @@ function displayMultiExitIcComparison(
             result.difference <= acceptableDelay
         );
 
+
+    const roadOrderResults =
+        results.slice();
+
     if (acceptableResults.length > 0) {
 
         acceptableResults.sort(
@@ -2778,47 +2889,36 @@ function displayMultiExitIcComparison(
             ? lastLocalRouteMinutes - best.totalMinutes
             : null;
 
-    let localComparisonText = "";
-
-    let localComparisonClass = "value-normal";
+    let localComparisonValue = "";
 
     if (localComparisonMinutes > 0) {
 
-        localComparisonText =
-            "🚙有料回避より " +
+        localComparisonValue =
             "<span class='reason-green'>" +
             formatMinutes(localComparisonMinutes) +
-            "早着" +
+            "早い" +
             "</span>";
-
-        localComparisonClass =
-            "value-good";
 
     }
     else if (localComparisonMinutes < 0) {
 
-        localComparisonText =
-            "🚙有料回避より " +
+        localComparisonValue =
             "<span class='reason-red'>" +
             formatMinutes(
                 Math.abs(localComparisonMinutes)
             ) +
-            "遅着" +
+            "遅い" +
             "</span>";
-
-        localComparisonClass =
-            "value-high";
 
     }
     else if (localComparisonMinutes === 0) {
 
-        localComparisonText =
-            "🚙有料回避と同着";
-
-        localComparisonClass =
-            "value-normal";
+        localComparisonValue =
+            "<span class='reason-neutral'>同着</span>";
 
     }
+
+
 
     document
         .getElementById("dashboardRecommendation")
@@ -2857,73 +2957,68 @@ function displayMultiExitIcComparison(
         bestTotalTimeText +
         "</div>" +
 
-        "<div class='arrival-diff'>" +
-        "差 " +
-        bestShortDifferenceText +
-        "</div>" +
-
-        "<div>" +
-        "💴 ETC概算 " +
-        best.estimatedToll.toLocaleString() +
-        "円" +
+        "<div id='dashboardMovedJudge' class='multi-best-reason value-high'>" +
+        getExitIcJudge(best.score) +
         "</div>" +
 
         "<div class='multi-best-reason'>" +
-        "参考：約" +
+        "💴 ETC概算 " +
+        best.estimatedToll.toLocaleString() +
+        "円" +
+        "（節約 " +
         best.savedToll.toLocaleString() +
-        "円節約" +
+        "円）" +
         "</div>";
 
-    let highwayComparisonText = "";
-    let highwayComparisonClass = "value-normal";
+
+    let highwayComparisonValue = "";
 
     if (best.difference > 0) {
 
-        highwayComparisonText =
-            "全高速より " +
+        highwayComparisonValue =
             "<span class='reason-red'>" +
             formatMinutes(best.difference) +
             "遅い" +
             "</span>";
 
-        highwayComparisonClass =
-            "value-high";
-
     }
     else if (best.difference < 0) {
 
-        highwayComparisonText =
-            "全高速より" +
+        highwayComparisonValue =
+            "<span class='reason-green'>" +
             formatMinutes(
                 Math.abs(best.difference)
             ) +
-            "早着";
-
-        highwayComparisonClass =
-            "value-good";
+            "早い" +
+            "</span>";
 
     }
     else {
 
-        highwayComparisonText =
-            "全高速と同着";
-
-        highwayComparisonClass =
-            "value-normal";
+        highwayComparisonValue =
+            "<span class='reason-neutral'>同着</span>";
 
     }
 
     dashboardReasonText +=
-        "<div class='multi-best-reason'>" +
-        highwayComparisonText +
+        "<div class='dashboard-compare-row'>" +
+
+        "<div class='dashboard-compare-item'>" +
+        "<div class='compare-label'>🚙 高速利用より</div>" +
+        "<div class='compare-value'>" +
+        highwayComparisonValue +
+        "</div>" +
+        "</div>" +
+
+        "<div class='dashboard-compare-item'>" +
+        "<div class='compare-label'>🚗 有料回避より</div>" +
+        "<div class='compare-value'>" +
+        localComparisonValue +
+        "</div>" +
+        "</div>" +
+
         "</div>";
 
-    if (localComparisonText) {
-        dashboardReasonText +=
-            "<div class='multi-best-reason'>" +
-            localComparisonText +
-            "</div>";
-    }
 
 
     document
@@ -2939,7 +3034,7 @@ function displayMultiExitIcComparison(
     document
         .getElementById("dashboardValueJudge")
         .textContent =
-        getExitIcJudge(best.score);
+        "";
 
 
     const dashboardValueJudge =
@@ -2987,7 +3082,6 @@ function displayMultiExitIcComparison(
         best.yenPerExtraMinute + "円/分";
 
     html +=
-        html +=
         "<div class='multi-best'>" +
         "<div class='multi-best-label'>おすすめルート</div>" +
         "<div class='multi-best-ic'>" +
@@ -3053,7 +3147,7 @@ function displayMultiExitIcComparison(
         "<div class='multi-best-reason'>" +
         "順位は節約効率（円/分）で算出" +
         "<br>" +
-        "※到着差は「🚙 有料回避」との到着時間差" +
+        "※到着差は「🚗 有料回避」との到着時間差" +
         "</div>";
 
 
@@ -3066,7 +3160,20 @@ function displayMultiExitIcComparison(
         "</div>";
 
 
-    for (const [index, result] of sortedResults.entries()) {
+    const rankMap = new Map();
+
+    sortedResults.forEach((result, index) => {
+        rankMap.set(result.exitIc, index + 1);
+    });
+
+    const displayResults =
+        roadOrderResults;
+
+
+    for (const result of displayResults) {
+
+        const rank =
+            rankMap.get(result.exitIc);
 
         let differenceText = "";
 
@@ -3074,13 +3181,20 @@ function displayMultiExitIcComparison(
             lastLocalRouteMinutes -
             result.totalMinutes;
 
+        console.log(
+            "DEBUG",
+            result.exitIc,
+            result.totalMinutes,
+            lastLocalRouteMinutes
+        );
+
         let differenceClass = "arrival-diff-same";
 
         if (localDifference > 0) {
 
             differenceText =
                 formatMinutes(localDifference) +
-                "早着";
+                "早い";
 
             differenceClass =
                 "arrival-diff-good";
@@ -3092,7 +3206,7 @@ function displayMultiExitIcComparison(
                 formatMinutes(
                     Math.abs(localDifference)
                 ) +
-                "遅着";
+                "遅い";
 
             differenceClass =
                 "arrival-diff-bad";
@@ -3139,7 +3253,7 @@ function displayMultiExitIcComparison(
         html +=
             "<div class='" + rowClass + "'>" +
             "<span>" +
-            getRankLabel(index) +
+            getRankLabel(rank - 1) +
             " " +
             getIcDisplayName(result.exitIc) +
             "</span>" +
@@ -3162,6 +3276,34 @@ function displayMultiExitIcComparison(
             "</span>" +
             "</div>";
     }
+
+    if (invalidIcResults.length > 0) {
+
+        html +=
+            "<div class='multi-best-reason' style='margin-top:12px; color:#999'>" +
+            "⚠ 比較対象外<br>";
+
+        invalidIcResults.forEach(item => {
+
+            html +=
+                getIcDisplayName(item.exitIc) +
+                "　" +
+                item.reason;
+
+            if (item.totalMinutes !== null) {
+                html +=
+                    "（" +
+                    item.totalMinutes +
+                    "分）";
+            }
+
+            html += "<br>";
+        });
+
+        html +=
+            "</div>";
+    }
+
 
     document
         .getElementById("multiExitIcResult")
@@ -3365,20 +3507,84 @@ async function searchAutoExitIcComparison(
                 (a.order ?? 999) - (b.order ?? 999)
             );
 
-    const safeStartIndex =
-        Math.max(
-            0,
-            Math.min(
-                startIndex,
-                sortedExits.length - 5
-            )
+    const destinationNearestIc =
+        await findNearestIcInfoByAddress(
+            destination,
+            icArea
         );
 
-    const selectedExits =
-        sortedExits.slice(
-            safeStartIndex,
-            safeStartIndex + 5
-        );
+    let candidateCount = 5;
+
+    if (
+        destinationNearestIc &&
+        lastTollStartIcOrder !== null &&
+        destinationNearestIc.order !== null
+    ) {
+
+        const icOrderDistance =
+            Math.abs(
+                destinationNearestIc.order -
+                lastTollStartIcOrder
+            );
+
+        if (icOrderDistance >= 10) {
+            candidateCount = 7;
+        }
+    }
+
+    const destinationIndex =
+        destinationNearestIc
+            ? sortedExits.findIndex(exit =>
+                exit.googleName === destinationNearestIc.googleName
+            )
+            : -1;
+
+    let selectedExits = [];
+
+    if (destinationIndex >= 0) {
+
+        if (destinationIndex >= startIndex) {
+
+            const endIndex =
+                Math.min(
+                    destinationIndex + 1,
+                    startIndex + candidateCount
+                );
+
+            selectedExits =
+                sortedExits.slice(
+                    startIndex,
+                    endIndex
+                );
+
+        }
+        else {
+
+            const endIndex =
+                Math.max(
+                    destinationIndex,
+                    startIndex - candidateCount + 1
+                );
+
+            selectedExits =
+                sortedExits.slice(
+                    endIndex,
+                    startIndex + 1
+                ).reverse();
+
+        }
+
+    }
+    else {
+
+        selectedExits =
+            sortedExits.slice(
+                startIndex,
+                startIndex + candidateCount
+            );
+
+    }
+
 
     const startIcName =
         selectedExits[0]
@@ -3420,11 +3626,6 @@ async function searchAutoExitIcComparison(
             "km）";
     }
 
-    const destinationNearestIc =
-        await findNearestIcInfoByAddress(
-            destination,
-            icArea
-        );
 
     if (destinationNearestIc) {
 
@@ -4313,6 +4514,9 @@ async function suggestIcAreaByDirection(destination) {
         Math.round(bearing),
         "度"
     );
+
+
+
 
     if (bearing >= 20 && bearing < 70) {
 

@@ -623,6 +623,7 @@ let invalidIcResults = [];
 
 let isAutoUpdateEnabled = true;
 let currentMultiIcMode = "entrance";
+let lastMultiIcV2Results = [];
 
 const TEST_ORIGIN = "荒川区役所";
 
@@ -3244,6 +3245,157 @@ async function searchMultiExitIcComparison() {
     }
 }
 
+async function searchEntranceIcComparisonV2(options = {}) {
+
+    const origin =
+        options.origin ??
+        document.getElementById("origin")?.value ??
+        "";
+
+    const destination =
+        options.destination ??
+        document.getElementById("destination")?.value ??
+        "";
+
+    const selectedExits =
+        options.selectedExits ?? [];
+
+    const routeOrigin =
+        getRouteOriginForMultiExitComparison(origin);
+
+    lastMultiIcV2Results = [];
+
+    let allLocalMinutes = null;
+    let allLocalError = null;
+
+    try {
+
+        const allLocalRoute =
+            await getLocalRouteForMultiExitComparison(
+                routeOrigin,
+                destination
+            );
+
+        allLocalMinutes =
+            getRouteDurationMinutes(allLocalRoute);
+
+    } catch (error) {
+
+        allLocalError =
+            error.message || String(error);
+
+        console.warn(
+            "V2 all local route failed",
+            allLocalError
+        );
+    }
+
+    for (const exit of selectedExits) {
+
+        try {
+
+            const localToCandidateRoute =
+                await getLocalRouteForMultiExitComparison(
+                    routeOrigin,
+                    exit.googleName
+                );
+
+            const highwayFromCandidateRoute =
+                await getHighwayRouteForMultiExitComparison(
+                    exit.googleName,
+                    destination
+                );
+
+            const localToCandidateMinutes =
+                getRouteDurationMinutes(
+                    localToCandidateRoute
+                );
+
+            const highwayFromCandidateMinutes =
+                getRouteDurationMinutes(
+                    highwayFromCandidateRoute
+                );
+
+            const totalMinutes =
+                localToCandidateMinutes +
+                highwayFromCandidateMinutes;
+
+            const estimatedToll =
+                Math.round(
+                    (
+                        highwayFromCandidateRoute.distanceMeters /
+                        1000
+                    ) * 24
+                );
+
+            const differenceFromAllLocal =
+                allLocalMinutes === null
+                    ? null
+                    : allLocalMinutes - totalMinutes;
+
+            const yenPerSavedMinute =
+                differenceFromAllLocal > 0
+                    ? Math.round(
+                        estimatedToll /
+                        differenceFromAllLocal
+                    )
+                    : null;
+
+            lastMultiIcV2Results.push({
+                candidateIcName: exit.displayName,
+                candidateIcGoogleName: exit.googleName,
+                localToCandidateMinutes:
+                    localToCandidateMinutes,
+                highwayFromCandidateMinutes:
+                    highwayFromCandidateMinutes,
+                totalMinutes: totalMinutes,
+                estimatedToll: estimatedToll,
+                allLocalMinutes: allLocalMinutes,
+                differenceFromAllLocal:
+                    differenceFromAllLocal,
+                yenPerSavedMinute: yenPerSavedMinute,
+                minutesToCandidate:
+                    localToCandidateMinutes,
+                baselineError: allLocalError,
+                error: null
+            });
+
+        } catch (error) {
+
+            lastMultiIcV2Results.push({
+                candidateIcName: exit.displayName,
+                candidateIcGoogleName: exit.googleName,
+                localToCandidateMinutes: null,
+                highwayFromCandidateMinutes: null,
+                totalMinutes: null,
+                estimatedToll: null,
+                allLocalMinutes: allLocalMinutes,
+                differenceFromAllLocal: null,
+                yenPerSavedMinute: null,
+                minutesToCandidate: null,
+                baselineError: allLocalError,
+                error: error.message || String(error)
+            });
+        }
+    }
+
+    console.log(
+        "複数IC比較V2 entrance results",
+        lastMultiIcV2Results
+    );
+
+    console.table(lastMultiIcV2Results);
+}
+
+function getRouteDurationMinutes(route) {
+
+    return Math.round(
+        parseInt(
+            route.duration.replace("s", "")
+        ) / 60
+    );
+}
+
 function displayMultiExitIcComparison(
     keepHighwayMinutes,
     results,
@@ -4214,6 +4366,13 @@ async function searchAutoExitIcComparison(
             .getElementById("multiExitIcResult")
             .textContent =
             noExitCandidatesMessage;
+    }
+    else if (currentMultiIcMode === "entrance") {
+        await searchEntranceIcComparisonV2({
+            origin: origin,
+            destination: destination,
+            selectedExits: selectedExits
+        });
     }
     else {
         await searchMultiExitIcComparison();

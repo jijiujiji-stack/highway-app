@@ -619,6 +619,29 @@ let lastLocalRouteMinutes = null;
 
 let invalidIcResults = [];
 
+const TEST_ORIGIN = "荒川区役所";
+
+const TEST_DESTINATIONS = [
+    { area: "joban", name: "筑波山" },
+    { area: "joban", name: "スパリゾートハワイアンズ" },
+    { area: "chuo", name: "津久井湖" },
+    { area: "chuo", name: "松本城" },
+    { area: "kanetsu", name: "長瀞オートキャンプ場" },
+    { area: "kanetsu", name: "吹割の滝" },
+    { area: "tomei", name: "熱海城" },
+    { area: "tomei", name: "タミヤサーキット" },
+    { area: "keiyo", name: "東京ディズニーランド" },
+    { area: "keiyo", name: "幕張メッセ" },
+    { area: "tokan", name: "成田空港" },
+    { area: "tokan", name: "香取神宮" },
+    { area: "joshinetsu", name: "峠の釜めし本舗おぎのや資料館" },
+    { area: "joshinetsu", name: "鬼押出し園" },
+    { area: "tateyama", name: "道の駅保田小学校" },
+    { area: "tateyama", name: "鴨川シーワールド" },
+    { area: "aqualine", name: "木更津アウトレット" },
+    { area: "aqualine", name: "養老渓谷" }
+];
+
 
 
 
@@ -728,6 +751,13 @@ window.addEventListener("load", () => {
         .addEventListener(
             "click",
             searchAutoExitIcComparison
+        );
+
+    document
+        .getElementById("candidateIcTestButton")
+        ?.addEventListener(
+            "click",
+            runCandidateIcTest
         );
 
 
@@ -2615,8 +2645,56 @@ async function findNearestHighwayStartForAutoExitComparison(
         }
     }
 
+    return findNearestIcByMasterCoordinatesForAutoExitComparison(
+        icArea,
+        baseLat,
+        baseLng
+    );
+}
+
+async function findDestinationNearestIcForAutoExitComparison(
+    destination,
+    icArea
+) {
+
+    const destinationLatLng =
+        await getLatLngFromAddress(destination);
+
+    if (!destinationLatLng) {
+        return null;
+    }
+
+    const nearestInfo =
+        findNearestIcByMasterCoordinatesForAutoExitComparison(
+            icArea,
+            destinationLatLng.lat,
+            destinationLatLng.lng
+        );
+
+    if (!nearestInfo) {
+        return null;
+    }
+
+    return {
+        displayName: nearestInfo.exit.displayName,
+        googleName: nearestInfo.exit.googleName,
+        order: nearestInfo.exit.order ?? null,
+        distanceKm: nearestInfo.distanceKm
+    };
+}
+
+function findNearestIcByMasterCoordinatesForAutoExitComparison(
+    icArea,
+    baseLat,
+    baseLng
+) {
+
     const exits =
         IC_MASTER[icArea].exits
+            .filter(exit =>
+                exit.lat !== undefined &&
+                exit.lng !== undefined
+            )
             .slice()
             .sort((a, b) =>
                 (a.order ?? 999) - (b.order ?? 999)
@@ -2627,34 +2705,12 @@ async function findNearestHighwayStartForAutoExitComparison(
 
     for (const exit of exits) {
 
-        let exitLat = exit.lat;
-        let exitLng = exit.lng;
-
-        if (
-            exitLat === undefined ||
-            exitLng === undefined
-        ) {
-
-            const exitLatLng =
-                await getLatLngFromAddress(exit.googleName);
-
-            if (!exitLatLng) {
-                continue;
-            }
-
-            exit.lat = exitLatLng.lat;
-            exit.lng = exitLatLng.lng;
-
-            exitLat = exit.lat;
-            exitLng = exit.lng;
-        }
-
         const distance =
             calculateDistance(
                 baseLat,
                 baseLng,
-                exitLat,
-                exitLng
+                exit.lat,
+                exit.lng
             );
 
         if (distance < nearestDistance) {
@@ -3891,7 +3947,7 @@ async function searchAutoExitIcComparison(
         highwayStart.order ?? null;
 
     const destinationNearestIc =
-        await findNearestIcInfoByAddress(
+        await findDestinationNearestIcForAutoExitComparison(
             destination,
             icArea
         );
@@ -4094,6 +4150,746 @@ async function searchAutoExitIcComparison(
         scrollToTopPanel();
     }
 
+}
+
+
+async function runCandidateIcTest() {
+
+    const button =
+        document.getElementById("candidateIcTestButton");
+
+    const resultArea =
+        document.getElementById("candidateIcTestResult");
+
+    if (!resultArea) {
+        return;
+    }
+
+    if (
+        !window.google ||
+        !window.google.maps ||
+        !window.google.maps.Geocoder
+    ) {
+        resultArea.textContent =
+            "NG\nエラー内容: Google Maps 読み込み前です";
+        return;
+    }
+
+    if (button) {
+        button.disabled = true;
+    }
+
+    resultArea.textContent =
+        "候補ICテスト実行中...";
+
+    const savedLatitude = currentLatitude;
+    const savedLongitude = currentLongitude;
+    const savedDecisionType = lastIcAreaDecisionType;
+
+    const results = [];
+
+    try {
+
+        for (const destination of TEST_DESTINATIONS) {
+
+            const routes = [
+                {
+                    expectedArea: destination.area,
+                    origin: TEST_ORIGIN,
+                    destination: destination.name
+                },
+                {
+                    expectedArea: destination.area,
+                    origin: destination.name,
+                    destination: TEST_ORIGIN
+                }
+            ];
+
+            for (const route of routes) {
+                results.push(
+                    await runCandidateIcTestCase(route)
+                );
+            }
+        }
+
+        resultArea.textContent =
+            formatCandidateIcTestResults(results);
+
+    } finally {
+
+        currentLatitude = savedLatitude;
+        currentLongitude = savedLongitude;
+        lastIcAreaDecisionType = savedDecisionType;
+
+        if (button) {
+            button.disabled = false;
+        }
+    }
+}
+
+async function runCandidateIcTestCase(route) {
+
+    const result = {
+        ok: false,
+        expectedArea: route.expectedArea,
+        actualArea: "",
+        geometryArea: "",
+        geometryOk: false,
+        geometrySummary: "",
+        geometryTopResults: [],
+        nearestIcArea: "",
+        nearestIcName: "",
+        nearestIcDistanceKm: null,
+        origin: route.origin,
+        destination: route.destination,
+        direction: "",
+        highwayStart: "",
+        candidateCount: 0,
+        candidates: [],
+        error: ""
+    };
+
+    try {
+
+        const originLatLng =
+            await getLatLngFromAddress(route.origin);
+
+        if (!originLatLng) {
+            throw new Error(
+                "起点を座標化できません: " + route.origin
+            );
+        }
+
+        currentLatitude = originLatLng.lat;
+        currentLongitude = originLatLng.lng;
+
+        const nearestIcSuggestion =
+            await suggestIcAreaByNearestIc(
+                route.origin,
+                originLatLng
+            );
+
+        result.nearestIcArea =
+            nearestIcSuggestion?.icArea || "";
+
+        result.nearestIcName =
+            nearestIcSuggestion?.exit?.displayName || "";
+
+        result.nearestIcDistanceKm =
+            nearestIcSuggestion?.distanceKm ?? null;
+
+        const geometrySuggestion =
+            await getIcAreaGeometrySuggestionForTest(
+                route.origin,
+                route.destination,
+                originLatLng
+            );
+
+        result.geometryArea =
+            geometrySuggestion?.icArea || "";
+
+        result.geometryOk =
+            result.geometryArea === route.expectedArea;
+
+        result.geometrySummary =
+            formatGeometrySuggestionSummaryForTest(
+                geometrySuggestion
+            );
+
+        result.geometryTopResults =
+            geometrySuggestion?.scores?.slice(0, 3) || [];
+
+        const icArea =
+            await suggestIcArea(
+                route.origin,
+                route.destination
+            );
+
+        if (!icArea || !IC_MASTER[icArea]) {
+            throw new Error(
+                "方面判定ができません: " + route.destination
+            );
+        }
+
+        result.actualArea = icArea;
+        result.direction =
+            IC_MASTER[icArea].label +
+            " / " +
+            getIcAreaDecisionLabel();
+
+        const highwayStartInfo =
+            await findNearestHighwayStartByPointForCandidateIcTest(
+                icArea,
+                originLatLng.lat,
+                originLatLng.lng
+            );
+
+        if (!highwayStartInfo) {
+            throw new Error(
+                "高速起点にできるIC/出入口が見つかりません"
+            );
+        }
+
+        result.highwayStart =
+            highwayStartInfo.exit.displayName +
+            "（約" +
+            highwayStartInfo.distanceKm +
+            "km）";
+
+        const destinationLatLng =
+            await getLatLngFromAddress(route.destination);
+
+        if (!destinationLatLng) {
+            throw new Error(
+                "目的地を座標化できません: " +
+                route.destination
+            );
+        }
+
+        const destinationNearestIc =
+            await findNearestIcInfoByPoint(
+                icArea,
+                destinationLatLng.lat,
+                destinationLatLng.lng
+            );
+
+        const selectedExits =
+            selectExitCandidatesForAutoExitComparison(
+                icArea,
+                highwayStartInfo.exit,
+                destinationNearestIc,
+                7
+            );
+
+        result.candidates =
+            selectedExits.map(exit => exit.displayName);
+
+        result.candidateCount =
+            selectedExits.length;
+
+        result.ok =
+            selectedExits.length > 0 &&
+            route.expectedArea === icArea;
+
+        if (route.expectedArea !== icArea) {
+            result.error =
+                "期待方面と実際方面が違います";
+        }
+        else if (!result.ok) {
+            result.error =
+                "候補IC数が0件です";
+        }
+
+    } catch (error) {
+
+        result.error =
+            error.message || String(error);
+    }
+
+    return result;
+}
+
+async function suggestIcAreaByGeometryForTest(
+    origin,
+    destination
+) {
+
+    const suggestion =
+        await getIcAreaGeometrySuggestionForTest(
+            origin,
+            destination
+        );
+
+    return suggestion?.icArea || null;
+}
+
+async function suggestIcAreaByNearestIc(
+    origin,
+    originLatLng = null
+) {
+
+    const resolvedOriginLatLng =
+        originLatLng ||
+        await getLatLngFromAddress(origin);
+
+    if (!resolvedOriginLatLng) {
+        return null;
+    }
+
+    let nearest = null;
+    let nearestDistance = Infinity;
+    let nearestIcArea = "";
+
+    for (const icArea in IC_MASTER) {
+
+        for (const exit of IC_MASTER[icArea].exits) {
+
+            if (
+                exit.lat === undefined ||
+                exit.lng === undefined
+            ) {
+                continue;
+            }
+
+            const distance =
+                calculateDistance(
+                    resolvedOriginLatLng.lat,
+                    resolvedOriginLatLng.lng,
+                    exit.lat,
+                    exit.lng
+                );
+
+            if (distance < nearestDistance) {
+                nearestDistance = distance;
+                nearest = exit;
+                nearestIcArea = icArea;
+            }
+        }
+    }
+
+    if (!nearest) {
+        return null;
+    }
+
+    return {
+        icArea: nearestIcArea,
+        exit: nearest,
+        distanceKm: Math.round(nearestDistance / 1000)
+    };
+}
+
+async function getIcAreaGeometrySuggestionForTest(
+    origin,
+    destination,
+    originLatLng = null
+) {
+
+    const resolvedOriginLatLng =
+        originLatLng ||
+        await getLatLngFromAddress(origin);
+
+    const destinationLatLng =
+        await getLatLngFromAddress(destination);
+
+    if (
+        !resolvedOriginLatLng ||
+        !destinationLatLng
+    ) {
+        return null;
+    }
+
+    const scores = [];
+
+    for (const icArea in IC_MASTER) {
+
+        const originNearest =
+            await findNearestIcForGeometryTest(
+                icArea,
+                resolvedOriginLatLng.lat,
+                resolvedOriginLatLng.lng
+            );
+
+        const destinationNearest =
+            await findNearestIcForGeometryTest(
+                icArea,
+                destinationLatLng.lat,
+                destinationLatLng.lng
+            );
+
+        if (
+            !originNearest ||
+            !destinationNearest
+        ) {
+            continue;
+        }
+
+        const orderDiff =
+            Math.abs(
+                (destinationNearest.exit.order ?? 0) -
+                (originNearest.exit.order ?? 0)
+            );
+
+        const score =
+            calculateIcAreaGeometryScoreForTest(
+                originNearest.distanceKm,
+                destinationNearest.distanceKm
+            );
+
+        scores.push({
+            icArea,
+            score,
+            originIc: originNearest.exit,
+            destinationIc: destinationNearest.exit,
+            originDistanceKm: originNearest.distanceKm,
+            destinationDistanceKm: destinationNearest.distanceKm,
+            orderDiff
+        });
+    }
+
+    scores.sort((a, b) => a.score - b.score);
+
+    console.log(
+        "[IC GEOMETRY TEST]",
+        origin,
+        "→",
+        destination
+    );
+
+    console.table(
+        scores.map(item => ({
+            icArea: item.icArea,
+            score: item.score,
+            originIc: item.originIc.displayName,
+            originDistanceKm: item.originDistanceKm,
+            destinationIc: item.destinationIc.displayName,
+            destinationDistanceKm: item.destinationDistanceKm,
+            orderDiff: item.orderDiff
+        }))
+    );
+
+    if (!scores[0]) {
+        return null;
+    }
+
+    return {
+        ...scores[0],
+        scores
+    };
+}
+
+function calculateIcAreaGeometryScoreForTest(
+    originDistanceKm,
+    destinationDistanceKm
+) {
+
+    let score =
+        destinationDistanceKm * 2 +
+        originDistanceKm * 0.5;
+
+    return Math.round(score * 10) / 10;
+}
+
+async function findNearestIcForGeometryTest(
+    icArea,
+    baseLat,
+    baseLng
+) {
+
+    const exits =
+        IC_MASTER[icArea].exits
+            .slice()
+            .sort((a, b) =>
+                (a.order ?? 999) - (b.order ?? 999)
+            );
+
+    let nearest = null;
+    let nearestDistance = Infinity;
+
+    for (const exit of exits) {
+
+        let exitLat = exit.lat;
+        let exitLng = exit.lng;
+
+        if (
+            exitLat === undefined ||
+            exitLng === undefined
+        ) {
+
+            const exitLatLng =
+                await getLatLngFromAddress(exit.googleName);
+
+            if (!exitLatLng) {
+                continue;
+            }
+
+            exit.lat = exitLatLng.lat;
+            exit.lng = exitLatLng.lng;
+
+            exitLat = exit.lat;
+            exitLng = exit.lng;
+        }
+
+        const distance =
+            calculateDistance(
+                baseLat,
+                baseLng,
+                exitLat,
+                exitLng
+            );
+
+        if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearest = exit;
+        }
+    }
+
+    if (!nearest) {
+        return null;
+    }
+
+    return {
+        exit: nearest,
+        distanceKm: Math.round(nearestDistance / 1000)
+    };
+}
+
+async function findNearestHighwayStartByPointForCandidateIcTest(
+    icArea,
+    baseLat,
+    baseLng
+) {
+
+    const exits =
+        IC_MASTER[icArea].exits
+            .slice()
+            .sort((a, b) =>
+                (a.order ?? 999) - (b.order ?? 999)
+            );
+
+    let nearest = null;
+    let nearestDistance = Infinity;
+
+    for (const exit of exits) {
+
+        let exitLat = exit.lat;
+        let exitLng = exit.lng;
+
+        if (
+            exitLat === undefined ||
+            exitLng === undefined
+        ) {
+
+            const exitLatLng =
+                await getLatLngFromAddress(exit.googleName);
+
+            if (!exitLatLng) {
+                continue;
+            }
+
+            exit.lat = exitLatLng.lat;
+            exit.lng = exitLatLng.lng;
+
+            exitLat = exit.lat;
+            exitLng = exit.lng;
+        }
+
+        const distance =
+            calculateDistance(
+                baseLat,
+                baseLng,
+                exitLat,
+                exitLng
+            );
+
+        if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearest = exit;
+        }
+    }
+
+    if (!nearest) {
+        return null;
+    }
+
+    return {
+        exit: nearest,
+        distanceKm: Math.round(nearestDistance / 1000)
+    };
+}
+
+function formatCandidateIcTestResults(results) {
+
+    const okCount =
+        results.filter(result => result.ok).length;
+
+    const geometryOkCount =
+        results.filter(result => result.geometryOk).length;
+
+    const lines = [
+        "候補ICテスト結果",
+        "OK: " + okCount + " / " + results.length,
+        "座標ベースOK: " + geometryOkCount + " / " + results.length,
+        ""
+    ];
+
+    results.forEach((result, index) => {
+
+        lines.push(
+            "[" +
+            (index + 1) +
+            "] " +
+            (result.ok ? "OK" : "NG") +
+            " " +
+            result.expectedArea +
+            " / " +
+            result.origin +
+            " → " +
+            result.destination
+        );
+
+        lines.push(
+            "期待方面: " +
+            formatCandidateIcAreaForTest(
+                result.expectedArea
+            )
+        );
+
+        lines.push(
+            "現行判定: " +
+            formatCandidateIcAreaForTest(
+                result.actualArea
+            )
+        );
+
+        lines.push(
+            "座標ベース判定: " +
+            formatCandidateIcAreaForTest(
+                result.geometryArea
+            )
+        );
+
+        lines.push(
+            "座標ベース一致: " +
+            (result.geometryOk ? "OK" : "NG")
+        );
+
+        lines.push(
+            "座標ベース詳細: " +
+            (result.geometrySummary || "--")
+        );
+
+        lines.push("座標ベース上位3方面:");
+
+        lines.push(
+            formatGeometryTopResultsForTest(
+                result.geometryTopResults
+            )
+        );
+
+        lines.push(
+            "最寄IC方式判定: " +
+            formatCandidateIcAreaForTest(
+                result.nearestIcArea
+            )
+        );
+
+        lines.push(
+            "最寄IC: " +
+            (result.nearestIcName || "--")
+        );
+
+        lines.push(
+            "距離: " +
+            (
+                result.nearestIcDistanceKm === null
+                    ? "--"
+                    : result.nearestIcDistanceKm + "km"
+            )
+        );
+
+        lines.push(
+            "方面判定: " +
+            (result.direction || "--")
+        );
+
+        lines.push(
+            "高速起点: " +
+            (result.highwayStart || "--")
+        );
+
+        lines.push(
+            "候補IC数: " +
+            result.candidateCount
+        );
+
+        lines.push(
+            "候補IC一覧: " +
+            (
+                result.candidates.length > 0
+                    ? result.candidates.join(", ")
+                    : "--"
+            )
+        );
+
+        lines.push(
+            "エラー内容: " +
+            (result.error || "--")
+        );
+
+        lines.push("");
+    });
+
+    return lines.join("\n");
+}
+
+function formatCandidateIcAreaForTest(icArea) {
+
+    if (!icArea) {
+        return "--";
+    }
+
+    if (!IC_MASTER[icArea]) {
+        return icArea;
+    }
+
+    return icArea + "（" + IC_MASTER[icArea].label + "）";
+}
+
+function formatGeometrySuggestionSummaryForTest(suggestion) {
+
+    if (!suggestion) {
+        return "--";
+    }
+
+    return (
+        "score=" +
+        suggestion.score +
+        " / 出発地最寄り=" +
+        suggestion.originIc.displayName +
+        "（約" +
+        suggestion.originDistanceKm +
+        "km）" +
+        " / 目的地最寄り=" +
+        suggestion.destinationIc.displayName +
+        "（約" +
+        suggestion.destinationDistanceKm +
+        "km）" +
+        " / order差=" +
+        suggestion.orderDiff
+    );
+}
+
+function formatGeometryTopResultsForTest(results) {
+
+    if (
+        !results ||
+        results.length === 0
+    ) {
+        return "--";
+    }
+
+    return results
+        .map((item, index) =>
+            "  " +
+            (index + 1) +
+            ". icArea=" +
+            item.icArea +
+            " / score=" +
+            item.score +
+            " / 出発地最寄りIC=" +
+            item.originIc.displayName +
+            " / 出発地距離=" +
+            item.originDistanceKm +
+            "km" +
+            " / 目的地最寄りIC=" +
+            item.destinationIc.displayName +
+            " / 目的地距離=" +
+            item.destinationDistanceKm +
+            "km" +
+            " / order差=" +
+            item.orderDiff
+        )
+        .join("\n");
 }
 
 

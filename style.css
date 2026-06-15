@@ -1,0 +1,992 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: #111;
+    color: white;
+    font-family: sans-serif;
+}
+
+.container {
+    max-width: 600px;
+    margin: auto;
+    padding: 15px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    margin-bottom: 5px;
+}
+
+.search-area {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input {
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+}
+
+button {
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.card {
+    background: #222;
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.highway-card {
+    border-left: 6px solid #2ecc71;
+}
+
+.local-card {
+    border-left: 6px solid #e74c3c;
+}
+
+.score-card {
+    border-left: 6px solid #3498db;
+}
+
+.value {
+    font-size: 36px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.sub {
+    color: #bbb;
+    margin-top: 5px;
+}
+
+.score-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+.dashboard-card {
+
+    background: #1a1a1a;
+
+    border-radius: 15px;
+
+    padding: 20px;
+
+    margin-bottom: 20px;
+
+    text-align: center;
+
+    border: 2px solid #444;
+}
+
+.recommendation {
+
+    margin-bottom: 15px;
+}
+
+#dashboardStars {
+
+    font-size: 42px;
+
+    margin-bottom: 10px;
+}
+
+#dashboardRecommendation {
+
+    font-size: 28px;
+
+    font-weight: bold;
+}
+
+.dashboard-times {
+
+    display: flex;
+
+    justify-content: space-around;
+
+    margin-top: 15px;
+
+    font-size: 26px;
+
+    font-weight: bold;
+}
+
+
+
+.dashboard-update {
+    margin-top: 12px;
+    color: #ddd;
+    font-size: 13px;
+}
+
+.dashboard-update span {
+    font-weight: bold;
+    color: white;
+}
+
+.dashboard-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.dashboard-info div {
+    background: #222;
+    border-radius: 10px;
+    padding: 8px 4px;
+    font-size: 12px;
+    text-align: center;
+}
+
+.dashboard-info span {
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 4px;
+}
+
+#dashboardReason {
+
+    margin-top: 10px;
+
+    color: #ccc;
+
+    font-size: 14px;
+
+    white-space: pre-line;
+
+}
+
+.recommend-highway {
+    border-color: #2ecc71;
+}
+
+.recommend-neutral {
+    border-color: #f1c40f;
+}
+
+.recommend-local {
+    border-color: #e74c3c;
+}
+
+.recommend-highway #dashboardRecommendation {
+    color: #2ecc71;
+}
+
+.recommend-neutral #dashboardRecommendation {
+    color: #f1c40f;
+}
+
+.recommend-local #dashboardRecommendation {
+    color: #e74c3c;
+}
+
+.time-box {
+
+    background: #222;
+
+    border-radius: 12px;
+
+    padding: 12px;
+
+    width: 45%;
+}
+
+.time-label {
+
+    font-size: 14px;
+
+    color: #bbb;
+
+    margin-bottom: 8px;
+}
+
+.time-value {
+
+    font-size: 32px;
+
+    font-weight: bold;
+
+    color: white;
+}
+
+
+.gps-info {
+
+    margin-top: 15px;
+
+    padding-top: 15px;
+
+    border-top: 1px solid #333;
+
+    text-align: left;
+
+    color: #ddd;
+
+    font-size: 14px;
+
+    line-height: 1.8;
+}
+
+
+.dashboard-mini-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.dashboard-mini-grid div {
+    background: #202020;
+    border-radius: 8px;
+    padding: 6px 4px;
+    font-size: 11px;
+    color: #aaa;
+    text-align: center;
+}
+
+.dashboard-mini-grid span {
+    display: block;
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+    margin-top: 3px;
+}
+
+#dashboardValueJudge {
+    margin-top: 8px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.value-super {
+    color: #2ecc71;
+}
+
+.value-good {
+    color: #7bed9f;
+}
+
+.value-normal {
+    color: #f1c40f;
+}
+
+.value-expensive {
+    color: #e67e22;
+}
+
+.value-high {
+    color: #e74c3c;
+}
+
+.exit-ic-card {
+    border-left: 6px solid #9b59b6;
+}
+
+#exitIcJudge {
+    font-weight: bold;
+    color: #f1c40f;
+}
+
+.multi-exit-ic-card {
+    border-left: 6px solid #1abc9c;
+}
+
+.multi-best {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2ecc71;
+    margin-bottom: 12px;
+}
+
+.multi-row {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr 1fr;
+    gap: 6px;
+    padding: 8px 0;
+    border-bottom: 1px solid #333;
+    font-size: 13px;
+}
+
+.multi-header {
+    color: #aaa;
+    font-weight: bold;
+}
+
+.multi-best-stars {
+    font-size: 28px;
+    margin-top: 6px;
+}
+
+.multi-best-reason {
+    font-size: 14px;
+    color: #ddd;
+    margin-top: 6px;
+}
+
+.multi-recommended-row {
+    background: rgba(46, 204, 113, 0.15);
+    border-radius: 8px;
+    padding-left: 6px;
+    padding-right: 6px;
+}
+
+.multi-recommended-row span:first-child::before {
+    content: "おすすめ ";
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+.multi-over-delay-row {
+    opacity: 0.55;
+}
+
+.multi-over-delay-row span:first-child::after {
+    content: " 許容超え";
+    color: #e67e22;
+    font-size: 11px;
+}
+
+.nearby-ic-card {
+    border-left: 6px solid #e84393;
+}
+
+#nearbyIcResult div {
+    padding: 6px 0;
+    border-bottom: 1px solid #333;
+}
+
+.ic-area-reason {
+    font-size: 12px;
+    color: #aaa;
+    margin-top: -4px;
+    margin-bottom: 6px;
+}
+
+.multi-best {
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.multi-best-label {
+    font-size: 14px;
+    font-weight: bold;
+    opacity: 0.8;
+    margin-bottom: 4px;
+}
+
+.multi-best-ic {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 6px 0;
+}
+
+.multi-best-stars {
+    font-size: 24px;
+    margin: 6px 0;
+}
+
+.multi-best-main-reason {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.multi-best-reason {
+    font-size: 14px;
+    margin-top: 6px;
+}
+
+
+.auto-compare-toggle {
+    display: block;
+    margin: 10px 0;
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.auto-compare-toggle input {
+    margin-right: 6px;
+}
+
+
+.origin-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.origin-row input {
+    flex: 1;
+}
+
+.small-button {
+    width: auto;
+    padding: 10px 14px;
+    white-space: nowrap;
+}
+
+details#searchPanel {
+    background: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 12px;
+}
+
+details#searchPanel summary {
+    font-weight: bold;
+    cursor: pointer;
+    padding: 6px 0;
+}
+
+details#searchPanel {
+    background: #222;
+    border: 1px solid #444;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 12px;
+}
+
+details#searchPanel summary {
+    color: white;
+}
+
+details#searchPanel label {
+    color: #ddd;
+}
+
+details#searchPanel input,
+details#searchPanel select {
+    background: #111;
+    color: white;
+    border: 1px solid #555;
+}
+
+details#searchPanel button {
+    background: #3498db;
+    color: white;
+    font-weight: bold;
+}
+
+details#searchPanel label {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 4px;
+}
+
+details#searchPanel input,
+details#searchPanel select {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 8px;
+}
+
+details#searchPanel button {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+details#searchPanel .origin-row {
+    display: flex;
+    gap: 8px;
+}
+
+details#searchPanel .origin-row input {
+    flex: 1;
+    width: auto;
+}
+
+details#searchPanel .origin-row button {
+    width: auto;
+    margin: 0;
+}
+
+details#searchPanel .auto-compare-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+details#searchPanel .auto-compare-toggle input {
+    width: auto;
+    margin: 0;
+}
+
+.time-detail {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #ccc;
+    line-height: 1.4;
+}
+
+
+
+.debug-info {
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid #444;
+    font-size: 12px;
+    color: #aaa;
+}
+
+.debug-info summary {
+    cursor: pointer;
+    font-weight: bold;
+    color: #ddd;
+    margin-bottom: 8px;
+}
+
+.gps-status-normal {
+    color: #2ecc71 !important;
+    font-weight: bold;
+}
+
+.gps-status-warning {
+    color: #f1c40f !important;
+    font-weight: bold;
+}
+
+.gps-status-error {
+    color: #e74c3c !important;
+    font-weight: bold;
+}
+
+.gps-status-blink {
+    animation: gpsBlink 0.5s linear 6;
+}
+
+@keyframes gpsBlink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+
+.update-blink,
+.recommendation-blink {
+    animation: noticeBlink 0.5s linear 6;
+}
+
+@keyframes noticeBlink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.time-good {
+    color: #2ecc71 !important;
+}
+
+.time-bad {
+    color: #e74c3c !important;
+}
+
+.time-neutral {
+    color: white !important;
+}
+
+#icArea {
+    width: 100%;
+    min-height: 40px;
+    padding: 8px 10px;
+    font-size: 16px;
+    border-radius: 8px;
+}
+
+.location-normal {
+    color: white !important;
+}
+
+.location-warning {
+    color: #f1c40f !important;
+    font-weight: bold;
+}
+
+.location-error {
+    color: #e74c3c !important;
+    font-weight: bold;
+}
+
+.data-update-normal {
+    color: white !important;
+}
+
+.data-update-working {
+    color: #f1c40f !important;
+    font-weight: bold;
+}
+
+.data-update-error {
+    color: #e74c3c !important;
+    font-weight: bold;
+}
+
+.main-status-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.route-mode-highway {
+    color: #3498db !important;
+    font-weight: bold;
+}
+
+.route-mode-local {
+    color: white !important;
+    font-weight: bold;
+}
+
+.route-mode-neutral {
+    color: #f1c40f !important;
+    font-weight: bold;
+}
+
+.route-mode-unknown {
+    color: #aaa !important;
+    font-weight: bold;
+}
+
+
+.time-sub-label {
+
+    font-size: 0.65em;
+
+    color: #cccccc;
+
+    margin-top: 2px;
+
+    line-height: 1.2;
+
+}
+
+
+#dashboardStars {
+    min-height: 48px;
+}
+
+#dashboardRecommendation {
+    min-height: 38px;
+    line-height: 1.2;
+}
+
+#dashboardReason {
+    min-height: 44px;
+    line-height: 1.35;
+}
+
+#dashboardValueJudge {
+    min-height: 26px;
+}
+
+.dashboard-card {
+    overflow: hidden;
+}
+
+
+.arrival-good {
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+.arrival-normal {
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.arrival-bad {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.arrival-good,
+.arrival-normal,
+.arrival-bad {
+
+    font-size: 1.8em;
+
+    font-weight: bold;
+
+    line-height: 1.1;
+
+    margin-bottom: 2px;
+}
+
+.arrival-diff {
+
+    font-size: 0.85em;
+
+    opacity: 0.85;
+
+    margin-bottom: 4px;
+}
+
+.destination-wrapper {
+
+    position: relative;
+}
+
+.destination-wrapper input {
+
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.clear-button {
+
+    position: absolute;
+
+    right: 10px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    border: none;
+
+    background: transparent;
+
+    font-size: 22px;
+
+    color: #999;
+
+    cursor: pointer;
+
+    display: none;
+
+    padding: 0 8px;
+}
+
+.clear-button:hover {
+
+    color: #ff6666;
+}
+
+
+details#searchPanel .clear-button {
+    display: none;
+    width: auto;
+    margin: 0;
+    padding: 0 8px;
+
+    position: absolute;
+    right: 10px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    background: transparent;
+    border: none;
+
+    color: #999;
+    font-size: 22px;
+    line-height: 1;
+
+    z-index: 2;
+}
+
+.origin-wrapper {
+
+    position: relative;
+
+    flex: 1;
+}
+
+details#searchPanel .destination-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+details#searchPanel .destination-wrapper {
+    position: relative;
+    flex: 1;
+}
+
+details#searchPanel .destination-row input {
+    width: 100%;
+}
+
+details#searchPanel .destination-row button.small-button {
+    width: auto;
+    margin: 0;
+    padding: 10px 14px;
+    white-space: nowrap;
+}
+
+
+
+
+details#searchPanel .origin-wrapper {
+    position: relative;
+    flex: 1;
+}
+
+details#searchPanel .origin-row input {
+    width: 100%;
+}
+
+.active-search {
+    background: #27ae60 !important;
+}
+
+#nextUpdateInfo {
+    display: inline-block;
+    min-width: 95px;
+    text-align: center;
+}
+
+.dashboard-route-info {
+    font-size: 18px;
+    font-weight: 700;
+    color: #cccccc;
+    margin-top: 8px;
+    margin-bottom: 10px;
+}
+
+.old-feature-hidden {
+    display: none;
+}
+
+
+.arrival-diff-good {
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+.arrival-diff-bad {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.arrival-diff-same {
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.multi-best-reason.value-good {
+    color: #2ecc71 !important;
+    font-weight: bold;
+}
+
+.multi-best-reason.value-high {
+    color: #e74c3c !important;
+    font-weight: bold;
+}
+
+.multi-best-reason.value-normal {
+    color: #ffffff !important;
+    font-weight: bold;
+}
+
+.multi-best-reason.value-expensive {
+    color: #e67e22 !important;
+    font-weight: bold;
+}
+
+.reason-green {
+    color: #2ecc71 !important;
+    font-weight: bold;
+}
+
+.reason-red {
+    color: #e74c3c !important;
+    font-weight: bold;
+}
+
+.dashboard-compare-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+    margin-bottom: 4px;
+    font-size: 13px;
+    line-height: 1.3;
+}
+
+.dashboard-compare-item {
+    text-align: center;
+    color: #ddd;
+    font-weight: bold;
+}
+
+#dashboardMovedJudge {
+    margin-top: 4px;
+    margin-bottom: 8px;
+    font-size: 18px;
+}
+
+.compare-label {
+    font-size: 15px;
+    font-weight: bold;
+    color: #dddddd;
+    margin-bottom: 4px;
+}
+
+.compare-value {
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+.reason-neutral {
+    color: #ffffff !important;
+    font-weight: bold;
+}
+
+.main-compare-label {
+    font-size: 15px;
+    font-weight: bold;
+    color: #dddddd;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.main-compare-value {
+    font-size: 26px;
+    font-weight: bold;
+    line-height: 1.15;
+}
+
+.main-compare-cost {
+    font-size: 14px;
+    font-weight: bold;
+    color: #dddddd;
+    margin-top: 4px;
+}

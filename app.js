@@ -2526,6 +2526,183 @@ function displayExitIcComparison(
         judge;
 }
 
+function findIcDefinitionForMultiExitComparison(googleName) {
+
+    for (const areaKey in IC_MASTER) {
+
+        const found =
+            IC_MASTER[areaKey].exits.find(exit =>
+                exit.googleName === googleName
+            );
+
+        if (found) {
+            return found;
+        }
+    }
+
+    return null;
+}
+
+function buildRoutesLocationForIcOrAddress(value) {
+
+    if (
+        value &&
+        typeof value === "object" &&
+        value.lat !== undefined &&
+        value.lng !== undefined
+    ) {
+        return {
+            location: {
+                latLng: {
+                    latitude: value.lat,
+                    longitude: value.lng
+                }
+            }
+        };
+    }
+
+    const ic =
+        findIcDefinitionForMultiExitComparison(value);
+
+    if (
+        ic &&
+        ic.lat !== undefined &&
+        ic.lng !== undefined
+    ) {
+        return {
+            location: {
+                latLng: {
+                    latitude: ic.lat,
+                    longitude: ic.lng
+                }
+            }
+        };
+    }
+
+    return {
+        address: value
+    };
+}
+
+async function getHighwayRouteForMultiExitComparison(
+    origin,
+    destination
+) {
+
+    const response = await fetch(
+        "https://routes.googleapis.com/directions/v2:computeRoutes",
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json",
+                "X-Goog-Api-Key":
+                    CONFIG.GOOGLE_MAPS_API_KEY,
+
+                "X-Goog-FieldMask":
+                    "routes.duration,routes.distanceMeters,routes.travelAdvisory.tollInfo"
+            },
+
+            body: JSON.stringify({
+
+                origin:
+                    buildRoutesLocationForIcOrAddress(origin),
+
+                destination:
+                    buildRoutesLocationForIcOrAddress(destination),
+
+                travelMode: "DRIVE",
+
+                routingPreference:
+                    "TRAFFIC_AWARE",
+
+                extraComputations: [
+                    "TOLLS"]
+            })
+        }
+    );
+
+    const data =
+        await response.json();
+
+    console.log(
+        "multi exit highway route detail",
+        JSON.stringify(data, null, 2)
+    );
+
+    if (
+        !data.routes ||
+        data.routes.length === 0
+    ) {
+        throw new Error(
+            "Highway route was not found: " +
+            origin +
+            " -> " +
+            destination
+        );
+    }
+
+    return data.routes[0];
+}
+
+async function getLocalRouteForMultiExitComparison(
+    origin,
+    destination
+) {
+
+    const response = await fetch(
+        "https://routes.googleapis.com/directions/v2:computeRoutes",
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json",
+
+                "X-Goog-Api-Key":
+                    CONFIG.GOOGLE_MAPS_API_KEY,
+
+                "X-Goog-FieldMask":
+                    "routes.duration,routes.distanceMeters"
+            },
+
+            body: JSON.stringify({
+
+                origin:
+                    buildRoutesLocationForIcOrAddress(origin),
+
+                destination:
+                    buildRoutesLocationForIcOrAddress(destination),
+
+                travelMode: "DRIVE",
+
+                routingPreference:
+                    "TRAFFIC_AWARE",
+
+                routeModifiers: {
+                    avoidTolls: true
+                }
+            })
+        }
+    );
+
+    const data =
+        await response.json();
+
+    if (
+        !data.routes ||
+        data.routes.length === 0
+    ) {
+        throw new Error(
+            "Local route was not found: " +
+            origin +
+            " -> " +
+            destination
+        );
+    }
+
+    return data.routes[0];
+}
+
 async function searchMultiExitIcComparison() {
 
     if (
@@ -2642,13 +2819,16 @@ async function searchMultiExitIcComparison() {
                 }
 
                 const highwayToIcRoute =
-                    await getHighwayRouteFromOrigin(
-                        origin,
+                    await getHighwayRouteForMultiExitComparison(
+                        origin || {
+                            lat: currentLatitude,
+                            lng: currentLongitude
+                        },
                         exitIc
                     );
 
                 const localFromIcRoute =
-                    await getLocalRoute(
+                    await getLocalRouteForMultiExitComparison(
                         exitIc,
                         destination
                     );
@@ -2696,7 +2876,7 @@ async function searchMultiExitIcComparison() {
                 ) {
 
                     const exitIcTollRoute =
-                        await getHighwayRoute(
+                        await getHighwayRouteForMultiExitComparison(
                             lastTollStartIcGoogleName,
                             exitIc
                         );

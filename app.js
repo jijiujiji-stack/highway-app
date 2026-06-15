@@ -2584,6 +2584,136 @@ function buildRoutesLocationForIcOrAddress(value) {
     };
 }
 
+function getRouteOriginForMultiExitComparison(origin) {
+
+    if (origin) {
+        return origin;
+    }
+
+    return {
+        lat: currentLatitude,
+        lng: currentLongitude
+    };
+}
+
+async function findNearestHighwayStartForAutoExitComparison(
+    origin,
+    icArea
+) {
+
+    let baseLat = currentLatitude;
+    let baseLng = currentLongitude;
+
+    if (origin) {
+
+        const originLatLng =
+            await getLatLngFromAddress(origin);
+
+        if (originLatLng) {
+            baseLat = originLatLng.lat;
+            baseLng = originLatLng.lng;
+        }
+    }
+
+    const exits =
+        IC_MASTER[icArea].exits
+            .slice()
+            .sort((a, b) =>
+                (a.order ?? 999) - (b.order ?? 999)
+            );
+
+    let nearest = null;
+    let nearestDistance = Infinity;
+
+    for (const exit of exits) {
+
+        let exitLat = exit.lat;
+        let exitLng = exit.lng;
+
+        if (
+            exitLat === undefined ||
+            exitLng === undefined
+        ) {
+
+            const exitLatLng =
+                await getLatLngFromAddress(exit.googleName);
+
+            if (!exitLatLng) {
+                continue;
+            }
+
+            exit.lat = exitLatLng.lat;
+            exit.lng = exitLatLng.lng;
+
+            exitLat = exit.lat;
+            exitLng = exit.lng;
+        }
+
+        const distance =
+            calculateDistance(
+                baseLat,
+                baseLng,
+                exitLat,
+                exitLng
+            );
+
+        if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearest = exit;
+        }
+    }
+
+    if (!nearest) {
+        return null;
+    }
+
+    return {
+        exit: nearest,
+        distanceKm: Math.round(nearestDistance / 1000)
+    };
+}
+
+function selectExitCandidatesForAutoExitComparison(
+    icArea,
+    highwayStart,
+    destinationNearestIc,
+    maxCount = 7
+) {
+
+    if (!highwayStart) {
+        return [];
+    }
+
+    const startOrder =
+        highwayStart.order ?? null;
+
+    const destinationOrder =
+        destinationNearestIc?.order ?? null;
+
+    const isForwardDirection =
+        destinationOrder === null ||
+        destinationOrder > startOrder;
+
+    return IC_MASTER[icArea].exits
+        .slice()
+        .sort((a, b) =>
+            isForwardDirection
+                ? (a.order ?? 999) - (b.order ?? 999)
+                : (b.order ?? -999) - (a.order ?? -999)
+        )
+        .filter(exit =>
+            exit.googleName !== highwayStart.googleName &&
+            startOrder !== null &&
+            exit.order !== undefined &&
+            (
+                isForwardDirection
+                    ? exit.order > startOrder
+                    : exit.order < startOrder
+            )
+        )
+        .slice(0, maxCount);
+}
+
 async function getHighwayRouteForMultiExitComparison(
     origin,
     destination
@@ -2778,6 +2908,38 @@ async function searchMultiExitIcComparison() {
                 ) / 60
             );
 
+        const routeOrigin =
+            getRouteOriginForMultiExitComparison(origin);
+
+        const highwayStartIc =
+            findIcDefinitionForMultiExitComparison(
+                lastTollStartIcGoogleName
+            );
+
+        const isForwardDirection =
+            !highwayStartIc ||
+            lastTollEndIcOrder === null ||
+            highwayStartIc.order === undefined ||
+            lastTollEndIcOrder > highwayStartIc.order;
+
+        let localToHighwayStartMinutes = 0;
+
+        if (lastTollStartIcGoogleName) {
+
+            const localToHighwayStartRoute =
+                await getLocalRouteForMultiExitComparison(
+                    routeOrigin,
+                    lastTollStartIcGoogleName
+                );
+
+            localToHighwayStartMinutes =
+                Math.round(
+                    parseInt(
+                        localToHighwayStartRoute.duration.replace("s", "")
+                    ) / 60
+                );
+        }
+
         let keepHighwayToll = 0;
 
         if (
@@ -2787,7 +2949,7 @@ async function searchMultiExitIcComparison() {
         ) {
 
             const keepHighwayTollRoute =
-                await getHighwayRoute(
+                await getHighwayRouteForMultiExitComparison(
                     lastTollStartIcGoogleName,
                     lastTollEndIcGoogleName
                 );
@@ -2804,6 +2966,9 @@ async function searchMultiExitIcComparison() {
 
             try {
 
+                const exitIcDefinition =
+                    findIcDefinitionForMultiExitComparison(exitIc);
+
                 if (
                     lastTollStartIcGoogleName &&
                     exitIc === lastTollStartIcGoogleName
@@ -2818,12 +2983,30 @@ async function searchMultiExitIcComparison() {
                     continue;
                 }
 
+                if (
+                    highwayStartIc &&
+                    exitIcDefinition &&
+                    highwayStartIc.order !== undefined &&
+                    exitIcDefinition.order !== undefined &&
+                    (
+                        isForwardDirection
+                            ? exitIcDefinition.order <= highwayStartIc.order
+                            : exitIcDefinition.order >= highwayStartIc.order
+                    )
+                ) {
+
+                    invalidIcResults.push({
+                        exitIc: exitIc,
+                        totalMinutes: null,
+                        reason: "\u9ad8\u901f\u8d77\u70b9\u4ee5\u524d\u306e\u305f\u3081\u9664\u5916"
+                    });
+
+                    continue;
+                }
+
                 const highwayToIcRoute =
                     await getHighwayRouteForMultiExitComparison(
-                        origin || {
-                            lat: currentLatitude,
-                            lng: currentLongitude
-                        },
+                        lastTollStartIcGoogleName || routeOrigin,
                         exitIc
                     );
 
@@ -2848,6 +3031,7 @@ async function searchMultiExitIcComparison() {
                     );
 
                 const totalMinutes =
+                    localToHighwayStartMinutes +
                     highwayToIcMinutes +
                     localFromIcMinutes;
 
@@ -3677,15 +3861,34 @@ async function searchAutoExitIcComparison(
             "</span>";
     }
 
-    const startIndex =
-        await getCandidateStartIndexByLocation(origin, icArea);
+    const highwayStartInfo =
+        await findNearestHighwayStartForAutoExitComparison(
+            origin,
+            icArea
+        );
 
-    const sortedExits =
-        IC_MASTER[icArea].exits
-            .slice()
-            .sort((a, b) =>
-                (a.order ?? 999) - (b.order ?? 999)
-            );
+    if (!highwayStartInfo) {
+        alert("\u9ad8\u901f\u8d77\u70b9\u306b\u3067\u304d\u308bIC/\u51fa\u5165\u53e3\u304c\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f");
+        return;
+    }
+
+    const highwayStart =
+        highwayStartInfo.exit;
+
+    lastNearestIcName =
+        highwayStart.displayName;
+
+    lastNearestIcDistanceKm =
+        highwayStartInfo.distanceKm;
+
+    lastTollStartIcName =
+        highwayStart.displayName;
+
+    lastTollStartIcGoogleName =
+        highwayStart.googleName;
+
+    lastTollStartIcOrder =
+        highwayStart.order ?? null;
 
     const destinationNearestIc =
         await findNearestIcInfoByAddress(
@@ -3693,77 +3896,13 @@ async function searchAutoExitIcComparison(
             icArea
         );
 
-    let candidateCount = 5;
-
-    if (
-        destinationNearestIc &&
-        lastTollStartIcOrder !== null &&
-        destinationNearestIc.order !== null
-    ) {
-
-        const icOrderDistance =
-            Math.abs(
-                destinationNearestIc.order -
-                lastTollStartIcOrder
-            );
-
-        if (icOrderDistance >= 10) {
-            candidateCount = 7;
-        }
-    }
-
-    const destinationIndex =
-        destinationNearestIc
-            ? sortedExits.findIndex(exit =>
-                exit.googleName === destinationNearestIc.googleName
-            )
-            : -1;
-
-    let selectedExits = [];
-
-    if (destinationIndex >= 0) {
-
-        if (destinationIndex >= startIndex) {
-
-            const endIndex =
-                Math.min(
-                    destinationIndex + 1,
-                    startIndex + candidateCount
-                );
-
-            selectedExits =
-                sortedExits.slice(
-                    startIndex,
-                    endIndex
-                );
-
-        }
-        else {
-
-            const endIndex =
-                Math.max(
-                    destinationIndex,
-                    startIndex - candidateCount + 1
-                );
-
-            selectedExits =
-                sortedExits.slice(
-                    endIndex,
-                    startIndex + 1
-                ).reverse();
-
-        }
-
-    }
-    else {
-
-        selectedExits =
-            sortedExits.slice(
-                startIndex,
-                startIndex + candidateCount
-            );
-
-    }
+    const selectedExits =
+        selectExitCandidatesForAutoExitComparison(
+            icArea,
+            highwayStart,
+            destinationNearestIc,
+            7
+        );
 
 
     const startIcName =
@@ -3821,6 +3960,27 @@ async function searchAutoExitIcComparison(
         reasonText +=
             " / 目的地側IC：" +
             lastTollEndIcName;
+    }
+
+    reasonText =
+        "\u9ad8\u901f\u8d77\u70b9\uff1a" +
+        highwayStart.displayName +
+        " / \u6bd4\u8f03\u5bfe\u8c61\uff1a" +
+        (
+            selectedExits[0]
+                ? selectedExits[0].displayName
+                : "\u306a\u3057"
+        ) +
+        "\u301c" +
+        endIcName;
+
+    if (lastNearestIcName) {
+        reasonText +=
+            " / \u6700\u5bc4\u308a\uff1a" +
+            lastNearestIcName +
+            "\uff08\u7d04" +
+            lastNearestIcDistanceKm +
+            "km\uff09";
     }
 
     document

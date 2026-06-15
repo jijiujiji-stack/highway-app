@@ -621,6 +621,8 @@ let lastLocalRouteMinutes = null;
 
 let invalidIcResults = [];
 
+let isAutoUpdateEnabled = true;
+
 const TEST_ORIGIN = "荒川区役所";
 
 const TEST_DESTINATIONS = [
@@ -660,6 +662,8 @@ window.addEventListener("load", () => {
     document
         .getElementById("searchButton")
         .addEventListener("click", searchRoute);
+
+    initializeAutoUpdateToggle();
 
     document
         .getElementById("gpsSearchButton")
@@ -1765,6 +1769,11 @@ function startGpsUpdate() {
             "住所更新"
         );
 
+        if (!isAutoUpdateEnabled) {
+            renderAutoUpdateStatus();
+            return;
+        }
+
         getCurrentLocation(true);
 
     }, 180000);
@@ -1773,6 +1782,11 @@ function startGpsUpdate() {
     setInterval(() => {
 
         updateGpsStatus();
+
+        if (!isAutoUpdateEnabled) {
+            renderAutoUpdateStatus();
+            return;
+        }
 
         if (
             currentLatitude !== null &&
@@ -2192,6 +2206,11 @@ function findNearestIcIndex(icArea) {
 
 
 function checkAutoReSearch() {
+
+    if (!isAutoUpdateEnabled) {
+        renderAutoUpdateStatus();
+        return;
+    }
 
     if (
         lastSearchLatitude === null ||
@@ -5886,6 +5905,85 @@ function setCurrentLocationText(text) {
     }
 }
 
+function initializeAutoUpdateToggle() {
+
+    const toggleButton =
+        document.getElementById("autoUpdateToggle");
+
+    if (!toggleButton) {
+        return;
+    }
+
+    toggleButton.addEventListener("click", () => {
+        isAutoUpdateEnabled = !isAutoUpdateEnabled;
+        renderAutoUpdateStatus();
+
+        if (
+            isAutoUpdateEnabled &&
+            currentLatitude !== null &&
+            currentLongitude !== null
+        ) {
+            checkAutoReSearch();
+        }
+    });
+
+    const nextUpdateInfo =
+        document.getElementById("nextUpdateInfo");
+
+    if (nextUpdateInfo) {
+        new MutationObserver(() => {
+            if (
+                !isAutoUpdateEnabled &&
+                nextUpdateInfo.textContent !== "更新停止中"
+            ) {
+                renderAutoUpdateStatus();
+            }
+        }).observe(
+            nextUpdateInfo,
+            {
+                childList: true,
+                characterData: true,
+                subtree: true
+            }
+        );
+    }
+
+    renderAutoUpdateStatus();
+}
+
+function renderAutoUpdateStatus() {
+
+    const toggleButton =
+        document.getElementById("autoUpdateToggle");
+
+    const toggleState =
+        document.getElementById("autoUpdateToggleState");
+
+    if (toggleState) {
+        toggleState.textContent =
+            isAutoUpdateEnabled ? "ON" : "OFF";
+    }
+
+    if (toggleButton) {
+        toggleButton.setAttribute(
+            "aria-pressed",
+            String(!isAutoUpdateEnabled)
+        );
+
+        toggleButton.classList.toggle(
+            "is-paused",
+            !isAutoUpdateEnabled
+        );
+    }
+
+    if (!isAutoUpdateEnabled) {
+        setDataUpdateStatus(
+            "更新停止中",
+            "data-update-paused"
+        );
+    }
+}
+
 function setDataUpdateStatus(text, statusClass) {
 
     const nextUpdateInfo =
@@ -5895,12 +5993,21 @@ function setDataUpdateStatus(text, statusClass) {
         return;
     }
 
+    if (
+        !isAutoUpdateEnabled &&
+        text !== "更新停止中"
+    ) {
+        text = "更新停止中";
+        statusClass = "data-update-paused";
+    }
+
     nextUpdateInfo.textContent = text;
 
     nextUpdateInfo.classList.remove(
         "data-update-normal",
         "data-update-working",
-        "data-update-error"
+        "data-update-error",
+        "data-update-paused"
     );
 
     nextUpdateInfo.classList.add(statusClass);

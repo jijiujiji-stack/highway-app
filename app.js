@@ -622,6 +622,7 @@ let lastLocalRouteMinutes = null;
 let invalidIcResults = [];
 
 let isAutoUpdateEnabled = true;
+let currentMultiIcMode = "entrance";
 
 const TEST_ORIGIN = "荒川区役所";
 
@@ -664,6 +665,7 @@ window.addEventListener("load", () => {
         .addEventListener("click", searchRoute);
 
     initializeAutoUpdateToggle();
+    initializeMultiIcModeSwitch();
 
     document
         .getElementById("gpsSearchButton")
@@ -5949,6 +5951,49 @@ function initializeAutoUpdateToggle() {
     }
 
     renderAutoUpdateStatus();
+}
+
+function initializeMultiIcModeSwitch() {
+
+    const modeInputs =
+        document.querySelectorAll(
+            "input[name='multiIcMode']"
+        );
+
+    const description =
+        document.getElementById(
+            "multiIcModeDescription"
+        );
+
+    modeInputs.forEach(input => {
+
+        input.addEventListener(
+            "change",
+            () => {
+
+                if (!input.checked) {
+                    return;
+                }
+
+                currentMultiIcMode =
+                    input.value;
+
+                if (!description) {
+                    return;
+                }
+
+                description.textContent =
+                    currentMultiIcMode === "entrance"
+                        ? "おすすめ入口を探す準備中"
+                        : "おすすめ出口を探す準備中";
+
+                console.log(
+                    "複数IC比較モード",
+                    currentMultiIcMode
+                );
+            }
+        );
+    });
 }
 
 function renderAutoUpdateStatus() {

@@ -140,6 +140,13 @@
                 </div>
 
 
+                <div>
+                    <button id="autoUpdateToggle" class="auto-update-toggle" type="button" aria-pressed="false">
+                        自動更新：<span id="autoUpdateToggleState">ON</span>
+                    </button>
+                </div>
+
+
                 <!--
                 <div>
                     走行判定
@@ -269,6 +276,37 @@
 
         <div class="card multi-exit-ic-card">
             <h2>複数IC比較</h2>
+
+            <div class="multi-ic-mode-switch">
+
+                <label>
+                    <input
+                        type="radio"
+                        name="multiIcMode"
+                        value="entrance"
+                        checked>
+
+                    下道走行中
+                </label>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="multiIcMode"
+                        value="exit">
+
+                    高速走行中
+                </label>
+
+            </div>
+
+            <div
+                id="multiIcModeDescription"
+                class="multi-ic-mode-description">
+
+                おすすめ入口を探す準備中
+
+            </div>
 
             <div id="multiExitIcResult">
                 まだ比較していません

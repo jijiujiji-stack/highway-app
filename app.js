@@ -3385,6 +3385,10 @@ async function searchEntranceIcComparisonV2(options = {}) {
     );
 
     console.table(lastMultiIcV2Results);
+
+    displayEntranceIcComparisonV2Results(
+        lastMultiIcV2Results
+    );
 }
 
 function getRouteDurationMinutes(route) {
@@ -3394,6 +3398,151 @@ function getRouteDurationMinutes(route) {
             route.duration.replace("s", "")
         ) / 60
     );
+}
+
+function displayEntranceIcComparisonV2Results(results) {
+
+    const resultArea =
+        document.getElementById("multiExitIcResult");
+
+    if (!resultArea) {
+        return;
+    }
+
+    if (
+        !Array.isArray(results) ||
+        results.length === 0
+    ) {
+        resultArea.textContent =
+            "V2比較結果がありません";
+        return;
+    }
+
+    const sortedResults =
+        [...results].sort((a, b) =>
+            (
+                a.minutesToCandidate === null ||
+                a.minutesToCandidate === undefined
+                    ? Infinity
+                    : a.minutesToCandidate
+            ) -
+            (
+                b.minutesToCandidate === null ||
+                b.minutesToCandidate === undefined
+                    ? Infinity
+                    : b.minutesToCandidate
+            )
+        );
+
+    resultArea.innerHTML =
+        "<div class=\"v2-ic-result-list\">" +
+        sortedResults
+            .map(result =>
+                buildEntranceIcComparisonV2CardHtml(result)
+            )
+            .join("") +
+        "</div>";
+}
+
+function buildEntranceIcComparisonV2CardHtml(result) {
+
+    const hasError = Boolean(result.error);
+
+    const hasNoSaving =
+        !hasError &&
+        result.differenceFromAllLocal !== null &&
+        result.differenceFromAllLocal <= 0;
+
+    const classNames = [
+        "v2-ic-result-card",
+        hasNoSaving ? "v2-ic-no-saving" : "",
+        hasError ? "v2-ic-error" : ""
+    ]
+        .filter(Boolean)
+        .join(" ");
+
+    const icName =
+        escapeHtml(result.candidateIcName || "--");
+
+    if (hasError) {
+        return (
+            "<div class=\"" + classNames + "\">" +
+            "<div class=\"v2-ic-name\">" +
+            icName +
+            "</div>" +
+            "<div class=\"v2-ic-main\">取得失敗</div>" +
+            "<div class=\"v2-ic-detail\">" +
+            escapeHtml(result.error) +
+            "</div>" +
+            "</div>"
+        );
+    }
+
+    const savingText =
+        formatV2SavingText(
+            result.differenceFromAllLocal
+        );
+
+    const yenPerMinuteText =
+        result.yenPerSavedMinute === null
+            ? "--"
+            : result.yenPerSavedMinute.toLocaleString() +
+            "円/分";
+
+    return (
+        "<div class=\"" + classNames + "\">" +
+        "<div class=\"v2-ic-name\">" +
+        icName +
+        "</div>" +
+        "<div class=\"v2-ic-main\">" +
+        "あと" +
+        result.minutesToCandidate +
+        "分" +
+        "</div>" +
+        "<div class=\"v2-ic-detail\">" +
+        savingText +
+        "<br>ETC 約" +
+        result.estimatedToll.toLocaleString() +
+        "円" +
+        "<br>" +
+        yenPerMinuteText +
+        "<br>合計" +
+        result.totalMinutes +
+        "分" +
+        "</div>" +
+        "</div>"
+    );
+}
+
+function formatV2SavingText(differenceFromAllLocal) {
+
+    if (differenceFromAllLocal === null) {
+        return "短縮時間不明";
+    }
+
+    if (differenceFromAllLocal > 0) {
+        return differenceFromAllLocal + "分短縮";
+    }
+
+    if (differenceFromAllLocal < 0) {
+        return (
+            "短縮なし<br>" +
+            Math.abs(differenceFromAllLocal) +
+            "分遅い"
+        );
+    }
+
+    return "短縮なし<br>全下道と同じ";
+}
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 function displayMultiExitIcComparison(

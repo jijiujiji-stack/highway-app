@@ -5,6 +5,21 @@ const USE_DISTANCE_ONLY_IC_AREA = true;
 // キーワード判定は補助扱い。距離だけ方式を優先するため標準では使わない。
 const ENABLE_KEYWORD_AREA_HINT = false;
 
+// 開発中のGoogle API使用量を抑えるための設定
+const DEV_API_SAVING_MODE = true;
+
+// 開発中は候補IC数を少なめにする
+const DEV_IC_CANDIDATE_COUNT = 3;
+
+// 通常運用時の候補IC数
+const PROD_IC_CANDIDATE_COUNT = 5;
+
+// 実際に使用する候補IC数
+const ACTIVE_IC_CANDIDATE_COUNT =
+    DEV_API_SAVING_MODE
+        ? DEV_IC_CANDIDATE_COUNT
+        : PROD_IC_CANDIDATE_COUNT;
+
 const IC_MASTER = {
     // 接続道路のICは重複登録を許可する。
     // 例: 木更津金田ICをアクアライン・館山道双方へ保持する。
@@ -2811,7 +2826,7 @@ function selectExitCandidatesForAutoExitComparison(
     icArea,
     highwayStart,
     destinationNearestIc,
-    maxCount = 7
+    maxCount = ACTIVE_IC_CANDIDATE_COUNT
 ) {
 
     if (!highwayStart) {
@@ -4230,7 +4245,7 @@ async function prepareV2SimpleDiagnosticCandidates(
             icArea,
             highwayStart,
             destinationNearestIc,
-            7
+            ACTIVE_IC_CANDIDATE_COUNT
         );
 
     const endIcName =
@@ -4269,6 +4284,19 @@ async function prepareV2SimpleDiagnosticCandidates(
             " / 目的地側IC：" +
             destinationNearestIc.displayName;
     }
+
+    const savingModeLabel =
+        DEV_API_SAVING_MODE
+            ? "（API節約モード）"
+            : "";
+
+    reasonText +=
+        " / 候補選定：" +
+        highwayStart.displayName +
+        "から" +
+        selectedExits.length +
+        "件比較" +
+        savingModeLabel;
 
     if (selectedExits.length === 0) {
         reasonText =
@@ -6430,7 +6458,7 @@ async function searchAutoExitIcComparison(
             icArea,
             highwayStart,
             destinationNearestIc,
-            7
+            ACTIVE_IC_CANDIDATE_COUNT
         );
 
     console.log(
@@ -6548,6 +6576,19 @@ async function searchAutoExitIcComparison(
             " / 目的地側IC：" +
             destinationNearestIc.displayName;
     }
+
+    const savingModeLabel =
+        DEV_API_SAVING_MODE
+            ? "（API節約モード）"
+            : "";
+
+    reasonText +=
+        " / 候補選定：" +
+        highwayStart.displayName +
+        "から" +
+        selectedExits.length +
+        "件比較" +
+        savingModeLabel;
 
     if (selectedExits.length === 0) {
         reasonText =
@@ -6894,7 +6935,7 @@ async function runCandidateIcTestCase(route) {
                 icArea,
                 highwayStartInfo.exit,
                 destinationNearestIc,
-                7
+                ACTIVE_IC_CANDIDATE_COUNT
             );
 
         result.candidates =

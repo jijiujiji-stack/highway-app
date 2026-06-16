@@ -770,6 +770,13 @@ window.addEventListener("load", () => {
             runCandidateIcTest
         );
 
+    document
+        .getElementById("v2TestSummaryButton")
+        ?.addEventListener(
+            "click",
+            dumpV2TestSummary
+        );
+
 
     document
         .getElementById("origin")
@@ -3678,6 +3685,129 @@ function calculateExitRecommendScoreDetailV2(result) {
         efficiencyScore:
             Math.min(result.yenPerDelayedMinute, 60)
     };
+}
+
+function dumpV2TestSummary() {
+
+    const bestEntrance =
+        getBestEntranceIcV2(lastMultiIcV2Results);
+
+    const bestExit =
+        getBestExitIcV2(lastExitIcV2Results);
+
+    const lines = [
+        "=== V2 TEST SUMMARY ===",
+        "現在モード: " + currentMultiIcMode,
+        "目的地: " + getElementTextOrValue("destination"),
+        "IC候補エリア: " + getElementTextOrValue("icArea"),
+        "候補選定理由: " + getElementTextOrValue("candidateReason"),
+        "現在地: " + getElementTextOrValue("currentLocation"),
+        "最新検索地点: " + getElementTextOrValue("lastSearchLocation"),
+        "",
+        "--- ENTRANCE MODE ---",
+        "おすすめ入口: " +
+            (bestEntrance?.candidateIcName || "なし"),
+        "おすすめスコア: " +
+            (
+                bestEntrance?.recommendScore !== undefined &&
+                bestEntrance?.recommendScore !== null
+                    ? Math.round(bestEntrance.recommendScore)
+                    : "--"
+            ),
+        "候補数: " + lastMultiIcV2Results.length,
+        "",
+        "--- EXIT MODE ---",
+        "おすすめ出口: " +
+            (bestExit?.candidateIcName || "なし"),
+        "おすすめスコア: " +
+            (
+                bestExit?.recommendScore !== undefined &&
+                bestExit?.recommendScore !== null
+                    ? Math.round(bestExit.recommendScore)
+                    : "--"
+            ),
+        "候補数: " + lastExitIcV2Results.length,
+        "",
+        "--- DASHBOARD ---",
+        "dashboardRecommendation: " +
+            getElementTextOrValue("dashboardRecommendation"),
+        "dashboardReason: " +
+            getElementTextOrValue("dashboardReason"),
+        "dashboardValueJudge: " +
+            getElementTextOrValue("dashboardValueJudge"),
+        "dashboardHighway: " +
+            getElementTextOrValue("dashboardHighway"),
+        "dashboardHighwayDetail: " +
+            getElementTextOrValue("dashboardHighwayDetail"),
+        "dashboardLocal: " +
+            getElementTextOrValue("dashboardLocal"),
+        "dashboardLocalDetail: " +
+            getElementTextOrValue("dashboardLocalDetail"),
+        "dashboardDestination: " +
+            getElementTextOrValue("dashboardDestination"),
+        "dashboardEfficiency: " +
+            getElementTextOrValue("dashboardEfficiency"),
+        "dashboardCost: " +
+            getElementTextOrValue("dashboardCost")
+    ];
+
+    console.log(lines.join("\n"));
+
+    if (lastMultiIcV2Results.length > 0) {
+        console.log("--- ENTRANCE MODE TABLE ---");
+        console.table(
+            lastMultiIcV2Results.map(result => ({
+                ic: result.candidateIcName,
+                minutesToCandidate:
+                    result.minutesToCandidate,
+                savedMinutes:
+                    result.differenceFromAllLocal,
+                toll: result.estimatedToll,
+                yenPerSavedMinute:
+                    result.yenPerSavedMinute,
+                score: result.recommendScore,
+                error: result.error
+            }))
+        );
+    }
+
+    if (lastExitIcV2Results.length > 0) {
+        console.log("--- EXIT MODE TABLE ---");
+        console.table(
+            lastExitIcV2Results.map(result => ({
+                ic: result.candidateIcName,
+                minutesToCandidate:
+                    result.minutesToCandidate,
+                savedToll: result.savedToll,
+                delayMinutes:
+                    result.differenceFromAllHighway,
+                yenPerDelayedMinute:
+                    result.yenPerDelayedMinute,
+                score: result.recommendScore,
+                error: result.error
+            }))
+        );
+    }
+}
+
+function getElementTextOrValue(id) {
+
+    const element =
+        document.getElementById(id);
+
+    if (!element) {
+        return "";
+    }
+
+    if (
+        "value" in element &&
+        element.value !== undefined &&
+        element.value !== ""
+    ) {
+        return element.value;
+    }
+
+    return element.textContent.trim();
 }
 
 function displayExitIcComparisonV2Results(results) {

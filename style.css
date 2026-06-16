@@ -679,7 +679,8 @@ details#searchPanel .auto-compare-toggle input {
     margin-bottom: 8px;
 }
 
-.debug-info #candidateIcTestButton {
+.debug-info #candidateIcTestButton,
+.debug-info #v2TestSummaryButton {
     width: 100%;
     margin-top: 10px;
 }

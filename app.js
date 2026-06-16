@@ -717,8 +717,11 @@ const TEST_DESTINATIONS = [
     { area: "tokan", name: "香取神宮" },
     { area: "joshinetsu", name: "峠の釜めし本舗おぎのや資料館" },
     { area: "joshinetsu", name: "鬼押出し園" },
+    { area: "joshinetsu", name: "軽井沢駅" },
+    { area: "tateyama", name: "マザー牧場" },
     { area: "tateyama", name: "道の駅保田小学校" },
     { area: "tateyama", name: "鴨川シーワールド" },
+    { area: "aqualine", name: "三井アウトレットパーク木更津" },
     { area: "aqualine", name: "木更津アウトレット" },
     { area: "aqualine", name: "養老渓谷" }
 ];

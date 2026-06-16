@@ -3689,6 +3689,9 @@ function calculateExitRecommendScoreDetailV2(result) {
 
 function dumpV2TestSummary() {
 
+    const acceptableDelayMinutes =
+        getAcceptableDelayMinutes();
+
     const bestEntrance =
         getBestEntranceIcV2(lastMultiIcV2Results);
 
@@ -3701,6 +3704,13 @@ function dumpV2TestSummary() {
         "出発地入力: " + getElementTextOrValue("origin"),
         "目的地入力: " + getElementTextOrValue("destination"),
         "目的地: " + getElementTextOrValue("destination"),
+        "許容時間: " + acceptableDelayMinutes + "分",
+        "入口おすすめ条件: " +
+            acceptableDelayMinutes +
+            "分以上短縮",
+        "出口おすすめ条件: " +
+            acceptableDelayMinutes +
+            "分以内の遅れ",
         "IC候補エリア: " + getElementTextOrValue("icArea"),
         "候補選定理由: " + getElementTextOrValue("candidateReason"),
         "現在地: " + getElementTextOrValue("currentLocation"),
@@ -3881,6 +3891,21 @@ function getElementTextOrValue(id) {
     return element.textContent.trim();
 }
 
+function getAcceptableDelayMinutes() {
+
+    const input =
+        document.getElementById("acceptableDelay");
+
+    const value =
+        parseInt(input?.value, 10);
+
+    if (Number.isNaN(value)) {
+        return 30;
+    }
+
+    return Math.max(0, value);
+}
+
 function displayExitIcComparisonV2Results(results) {
 
     const resultArea =
@@ -3932,12 +3957,17 @@ function getBestExitIcV2(results) {
         return null;
     }
 
+    const acceptableDelayMinutes =
+        getAcceptableDelayMinutes();
+
     const candidates =
         results
             .filter(result =>
                 !result.error &&
                 result.savedToll > 0 &&
                 result.differenceFromAllHighway > 0 &&
+                result.differenceFromAllHighway <=
+                    acceptableDelayMinutes &&
                 result.yenPerDelayedMinute !== null &&
                 result.recommendScore !== null
             )
@@ -3982,7 +4012,7 @@ function buildBestExitIcV2Html(results) {
             "<div class=\"v2-best-exit-card v2-best-exit-empty\">" +
             "<div class=\"v2-best-exit-label\">おすすめ出口なし</div>" +
             "<div class=\"v2-best-exit-detail\">" +
-            "このまま高速継続がよさそうです" +
+            "この条件では高速継続がよさそうです" +
             "</div>" +
             "</div>"
         );
@@ -4182,11 +4212,16 @@ function getBestEntranceIcV2(results) {
         return null;
     }
 
+    const acceptableDelayMinutes =
+        getAcceptableDelayMinutes();
+
     const candidates =
         results
             .filter(result =>
                 !result.error &&
                 result.differenceFromAllLocal > 0 &&
+                result.differenceFromAllLocal >=
+                    acceptableDelayMinutes &&
                 result.yenPerSavedMinute !== null &&
                 result.recommendScore !== null
             )
@@ -4241,7 +4276,7 @@ function buildBestEntranceIcV2Html(results) {
             "<div class=\"v2-best-entrance-card v2-best-empty\">" +
             "<div class=\"v2-best-label\">おすすめ入口なし</div>" +
             "<div class=\"v2-best-detail\">" +
-            "今回は全下道の方がよさそうです" +
+            "この条件では全下道の方がよさそうです" +
             "</div>" +
             "</div>"
         );
@@ -4356,7 +4391,7 @@ function updateDashboardWithBestEntranceIcV2() {
 
         if (dashboardReason) {
             dashboardReason.textContent =
-                "今回は全下道の方がよさそうです";
+                "この条件では全下道の方がよさそうです";
         }
 
         if (dashboardValueJudge) {
@@ -4553,7 +4588,7 @@ function updateDashboardWithBestExitIcV2() {
 
         if (dashboardReason) {
             dashboardReason.textContent =
-                "このまま高速継続がよさそうです";
+                "この条件では高速継続がよさそうです";
         }
 
         if (dashboardValueJudge) {

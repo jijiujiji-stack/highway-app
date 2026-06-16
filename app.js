@@ -3389,6 +3389,8 @@ async function searchEntranceIcComparisonV2(options = {}) {
     displayEntranceIcComparisonV2Results(
         lastMultiIcV2Results
     );
+
+    updateDashboardWithBestEntranceIcV2();
 }
 
 function getRouteDurationMinutes(route) {
@@ -3534,6 +3536,195 @@ function buildBestEntranceIcV2Html(results) {
         "</div>" +
         "</div>"
     );
+}
+
+function updateDashboardWithBestEntranceIcV2() {
+
+    const best =
+        getBestEntranceIcV2(lastMultiIcV2Results);
+
+    const dashboardCard =
+        document.querySelector(".dashboard-card");
+
+    if (dashboardCard) {
+        dashboardCard.classList.remove(
+            "recommend-highway",
+            "recommend-neutral",
+            "recommend-local"
+        );
+
+        dashboardCard.classList.add(
+            best ? "recommend-highway" : "recommend-local"
+        );
+    }
+
+    const dashboardStars =
+        document.getElementById("dashboardStars");
+
+    const dashboardRecommendation =
+        document.getElementById("dashboardRecommendation");
+
+    const dashboardReason =
+        document.getElementById("dashboardReason");
+
+    const dashboardValueJudge =
+        document.getElementById("dashboardValueJudge");
+
+    const dashboardHighway =
+        document.getElementById("dashboardHighway");
+
+    const dashboardHighwayDetail =
+        document.getElementById("dashboardHighwayDetail");
+
+    const dashboardLocal =
+        document.getElementById("dashboardLocal");
+
+    const dashboardLocalDetail =
+        document.getElementById("dashboardLocalDetail");
+
+    const dashboardEfficiency =
+        document.getElementById("dashboardEfficiency");
+
+    const dashboardCost =
+        document.getElementById("dashboardCost");
+
+    if (!best) {
+
+        const allLocalMinutes =
+            getAllLocalMinutesFromV2Results();
+
+        if (dashboardStars) {
+            dashboardStars.textContent = "🚗";
+        }
+
+        if (dashboardRecommendation) {
+            dashboardRecommendation.textContent =
+                "おすすめ入口なし";
+        }
+
+        lastRecommendationText =
+            "おすすめ入口なし";
+
+        if (dashboardReason) {
+            dashboardReason.textContent =
+                "今回は全下道の方がよさそうです";
+        }
+
+        if (dashboardValueJudge) {
+            dashboardValueJudge.className = "";
+            dashboardValueJudge.classList.add("value-good");
+            dashboardValueJudge.textContent =
+                "有料回避推奨";
+        }
+
+        if (dashboardHighway) {
+            dashboardHighway.textContent = "--";
+        }
+
+        if (dashboardHighwayDetail) {
+            dashboardHighwayDetail.textContent =
+                "おすすめ入口なし";
+        }
+
+        if (dashboardLocal) {
+            dashboardLocal.textContent =
+                allLocalMinutes === null
+                    ? "全下道--"
+                    : "全下道" + allLocalMinutes + "分";
+        }
+
+        if (dashboardLocalDetail) {
+            dashboardLocalDetail.textContent =
+                "比較基準";
+        }
+
+        if (dashboardEfficiency) {
+            dashboardEfficiency.textContent = "--";
+        }
+
+        if (dashboardCost) {
+            dashboardCost.textContent = "有料回避";
+        }
+
+        return;
+    }
+
+    if (dashboardStars) {
+        dashboardStars.textContent = "🚙";
+    }
+
+    if (dashboardRecommendation) {
+        dashboardRecommendation.textContent =
+            "おすすめ入口";
+    }
+
+    lastRecommendationText =
+        "おすすめ入口";
+
+    if (dashboardReason) {
+        dashboardReason.textContent =
+            best.candidateIcName +
+            "\nあと" +
+            best.minutesToCandidate +
+            "分" +
+            "\n" +
+            best.differenceFromAllLocal +
+            "分短縮" +
+            "\nETC 約" +
+            best.estimatedToll.toLocaleString() +
+            "円";
+    }
+
+    if (dashboardValueJudge) {
+        dashboardValueJudge.className = "";
+        dashboardValueJudge.classList.add("value-good");
+        dashboardValueJudge.textContent =
+            best.yenPerSavedMinute.toLocaleString() +
+            "円/分";
+    }
+
+    if (dashboardHighway) {
+        dashboardHighway.textContent =
+            "合計" + best.totalMinutes + "分";
+    }
+
+    if (dashboardHighwayDetail) {
+        dashboardHighwayDetail.textContent =
+            "候補ICから高速利用";
+    }
+
+    if (dashboardLocal) {
+        dashboardLocal.textContent =
+            best.allLocalMinutes === null
+                ? "全下道--"
+                : "全下道" + best.allLocalMinutes + "分";
+    }
+
+    if (dashboardLocalDetail) {
+        dashboardLocalDetail.textContent =
+            "比較基準";
+    }
+
+    if (dashboardEfficiency) {
+        dashboardEfficiency.textContent =
+            best.differenceFromAllLocal + "分短縮";
+    }
+
+    if (dashboardCost) {
+        dashboardCost.textContent =
+            best.estimatedToll.toLocaleString() + "円";
+    }
+}
+
+function getAllLocalMinutesFromV2Results() {
+
+    const result =
+        lastMultiIcV2Results.find(item =>
+            item.allLocalMinutes !== null &&
+            item.allLocalMinutes !== undefined
+        );
+
+    return result ? result.allLocalMinutes : null;
 }
 
 function buildEntranceIcComparisonV2CardHtml(result) {

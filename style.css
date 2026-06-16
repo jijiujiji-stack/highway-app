@@ -1231,6 +1231,48 @@ details#searchPanel .origin-row input {
     border-color: #e74c3c;
 }
 
+.v2-best-exit-card {
+    background: #2a220d;
+    border: 2px solid #f1c40f;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 14px;
+    text-align: center;
+}
+
+.v2-best-exit-label {
+    font-size: 14px;
+    color: #f1c40f;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.v2-best-exit-name {
+    font-size: 30px;
+    font-weight: bold;
+    color: #f1c40f;
+    margin-bottom: 10px;
+}
+
+.v2-best-exit-main {
+    font-size: 22px;
+    font-weight: bold;
+    color: #f1c40f;
+    margin-bottom: 8px;
+}
+
+.v2-best-exit-detail {
+    font-size: 14px;
+    color: #ddd;
+    line-height: 1.7;
+}
+
+.v2-best-exit-empty {
+    background: #222;
+    border: 1px solid #555;
+    color: #ccc;
+}
+
 .v2-best-entrance-card {
     background: #10251a;
     border: 2px solid #2ecc71;

@@ -3612,6 +3612,7 @@ function displayExitIcComparisonV2Results(results) {
         );
 
     resultArea.innerHTML =
+        buildBestExitIcV2Html(results) +
         "<div class=\"v2-exit-result-list\">" +
         sortedResults
             .map(result =>
@@ -3619,6 +3620,97 @@ function displayExitIcComparisonV2Results(results) {
             )
             .join("") +
         "</div>";
+}
+
+function getBestExitIcV2(results) {
+
+    if (!Array.isArray(results)) {
+        return null;
+    }
+
+    const candidates =
+        results
+            .filter(result =>
+                !result.error &&
+                result.savedToll > 0 &&
+                result.differenceFromAllHighway > 0 &&
+                result.yenPerDelayedMinute !== null
+            )
+            .sort((a, b) => {
+
+                if (
+                    a.yenPerDelayedMinute !==
+                    b.yenPerDelayedMinute
+                ) {
+                    return (
+                        b.yenPerDelayedMinute -
+                        a.yenPerDelayedMinute
+                    );
+                }
+
+                if (
+                    a.differenceFromAllHighway !==
+                    b.differenceFromAllHighway
+                ) {
+                    return (
+                        a.differenceFromAllHighway -
+                        b.differenceFromAllHighway
+                    );
+                }
+
+                return (
+                    a.minutesToCandidate -
+                    b.minutesToCandidate
+                );
+            });
+
+    return candidates[0] || null;
+}
+
+function buildBestExitIcV2Html(results) {
+
+    const best =
+        getBestExitIcV2(results);
+
+    if (!best) {
+        return (
+            "<div class=\"v2-best-exit-card v2-best-exit-empty\">" +
+            "<div class=\"v2-best-exit-label\">おすすめ出口なし</div>" +
+            "<div class=\"v2-best-exit-detail\">" +
+            "このまま高速継続がよさそうです" +
+            "</div>" +
+            "</div>"
+        );
+    }
+
+    const icName =
+        escapeHtml(best.candidateIcName || "--");
+
+    return (
+        "<div class=\"v2-best-exit-card\">" +
+        "<div class=\"v2-best-exit-label\">おすすめ出口</div>" +
+        "<div class=\"v2-best-exit-name\">" +
+        icName +
+        "</div>" +
+        "<div class=\"v2-best-exit-main\">" +
+        "あと" +
+        best.minutesToCandidate +
+        "分" +
+        "</div>" +
+        "<div class=\"v2-best-exit-detail\">" +
+        best.savedToll.toLocaleString() +
+        "円節約" +
+        "<br>" +
+        best.differenceFromAllHighway +
+        "分遅い" +
+        "<br>" +
+        best.yenPerDelayedMinute.toLocaleString() +
+        "円/分" +
+        "<br>合計" +
+        formatV2Duration(best.totalMinutes) +
+        "</div>" +
+        "</div>"
+    );
 }
 
 function buildExitIcComparisonV2CardHtml(result) {

@@ -8178,7 +8178,7 @@ function checkIcMasterHealth() {
     );
 }
 
-function checkSuggestIcArea() {
+async function checkSuggestIcArea() {
 
     const testCases = [
         ["東京都荒川区", "スパリゾートハワイアンズ"],
@@ -8200,18 +8200,20 @@ function checkSuggestIcArea() {
         ["マザー牧場", "東京都荒川区"]
     ];
 
-    console.table(
-        testCases.map(
-            ([origin, destination]) => ({
+    const results = [];
+
+    for (const [origin, destination] of testCases) {
+        results.push({
+            origin,
+            destination,
+            area: await suggestIcArea(
                 origin,
-                destination,
-                area: suggestIcArea(
-                    origin,
-                    destination
-                )
-            })
-        )
-    );
+                destination
+            )
+        });
+    }
+
+    console.table(results);
 }
 
 

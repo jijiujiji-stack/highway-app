@@ -626,6 +626,12 @@ let currentMultiIcMode = "entrance";
 let lastMultiIcV2Results = [];
 let lastExitIcV2Results = [];
 
+const V2_DIAGNOSTIC_DESTINATIONS = [
+    "筑波山",
+    "スパリゾートハワイアンズ",
+    "マザー牧場"
+];
+
 const TEST_ORIGIN = "荒川区役所";
 
 const TEST_DESTINATIONS = [
@@ -775,6 +781,13 @@ window.addEventListener("load", () => {
         ?.addEventListener(
             "click",
             dumpV2TestSummary
+        );
+
+    document
+        .getElementById("v2DiagnosticButton")
+        ?.addEventListener(
+            "click",
+            runV2SimpleDiagnostic
         );
 
 
@@ -3799,6 +3812,596 @@ function dumpV2TestSummary() {
                 error: result.error
             }))
         );
+    }
+}
+
+async function runV2SimpleDiagnostic() {
+
+    const originInput =
+        document.getElementById("origin");
+
+    const destinationInput =
+        document.getElementById("destination");
+
+    const diagnosticButton =
+        document.getElementById("v2DiagnosticButton");
+
+    const originalOrigin =
+        originInput?.value ?? "";
+
+    const originalDestination =
+        destinationInput?.value ?? "";
+
+    const originalMode =
+        currentMultiIcMode;
+
+    const diagnosticOrigin =
+        originalOrigin.trim() || TEST_ORIGIN;
+
+    const acceptableDelayMinutes =
+        getAcceptableDelayMinutes();
+
+    if (diagnosticButton) {
+        diagnosticButton.disabled = true;
+        diagnosticButton.textContent = "V2簡易診断中...";
+    }
+
+    console.log(
+        [
+            "=== V2 SIMPLE DIAGNOSTIC ===",
+            "出発地: " + diagnosticOrigin,
+            "許容時間: " +
+                acceptableDelayMinutes +
+                "分",
+            "テスト件数: " +
+                V2_DIAGNOSTIC_DESTINATIONS.length
+        ].join("\n")
+    );
+
+    const summaries = [];
+
+    try {
+
+        for (
+            let index = 0;
+            index < V2_DIAGNOSTIC_DESTINATIONS.length;
+            index++
+        ) {
+
+            const destination =
+                V2_DIAGNOSTIC_DESTINATIONS[index];
+
+            const summary =
+                await runV2SimpleDiagnosticForDestination(
+                    index + 1,
+                    diagnosticOrigin,
+                    destination
+                );
+
+            summaries.push(summary);
+
+            console.log(
+                formatV2SimpleDiagnosticSummary(summary)
+            );
+        }
+
+        console.log("=== V2 SIMPLE DIAGNOSTIC TABLE ===");
+        console.table(
+            summaries.map(summary => ({
+                destination: summary.destination,
+                icArea: summary.icArea,
+                bestEntrance: summary.bestEntranceName,
+                entranceScore: summary.entranceScore,
+                entranceJudge: summary.entranceJudge,
+                bestExit: summary.bestExitName,
+                exitScore: summary.exitScore,
+                exitJudge: summary.exitJudge
+            }))
+        );
+
+    } finally {
+
+        if (originInput) {
+            originInput.value = originalOrigin;
+        }
+
+        if (destinationInput) {
+            destinationInput.value = originalDestination;
+        }
+
+        setMultiIcModeForDiagnostic(originalMode);
+
+        if (diagnosticButton) {
+            diagnosticButton.disabled = false;
+            diagnosticButton.textContent = "V2簡易診断";
+        }
+
+        console.log(
+            "V2簡易診断完了。入力欄とモードは診断前の状態に戻しました。上部パネルは最後の診断結果のままです。"
+        );
+    }
+}
+
+async function runV2SimpleDiagnosticForDestination(
+    index,
+    origin,
+    destination
+) {
+
+    const originInput =
+        document.getElementById("origin");
+
+    const destinationInput =
+        document.getElementById("destination");
+
+    if (originInput) {
+        originInput.value = origin;
+    }
+
+    if (destinationInput) {
+        destinationInput.value = destination;
+    }
+
+    const dashboardDestination =
+        document.getElementById("dashboardDestination");
+
+    if (dashboardDestination) {
+        dashboardDestination.textContent =
+            shortenDestinationName(destination);
+    }
+
+    const summary = {
+        index: index,
+        origin: origin,
+        destination: destination,
+        icArea: "--",
+        candidateReason: "--",
+        bestEntranceName: "なし",
+        entranceScore: "--",
+        entranceSavedMinutes: "--",
+        entranceToll: "--",
+        entranceJudge: "未実行",
+        bestExitName: "なし",
+        exitScore: "--",
+        exitSavedToll: "--",
+        exitDelayMinutes: "--",
+        exitJudge: "未実行",
+        entranceDashboard: "",
+        exitDashboard: "",
+        error: null
+    };
+
+    try {
+
+        await getRoutes(origin, destination, true);
+
+        const candidateInfo =
+            await prepareV2SimpleDiagnosticCandidates(
+                origin,
+                destination
+            );
+
+        summary.icArea = candidateInfo.icArea;
+        summary.candidateReason =
+            candidateInfo.reasonText;
+
+        setMultiIcModeForDiagnostic("entrance");
+
+        await searchEntranceIcComparisonV2({
+            origin: origin,
+            destination: destination,
+            selectedExits: candidateInfo.selectedExits
+        });
+
+        const bestEntrance =
+            getBestEntranceIcV2(lastMultiIcV2Results);
+
+        const hasEntranceError =
+            lastMultiIcV2Results.some(result =>
+                Boolean(result.error || result.baselineError)
+            );
+
+        summary.bestEntranceName =
+            bestEntrance?.candidateIcName || "なし";
+        summary.entranceScore =
+            formatDiagnosticScore(bestEntrance);
+        summary.entranceSavedMinutes =
+            bestEntrance
+                ? bestEntrance.differenceFromAllLocal + "分"
+                : "--";
+        summary.entranceToll =
+            bestEntrance
+                ? bestEntrance.estimatedToll.toLocaleString() +
+                "円"
+                : "--";
+        summary.entranceJudge =
+            getV2DiagnosticJudge(
+                bestEntrance,
+                hasEntranceError,
+                "おすすめ入口なし"
+            );
+        summary.entranceDashboard =
+            getV2DiagnosticDashboardText();
+
+        setMultiIcModeForDiagnostic("exit");
+
+        await searchExitIcComparisonV2({
+            origin: origin,
+            destination: destination,
+            selectedExits: candidateInfo.selectedExits
+        });
+
+        const bestExit =
+            getBestExitIcV2(lastExitIcV2Results);
+
+        const hasExitError =
+            lastExitIcV2Results.some(result =>
+                Boolean(result.error || result.baselineError)
+            );
+
+        summary.bestExitName =
+            bestExit?.candidateIcName || "なし";
+        summary.exitScore =
+            formatDiagnosticScore(bestExit);
+        summary.exitSavedToll =
+            bestExit
+                ? bestExit.savedToll.toLocaleString() + "円"
+                : "--";
+        summary.exitDelayMinutes =
+            bestExit
+                ? bestExit.differenceFromAllHighway + "分"
+                : "--";
+        summary.exitJudge =
+            getV2DiagnosticJudge(
+                bestExit,
+                hasExitError,
+                "おすすめ出口なし"
+            );
+        summary.exitDashboard =
+            getV2DiagnosticDashboardText();
+
+    } catch (error) {
+
+        summary.error =
+            error.message || String(error);
+
+        summary.entranceJudge = "NG：エラーあり";
+        summary.exitJudge = "NG：エラーあり";
+    }
+
+    return summary;
+}
+
+async function prepareV2SimpleDiagnosticCandidates(
+    origin,
+    destination
+) {
+
+    const icAreaSelect =
+        document.getElementById("icArea");
+
+    const icAreaReason =
+        document.getElementById("icAreaReason");
+
+    let icArea =
+        icAreaSelect?.value || "joban";
+
+    let distanceOnlyIcAreaInfo = null;
+    let destinationLatLng = null;
+
+    const autoIcAreaEnabled =
+        document.getElementById("autoIcAreaEnabled")
+            ?.checked;
+
+    const originLatLng =
+        await getAutoExitComparisonOriginLatLng(origin);
+
+    if (!originLatLng) {
+        throw new Error(
+            "診断用の出発地座標を取得できませんでした"
+        );
+    }
+
+    if (autoIcAreaEnabled) {
+
+        if (USE_DISTANCE_ONLY_IC_AREA) {
+
+            destinationLatLng =
+                await getLatLngFromAddress(destination);
+
+            if (originLatLng && destinationLatLng) {
+                distanceOnlyIcAreaInfo =
+                    suggestIcAreaByDistanceOnlyForTest(
+                        originLatLng,
+                        destinationLatLng
+                    );
+            }
+        }
+
+        if (
+            distanceOnlyIcAreaInfo &&
+            IC_MASTER[distanceOnlyIcAreaInfo.icArea]
+        ) {
+            icArea = distanceOnlyIcAreaInfo.icArea;
+        }
+        else {
+
+            const suggestedIcArea =
+                await suggestIcArea(origin, destination);
+
+            if (suggestedIcArea) {
+                icArea = suggestedIcArea;
+            }
+        }
+    }
+
+    if (icAreaSelect) {
+        icAreaSelect.value = icArea;
+    }
+
+    const highwayStartInfo =
+        findNearestIcByMasterCoordinatesForAutoExitComparison(
+            icArea,
+            originLatLng.lat,
+            originLatLng.lng
+        );
+
+    /*
+     * 診断中は出発地入力を前提にしているため、取得済み座標を使って
+     * 追加のジオコードを避ける。
+     */
+    if (!highwayStartInfo) {
+        throw new Error(
+            "高速起点にできるIC/出入口が見つかりませんでした"
+        );
+    }
+
+    const highwayStart =
+        highwayStartInfo.exit;
+
+    lastNearestIcName =
+        highwayStart.displayName;
+    lastNearestIcDistanceKm =
+        highwayStartInfo.distanceKm;
+    lastTollStartIcName =
+        highwayStart.displayName;
+    lastTollStartIcGoogleName =
+        highwayStart.googleName;
+    lastTollStartIcOrder =
+        highwayStart.order ?? null;
+
+    if (!destinationLatLng) {
+        destinationLatLng =
+            await getLatLngFromAddress(destination);
+    }
+
+    const destinationNearestInfo =
+        destinationLatLng
+            ? findNearestIcByMasterCoordinatesForAutoExitComparison(
+                icArea,
+                destinationLatLng.lat,
+                destinationLatLng.lng
+            )
+            : null;
+
+    const destinationNearestIc =
+        destinationNearestInfo
+            ? {
+                displayName:
+                    destinationNearestInfo.exit.displayName,
+                googleName:
+                    destinationNearestInfo.exit.googleName,
+                order:
+                    destinationNearestInfo.exit.order ?? null,
+                distanceKm:
+                    destinationNearestInfo.distanceKm
+            }
+            : null;
+
+    if (destinationNearestIc) {
+        lastTollEndIcName =
+            destinationNearestIc.displayName;
+        lastTollEndIcGoogleName =
+            destinationNearestIc.googleName;
+        lastTollEndIcOrder =
+            destinationNearestIc.order;
+    }
+
+    const selectedExits =
+        selectExitCandidatesForAutoExitComparison(
+            icArea,
+            highwayStart,
+            destinationNearestIc,
+            7
+        );
+
+    const endIcName =
+        selectedExits[selectedExits.length - 1]
+            ? selectedExits[selectedExits.length - 1]
+                .displayName
+            : "なし";
+
+    let reasonText =
+        "高速起点：" +
+        highwayStart.displayName +
+        " / 比較対象：" +
+        (
+            selectedExits[0]
+                ? selectedExits[0].displayName
+                : "なし"
+        ) +
+        "〜" +
+        endIcName +
+        " / 最寄り：" +
+        lastNearestIcName +
+        "（約" +
+        lastNearestIcDistanceKm +
+        "km）";
+
+    if (distanceOnlyIcAreaInfo) {
+        reasonText +=
+            " / 方面判定：距離だけ方式" +
+            " / 距離合計：約" +
+            distanceOnlyIcAreaInfo.score +
+            "km";
+    }
+
+    if (destinationNearestIc) {
+        reasonText +=
+            " / 目的地側IC：" +
+            destinationNearestIc.displayName;
+    }
+
+    if (selectedExits.length === 0) {
+        reasonText =
+            "比較対象ICが見つかりません。IC候補エリアを手動で変更してください";
+    }
+
+    if (icAreaReason) {
+        icAreaReason.textContent =
+            "方面判定：" +
+            IC_MASTER[icArea].label +
+            " / " +
+            reasonText;
+    }
+
+    const candidateReason =
+        document.getElementById("candidateReason");
+
+    if (candidateReason) {
+        candidateReason.textContent = reasonText;
+    }
+
+    const candidateReasonDebug =
+        document.getElementById("candidateReasonDebug");
+
+    if (candidateReasonDebug) {
+        candidateReasonDebug.textContent = reasonText;
+    }
+
+    const exitIcList =
+        document.getElementById("exitIcList");
+
+    if (exitIcList) {
+        exitIcList.value =
+            selectedExits
+                .map(exit => exit.googleName)
+                .join(", ");
+    }
+
+    return {
+        icArea: icArea,
+        reasonText: reasonText,
+        selectedExits: selectedExits
+    };
+}
+
+function formatV2SimpleDiagnosticSummary(summary) {
+
+    const lines = [
+        "--- " +
+            summary.index +
+            ". " +
+            summary.destination +
+            " ---",
+        "IC候補エリア: " + summary.icArea,
+        "候補選定理由: " + summary.candidateReason,
+        "おすすめ入口: " + summary.bestEntranceName,
+        "入口スコア: " + summary.entranceScore,
+        "入口短縮: " + summary.entranceSavedMinutes,
+        "入口ETC: " + summary.entranceToll,
+        "入口判定: " + summary.entranceJudge,
+        "",
+        "おすすめ出口: " + summary.bestExitName,
+        "出口スコア: " + summary.exitScore,
+        "出口節約: " + summary.exitSavedToll,
+        "出口遅れ: " + summary.exitDelayMinutes,
+        "出口判定: " + summary.exitJudge,
+        "",
+        "入口上部パネル:",
+        summary.entranceDashboard || "--",
+        "",
+        "出口上部パネル:",
+        summary.exitDashboard || "--"
+    ];
+
+    if (summary.error) {
+        lines.push("", "エラー: " + summary.error);
+    }
+
+    return lines.join("\n");
+}
+
+function formatDiagnosticScore(result) {
+
+    if (
+        !result ||
+        result.recommendScore === null ||
+        result.recommendScore === undefined
+    ) {
+        return "--";
+    }
+
+    return Math.round(result.recommendScore);
+}
+
+function getV2DiagnosticJudge(
+    best,
+    hasError,
+    emptyMessage
+) {
+
+    if (hasError) {
+        return "NG：エラーあり";
+    }
+
+    if (best) {
+        return "OK";
+    }
+
+    return "注意：" + emptyMessage;
+}
+
+function getV2DiagnosticDashboardText() {
+
+    return [
+        "recommendation=" +
+            getElementTextOrValue("dashboardRecommendation"),
+        "reason=" +
+            getDashboardReasonLogText()
+                .replace(/\n/g, " / "),
+        "value=" +
+            getElementTextOrValue("dashboardValueJudge"),
+        "highway=" +
+            getElementTextOrValue("dashboardHighway"),
+        "local=" +
+            getElementTextOrValue("dashboardLocal")
+    ].join("\n");
+}
+
+function setMultiIcModeForDiagnostic(mode) {
+
+    currentMultiIcMode = mode;
+
+    const input =
+        document.querySelector(
+            "input[name='multiIcMode'][value='" +
+            mode +
+            "']"
+        );
+
+    if (input) {
+        input.checked = true;
+    }
+
+    const description =
+        document.getElementById("multiIcModeDescription");
+
+    if (description) {
+        description.textContent =
+            mode === "entrance"
+                ? "おすすめ入口を探す準備中"
+                : "おすすめ出口を探す準備中";
     }
 }
 

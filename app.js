@@ -624,6 +624,7 @@ let invalidIcResults = [];
 let isAutoUpdateEnabled = true;
 let currentMultiIcMode = "entrance";
 let lastMultiIcV2Results = [];
+let lastExitIcV2Results = [];
 
 const TEST_ORIGIN = "荒川区役所";
 
@@ -3399,6 +3400,178 @@ async function searchEntranceIcComparisonV2(options = {}) {
     updateDashboardWithBestEntranceIcV2();
 }
 
+async function searchExitIcComparisonV2(options = {}) {
+
+    const origin =
+        options.origin ??
+        document.getElementById("origin")?.value ??
+        "";
+
+    const destination =
+        options.destination ??
+        document.getElementById("destination")?.value ??
+        "";
+
+    const selectedExits =
+        options.selectedExits ?? [];
+
+    const routeOrigin =
+        getRouteOriginForMultiExitComparison(origin);
+
+    lastExitIcV2Results = [];
+
+    let allHighwayMinutes = null;
+    let allHighwayToll = null;
+    let baselineError = null;
+
+    try {
+
+        const allHighwayRoute =
+            await getHighwayRouteForMultiExitComparison(
+                routeOrigin,
+                destination
+            );
+
+        allHighwayMinutes =
+            getRouteDurationMinutes(allHighwayRoute);
+
+        const tollEstimate =
+            await estimateMainHighwayToll(
+                allHighwayRoute,
+                origin,
+                destination
+            );
+
+        allHighwayToll =
+            tollEstimate.amount;
+
+    } catch (error) {
+
+        baselineError =
+            error.message || String(error);
+
+        console.warn(
+            "V2 all highway route failed",
+            baselineError
+        );
+    }
+
+    for (const exit of selectedExits) {
+
+        try {
+
+            const highwayToCandidateRoute =
+                await getHighwayRouteForMultiExitComparison(
+                    routeOrigin,
+                    exit.googleName
+                );
+
+            const localFromCandidateRoute =
+                await getLocalRouteForMultiExitComparison(
+                    exit.googleName,
+                    destination
+                );
+
+            const highwayToCandidateMinutes =
+                getRouteDurationMinutes(
+                    highwayToCandidateRoute
+                );
+
+            const localFromCandidateMinutes =
+                getRouteDurationMinutes(
+                    localFromCandidateRoute
+                );
+
+            const totalMinutes =
+                highwayToCandidateMinutes +
+                localFromCandidateMinutes;
+
+            const exitTollEstimate =
+                Math.round(
+                    (
+                        highwayToCandidateRoute.distanceMeters /
+                        1000
+                    ) * 24
+                );
+
+            const savedToll =
+                allHighwayToll === null
+                    ? null
+                    : allHighwayToll - exitTollEstimate;
+
+            const differenceFromAllHighway =
+                allHighwayMinutes === null
+                    ? null
+                    : totalMinutes - allHighwayMinutes;
+
+            const yenPerDelayedMinute =
+                savedToll !== null &&
+                    differenceFromAllHighway > 0
+                    ? Math.round(
+                        savedToll /
+                        differenceFromAllHighway
+                    )
+                    : null;
+
+            lastExitIcV2Results.push({
+                candidateIcName: exit.displayName,
+                candidateIcGoogleName: exit.googleName,
+                highwayToCandidateMinutes:
+                    highwayToCandidateMinutes,
+                localFromCandidateMinutes:
+                    localFromCandidateMinutes,
+                totalMinutes: totalMinutes,
+                minutesToCandidate:
+                    highwayToCandidateMinutes,
+                allHighwayMinutes: allHighwayMinutes,
+                allHighwayToll: allHighwayToll,
+                exitTollEstimate: exitTollEstimate,
+                savedToll: savedToll,
+                differenceFromAllHighway:
+                    differenceFromAllHighway,
+                yenPerDelayedMinute:
+                    yenPerDelayedMinute,
+                baselineError: baselineError,
+                error: null
+            });
+
+        } catch (error) {
+
+            lastExitIcV2Results.push({
+                candidateIcName: exit.displayName,
+                candidateIcGoogleName: exit.googleName,
+                highwayToCandidateMinutes: null,
+                localFromCandidateMinutes: null,
+                totalMinutes: null,
+                minutesToCandidate: null,
+                allHighwayMinutes: allHighwayMinutes,
+                allHighwayToll: allHighwayToll,
+                exitTollEstimate: null,
+                savedToll: null,
+                differenceFromAllHighway: null,
+                yenPerDelayedMinute: null,
+                baselineError: baselineError,
+                error: error.message || String(error)
+            });
+        }
+    }
+
+    console.log(
+        "複数IC比較V2 exit results",
+        lastExitIcV2Results
+    );
+
+    console.table(lastExitIcV2Results);
+
+    const resultArea =
+        document.getElementById("multiExitIcResult");
+
+    if (resultArea) {
+        resultArea.textContent =
+            "V2出口比較データを作成しました。コンソールを確認してください。";
+    }
+}
+
 function getRouteDurationMinutes(route) {
 
     return Math.round(
@@ -4907,7 +5080,11 @@ async function searchAutoExitIcComparison(
         });
     }
     else {
-        await searchMultiExitIcComparison();
+        await searchExitIcComparisonV2({
+            origin: origin,
+            destination: destination,
+            selectedExits: selectedExits
+        });
     }
 
     const autoCompareCheckbox =

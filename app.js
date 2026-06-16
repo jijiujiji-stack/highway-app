@@ -4060,9 +4060,19 @@ function buildExitIcComparisonV2CardHtml(result) {
         result.savedToll !== null &&
         result.savedToll <= 0;
 
+    const acceptableDelayMinutes =
+        getAcceptableDelayMinutes();
+
+    const isExitOverThreshold =
+        !hasError &&
+        result.savedToll > 0 &&
+        result.differenceFromAllHighway >
+            acceptableDelayMinutes;
+
     const classNames = [
         "v2-exit-result-card",
         hasNoSaving ? "v2-exit-no-saving" : "",
+        isExitOverThreshold ? "v2-exit-excluded" : "",
         hasError ? "v2-exit-error" : ""
     ]
         .filter(Boolean)
@@ -4101,6 +4111,17 @@ function buildExitIcComparisonV2CardHtml(result) {
             result.yenPerDelayedMinute.toLocaleString() +
             "円/分";
 
+    const excludedNote =
+        isExitOverThreshold
+            ? "<div class=\"v2-exit-excluded-note\">" +
+            "遅れ超過：許容" +
+            acceptableDelayMinutes +
+            "分に対して" +
+            result.differenceFromAllHighway +
+            "分遅い" +
+            "</div>"
+            : "";
+
     return (
         "<div class=\"" + classNames + "\">" +
         "<div class=\"v2-exit-name\">" +
@@ -4118,6 +4139,7 @@ function buildExitIcComparisonV2CardHtml(result) {
         yenPerDelayedMinuteText +
         "<br>合計" +
         formatV2Duration(result.totalMinutes) +
+        excludedNote +
         "</div>" +
         "</div>"
     );
@@ -4806,9 +4828,19 @@ function buildEntranceIcComparisonV2CardHtml(result) {
         result.differenceFromAllLocal !== null &&
         result.differenceFromAllLocal <= 0;
 
+    const acceptableDelayMinutes =
+        getAcceptableDelayMinutes();
+
+    const isEntranceBelowThreshold =
+        !hasError &&
+        result.differenceFromAllLocal > 0 &&
+        result.differenceFromAllLocal <
+            acceptableDelayMinutes;
+
     const classNames = [
         "v2-ic-result-card",
         hasNoSaving ? "v2-ic-no-saving" : "",
+        isEntranceBelowThreshold ? "v2-ic-excluded" : "",
         hasError ? "v2-ic-error" : ""
     ]
         .filter(Boolean)
@@ -4842,6 +4874,17 @@ function buildEntranceIcComparisonV2CardHtml(result) {
             : result.yenPerSavedMinute.toLocaleString() +
             "円/分";
 
+    const excludedNote =
+        isEntranceBelowThreshold
+            ? "<div class=\"v2-ic-excluded-note\">" +
+            "短縮不足：許容" +
+            acceptableDelayMinutes +
+            "分に対して" +
+            result.differenceFromAllLocal +
+            "分短縮" +
+            "</div>"
+            : "";
+
     return (
         "<div class=\"" + classNames + "\">" +
         "<div class=\"v2-ic-name\">" +
@@ -4861,6 +4904,7 @@ function buildEntranceIcComparisonV2CardHtml(result) {
         yenPerMinuteText +
         "<br>合計" +
         formatV2Duration(result.totalMinutes) +
+        excludedNote +
         "</div>" +
         "</div>"
     );

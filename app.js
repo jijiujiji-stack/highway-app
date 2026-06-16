@@ -3531,8 +3531,7 @@ function buildBestEntranceIcV2Html(results) {
         best.yenPerSavedMinute.toLocaleString() +
         "円/分" +
         "<br>合計" +
-        best.totalMinutes +
-        "分" +
+        formatV2Duration(best.totalMinutes) +
         "</div>" +
         "</div>"
     );
@@ -3630,7 +3629,7 @@ function updateDashboardWithBestEntranceIcV2() {
             dashboardLocal.textContent =
                 allLocalMinutes === null
                     ? "全下道--"
-                    : "全下道" + allLocalMinutes + "分";
+                    : formatV2Duration(allLocalMinutes);
         }
 
         if (dashboardLocalDetail) {
@@ -3685,7 +3684,7 @@ function updateDashboardWithBestEntranceIcV2() {
 
     if (dashboardHighway) {
         dashboardHighway.textContent =
-            "合計" + best.totalMinutes + "分";
+            formatV2Duration(best.totalMinutes);
     }
 
     if (dashboardHighwayDetail) {
@@ -3697,7 +3696,7 @@ function updateDashboardWithBestEntranceIcV2() {
         dashboardLocal.textContent =
             best.allLocalMinutes === null
                 ? "全下道--"
-                : "全下道" + best.allLocalMinutes + "分";
+                : formatV2Duration(best.allLocalMinutes);
     }
 
     if (dashboardLocalDetail) {
@@ -3790,10 +3789,37 @@ function buildEntranceIcComparisonV2CardHtml(result) {
         "<br>" +
         yenPerMinuteText +
         "<br>合計" +
-        result.totalMinutes +
-        "分" +
+        formatV2Duration(result.totalMinutes) +
         "</div>" +
         "</div>"
+    );
+}
+
+function formatV2Duration(minutes) {
+
+    if (
+        minutes === null ||
+        minutes === undefined ||
+        Number.isNaN(minutes)
+    ) {
+        return "--";
+    }
+
+    if (minutes < 60) {
+        return minutes + "分";
+    }
+
+    const hours =
+        Math.floor(minutes / 60);
+
+    const mins =
+        minutes % 60;
+
+    return (
+        hours +
+        "時間" +
+        String(mins).padStart(2, "0") +
+        "分"
     );
 }
 

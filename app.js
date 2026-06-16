@@ -3435,6 +3435,7 @@ function displayEntranceIcComparisonV2Results(results) {
         );
 
     resultArea.innerHTML =
+        buildBestEntranceIcV2Html(results) +
         "<div class=\"v2-ic-result-list\">" +
         sortedResults
             .map(result =>
@@ -3442,6 +3443,97 @@ function displayEntranceIcComparisonV2Results(results) {
             )
             .join("") +
         "</div>";
+}
+
+function getBestEntranceIcV2(results) {
+
+    if (!Array.isArray(results)) {
+        return null;
+    }
+
+    const candidates =
+        results
+            .filter(result =>
+                !result.error &&
+                result.differenceFromAllLocal > 0 &&
+                result.yenPerSavedMinute !== null
+            )
+            .sort((a, b) => {
+
+                if (
+                    a.yenPerSavedMinute !==
+                    b.yenPerSavedMinute
+                ) {
+                    return (
+                        a.yenPerSavedMinute -
+                        b.yenPerSavedMinute
+                    );
+                }
+
+                if (
+                    a.differenceFromAllLocal !==
+                    b.differenceFromAllLocal
+                ) {
+                    return (
+                        b.differenceFromAllLocal -
+                        a.differenceFromAllLocal
+                    );
+                }
+
+                return (
+                    a.minutesToCandidate -
+                    b.minutesToCandidate
+                );
+            });
+
+    return candidates[0] || null;
+}
+
+function buildBestEntranceIcV2Html(results) {
+
+    const best =
+        getBestEntranceIcV2(results);
+
+    if (!best) {
+        return (
+            "<div class=\"v2-best-entrance-card v2-best-empty\">" +
+            "<div class=\"v2-best-label\">おすすめ入口なし</div>" +
+            "<div class=\"v2-best-detail\">" +
+            "今回は全下道の方がよさそうです" +
+            "</div>" +
+            "</div>"
+        );
+    }
+
+    const icName =
+        escapeHtml(best.candidateIcName || "--");
+
+    return (
+        "<div class=\"v2-best-entrance-card\">" +
+        "<div class=\"v2-best-label\">おすすめ入口</div>" +
+        "<div class=\"v2-best-name\">" +
+        icName +
+        "</div>" +
+        "<div class=\"v2-best-main\">" +
+        "あと" +
+        best.minutesToCandidate +
+        "分" +
+        "</div>" +
+        "<div class=\"v2-best-detail\">" +
+        best.differenceFromAllLocal +
+        "分短縮" +
+        "<br>ETC 約" +
+        best.estimatedToll.toLocaleString() +
+        "円" +
+        "<br>" +
+        best.yenPerSavedMinute.toLocaleString() +
+        "円/分" +
+        "<br>合計" +
+        best.totalMinutes +
+        "分" +
+        "</div>" +
+        "</div>"
+    );
 }
 
 function buildEntranceIcComparisonV2CardHtml(result) {

@@ -1097,6 +1097,12 @@ async function displayRouteComparison(
     destination = ""
 ) {
 
+    setDashboardInfoLabels(
+        "効率率",
+        "単価"
+    );
+    setDashboardV2EntranceMode(false);
+
     const highwayMinutes =
         Math.round(
             parseInt(
@@ -3542,6 +3548,12 @@ function updateDashboardWithBestEntranceIcV2() {
     const best =
         getBestEntranceIcV2(lastMultiIcV2Results);
 
+    setDashboardInfoLabels(
+        "時間短縮",
+        "ETC料金"
+    );
+    setDashboardV2EntranceMode(Boolean(best));
+
     const dashboardCard =
         document.querySelector(".dashboard-card");
 
@@ -3661,22 +3673,37 @@ function updateDashboardWithBestEntranceIcV2() {
         "おすすめ入口";
 
     if (dashboardReason) {
-        dashboardReason.textContent =
-            best.candidateIcName +
-            "\nあと" +
+        dashboardReason.innerHTML =
+            "<div class=\"v2-best-entrance-card\">" +
+            "<div class=\"v2-best-name\">" +
+            escapeHtml(best.candidateIcName) +
+            "</div>" +
+            "<div class=\"v2-best-time-badge\">" +
+            "<span class=\"v2-best-time-icon\">◷</span>" +
+            "<span class=\"v2-best-time-text\">あと" +
             best.minutesToCandidate +
-            "分" +
-            "\n" +
-            best.differenceFromAllLocal +
-            "分短縮" +
-            "\nETC 約" +
-            best.estimatedToll.toLocaleString() +
-            "円";
+            "分</span>" +
+            "</div>" +
+            "<div class=\"v2-best-detail\">" +
+            escapeHtml(
+                best.differenceFromAllLocal +
+                "分短縮"
+            ) +
+            "<br>" +
+            escapeHtml(
+                "ETC 約" +
+                best.estimatedToll.toLocaleString() +
+                "円"
+            ) +
+            "</div>" +
+            "</div>";
     }
 
     if (dashboardValueJudge) {
         dashboardValueJudge.className = "";
-        dashboardValueJudge.classList.add("value-good");
+        dashboardValueJudge.classList.add(
+            "v2-best-yenpm-badge"
+        );
         dashboardValueJudge.textContent =
             best.yenPerSavedMinute.toLocaleString() +
             "円/分";
@@ -3713,6 +3740,47 @@ function updateDashboardWithBestEntranceIcV2() {
         dashboardCost.textContent =
             best.estimatedToll.toLocaleString() + "円";
     }
+}
+
+function setDashboardInfoLabels(
+    efficiencyLabelText,
+    costLabelText
+) {
+
+    const efficiencyLabel =
+        document.getElementById(
+            "dashboardEfficiencyLabel"
+        );
+
+    const costLabel =
+        document.getElementById(
+            "dashboardCostLabel"
+        );
+
+    if (efficiencyLabel) {
+        efficiencyLabel.textContent =
+            efficiencyLabelText;
+    }
+
+    if (costLabel) {
+        costLabel.textContent =
+            costLabelText;
+    }
+}
+
+function setDashboardV2EntranceMode(isActive) {
+
+    const dashboardCard =
+        document.querySelector(".dashboard-card");
+
+    if (!dashboardCard) {
+        return;
+    }
+
+    dashboardCard.classList.toggle(
+        "v2-dashboard-entrance-active",
+        isActive
+    );
 }
 
 function getAllLocalMinutesFromV2Results() {
@@ -3860,6 +3928,12 @@ function displayMultiExitIcComparison(
     acceptableDelay,
     tollStartIcName
 ) {
+
+    setDashboardInfoLabels(
+        "効率率",
+        "単価"
+    );
+    setDashboardV2EntranceMode(false);
 
     const sortedResults =
         [...results].sort(

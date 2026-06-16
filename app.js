@@ -3349,7 +3349,7 @@ async function searchEntranceIcComparisonV2(options = {}) {
                     )
                     : null;
 
-            lastMultiIcV2Results.push({
+            const result = {
                 candidateIcName: exit.displayName,
                 candidateIcGoogleName: exit.googleName,
                 localToCandidateMinutes:
@@ -3366,7 +3366,15 @@ async function searchEntranceIcComparisonV2(options = {}) {
                     localToCandidateMinutes,
                 baselineError: allLocalError,
                 error: null
-            });
+            };
+
+            result.recommendScoreDetail =
+                calculateEntranceRecommendScoreDetailV2(result);
+
+            result.recommendScore =
+                calculateEntranceRecommendScoreV2(result);
+
+            lastMultiIcV2Results.push(result);
 
         } catch (error) {
 
@@ -3382,7 +3390,9 @@ async function searchEntranceIcComparisonV2(options = {}) {
                 yenPerSavedMinute: null,
                 minutesToCandidate: null,
                 baselineError: allLocalError,
-                error: error.message || String(error)
+                error: error.message || String(error),
+                recommendScore: null,
+                recommendScoreDetail: null
             });
         }
     }
@@ -3514,7 +3524,7 @@ async function searchExitIcComparisonV2(options = {}) {
                     )
                     : null;
 
-            lastExitIcV2Results.push({
+            const result = {
                 candidateIcName: exit.displayName,
                 candidateIcGoogleName: exit.googleName,
                 highwayToCandidateMinutes:
@@ -3534,7 +3544,15 @@ async function searchExitIcComparisonV2(options = {}) {
                     yenPerDelayedMinute,
                 baselineError: baselineError,
                 error: null
-            });
+            };
+
+            result.recommendScoreDetail =
+                calculateExitRecommendScoreDetailV2(result);
+
+            result.recommendScore =
+                calculateExitRecommendScoreV2(result);
+
+            lastExitIcV2Results.push(result);
 
         } catch (error) {
 
@@ -3552,7 +3570,9 @@ async function searchExitIcComparisonV2(options = {}) {
                 differenceFromAllHighway: null,
                 yenPerDelayedMinute: null,
                 baselineError: baselineError,
-                error: error.message || String(error)
+                error: error.message || String(error),
+                recommendScore: null,
+                recommendScoreDetail: null
             });
         }
     }
@@ -3578,6 +3598,86 @@ function getRouteDurationMinutes(route) {
             route.duration.replace("s", "")
         ) / 60
     );
+}
+
+function calculateEntranceRecommendScoreV2(result) {
+
+    const detail =
+        calculateEntranceRecommendScoreDetailV2(result);
+
+    if (!detail) {
+        return null;
+    }
+
+    return (
+        detail.savedTimeScore +
+        detail.nearScore +
+        detail.costScore
+    );
+}
+
+function calculateEntranceRecommendScoreDetailV2(result) {
+
+    if (
+        !result ||
+        result.error ||
+        result.differenceFromAllLocal <= 0 ||
+        result.yenPerSavedMinute === null ||
+        result.minutesToCandidate === null
+    ) {
+        return null;
+    }
+
+    return {
+        savedTimeScore:
+            Math.min(result.differenceFromAllLocal, 60),
+        nearScore:
+            Math.max(0, 40 - result.minutesToCandidate),
+        costScore:
+            Math.max(0, 60 - result.yenPerSavedMinute)
+    };
+}
+
+function calculateExitRecommendScoreV2(result) {
+
+    const detail =
+        calculateExitRecommendScoreDetailV2(result);
+
+    if (!detail) {
+        return null;
+    }
+
+    return (
+        detail.savingScore +
+        detail.delayScore +
+        detail.nearScore +
+        detail.efficiencyScore
+    );
+}
+
+function calculateExitRecommendScoreDetailV2(result) {
+
+    if (
+        !result ||
+        result.error ||
+        result.savedToll <= 0 ||
+        result.differenceFromAllHighway <= 0 ||
+        result.yenPerDelayedMinute === null ||
+        result.minutesToCandidate === null
+    ) {
+        return null;
+    }
+
+    return {
+        savingScore:
+            Math.min(result.savedToll / 20, 60),
+        delayScore:
+            Math.max(0, 50 - result.differenceFromAllHighway),
+        nearScore:
+            Math.max(0, 40 - result.minutesToCandidate),
+        efficiencyScore:
+            Math.min(result.yenPerDelayedMinute, 60)
+    };
 }
 
 function displayExitIcComparisonV2Results(results) {
@@ -3637,17 +3737,18 @@ function getBestExitIcV2(results) {
                 !result.error &&
                 result.savedToll > 0 &&
                 result.differenceFromAllHighway > 0 &&
-                result.yenPerDelayedMinute !== null
+                result.yenPerDelayedMinute !== null &&
+                result.recommendScore !== null
             )
             .sort((a, b) => {
 
                 if (
-                    a.yenPerDelayedMinute !==
-                    b.yenPerDelayedMinute
+                    a.recommendScore !==
+                    b.recommendScore
                 ) {
                     return (
-                        b.yenPerDelayedMinute -
-                        a.yenPerDelayedMinute
+                        b.recommendScore -
+                        a.recommendScore
                     );
                 }
 
@@ -3711,6 +3812,9 @@ function buildBestExitIcV2Html(results) {
         "円/分" +
         "<br>合計" +
         formatV2Duration(best.totalMinutes) +
+        "<br>おすすめ度 " +
+        Math.round(best.recommendScore) +
+        "点" +
         "</div>" +
         "</div>"
     );
@@ -3882,17 +3986,28 @@ function getBestEntranceIcV2(results) {
             .filter(result =>
                 !result.error &&
                 result.differenceFromAllLocal > 0 &&
-                result.yenPerSavedMinute !== null
+                result.yenPerSavedMinute !== null &&
+                result.recommendScore !== null
             )
             .sort((a, b) => {
 
                 if (
-                    a.yenPerSavedMinute !==
-                    b.yenPerSavedMinute
+                    a.recommendScore !==
+                    b.recommendScore
                 ) {
                     return (
-                        a.yenPerSavedMinute -
-                        b.yenPerSavedMinute
+                        b.recommendScore -
+                        a.recommendScore
+                    );
+                }
+
+                if (
+                    a.minutesToCandidate !==
+                    b.minutesToCandidate
+                ) {
+                    return (
+                        a.minutesToCandidate -
+                        b.minutesToCandidate
                     );
                 }
 
@@ -3907,8 +4022,8 @@ function getBestEntranceIcV2(results) {
                 }
 
                 return (
-                    a.minutesToCandidate -
-                    b.minutesToCandidate
+                    a.yenPerSavedMinute -
+                    b.yenPerSavedMinute
                 );
             });
 
@@ -3956,6 +4071,9 @@ function buildBestEntranceIcV2Html(results) {
         "円/分" +
         "<br>合計" +
         formatV2Duration(best.totalMinutes) +
+        "<br>おすすめ度 " +
+        Math.round(best.recommendScore) +
+        "点" +
         "</div>" +
         "</div>"
     );

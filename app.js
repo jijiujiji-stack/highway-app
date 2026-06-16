@@ -3698,6 +3698,8 @@ function dumpV2TestSummary() {
     const lines = [
         "=== V2 TEST SUMMARY ===",
         "現在モード: " + currentMultiIcMode,
+        "出発地入力: " + getElementTextOrValue("origin"),
+        "目的地入力: " + getElementTextOrValue("destination"),
         "目的地: " + getElementTextOrValue("destination"),
         "IC候補エリア: " + getElementTextOrValue("icArea"),
         "候補選定理由: " + getElementTextOrValue("candidateReason"),
@@ -3731,8 +3733,8 @@ function dumpV2TestSummary() {
         "--- DASHBOARD ---",
         "dashboardRecommendation: " +
             getElementTextOrValue("dashboardRecommendation"),
-        "dashboardReason: " +
-            getElementTextOrValue("dashboardReason"),
+        "dashboardReason:\n" +
+            getDashboardReasonLogText(),
         "dashboardValueJudge: " +
             getElementTextOrValue("dashboardValueJudge"),
         "dashboardHighway: " +
@@ -3788,6 +3790,75 @@ function dumpV2TestSummary() {
             }))
         );
     }
+}
+
+function getDashboardReasonLogText() {
+
+    const element =
+        document.getElementById("dashboardReason");
+
+    if (!element) {
+        return "";
+    }
+
+    const lines = [];
+
+    collectTextLinesFromNode(element, lines);
+
+    return lines
+        .map(text => text.trim())
+        .filter(text => text.length > 0)
+        .join("\n");
+}
+
+function collectTextLinesFromNode(node, lines) {
+
+    if (node.nodeType === Node.TEXT_NODE) {
+        const text =
+            node.textContent.trim();
+
+        if (text) {
+            lines.push(text);
+        }
+
+        return;
+    }
+
+    if (node.nodeName === "BR") {
+        return;
+    }
+
+    if (
+        node.nodeType === Node.ELEMENT_NODE &&
+        node.classList?.contains("v2-best-time-badge")
+    ) {
+        const text =
+            node.textContent
+                .replace(/\s+/g, " ")
+                .replace("◷", "◷ ")
+                .trim();
+
+        if (text) {
+            lines.push(text);
+        }
+
+        return;
+    }
+
+    if (!node.childNodes || node.childNodes.length === 0) {
+        const text =
+            node.textContent?.trim();
+
+        if (text) {
+            lines.push(text);
+        }
+
+        return;
+    }
+
+    node.childNodes.forEach(child =>
+        collectTextLinesFromNode(child, lines)
+    );
 }
 
 function getElementTextOrValue(id) {

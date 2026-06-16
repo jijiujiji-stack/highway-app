@@ -3563,13 +3563,9 @@ async function searchExitIcComparisonV2(options = {}) {
 
     console.table(lastExitIcV2Results);
 
-    const resultArea =
-        document.getElementById("multiExitIcResult");
-
-    if (resultArea) {
-        resultArea.textContent =
-            "V2出口比較データを作成しました。コンソールを確認してください。";
-    }
+    displayExitIcComparisonV2Results(
+        lastExitIcV2Results
+    );
 }
 
 function getRouteDurationMinutes(route) {
@@ -3579,6 +3575,160 @@ function getRouteDurationMinutes(route) {
             route.duration.replace("s", "")
         ) / 60
     );
+}
+
+function displayExitIcComparisonV2Results(results) {
+
+    const resultArea =
+        document.getElementById("multiExitIcResult");
+
+    if (!resultArea) {
+        return;
+    }
+
+    if (
+        !Array.isArray(results) ||
+        results.length === 0
+    ) {
+        resultArea.textContent =
+            "V2出口比較結果がありません";
+        return;
+    }
+
+    const sortedResults =
+        [...results].sort((a, b) =>
+            (
+                a.minutesToCandidate === null ||
+                a.minutesToCandidate === undefined
+                    ? Infinity
+                    : a.minutesToCandidate
+            ) -
+            (
+                b.minutesToCandidate === null ||
+                b.minutesToCandidate === undefined
+                    ? Infinity
+                    : b.minutesToCandidate
+            )
+        );
+
+    resultArea.innerHTML =
+        "<div class=\"v2-exit-result-list\">" +
+        sortedResults
+            .map(result =>
+                buildExitIcComparisonV2CardHtml(result)
+            )
+            .join("") +
+        "</div>";
+}
+
+function buildExitIcComparisonV2CardHtml(result) {
+
+    const hasError = Boolean(result.error);
+
+    const hasNoSaving =
+        !hasError &&
+        result.savedToll !== null &&
+        result.savedToll <= 0;
+
+    const classNames = [
+        "v2-exit-result-card",
+        hasNoSaving ? "v2-exit-no-saving" : "",
+        hasError ? "v2-exit-error" : ""
+    ]
+        .filter(Boolean)
+        .join(" ");
+
+    const icName =
+        escapeHtml(result.candidateIcName || "--");
+
+    if (hasError) {
+        return (
+            "<div class=\"" + classNames + "\">" +
+            "<div class=\"v2-exit-name\">" +
+            icName +
+            "</div>" +
+            "<div class=\"v2-exit-main\">取得失敗</div>" +
+            "<div class=\"v2-exit-detail\">" +
+            escapeHtml(result.error) +
+            "</div>" +
+            "</div>"
+        );
+    }
+
+    const delayText =
+        formatExitV2DelayText(
+            result.differenceFromAllHighway
+        );
+
+    const savingText =
+        formatExitV2SavingText(result.savedToll);
+
+    const yenPerDelayedMinuteText =
+        result.yenPerDelayedMinute === null ||
+            result.savedToll <= 0
+            ? ""
+            : "<br>" +
+            result.yenPerDelayedMinute.toLocaleString() +
+            "円/分";
+
+    return (
+        "<div class=\"" + classNames + "\">" +
+        "<div class=\"v2-exit-name\">" +
+        icName +
+        "</div>" +
+        "<div class=\"v2-exit-main\">" +
+        "あと" +
+        result.minutesToCandidate +
+        "分" +
+        "</div>" +
+        "<div class=\"v2-exit-detail\">" +
+        delayText +
+        "<br>" +
+        savingText +
+        yenPerDelayedMinuteText +
+        "<br>合計" +
+        formatV2Duration(result.totalMinutes) +
+        "</div>" +
+        "</div>"
+    );
+}
+
+function formatExitV2DelayText(differenceFromAllHighway) {
+
+    if (differenceFromAllHighway === null) {
+        return "全高速との差分不明";
+    }
+
+    if (differenceFromAllHighway > 0) {
+        return differenceFromAllHighway + "分遅い";
+    }
+
+    if (differenceFromAllHighway < 0) {
+        return (
+            "遅くならない<br>" +
+            Math.abs(differenceFromAllHighway) +
+            "分早い"
+        );
+    }
+
+    return "遅くならない<br>全高速と同等";
+}
+
+function formatExitV2SavingText(savedToll) {
+
+    if (savedToll === null) {
+        return "節約額不明";
+    }
+
+    if (savedToll > 0) {
+        return savedToll.toLocaleString() + "円節約";
+    }
+
+    if (savedToll < 0) {
+        return "節約なし";
+    }
+
+    return "節約なし";
 }
 
 function displayEntranceIcComparisonV2Results(results) {

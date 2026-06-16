@@ -1190,6 +1190,47 @@ details#searchPanel .origin-row input {
     border-color: #e74c3c;
 }
 
+.v2-exit-result-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.v2-exit-result-card {
+    background: #111;
+    border: 1px solid #444;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.v2-exit-name {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.v2-exit-main {
+    font-size: 18px;
+    font-weight: bold;
+    color: #f1c40f;
+    margin-bottom: 6px;
+}
+
+.v2-exit-detail {
+    font-size: 13px;
+    color: #ccc;
+    line-height: 1.6;
+}
+
+.v2-exit-no-saving {
+    opacity: 0.6;
+}
+
+.v2-exit-error {
+    opacity: 0.5;
+    border-color: #e74c3c;
+}
+
 .v2-best-entrance-card {
     background: #10251a;
     border: 2px solid #2ecc71;

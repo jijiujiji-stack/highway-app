@@ -4435,8 +4435,9 @@ function updateDashboardWithBestEntranceIcV2() {
         if (dashboardLocal) {
             dashboardLocal.textContent =
                 allLocalMinutes === null
-                    ? "全下道--"
-                    : formatV2Duration(allLocalMinutes);
+                    ? "全下道 --"
+                    : "全下道 " +
+                    formatV2Duration(allLocalMinutes);
         }
 
         if (dashboardLocalDetail) {
@@ -4506,6 +4507,7 @@ function updateDashboardWithBestEntranceIcV2() {
 
     if (dashboardHighway) {
         dashboardHighway.textContent =
+            "入口利用 " +
             formatV2Duration(best.totalMinutes);
     }
 
@@ -4517,8 +4519,9 @@ function updateDashboardWithBestEntranceIcV2() {
     if (dashboardLocal) {
         dashboardLocal.textContent =
             best.allLocalMinutes === null
-                ? "全下道--"
-                : formatV2Duration(best.allLocalMinutes);
+                ? "全下道 --"
+                : "全下道 " +
+                formatV2Duration(best.allLocalMinutes);
     }
 
     if (dashboardLocalDetail) {

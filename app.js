@@ -233,7 +233,7 @@ const IC_MASTER = {
             { order: 10, displayName: "花園IC", googleName: "関越自動車道 花園インターチェンジ", lat: 36.115, lng: 139.214 },
             { order: 11, displayName: "本庄児玉IC", googleName: "関越自動車道 本庄児玉インターチェンジ", lat: 36.223, lng: 139.152 },
             { order: 12, displayName: "高崎玉村SIC", googleName: "関越自動車道 高崎玉村スマートインターチェンジ", lat: 36.284, lng: 139.101 },
-            { order: 13, displayName: "高崎IC", googleName: "関越自動車道 高崎インターチェンジ", lat: 36.308, lng: 139.063 },
+            { order: 13, displayName: "高崎IC", googleName: "関越自動車道 高崎インターチェンジ", lat: 36.308, lng: 139.063, connection: true, connectedRoads: ["kanetsu", "joshinetsu"] },
             { order: 14, displayName: "前橋IC", googleName: "関越自動車道 前橋インターチェンジ", lat: 36.384, lng: 139.055 },
             { order: 15, displayName: "駒寄SIC", googleName: "関越自動車道 駒寄スマートインターチェンジ", lat: 36.441, lng: 139.010 },
             { order: 16, displayName: "渋川伊香保IC", googleName: "関越自動車道 渋川伊香保インターチェンジ", lat: 36.493, lng: 139.007 },
@@ -241,14 +241,16 @@ const IC_MASTER = {
             { order: 18, displayName: "昭和IC", googleName: "関越自動車道 昭和インターチェンジ", lat: 36.634, lng: 139.101 },
             { order: 19, displayName: "沼田IC", googleName: "関越自動車道 沼田インターチェンジ", lat: 36.663, lng: 139.036 },
             { order: 20, displayName: "月夜野IC", googleName: "関越自動車道 月夜野インターチェンジ", lat: 36.748, lng: 138.988 },
-            { order: 21, displayName: "水上IC", googleName: "関越自動車道 水上インターチェンジ", lat: 36.801, lng: 138.964 }
+            { order: 21, displayName: "水上IC", googleName: "関越自動車道 水上インターチェンジ", lat: 36.801, lng: 138.964 },
+            { order: 22, displayName: "藤岡IC", googleName: "上信越自動車道 藤岡インターチェンジ", lat: 36.269, lng: 139.074, connection: true, connectedRoads: ["kanetsu", "joshinetsu"] }
         ]
     },
 
     joshinetsu: {
         label: "上信越道方面",
         exits: [
-            { order: 1, displayName: "藤岡IC", googleName: "上信越自動車道 藤岡インターチェンジ", lat: 36.269, lng: 139.074 },
+            { order: 0, displayName: "高崎IC", googleName: "関越自動車道 高崎インターチェンジ", lat: 36.308, lng: 139.063, connection: true, connectedRoads: ["kanetsu", "joshinetsu"] },
+            { order: 1, displayName: "藤岡IC", googleName: "上信越自動車道 藤岡インターチェンジ", lat: 36.269, lng: 139.074, connection: true, connectedRoads: ["kanetsu", "joshinetsu"] },
             { order: 2, displayName: "吉井IC", googleName: "上信越自動車道 吉井インターチェンジ", lat: 36.250, lng: 138.986 },
             { order: 3, displayName: "富岡IC", googleName: "上信越自動車道 富岡インターチェンジ", lat: 36.250, lng: 138.891 },
             { order: 4, displayName: "下仁田IC", googleName: "上信越自動車道 下仁田インターチェンジ", lat: 36.210, lng: 138.774 },
@@ -340,14 +342,18 @@ const IC_MASTER = {
                 displayName: "木更津金田IC",
                 googleName: "東京湾アクアライン 木更津金田インターチェンジ",
                 lat: 35.435,
-                lng: 139.921
+                lng: 139.921,
+                connection: true,
+                connectedRoads: ["aqualine", "tateyama"]
             },
             {
                 order: 4,
                 displayName: "袖ケ浦IC",
                 googleName: "東京湾アクアライン連絡道 袖ケ浦インターチェンジ",
                 lat: 35.418,
-                lng: 139.980
+                lng: 139.980,
+                connection: true,
+                connectedRoads: ["aqualine", "tateyama"]
             }
         ]
     },
@@ -359,11 +365,40 @@ const IC_MASTER = {
         label: "館山道方面",
         exits: [
             {
+                order: -2,
+                displayName: "木更津金田IC",
+                googleName: "東京湾アクアライン 木更津金田インターチェンジ",
+                lat: 35.435,
+                lng: 139.921,
+                connection: true,
+                connectedRoads: ["aqualine", "tateyama"]
+            },
+            {
+                order: -1,
+                displayName: "袖ケ浦IC",
+                googleName: "東京湾アクアライン連絡道 袖ケ浦インターチェンジ",
+                lat: 35.418,
+                lng: 139.980,
+                connection: true,
+                connectedRoads: ["aqualine", "tateyama"]
+            },
+            {
+                order: 0,
+                displayName: "蘇我IC",
+                googleName: "京葉道路 蘇我インターチェンジ",
+                lat: 35.568,
+                lng: 140.158,
+                connection: true,
+                connectedRoads: ["keiyo", "tateyama", "tokan"]
+            },
+            {
                 order: 1,
                 displayName: "市原IC",
                 googleName: "館山自動車道 市原インターチェンジ",
                 lat: 35.498,
-                lng: 140.104
+                lng: 140.104,
+                connection: true,
+                connectedRoads: ["keiyo", "tateyama"]
             },
             {
                 order: 2,
@@ -499,7 +534,9 @@ const IC_MASTER = {
                 displayName: "蘇我IC",
                 googleName: "京葉道路 蘇我インターチェンジ",
                 lat: 35.568,
-                lng: 140.158
+                lng: 140.158,
+                connection: true,
+                connectedRoads: ["keiyo", "tateyama", "tokan"]
             }
         ]
     },
@@ -509,6 +546,15 @@ const IC_MASTER = {
     tokan: {
         label: "東関東道方面",
         exits: [
+            {
+                order: 0,
+                displayName: "蘇我IC",
+                googleName: "京葉道路 蘇我インターチェンジ",
+                lat: 35.568,
+                lng: 140.158,
+                connection: true,
+                connectedRoads: ["keiyo", "tokan", "tateyama"]
+            },
             {
                 order: 1,
                 displayName: "湾岸習志野IC",

@@ -1,6 +1,13 @@
+// 標準判定ロジック
+// 出発地・目的地最寄りICの距離合計で方面を決定する。
 const USE_DISTANCE_ONLY_IC_AREA = true;
 
+// キーワード判定は補助扱い。距離だけ方式を優先するため標準では使わない。
+const ENABLE_KEYWORD_AREA_HINT = false;
+
 const IC_MASTER = {
+    // 接続道路のICは重複登録を許可する。
+    // 例: 木更津金田ICをアクアライン・館山道双方へ保持する。
     joban: {
         label: "常磐道方面",
         exits: [
@@ -3724,6 +3731,7 @@ function dumpV2TestSummary() {
         "出口おすすめ条件: " +
             acceptableDelayMinutes +
             "分以内の遅れ",
+        "判定方式: " + getIcAreaDecisionMethodForLog(),
         "IC候補エリア: " + getElementTextOrValue("icArea"),
         "候補選定理由: " + getElementTextOrValue("candidateReason"),
         "現在地: " + getElementTextOrValue("currentLocation"),
@@ -3853,6 +3861,8 @@ async function runV2SimpleDiagnostic() {
             "許容時間: " +
                 acceptableDelayMinutes +
                 "分",
+            "判定方式: " +
+                getIcAreaDecisionMethodForLog(),
             "テスト件数: " +
                 V2_DIAGNOSTIC_DESTINATIONS.length
         ].join("\n")
@@ -3889,6 +3899,7 @@ async function runV2SimpleDiagnostic() {
         console.table(
             summaries.map(summary => ({
                 destination: summary.destination,
+                decisionMethod: summary.decisionMethod,
                 icArea: summary.icArea,
                 bestEntrance: summary.bestEntranceName,
                 entranceScore: summary.entranceScore,
@@ -3954,6 +3965,7 @@ async function runV2SimpleDiagnosticForDestination(
         index: index,
         origin: origin,
         destination: destination,
+        decisionMethod: getIcAreaDecisionMethodForLog(),
         icArea: "--",
         candidateReason: "--",
         bestEntranceName: "なし",
@@ -3982,6 +3994,8 @@ async function runV2SimpleDiagnosticForDestination(
             );
 
         summary.icArea = candidateInfo.icArea;
+        summary.decisionMethod =
+            candidateInfo.decisionMethod;
         summary.candidateReason =
             candidateInfo.reasonText;
 
@@ -4123,14 +4137,18 @@ async function prepareV2SimpleDiagnosticCandidates(
             IC_MASTER[distanceOnlyIcAreaInfo.icArea]
         ) {
             icArea = distanceOnlyIcAreaInfo.icArea;
+            lastIcAreaDecisionType = "distance-only";
         }
         else {
 
-            const suggestedIcArea =
-                await suggestIcArea(origin, destination);
+            if (ENABLE_KEYWORD_AREA_HINT) {
 
-            if (suggestedIcArea) {
-                icArea = suggestedIcArea;
+                const suggestedIcArea =
+                    await suggestIcArea(origin, destination);
+
+                if (suggestedIcArea) {
+                    icArea = suggestedIcArea;
+                }
             }
         }
     }
@@ -4291,6 +4309,7 @@ async function prepareV2SimpleDiagnosticCandidates(
 
     return {
         icArea: icArea,
+        decisionMethod: getIcAreaDecisionMethodForLog(),
         reasonText: reasonText,
         selectedExits: selectedExits
     };
@@ -4304,6 +4323,7 @@ function formatV2SimpleDiagnosticSummary(summary) {
             ". " +
             summary.destination +
             " ---",
+        "判定方式: " + summary.decisionMethod,
         "IC候補エリア: " + summary.icArea,
         "候補選定理由: " + summary.candidateReason,
         "おすすめ入口: " + summary.bestEntranceName,
@@ -6289,6 +6309,9 @@ async function searchAutoExitIcComparison(
             icArea =
                 distanceOnlyIcAreaInfo.icArea;
 
+            lastIcAreaDecisionType =
+                "distance-only";
+
             document
                 .getElementById("icArea")
                 .value =
@@ -6316,31 +6339,43 @@ async function searchAutoExitIcComparison(
         }
         else {
 
-            const suggestedIcArea =
-                await suggestIcArea(origin, destination);
+            if (ENABLE_KEYWORD_AREA_HINT) {
 
-            if (suggestedIcArea) {
+                const suggestedIcArea =
+                    await suggestIcArea(origin, destination);
 
-                icArea = suggestedIcArea;
+                if (suggestedIcArea) {
 
-                document
-                    .getElementById("icArea")
-                    .value =
-                    suggestedIcArea;
+                    icArea = suggestedIcArea;
 
-                icAreaReason.innerHTML =
-                    "<span style='color:#4CAF50'>" +
-                    "方面判定：" +
-                    IC_MASTER[suggestedIcArea].label +
-                    "（" +
-                    getIcAreaDecisionLabel() +
-                    "）" +
-                    "</span>";
+                    document
+                        .getElementById("icArea")
+                        .value =
+                        suggestedIcArea;
+
+                    icAreaReason.innerHTML =
+                        "<span style='color:#4CAF50'>" +
+                        "方面判定：" +
+                        IC_MASTER[suggestedIcArea].label +
+                        "（" +
+                        getIcAreaDecisionLabel() +
+                        "）" +
+                        "</span>";
+
+                }
+                else {
+                    icAreaReason.textContent =
+                        "方面判定：未判定";
+                }
 
             }
             else {
-                icAreaReason.textContent =
-                    "方面判定：未判定";
+                icAreaReason.innerHTML =
+                    "<span style='color:#f1c40f'>" +
+                    "方面判定：距離だけ方式で未判定 / 手動選択を使用（" +
+                    IC_MASTER[icArea].label +
+                    "）" +
+                    "</span>";
             }
         }
 
@@ -6960,6 +6995,8 @@ async function suggestIcAreaByNearestIc(
     };
 }
 
+// 標準判定ロジック
+// 出発地最寄りIC + 目的地最寄りIC + 距離合計で候補道路を選ぶ。
 function suggestIcAreaByDistanceOnlyForTest(
     originLatLng,
     destinationLatLng
@@ -7793,6 +7830,10 @@ function getIcAreaByKeyword(text) {
 
 function getIcAreaDecisionLabel() {
 
+    if (lastIcAreaDecisionType === "distance-only") {
+        return "距離だけ方式";
+    }
+
     if (lastIcAreaDecisionType === "origin-keyword") {
         return "出発地キーワード判定";
     }
@@ -7812,10 +7853,27 @@ function getIcAreaDecisionLabel() {
     return "自動判定";
 }
 
+function getIcAreaDecisionMethodForLog() {
+
+    if (USE_DISTANCE_ONLY_IC_AREA) {
+        return ENABLE_KEYWORD_AREA_HINT
+            ? "distance-only + keyword"
+            : "distance-only";
+    }
+
+    return ENABLE_KEYWORD_AREA_HINT
+        ? "keyword"
+        : "manual";
+}
+
 async function suggestIcArea(origin, destination) {
 
     if (!destination) {
         return null;
+    }
+
+    if (!ENABLE_KEYWORD_AREA_HINT) {
+        return await suggestIcAreaByDirection(destination);
     }
 
     const originText =

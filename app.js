@@ -15,10 +15,13 @@ const DEV_IC_CANDIDATE_COUNT = 3;
 const PROD_IC_CANDIDATE_COUNT = 5;
 
 // 実際に使用する候補IC数
-const ACTIVE_IC_CANDIDATE_COUNT =
-    DEV_API_SAVING_MODE
-        ? DEV_IC_CANDIDATE_COUNT
-        : PROD_IC_CANDIDATE_COUNT;
+let isRealDriveTestMode = false;
+
+function getActiveIcCandidateCount() {
+    return isRealDriveTestMode
+        ? PROD_IC_CANDIDATE_COUNT
+        : DEV_IC_CANDIDATE_COUNT;
+}
 
 const IC_MASTER = {
     // 接続道路のICは重複登録を許可する。
@@ -690,7 +693,7 @@ let lastLocalRouteMinutes = null;
 
 let invalidIcResults = [];
 
-let isAutoUpdateEnabled = true;
+let isAutoUpdateEnabled = false;
 let currentMultiIcMode = "entrance";
 let lastMultiIcV2Results = [];
 let lastExitIcV2Results = [];
@@ -745,6 +748,7 @@ window.addEventListener("load", () => {
         .addEventListener("click", searchRoute);
 
     initializeAutoUpdateToggle();
+    initializeRealDriveTestToggle();
     initializeMultiIcModeSwitch();
 
     document
@@ -2877,7 +2881,7 @@ function selectExitCandidatesForAutoExitComparison(
     icArea,
     highwayStart,
     destinationNearestIc,
-    maxCount = ACTIVE_IC_CANDIDATE_COUNT
+    maxCount = getActiveIcCandidateCount()
 ) {
 
     if (!highwayStart) {
@@ -4297,7 +4301,7 @@ async function prepareV2SimpleDiagnosticCandidates(
             icArea,
             highwayStart,
             destinationNearestIc,
-            ACTIVE_IC_CANDIDATE_COUNT
+            getActiveIcCandidateCount()
         );
 
     const endIcName =
@@ -6510,7 +6514,7 @@ async function searchAutoExitIcComparison(
             icArea,
             highwayStart,
             destinationNearestIc,
-            ACTIVE_IC_CANDIDATE_COUNT
+            getActiveIcCandidateCount()
         );
 
     console.log(
@@ -6987,7 +6991,7 @@ async function runCandidateIcTestCase(route) {
                 icArea,
                 highwayStartInfo.exit,
                 destinationNearestIc,
-                ACTIVE_IC_CANDIDATE_COUNT
+                getActiveIcCandidateCount()
             );
 
         result.candidates =
@@ -8455,6 +8459,60 @@ function initializeAutoUpdateToggle() {
     renderAutoUpdateStatus();
 }
 
+function initializeRealDriveTestToggle() {
+
+    const button =
+        document.getElementById("realDriveTestToggle");
+
+    const state =
+        document.getElementById("realDriveTestToggleState");
+
+    if (!button || !state) {
+        return;
+    }
+
+    isRealDriveTestMode = false;
+    renderRealDriveTestStatus();
+
+    button.addEventListener("click", () => {
+        isRealDriveTestMode = !isRealDriveTestMode;
+        renderRealDriveTestStatus();
+
+        console.log(
+            "実車テストモード",
+            isRealDriveTestMode ? "ON" : "OFF",
+            "候補IC数",
+            getActiveIcCandidateCount()
+        );
+    });
+}
+
+function renderRealDriveTestStatus() {
+
+    const toggleButton =
+        document.getElementById("realDriveTestToggle");
+
+    const toggleState =
+        document.getElementById("realDriveTestToggleState");
+
+    if (toggleState) {
+        toggleState.textContent =
+            isRealDriveTestMode ? "ON" : "OFF";
+    }
+
+    if (toggleButton) {
+        toggleButton.setAttribute(
+            "aria-pressed",
+            String(isRealDriveTestMode)
+        );
+
+        toggleButton.classList.toggle(
+            "is-paused",
+            !isRealDriveTestMode
+        );
+    }
+}
+
 function initializeMultiIcModeSwitch() {
 
     const modeInputs =
@@ -8514,7 +8572,7 @@ function renderAutoUpdateStatus() {
     if (toggleButton) {
         toggleButton.setAttribute(
             "aria-pressed",
-            String(!isAutoUpdateEnabled)
+            String(isAutoUpdateEnabled)
         );
 
         toggleButton.classList.toggle(

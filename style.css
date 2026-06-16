@@ -196,6 +196,13 @@ button {
     margin-bottom: 6px;
 }
 
+.v2-dashboard-exit-active #dashboardRecommendation {
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
 #dashboardReason .v2-best-entrance-card {
     background: transparent;
     border: none;
@@ -240,7 +247,42 @@ button {
     line-height: 1.7;
 }
 
+#dashboardReason .v2-best-exit-card {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+#dashboardReason .v2-best-exit-name {
+    color: #f1c40f;
+    font-size: 44px;
+    font-weight: bold;
+    line-height: 1.1;
+    margin-bottom: 12px;
+}
+
+#dashboardReason .v2-best-exit-detail {
+    font-size: 14px;
+    color: #ddd;
+    line-height: 1.7;
+}
+
 #dashboardValueJudge.v2-best-yenpm-badge {
+    display: inline-block;
+    background: rgba(255, 193, 7, 0.15);
+    border: 2px solid #ffc107;
+    color: #ffc107;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 6px 16px;
+    border-radius: 999px;
+    margin-top: 6px;
+}
+
+#dashboardValueJudge.v2-best-exit-yenpm-badge {
     display: inline-block;
     background: rgba(255, 193, 7, 0.15);
     border: 2px solid #ffc107;

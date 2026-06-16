@@ -335,7 +335,8 @@ const IC_MASTER = {
                 displayName: "海ほたるPA",
                 googleName: "東京湾アクアライン 海ほたるパーキングエリア",
                 lat: 35.463,
-                lng: 139.875
+                lng: 139.875,
+                isSelectable: false
             },
             {
                 order: 3,
@@ -2835,7 +2836,8 @@ function findNearestIcByMasterCoordinatesForAutoExitComparison(
         IC_MASTER[icArea].exits
             .filter(exit =>
                 exit.lat !== undefined &&
-                exit.lng !== undefined
+                exit.lng !== undefined &&
+                exit.isSelectable !== false
             )
             .slice()
             .sort((a, b) =>
@@ -2901,6 +2903,7 @@ function selectExitCandidatesForAutoExitComparison(
         )
         .filter(exit =>
             exit.googleName !== highwayStart.googleName &&
+            exit.isSelectable !== false &&
             startOrder !== null &&
             exit.order !== undefined &&
             (

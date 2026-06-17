@@ -695,6 +695,13 @@ let lastLocalRouteMinutes = null;
 
 let invalidIcResults = [];
 
+let selectedOriginAddress = "";
+let selectedDestinationAddress = "";
+let selectedOriginPlaceId = "";
+let selectedDestinationPlaceId = "";
+let selectedOriginLatLng = null;
+let selectedDestinationLatLng = null;
+
 let isAutoUpdateEnabled = false;
 let isAutoReSearchRunning = false;
 let currentMultiIcMode = "entrance";
@@ -785,6 +792,10 @@ window.addEventListener("load", () => {
         "input",
         function () {
 
+            selectedDestinationAddress = "";
+            selectedDestinationPlaceId = "";
+            selectedDestinationLatLng = null;
+
             clearDestinationButton.style.display =
                 this.value.trim()
                     ? "block"
@@ -795,6 +806,10 @@ window.addEventListener("load", () => {
     originInput.addEventListener(
         "input",
         function () {
+
+            selectedOriginAddress = "";
+            selectedOriginPlaceId = "";
+            selectedOriginLatLng = null;
 
             clearOriginButton.style.display =
                 this.value.trim()
@@ -808,6 +823,9 @@ window.addEventListener("load", () => {
         function () {
 
             destinationInput.value = "";
+            selectedDestinationAddress = "";
+            selectedDestinationPlaceId = "";
+            selectedDestinationLatLng = null;
 
             this.style.display = "none";
 
@@ -829,6 +847,9 @@ window.addEventListener("load", () => {
         function () {
 
             originInput.value = "";
+            selectedOriginAddress = "";
+            selectedOriginPlaceId = "";
+            selectedOriginLatLng = null;
 
             this.style.display = "none";
 
@@ -943,30 +964,112 @@ function initializeAutocomplete() {
     const destinationInput =
         document.getElementById("destination");
 
-    new google.maps.places.Autocomplete(
-        originInput,
-        {
-            componentRestrictions: { country: "jp" }
-        }
-    );
+    const originAutocomplete =
+        new google.maps.places.Autocomplete(
+            originInput,
+            {
+                componentRestrictions: { country: "jp" },
+                fields: [
+                    "formatted_address",
+                    "name",
+                    "place_id",
+                    "geometry"
+                ]
+            }
+        );
 
-    new google.maps.places.Autocomplete(
-        destinationInput,
-        {
-            componentRestrictions: { country: "jp" }
-        }
-    );
+    const destinationAutocomplete =
+        new google.maps.places.Autocomplete(
+            destinationInput,
+            {
+                componentRestrictions: { country: "jp" },
+                fields: [
+                    "formatted_address",
+                    "name",
+                    "place_id",
+                    "geometry"
+                ]
+            }
+        );
+
+    originAutocomplete.addListener("place_changed", () => {
+
+        const place =
+            originAutocomplete.getPlace();
+
+        selectedOriginAddress =
+            place.formatted_address ||
+            place.name ||
+            originInput.value;
+
+        selectedOriginPlaceId =
+            place.place_id || "";
+
+        selectedOriginLatLng =
+            place.geometry && place.geometry.location
+                ? {
+                    lat: place.geometry.location.lat(),
+                    lng: place.geometry.location.lng()
+                }
+                : null;
+
+        console.log(
+            "出発地Autocomplete選択",
+            selectedOriginAddress,
+            selectedOriginPlaceId,
+            selectedOriginLatLng
+        );
+
+    });
+
+    destinationAutocomplete.addListener("place_changed", () => {
+
+        const place =
+            destinationAutocomplete.getPlace();
+
+        selectedDestinationAddress =
+            place.formatted_address ||
+            place.name ||
+            destinationInput.value;
+
+        selectedDestinationPlaceId =
+            place.place_id || "";
+
+        selectedDestinationLatLng =
+            place.geometry && place.geometry.location
+                ? {
+                    lat: place.geometry.location.lat(),
+                    lng: place.geometry.location.lng()
+                }
+                : null;
+
+        console.log(
+            "目的地Autocomplete選択",
+            selectedDestinationAddress,
+            selectedDestinationPlaceId,
+            selectedDestinationLatLng
+        );
+
+    });
 
     console.log("Autocomplete 初期化完了");
 }
 
 async function searchRoute() {
 
-    const origin =
+    const originInputValue =
         document.getElementById("origin").value;
 
-    const destination =
+    const destinationInputValue =
         document.getElementById("destination").value;
+
+    const origin =
+        selectedOriginAddress ||
+        originInputValue;
+
+    const destination =
+        selectedDestinationAddress ||
+        destinationInputValue;
 
     document
         .getElementById("dashboardDestination")
@@ -996,7 +1099,15 @@ async function searchRoute() {
         document.getElementById("localTime").textContent =
             "検索中...";
 
-        await getRoutes(origin, destination);
+        await getRoutes(
+            origin,
+            destination,
+            false,
+            selectedOriginPlaceId,
+            selectedDestinationPlaceId,
+            selectedOriginLatLng,
+            selectedDestinationLatLng
+        );
 
         document
             .getElementById("lastRouteSearchTime")
@@ -1019,16 +1130,61 @@ async function searchRoute() {
     }
 }
 
+function createRouteWaypoint(
+    address,
+    placeId = "",
+    latLng = null
+) {
+    if (placeId) {
+        return {
+            placeId: placeId
+        };
+    }
+
+    if (latLng) {
+        return {
+            location: {
+                latLng: {
+                    latitude: latLng.lat,
+                    longitude: latLng.lng
+                }
+            }
+        };
+    }
+
+    return {
+        address: address
+    };
+}
+
 async function getRoutes(
     origin,
     destination,
-    suppressDashboardSummary = false
+    suppressDashboardSummary = false,
+    originPlaceId = "",
+    destinationPlaceId = "",
+    originLatLng = null,
+    destinationLatLng = null
 ) {
 
     const [highwayRoute, localRoute] =
         await Promise.all([
-            getHighwayRoute(origin, destination),
-            getLocalRoute(origin, destination)
+            getHighwayRoute(
+                origin,
+                destination,
+                originPlaceId,
+                destinationPlaceId,
+                originLatLng,
+                destinationLatLng
+            ),
+            getLocalRoute(
+                origin,
+                destination,
+                originPlaceId,
+                destinationPlaceId,
+                originLatLng,
+                destinationLatLng
+            )
         ]);
 
     await displayRouteComparison(
@@ -1067,7 +1223,11 @@ async function getRoutes(
 
 async function getHighwayRoute(
     origin,
-    destination
+    destination,
+    originPlaceId = "",
+    destinationPlaceId = "",
+    originLatLng = null,
+    destinationLatLng = null
 ) {
 
     const response = await fetch(
@@ -1086,13 +1246,17 @@ async function getHighwayRoute(
 
             body: JSON.stringify({
 
-                origin: {
-                    address: origin
-                },
+                origin: createRouteWaypoint(
+                    origin,
+                    originPlaceId,
+                    originLatLng
+                ),
 
-                destination: {
-                    address: destination
-                },
+                destination: createRouteWaypoint(
+                    destination,
+                    destinationPlaceId,
+                    destinationLatLng
+                ),
 
                 travelMode: "DRIVE",
 
@@ -1136,7 +1300,11 @@ async function getHighwayRoute(
 
 async function getLocalRoute(
     origin,
-    destination
+    destination,
+    originPlaceId = "",
+    destinationPlaceId = "",
+    originLatLng = null,
+    destinationLatLng = null
 ) {
 
     const response = await fetch(
@@ -1156,13 +1324,17 @@ async function getLocalRoute(
 
             body: JSON.stringify({
 
-                origin: {
-                    address: origin
-                },
+                origin: createRouteWaypoint(
+                    origin,
+                    originPlaceId,
+                    originLatLng
+                ),
 
-                destination: {
-                    address: destination
-                },
+                destination: createRouteWaypoint(
+                    destination,
+                    destinationPlaceId,
+                    destinationLatLng
+                ),
 
                 travelMode: "DRIVE",
 
@@ -1939,6 +2111,7 @@ async function searchFromCurrentLocation(
 
 
     const destination =
+        selectedDestinationAddress ||
         document
             .getElementById(
                 "destination"
@@ -1987,11 +2160,15 @@ async function searchFromCurrentLocation(
             await Promise.all([
 
                 getHighwayRouteFromGps(
-                    destination
+                    destination,
+                    selectedDestinationPlaceId,
+                    selectedDestinationLatLng
                 ),
 
                 getLocalRouteFromGps(
-                    destination
+                    destination,
+                    selectedDestinationPlaceId,
+                    selectedDestinationLatLng
                 )
 
             ]);
@@ -2063,7 +2240,9 @@ async function searchFromCurrentLocation(
 }
 
 async function getHighwayRouteFromGps(
-    destination
+    destination,
+    destinationPlaceId = "",
+    destinationLatLng = null
 ) {
 
     const response =
@@ -2098,10 +2277,11 @@ async function getHighwayRouteFromGps(
                         }
                     },
 
-                    destination: {
-                        address:
-                            destination
-                    },
+                    destination: createRouteWaypoint(
+                        destination,
+                        destinationPlaceId,
+                        destinationLatLng
+                    ),
 
                     travelMode:
                         "DRIVE",
@@ -2140,7 +2320,9 @@ async function getHighwayRouteFromGps(
 }
 
 async function getLocalRouteFromGps(
-    destination
+    destination,
+    destinationPlaceId = "",
+    destinationLatLng = null
 ) {
 
     const response =
@@ -2175,10 +2357,11 @@ async function getLocalRouteFromGps(
                         }
                     },
 
-                    destination: {
-                        address:
-                            destination
-                    },
+                    destination: createRouteWaypoint(
+                        destination,
+                        destinationPlaceId,
+                        destinationLatLng
+                    ),
 
                     travelMode:
                         "DRIVE",
@@ -6343,6 +6526,7 @@ async function searchAutoExitIcComparison(
     }
 
     const destination =
+        selectedDestinationAddress ||
         document
             .getElementById("destination")
             .value;
@@ -6376,12 +6560,21 @@ async function searchAutoExitIcComparison(
 
 
     const origin =
+        selectedOriginAddress ||
         document
             .getElementById("origin")
             .value;
 
     if (origin) {
-        await getRoutes(origin, destination, true);
+        await getRoutes(
+            origin,
+            destination,
+            true,
+            selectedOriginPlaceId,
+            selectedDestinationPlaceId,
+            selectedOriginLatLng,
+            selectedDestinationLatLng
+        );
     }
     else {
         await searchFromCurrentLocation(false, true);

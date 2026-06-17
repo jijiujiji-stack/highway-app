@@ -663,6 +663,8 @@ console.log(
 let currentLatitude = null;
 let currentLongitude = null;
 
+const geocodeLatLngCache = new Map();
+
 let lastSearchLatitude = null;
 let lastSearchLongitude = null;
 
@@ -694,6 +696,7 @@ let lastLocalRouteMinutes = null;
 let invalidIcResults = [];
 
 let isAutoUpdateEnabled = false;
+let isAutoReSearchRunning = false;
 let currentMultiIcMode = "entrance";
 let lastMultiIcV2Results = [];
 let lastExitIcV2Results = [];
@@ -1114,6 +1117,11 @@ async function getHighwayRoute(
         !data.routes ||
         data.routes.length === 0
     ) {
+        console.error(
+            "高速ルート取得失敗レスポンス",
+            data
+        );
+
         throw new Error(
             "高速ルートが見つかりません：" +
             origin +
@@ -1175,6 +1183,11 @@ async function getLocalRoute(
         !data.routes ||
         data.routes.length === 0
     ) {
+        console.error(
+            "下道ルート取得失敗レスポンス",
+            data
+        );
+
         throw new Error(
             "下道ルートが見つかりません：" +
             origin +
@@ -2312,10 +2325,17 @@ function findNearestIcIndex(icArea) {
 }
 
 
-function checkAutoReSearch() {
+async function checkAutoReSearch() {
 
     if (!isAutoUpdateEnabled) {
         renderAutoUpdateStatus();
+        return;
+    }
+
+    if (isAutoReSearchRunning) {
+        console.log(
+            "自動再検索スキップ：前回処理中"
+        );
         return;
     }
 
@@ -2431,6 +2451,10 @@ function checkAutoReSearch() {
             "data-update-working"
         );
 
+        isAutoReSearchRunning = true;
+
+        try {
+
         if (
             lastSearchMode === "autoExitIcCompareButton" ||
             document.getElementById("autoCompareEnabled")?.checked
@@ -2441,7 +2465,7 @@ function checkAutoReSearch() {
                 "候補IC自動比較ルートへ"
             );
 
-            searchAutoExitIcComparison(false);
+            await searchAutoExitIcComparison(false);
         }
         else {
 
@@ -2450,7 +2474,11 @@ function checkAutoReSearch() {
                 "現在地から再検索ルートへ"
             );
 
-            searchFromCurrentLocation(false);
+            await searchFromCurrentLocation(false);
+        }
+
+        } finally {
+            isAutoReSearchRunning = false;
         }
 
     }
@@ -6331,6 +6359,16 @@ async function searchAutoExitIcComparison(
         return;
     }
 
+    try {
+
+    const multiExitIcResult =
+        document.getElementById("multiExitIcResult");
+
+    if (multiExitIcResult) {
+        multiExitIcResult.textContent =
+            "候補IC比較中...";
+    }
+
     document
         .getElementById("dashboardDestination")
         .textContent =
@@ -6753,6 +6791,24 @@ async function searchAutoExitIcComparison(
 
     if (shouldClosePanel) {
         scrollToTopPanel();
+    }
+
+    } catch (error) {
+
+        console.error(error);
+
+        const multiExitIcResult =
+            document.getElementById("multiExitIcResult");
+
+        if (multiExitIcResult) {
+            multiExitIcResult.textContent =
+                "候補IC比較でエラーが発生しました。\n\n" +
+                (error.message || String(error)) +
+                "\n\n時間を置いて再実行してください。";
+        }
+
+    } finally {
+        // 処理中表示は成功時の結果表示またはcatchのエラー表示で上書きされる。
     }
 
 }
@@ -8661,6 +8717,18 @@ function updateRouteModeJudge(
 
 function getLatLngFromAddress(address) {
 
+    const cacheKey =
+        String(address || "").trim();
+
+    if (geocodeLatLngCache.has(cacheKey)) {
+        console.log(
+            "Geocoding cache hit",
+            cacheKey
+        );
+
+        return geocodeLatLngCache.get(cacheKey);
+    }
+
     return new Promise((resolve) => {
 
         const geocoder =
@@ -8678,10 +8746,17 @@ function getLatLngFromAddress(address) {
                     const location =
                         results[0].geometry.location;
 
-                    resolve({
+                    const result = {
                         lat: location.lat(),
                         lng: location.lng()
-                    });
+                    };
+
+                    geocodeLatLngCache.set(
+                        cacheKey,
+                        result
+                    );
+
+                    resolve(result);
 
                     return;
                 }

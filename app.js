@@ -702,6 +702,9 @@ let selectedDestinationPlaceId = "";
 let selectedOriginLatLng = null;
 let selectedDestinationLatLng = null;
 
+let wakeLock = null;
+let isWakeLockEnabled = false;
+
 let isAutoUpdateEnabled = false;
 let isAutoReSearchRunning = false;
 let currentMultiIcMode = "entrance";
@@ -759,6 +762,7 @@ window.addEventListener("load", () => {
 
     initializeAutoUpdateToggle();
     initializeRealDriveTestToggle();
+    initializeWakeLockToggle();
     initializeMultiIcModeSwitch();
 
     document
@@ -8758,6 +8762,151 @@ function renderRealDriveTestStatus() {
         toggleButton.classList.toggle(
             "is-paused",
             !isRealDriveTestMode
+        );
+    }
+}
+
+async function requestWakeLock() {
+
+    const unsupportedMessage =
+        "この環境では画面ON維持に対応していません";
+
+    if (!navigator.wakeLock) {
+
+        console.warn(unsupportedMessage);
+
+        const multiExitIcResult =
+            document.getElementById("multiExitIcResult");
+
+        if (multiExitIcResult) {
+            multiExitIcResult.textContent =
+                unsupportedMessage;
+        }
+
+        return false;
+    }
+
+    try {
+
+        wakeLock =
+            await navigator.wakeLock.request("screen");
+
+        wakeLock.addEventListener("release", () => {
+            wakeLock = null;
+            renderWakeLockStatus();
+        });
+
+        renderWakeLockStatus();
+
+        return true;
+
+    } catch (error) {
+
+        console.warn(
+            "画面ON維持の取得に失敗しました",
+            error
+        );
+
+        const multiExitIcResult =
+            document.getElementById("multiExitIcResult");
+
+        if (multiExitIcResult) {
+            multiExitIcResult.textContent =
+                "画面ON維持の取得に失敗しました";
+        }
+
+        return false;
+    }
+}
+
+async function releaseWakeLock() {
+
+    if (!wakeLock) {
+        renderWakeLockStatus();
+        return;
+    }
+
+    try {
+        await wakeLock.release();
+    } catch (error) {
+        console.warn(
+            "画面ON維持の解除に失敗しました",
+            error
+        );
+    } finally {
+        wakeLock = null;
+        renderWakeLockStatus();
+    }
+}
+
+function initializeWakeLockToggle() {
+
+    const toggleButton =
+        document.getElementById("wakeLockToggle");
+
+    if (!toggleButton) {
+        return;
+    }
+
+    toggleButton.addEventListener("click", async () => {
+
+        isWakeLockEnabled =
+            !isWakeLockEnabled;
+
+        renderWakeLockStatus();
+
+        if (isWakeLockEnabled) {
+
+            const requested =
+                await requestWakeLock();
+
+            if (!requested) {
+                isWakeLockEnabled = false;
+                renderWakeLockStatus();
+            }
+
+            return;
+        }
+
+        await releaseWakeLock();
+    });
+
+    document.addEventListener("visibilitychange", async () => {
+
+        if (
+            document.visibilityState === "visible" &&
+            isWakeLockEnabled &&
+            !wakeLock
+        ) {
+            await requestWakeLock();
+        }
+    });
+
+    renderWakeLockStatus();
+}
+
+function renderWakeLockStatus() {
+
+    const toggleButton =
+        document.getElementById("wakeLockToggle");
+
+    const toggleState =
+        document.getElementById("wakeLockToggleState");
+
+    if (toggleState) {
+        toggleState.textContent =
+            isWakeLockEnabled && wakeLock ? "ON" : "OFF";
+    }
+
+    if (toggleButton) {
+        toggleButton.setAttribute(
+            "aria-pressed",
+            String(isWakeLockEnabled && wakeLock)
+        );
+
+        toggleButton.classList.toggle(
+            "is-paused",
+            !(isWakeLockEnabled && wakeLock)
         );
     }
 }

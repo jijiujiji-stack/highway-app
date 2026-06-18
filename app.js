@@ -23,6 +23,20 @@ function getActiveIcCandidateCount() {
         : DEV_IC_CANDIDATE_COUNT;
 }
 
+function getAutoUpdateDistanceThreshold() {
+
+    return isRealDriveTestMode
+        ? 2000
+        : 7000;
+}
+
+function getAutoUpdateTimeThreshold() {
+
+    return isRealDriveTestMode
+        ? 180
+        : 300;
+}
+
 const IC_MASTER = {
     // 接続道路のICは重複登録を許可する。
     // 例: 木更津金田ICをアクアライン・館山道双方へ保持する。
@@ -909,7 +923,10 @@ window.addEventListener("load", () => {
         .getElementById(
             "nextUpdateInfo"
         ).textContent =
-        "2km移動 または 3分経過";
+        getAutoUpdateCountdownText(
+            getAutoUpdateDistanceThreshold(),
+            getAutoUpdateTimeThreshold()
+        );
 
 
 
@@ -2547,16 +2564,22 @@ async function checkAutoReSearch() {
             lastSearchTime
         ) / 1000;
 
+    const distanceThreshold =
+        getAutoUpdateDistanceThreshold();
+
+    const timeThreshold =
+        getAutoUpdateTimeThreshold();
+
     const remainingDistance =
         Math.max(
             0,
-            2000 - Math.round(distance)
+            distanceThreshold - Math.round(distance)
         );
 
     const remainingSeconds =
         Math.max(
             0,
-            180 - Math.round(elapsedSeconds)
+            timeThreshold - Math.round(elapsedSeconds)
         );
 
     let displaySeconds = remainingSeconds;
@@ -2571,14 +2594,15 @@ async function checkAutoReSearch() {
     }
 
     const displayTimeText =
-        formatCountdownSeconds(displaySeconds);
+        formatAutoUpdateTimeText(displaySeconds);
 
     const displayDistanceText =
-        (remainingDistance / 1000).toFixed(1) + "km";
+        formatAutoUpdateDistanceText(remainingDistance);
 
     setDataUpdateStatus(
+        "あと " +
         displayDistanceText +
-        " / " +
+        " または " +
         displayTimeText,
         "data-update-normal"
     );
@@ -2605,8 +2629,8 @@ async function checkAutoReSearch() {
     );
 
     if (
-        distance >= 2000 ||
-        elapsedSeconds >= 180
+        distance >= getAutoUpdateDistanceThreshold() ||
+        elapsedSeconds >= getAutoUpdateTimeThreshold()
     ) {
 
         console.log(
@@ -6956,7 +6980,10 @@ async function searchAutoExitIcComparison(
     document
         .getElementById("nextUpdateInfo")
         .textContent =
-        "2.0km / 3:00";
+        getAutoUpdateCountdownText(
+            getAutoUpdateDistanceThreshold(),
+            getAutoUpdateTimeThreshold()
+        );
 
     blinkElementById(
         "nextUpdateInfo",
@@ -8722,7 +8749,7 @@ function initializeRealDriveTestToggle() {
         renderRealDriveTestStatus();
 
         console.log(
-            "実車テストモード",
+            "高データ更新",
             isRealDriveTestMode ? "ON" : "OFF",
             "候補IC数",
             getActiveIcCandidateCount()
@@ -8754,6 +8781,8 @@ function renderRealDriveTestStatus() {
             !isRealDriveTestMode
         );
     }
+
+    updateAutoUpdateCountdownDisplay();
 }
 
 async function requestWakeLock() {
@@ -9372,6 +9401,124 @@ function formatCountdownSeconds(seconds) {
         minutes +
         ":" +
         String(secs).padStart(2, "0")
+    );
+}
+
+function formatAutoUpdateDistanceText(meters) {
+
+    if (meters <= 0) {
+        return "0km";
+    }
+
+    const kilometers =
+        Math.ceil(meters / 100) / 10;
+
+    if (Number.isInteger(kilometers)) {
+        return kilometers + "km";
+    }
+
+    return kilometers.toFixed(1) + "km";
+}
+
+function formatAutoUpdateTimeText(seconds) {
+
+    if (seconds <= 0) {
+        return "0秒";
+    }
+
+    const minutes =
+        Math.floor(seconds / 60);
+
+    const remainingSeconds =
+        seconds % 60;
+
+    if (remainingSeconds === 0) {
+        return minutes + "分";
+    }
+
+    if (minutes === 0) {
+        return remainingSeconds + "秒";
+    }
+
+    return minutes + "分" + remainingSeconds + "秒";
+}
+
+function getAutoUpdateCountdownText(
+    distanceMeters,
+    seconds
+) {
+
+    return (
+        "あと " +
+        formatAutoUpdateDistanceText(distanceMeters) +
+        " または " +
+        formatAutoUpdateTimeText(seconds)
+    );
+}
+
+function updateAutoUpdateCountdownDisplay() {
+
+    if (!isAutoUpdateEnabled) {
+        renderAutoUpdateStatus();
+        return;
+    }
+
+    const distanceThreshold =
+        getAutoUpdateDistanceThreshold();
+
+    const timeThreshold =
+        getAutoUpdateTimeThreshold();
+
+    if (
+        lastSearchLatitude === null ||
+        lastSearchLongitude === null ||
+        lastSearchTime === null ||
+        currentLatitude === null ||
+        currentLongitude === null
+    ) {
+        setDataUpdateStatus(
+            getAutoUpdateCountdownText(
+                distanceThreshold,
+                timeThreshold
+            ),
+            "data-update-normal"
+        );
+        return;
+    }
+
+    const distance =
+        calculateDistance(
+            lastSearchLatitude,
+            lastSearchLongitude,
+            currentLatitude,
+            currentLongitude
+        );
+
+    const elapsedSeconds =
+        (
+            Date.now()
+            -
+            lastSearchTime
+        ) / 1000;
+
+    const remainingDistance =
+        Math.max(
+            0,
+            distanceThreshold - Math.round(distance)
+        );
+
+    const remainingSeconds =
+        Math.max(
+            0,
+            timeThreshold - Math.round(elapsedSeconds)
+        );
+
+    setDataUpdateStatus(
+        getAutoUpdateCountdownText(
+            remainingDistance,
+            remainingSeconds
+        ),
+        "data-update-normal"
     );
 }
 

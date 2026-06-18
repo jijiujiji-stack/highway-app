@@ -884,7 +884,7 @@ window.addEventListener("load", () => {
         .getElementById("autoExitIcCompareButton")
         .addEventListener(
             "click",
-            searchAutoExitIcComparison
+            () => searchAutoExitIcComparison(true)
         );
 
     document
@@ -8968,9 +8968,31 @@ function initializeMultiIcModeSwitch() {
                     "複数IC比較モード",
                     currentMultiIcMode
                 );
+
+                refreshAutoExitIcComparisonAfterModeChange();
             }
         );
     });
+}
+
+function hasAutoExitIcComparisonResults() {
+
+    return (
+        lastMultiIcV2Results.length > 0 ||
+        lastExitIcV2Results.length > 0
+    );
+}
+
+async function refreshAutoExitIcComparisonAfterModeChange() {
+
+    if (!hasAutoExitIcComparisonResults()) {
+        console.log(
+            "候補IC自動比較は未実行のため、モード切替時の再比較をスキップ"
+        );
+        return;
+    }
+
+    await searchAutoExitIcComparison(false);
 }
 
 function renderAutoUpdateStatus() {

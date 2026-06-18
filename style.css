@@ -1186,6 +1186,15 @@ details#searchPanel .origin-row input {
     margin-right: 4px;
 }
 
+.multi-exit-ic-card #autoExitIcCompareButton {
+    display: block;
+    width: 100%;
+    margin-bottom: 12px;
+    background: #3498db;
+    color: white;
+    font-weight: bold;
+}
+
 .multi-ic-mode-description {
     color: #ccc;
     font-size: 13px;

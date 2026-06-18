@@ -707,6 +707,7 @@ let gpsErrorBlinkShown = false;
 
 let lastRecommendationText = "";
 let lastIcAreaDecisionType = "";
+let lastResolvedIcArea = null;
 
 let lastSearchMode = "";
 let lastLocalRouteMinutes = null;
@@ -1217,7 +1218,9 @@ async function getRoutes(
         localRoute,
         suppressDashboardSummary,
         origin,
-        destination
+        destination,
+        originLatLng,
+        destinationLatLng
     );
 
     lastSearchLatitude =
@@ -1398,7 +1401,9 @@ async function displayRouteComparison(
     local,
     suppressDashboardSummary = false,
     origin = "",
-    destination = ""
+    destination = "",
+    originLatLng = null,
+    destinationLatLng = null
 ) {
 
     setDashboardInfoLabels(
@@ -1434,11 +1439,20 @@ async function displayRouteComparison(
             local.distanceMeters / 1000
         ).toFixed(1);
 
+    const resolvedIcArea =
+        await resolveIcAreaForRoute(
+            origin,
+            destination,
+            originLatLng,
+            destinationLatLng
+        );
+
     const tollEstimate =
         await estimateMainHighwayToll(
             highway,
             origin,
-            destination
+            destination,
+            resolvedIcArea
         );
 
     const estimatedToll =
@@ -1783,10 +1797,111 @@ async function displayRouteComparison(
 }
 
 
+function updateIcAreaSelect(icArea) {
+
+    const icAreaSelect =
+        document.getElementById("icArea");
+
+    if (!icAreaSelect || !icArea) {
+        return;
+    }
+
+    icAreaSelect.value = icArea;
+}
+
+function setResolvedIcArea(icArea) {
+
+    if (!icArea) {
+        return;
+    }
+
+    lastResolvedIcArea = icArea;
+    updateIcAreaSelect(icArea);
+}
+
+async function resolveIcAreaForRoute(
+    origin,
+    destination,
+    originLatLng = null,
+    destinationLatLng = null
+) {
+
+    if (!destination) {
+        return null;
+    }
+
+    const autoIcAreaEnabled =
+        document.getElementById(
+            "autoIcAreaEnabled"
+        )?.checked;
+
+    let icArea =
+        document.getElementById("icArea")?.value;
+
+    if (autoIcAreaEnabled) {
+
+        let distanceOnlyIcAreaInfo = null;
+
+        if (USE_DISTANCE_ONLY_IC_AREA) {
+
+            const resolvedOriginLatLng =
+                originLatLng ||
+                await getAutoExitComparisonOriginLatLng(origin);
+
+            const resolvedDestinationLatLng =
+                destinationLatLng ||
+                await getLatLngFromAddress(destination);
+
+            if (
+                resolvedOriginLatLng &&
+                resolvedDestinationLatLng
+            ) {
+                distanceOnlyIcAreaInfo =
+                    suggestIcAreaByDistanceOnlyForTest(
+                        resolvedOriginLatLng,
+                        resolvedDestinationLatLng
+                    );
+            }
+        }
+
+        if (
+            distanceOnlyIcAreaInfo &&
+            IC_MASTER[distanceOnlyIcAreaInfo.icArea]
+        ) {
+            icArea = distanceOnlyIcAreaInfo.icArea;
+            lastIcAreaDecisionType = "distance-only";
+        }
+        else if (ENABLE_KEYWORD_AREA_HINT) {
+
+            const suggestedIcArea =
+                await suggestIcArea(
+                    origin,
+                    destination
+                );
+
+            if (suggestedIcArea) {
+                icArea = suggestedIcArea;
+            }
+        }
+    }
+
+    if (
+        icArea &&
+        IC_MASTER[icArea]
+    ) {
+        setResolvedIcArea(icArea);
+        return icArea;
+    }
+
+    return null;
+}
+
+
 async function estimateMainHighwayToll(
     highwayRoute,
     origin,
-    destination
+    destination,
+    preferredIcArea = null
 ) {
 
     const fallbackKm =
@@ -1813,10 +1928,18 @@ async function estimateMainHighwayToll(
                 "autoIcAreaEnabled"
             )?.checked;
 
-        let icArea =
+        const selectedIcArea =
             document.getElementById("icArea")?.value;
 
-        if (autoIcAreaEnabled) {
+        let icArea =
+            autoIcAreaEnabled
+                ? preferredIcArea || lastResolvedIcArea
+                : selectedIcArea;
+
+        if (
+            autoIcAreaEnabled &&
+            !icArea
+        ) {
 
             const suggestedIcArea =
                 await suggestIcArea(
@@ -1835,6 +1958,8 @@ async function estimateMainHighwayToll(
         ) {
             return fallbackResult;
         }
+
+        setResolvedIcArea(icArea);
 
         let startIc = null;
 
@@ -2200,7 +2325,12 @@ async function searchFromCurrentLocation(
             localRoute,
             suppressDashboardSummary,
             "",
-            destination
+            destination,
+            {
+                lat: currentLatitude,
+                lng: currentLongitude
+            },
+            selectedDestinationLatLng
         );
 
         lastSearchLatitude =
@@ -4475,9 +4605,7 @@ async function prepareV2SimpleDiagnosticCandidates(
         }
     }
 
-    if (icAreaSelect) {
-        icAreaSelect.value = icArea;
-    }
+    setResolvedIcArea(icArea);
 
     const highwayStartInfo =
         findNearestIcByMasterCoordinatesForAutoExitComparison(
@@ -6667,10 +6795,7 @@ async function searchAutoExitIcComparison(
             lastIcAreaDecisionType =
                 "distance-only";
 
-            document
-                .getElementById("icArea")
-                .value =
-                icArea;
+            setResolvedIcArea(icArea);
 
             icAreaReason.innerHTML =
                 "<span style='color:#4CAF50'>" +
@@ -6703,10 +6828,7 @@ async function searchAutoExitIcComparison(
 
                     icArea = suggestedIcArea;
 
-                    document
-                        .getElementById("icArea")
-                        .value =
-                        suggestedIcArea;
+                    setResolvedIcArea(suggestedIcArea);
 
                     icAreaReason.innerHTML =
                         "<span style='color:#4CAF50'>" +

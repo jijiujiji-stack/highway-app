@@ -1245,7 +1245,7 @@ async function getHighwayRoute(
                     CONFIG.GOOGLE_MAPS_API_KEY,
 
                 "X-Goog-FieldMask":
-                    "routes.duration,routes.distanceMeters,routes.travelAdvisory.tollInfo"
+                    "routes.duration,routes.distanceMeters"
             },
 
             body: JSON.stringify({
@@ -1265,10 +1265,7 @@ async function getHighwayRoute(
                 travelMode: "DRIVE",
 
                 routingPreference:
-                    "TRAFFIC_AWARE",
-
-                extraComputations: [
-                    "TOLLS"]
+                    "TRAFFIC_AWARE"
             })
         }
     );
@@ -2264,7 +2261,7 @@ async function getHighwayRouteFromGps(
                         CONFIG.GOOGLE_MAPS_API_KEY,
 
                     "X-Goog-FieldMask":
-                        "routes.duration,routes.distanceMeters,routes.travelAdvisory.tollInfo"
+                        "routes.duration,routes.distanceMeters"
 
                 },
 
@@ -2291,11 +2288,7 @@ async function getHighwayRouteFromGps(
                         "DRIVE",
 
                     routingPreference:
-                        "TRAFFIC_AWARE",
-
-                    extraComputations: [
-                        "TOLLS"
-                    ]
+                        "TRAFFIC_AWARE"
 
                 })
 
@@ -3150,7 +3143,7 @@ async function getHighwayRouteForMultiExitComparison(
                     CONFIG.GOOGLE_MAPS_API_KEY,
 
                 "X-Goog-FieldMask":
-                    "routes.duration,routes.distanceMeters,routes.travelAdvisory.tollInfo"
+                    "routes.duration,routes.distanceMeters"
             },
 
             body: JSON.stringify({
@@ -3164,10 +3157,7 @@ async function getHighwayRouteForMultiExitComparison(
                 travelMode: "DRIVE",
 
                 routingPreference:
-                    "TRAFFIC_AWARE",
-
-                extraComputations: [
-                    "TOLLS"]
+                    "TRAFFIC_AWARE"
             })
         }
     );

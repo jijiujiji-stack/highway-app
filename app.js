@@ -37,6 +37,8 @@ function getAutoUpdateTimeThreshold() {
         : 300;
 }
 
+const AUTO_RESEARCH_FAILURE_COOLDOWN_SECONDS = 60;
+
 const IC_MASTER = {
     // 接続道路のICは重複登録を許可する。
     // 例: 木更津金田ICをアクアライン・館山道双方へ保持する。
@@ -683,6 +685,8 @@ let lastSearchLatitude = null;
 let lastSearchLongitude = null;
 
 let lastSearchTime = null;
+
+let lastAutoReSearchFailureTime = 0;
 
 let lastSearchLocationName = "";
 
@@ -2244,6 +2248,9 @@ async function searchFromCurrentLocation(
 
     } catch (error) {
 
+        lastAutoReSearchFailureTime =
+            Date.now();
+
         console.error(error);
 
         setDataUpdateStatus(
@@ -2536,6 +2543,21 @@ async function checkAutoReSearch() {
         return;
     }
 
+    const elapsedAfterFailure =
+        (
+            Date.now()
+            -
+            lastAutoReSearchFailureTime
+        ) / 1000;
+
+    if (
+        elapsedAfterFailure <
+        AUTO_RESEARCH_FAILURE_COOLDOWN_SECONDS
+    ) {
+
+        return;
+    }
+
     if (
         lastSearchLatitude === null ||
         lastSearchLongitude === null
@@ -2600,9 +2622,9 @@ async function checkAutoReSearch() {
         formatAutoUpdateDistanceText(remainingDistance);
 
     setDataUpdateStatus(
-        "あと " +
+        "\u3042\u3068 " +
         displayDistanceText +
-        " または " +
+        " / " +
         displayTimeText,
         "data-update-normal"
     );
@@ -7009,6 +7031,9 @@ async function searchAutoExitIcComparison(
 
     } catch (error) {
 
+        lastAutoReSearchFailureTime =
+            Date.now();
+
         console.error(error);
 
         const multiExitIcResult =
@@ -9444,25 +9469,23 @@ function formatAutoUpdateDistanceText(meters) {
 
 function formatAutoUpdateTimeText(seconds) {
 
-    if (seconds <= 0) {
-        return "0秒";
-    }
+    const safeSeconds =
+        Math.max(
+            0,
+            Math.round(seconds)
+        );
 
-    const minutes =
-        Math.floor(seconds / 60);
+    const safeMinutes =
+        Math.floor(safeSeconds / 60);
 
-    const remainingSeconds =
-        seconds % 60;
+    const safeRemain =
+        safeSeconds % 60;
 
-    if (remainingSeconds === 0) {
-        return minutes + "分";
-    }
-
-    if (minutes === 0) {
-        return remainingSeconds + "秒";
-    }
-
-    return minutes + "分" + remainingSeconds + "秒";
+    return (
+        safeMinutes +
+        ":" +
+        String(safeRemain).padStart(2, "0")
+    );
 }
 
 function getAutoUpdateCountdownText(
@@ -9471,9 +9494,9 @@ function getAutoUpdateCountdownText(
 ) {
 
     return (
-        "あと " +
+        "\u3042\u3068 " +
         formatAutoUpdateDistanceText(distanceMeters) +
-        " または " +
+        " / " +
         formatAutoUpdateTimeText(seconds)
     );
 }

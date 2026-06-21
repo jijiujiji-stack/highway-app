@@ -716,6 +716,8 @@ let invalidIcResults = [];
 
 let selectedOriginAddress = "";
 let selectedDestinationAddress = "";
+let selectedDestinationDisplayName = "";
+let lastDestinationTypedValue = "";
 let selectedOriginPlaceId = "";
 let selectedDestinationPlaceId = "";
 let selectedOriginLatLng = null;
@@ -816,8 +818,10 @@ window.addEventListener("load", () => {
         function () {
 
             selectedDestinationAddress = "";
+            selectedDestinationDisplayName = "";
             selectedDestinationPlaceId = "";
             selectedDestinationLatLng = null;
+            lastDestinationTypedValue = this.value;
 
             clearDestinationButton.style.display =
                 this.value.trim()
@@ -847,6 +851,8 @@ window.addEventListener("load", () => {
 
             destinationInput.value = "";
             selectedDestinationAddress = "";
+            selectedDestinationDisplayName = "";
+            lastDestinationTypedValue = "";
             selectedDestinationPlaceId = "";
             selectedDestinationLatLng = null;
 
@@ -1058,6 +1064,13 @@ function initializeAutocomplete() {
             place.name ||
             destinationInput.value;
 
+        selectedDestinationDisplayName =
+            normalizeDestinationDisplayName(
+                place,
+                lastDestinationTypedValue ||
+                destinationInput.value
+            );
+
         selectedDestinationPlaceId =
             place.place_id || "";
 
@@ -1072,6 +1085,7 @@ function initializeAutocomplete() {
         console.log(
             "目的地Autocomplete選択",
             selectedDestinationAddress,
+            selectedDestinationDisplayName,
             selectedDestinationPlaceId,
             selectedDestinationLatLng
         );
@@ -1100,7 +1114,7 @@ async function searchRoute() {
     document
         .getElementById("dashboardDestination")
         .textContent =
-        shortenDestinationName(destination);
+        getDestinationDisplayName(destination);
 
     if (!origin || !destination) {
 
@@ -2292,7 +2306,7 @@ async function searchFromCurrentLocation(
     document
         .getElementById("dashboardDestination")
         .textContent =
-        shortenDestinationName(destination);
+        getDestinationDisplayName(destination);
 
     if (!destination) {
 
@@ -2898,14 +2912,84 @@ function shortenDestinationName(text) {
         return "未設定";
     }
 
-    let name = text
-        .replace("日本、", "")
-        .replace(/〒\d{3}-\d{4}\s*/, "");
+    let name =
+        String(text)
+            .trim()
+            .replace(/^日本、?/, "")
+            .replace(/〒\d{3}-\d{4}\s*/, "");
 
-    const parts =
-        name.split(" ");
+    name =
+        name.trim();
 
-    return parts[parts.length - 1];
+    if (name.length > 18) {
+        return name.slice(0, 18) + "…";
+    }
+
+    return name;
+}
+
+function getDestinationDisplayName(destination) {
+
+    if (
+        selectedDestinationDisplayName &&
+        selectedDestinationAddress === destination
+    ) {
+        return selectedDestinationDisplayName;
+    }
+
+    return (
+        shortenDestinationName(destination)
+    );
+}
+
+function normalizeDestinationDisplayName(place, inputValue) {
+
+    const name =
+        String(place?.name || "").trim();
+
+    const formattedAddress =
+        String(place?.formatted_address || "").trim();
+
+    const typedValue =
+        String(inputValue || "").trim();
+
+    if (isUsefulPlaceName(name)) {
+        return shortenDestinationName(name);
+    }
+
+    if (isUsefulPlaceName(typedValue)) {
+        return shortenDestinationName(typedValue);
+    }
+
+    if (formattedAddress) {
+        return shortenDestinationName(formattedAddress);
+    }
+
+    return shortenDestinationName(typedValue);
+}
+
+function isUsefulPlaceName(name) {
+
+    const trimmedName =
+        String(name || "").trim();
+
+    if (!trimmedName) {
+        return false;
+    }
+
+    if (
+        /^(B?\d+[FＦ]|地下\d+階|\d+階|フロア)$/i.test(
+            trimmedName
+        )
+    ) {
+        return false;
+    }
+
+    if (/^[A-Za-z0-9]{1,2}$/.test(trimmedName)) {
+        return false;
+    }
+
+    return true;
 }
 
 function formatMinutes(minutes) {
@@ -4449,7 +4533,7 @@ async function runV2SimpleDiagnosticForDestination(
 
     if (dashboardDestination) {
         dashboardDestination.textContent =
-            shortenDestinationName(destination);
+            getDestinationDisplayName(destination);
     }
 
     const summary = {
@@ -6763,7 +6847,7 @@ async function searchAutoExitIcComparison(
     document
         .getElementById("dashboardDestination")
         .textContent =
-        shortenDestinationName(destination);
+        getDestinationDisplayName(destination);
 
 
     const origin =

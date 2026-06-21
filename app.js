@@ -3029,6 +3029,86 @@ function formatArrivalTime(minutesFromNow) {
     );
 }
 
+function createRouteTimeHtml(minutes) {
+
+    if (
+        minutes === null ||
+        minutes === undefined ||
+        Number.isNaN(minutes)
+    ) {
+        return "--";
+    }
+
+    return (
+        "<div class=\"arrival-label\">到着時刻</div>" +
+        "<div class=\"arrival-time\">" +
+        formatArrivalTime(minutes) +
+        "</div>" +
+        "<div class=\"main-route-time\">" +
+        formatMinutes(minutes) +
+        "</div>"
+    );
+}
+
+function createRouteDistanceText(distanceKm) {
+
+    if (
+        distanceKm === null ||
+        distanceKm === undefined ||
+        Number.isNaN(distanceKm)
+    ) {
+        return "距離：--";
+    }
+
+    return "距離：" + Number(distanceKm).toFixed(1) + "km";
+}
+
+function createArrivalPredictionCardHtml(
+    subLabel,
+    minutes,
+    distanceKm
+) {
+
+    return (
+        "<div class=\"v2-arrival-prediction-card\">" +
+        "<div class=\"v2-arrival-prediction-title\">" +
+        "到着予測" +
+        "</div>" +
+        "<div class=\"v2-arrival-prediction-sub\">" +
+        escapeHtml(subLabel) +
+        "</div>" +
+        "<div class=\"v2-arrival-prediction-time\">" +
+        createRouteTimeHtml(minutes) +
+        "</div>" +
+        "<div class=\"v2-arrival-prediction-distance\">" +
+        escapeHtml(createRouteDistanceText(distanceKm)) +
+        "</div>" +
+        "</div>"
+    );
+}
+
+function createEtcEstimateHtml(amount, label = "") {
+
+    const tollAmount =
+        Number(amount || 0);
+
+    const tollLabel =
+        String(label || "")
+            .replace(/^料金計算：/, "")
+            .trim();
+
+    return (
+        "約" +
+        tollAmount.toLocaleString() +
+        "円" +
+        (
+            tollLabel
+                ? "<br>" + escapeHtml(tollLabel)
+                : ""
+        )
+    );
+}
+
 async function searchExitIcComparison() {
 
     if (
@@ -3876,6 +3956,7 @@ async function searchEntranceIcComparisonV2(options = {}) {
     lastMultiIcV2Results = [];
 
     let allLocalMinutes = null;
+    let allLocalDistanceKm = null;
     let allLocalError = null;
 
     try {
@@ -3888,6 +3969,9 @@ async function searchEntranceIcComparisonV2(options = {}) {
 
         allLocalMinutes =
             getRouteDurationMinutes(allLocalRoute);
+
+        allLocalDistanceKm =
+            allLocalRoute.distanceMeters / 1000;
 
     } catch (error) {
 
@@ -3930,6 +4014,12 @@ async function searchEntranceIcComparisonV2(options = {}) {
                 localToCandidateMinutes +
                 highwayFromCandidateMinutes;
 
+            const totalDistanceKm =
+                (
+                    localToCandidateRoute.distanceMeters +
+                    highwayFromCandidateRoute.distanceMeters
+                ) / 1000;
+
             const estimatedToll =
                 Math.round(
                     (
@@ -3959,8 +4049,17 @@ async function searchEntranceIcComparisonV2(options = {}) {
                 highwayFromCandidateMinutes:
                     highwayFromCandidateMinutes,
                 totalMinutes: totalMinutes,
+                totalDistanceKm: totalDistanceKm,
                 estimatedToll: estimatedToll,
+                tollLabel:
+                    exit.displayName &&
+                    lastTollEndIcName
+                        ? exit.displayName +
+                        "→" +
+                        lastTollEndIcName
+                        : "",
                 allLocalMinutes: allLocalMinutes,
+                allLocalDistanceKm: allLocalDistanceKm,
                 differenceFromAllLocal:
                     differenceFromAllLocal,
                 yenPerSavedMinute: yenPerSavedMinute,
@@ -3986,8 +4085,17 @@ async function searchEntranceIcComparisonV2(options = {}) {
                 localToCandidateMinutes: null,
                 highwayFromCandidateMinutes: null,
                 totalMinutes: null,
+                totalDistanceKm: null,
                 estimatedToll: null,
+                tollLabel:
+                    exit.displayName &&
+                    lastTollEndIcName
+                        ? exit.displayName +
+                        "→" +
+                        lastTollEndIcName
+                        : "",
                 allLocalMinutes: allLocalMinutes,
+                allLocalDistanceKm: allLocalDistanceKm,
                 differenceFromAllLocal: null,
                 yenPerSavedMinute: null,
                 minutesToCandidate: null,
@@ -4034,6 +4142,7 @@ async function searchExitIcComparisonV2(options = {}) {
     lastExitIcV2Results = [];
 
     let allHighwayMinutes = null;
+    let allHighwayDistanceKm = null;
     let allHighwayToll = null;
     let baselineError = null;
 
@@ -4047,6 +4156,9 @@ async function searchExitIcComparisonV2(options = {}) {
 
         allHighwayMinutes =
             getRouteDurationMinutes(allHighwayRoute);
+
+        allHighwayDistanceKm =
+            allHighwayRoute.distanceMeters / 1000;
 
         const tollEstimate =
             await estimateMainHighwayToll(
@@ -4099,6 +4211,12 @@ async function searchExitIcComparisonV2(options = {}) {
                 highwayToCandidateMinutes +
                 localFromCandidateMinutes;
 
+            const totalDistanceKm =
+                (
+                    highwayToCandidateRoute.distanceMeters +
+                    localFromCandidateRoute.distanceMeters
+                ) / 1000;
+
             const exitTollEstimate =
                 Math.round(
                     (
@@ -4134,9 +4252,11 @@ async function searchExitIcComparisonV2(options = {}) {
                 localFromCandidateMinutes:
                     localFromCandidateMinutes,
                 totalMinutes: totalMinutes,
+                totalDistanceKm: totalDistanceKm,
                 minutesToCandidate:
                     highwayToCandidateMinutes,
                 allHighwayMinutes: allHighwayMinutes,
+                allHighwayDistanceKm: allHighwayDistanceKm,
                 allHighwayToll: allHighwayToll,
                 exitTollEstimate: exitTollEstimate,
                 savedToll: savedToll,
@@ -4164,8 +4284,10 @@ async function searchExitIcComparisonV2(options = {}) {
                 highwayToCandidateMinutes: null,
                 localFromCandidateMinutes: null,
                 totalMinutes: null,
+                totalDistanceKm: null,
                 minutesToCandidate: null,
                 allHighwayMinutes: allHighwayMinutes,
+                allHighwayDistanceKm: allHighwayDistanceKm,
                 allHighwayToll: allHighwayToll,
                 exitTollEstimate: null,
                 savedToll: null,
@@ -5236,25 +5358,16 @@ function buildBestExitIcV2Html(results) {
         "<div class=\"v2-best-exit-name\">" +
         icName +
         "</div>" +
-        "<div class=\"v2-best-exit-main\">" +
-        "あと" +
-        best.minutesToCandidate +
-        "分" +
-        "</div>" +
         "<div class=\"v2-best-exit-detail\">" +
         best.savedToll.toLocaleString() +
         "円節約" +
-        "<br>" +
+        " / " +
         best.differenceFromAllHighway +
         "分遅い" +
-        "<br>" +
+        "<div class=\"v2-best-unit\">" +
         best.yenPerDelayedMinute.toLocaleString() +
         "円/分" +
-        "<br>合計" +
-        formatV2Duration(best.totalMinutes) +
-        "<br>おすすめ度 " +
-        Math.round(best.recommendScore) +
-        "点" +
+        "</div>" +
         "</div>" +
         "</div>"
     );
@@ -5522,25 +5635,16 @@ function buildBestEntranceIcV2Html(results) {
         "<div class=\"v2-best-name\">" +
         icName +
         "</div>" +
-        "<div class=\"v2-best-main\">" +
-        "あと" +
-        best.minutesToCandidate +
-        "分" +
-        "</div>" +
         "<div class=\"v2-best-detail\">" +
         best.differenceFromAllLocal +
         "分短縮" +
-        "<br>ETC 約" +
+        " / ETC料金 約" +
         best.estimatedToll.toLocaleString() +
         "円" +
-        "<br>" +
+        "<div class=\"v2-best-unit\">" +
         best.yenPerSavedMinute.toLocaleString() +
         "円/分" +
-        "<br>合計" +
-        formatV2Duration(best.totalMinutes) +
-        "<br>おすすめ度 " +
-        Math.round(best.recommendScore) +
-        "点" +
+        "</div>" +
         "</div>" +
         "</div>"
     );
@@ -5633,25 +5737,25 @@ function updateDashboardWithBestEntranceIcV2() {
         }
 
         if (dashboardHighway) {
-            dashboardHighway.textContent = "--";
+            dashboardHighway.innerHTML =
+                createRouteTimeHtml(null);
         }
 
         if (dashboardHighwayDetail) {
             dashboardHighwayDetail.textContent =
-                "おすすめ入口なし";
+                createRouteDistanceText(null);
         }
 
         if (dashboardLocal) {
-            dashboardLocal.textContent =
-                allLocalMinutes === null
-                    ? "全下道 --"
-                    : "全下道 " +
-                    formatV2Duration(allLocalMinutes);
+            dashboardLocal.innerHTML =
+                createRouteTimeHtml(allLocalMinutes);
         }
 
         if (dashboardLocalDetail) {
             dashboardLocalDetail.textContent =
-                "比較基準";
+                createRouteDistanceText(
+                    getAllLocalDistanceKmFromV2Results()
+                );
         }
 
         if (dashboardEfficiency) {
@@ -5661,6 +5765,11 @@ function updateDashboardWithBestEntranceIcV2() {
         if (dashboardCost) {
             dashboardCost.textContent = "有料回避";
         }
+
+        setDashboardRouteTimeClasses(
+            "time-neutral",
+            "time-bad"
+        );
 
         return;
     }
@@ -5683,59 +5792,55 @@ function updateDashboardWithBestEntranceIcV2() {
             "<div class=\"v2-best-name\">" +
             escapeHtml(best.candidateIcName) +
             "</div>" +
-            "<div class=\"v2-best-time-badge\">" +
-            "<span class=\"v2-best-time-icon\">◷</span>" +
-            "<span class=\"v2-best-time-text\">あと" +
-            best.minutesToCandidate +
-            "分</span>" +
-            "</div>" +
             "<div class=\"v2-best-detail\">" +
             escapeHtml(
                 best.differenceFromAllLocal +
                 "分短縮"
             ) +
-            "<br>" +
+            " / " +
             escapeHtml(
-                "ETC 約" +
+                "ETC料金 約" +
                 best.estimatedToll.toLocaleString() +
                 "円"
             ) +
+            "<div class=\"v2-best-unit\">" +
+            escapeHtml(
+                best.yenPerSavedMinute.toLocaleString() +
+                "円/分"
+            ) +
             "</div>" +
-            "</div>";
+            "</div>" +
+            "</div>" +
+            createArrivalPredictionCardHtml(
+                "おすすめ入口から高速利用時",
+                best.totalMinutes,
+                best.totalDistanceKm
+            );
     }
 
     if (dashboardValueJudge) {
         dashboardValueJudge.className = "";
-        dashboardValueJudge.classList.add(
-            "v2-best-yenpm-badge"
-        );
-        dashboardValueJudge.textContent =
-            best.yenPerSavedMinute.toLocaleString() +
-            "円/分";
+        dashboardValueJudge.textContent = "";
     }
 
     if (dashboardHighway) {
-        dashboardHighway.textContent =
-            "入口利用 " +
-            formatV2Duration(best.totalMinutes);
+        dashboardHighway.innerHTML =
+            createRouteTimeHtml(best.totalMinutes);
     }
 
     if (dashboardHighwayDetail) {
         dashboardHighwayDetail.textContent =
-            "候補ICから高速利用";
+            createRouteDistanceText(best.totalDistanceKm);
     }
 
     if (dashboardLocal) {
-        dashboardLocal.textContent =
-            best.allLocalMinutes === null
-                ? "全下道 --"
-                : "全下道 " +
-                formatV2Duration(best.allLocalMinutes);
+        dashboardLocal.innerHTML =
+            createRouteTimeHtml(best.allLocalMinutes);
     }
 
     if (dashboardLocalDetail) {
         dashboardLocalDetail.textContent =
-            "比較基準";
+            createRouteDistanceText(best.allLocalDistanceKm);
     }
 
     if (dashboardEfficiency) {
@@ -5744,9 +5849,17 @@ function updateDashboardWithBestEntranceIcV2() {
     }
 
     if (dashboardCost) {
-        dashboardCost.textContent =
-            best.estimatedToll.toLocaleString() + "円";
+        dashboardCost.innerHTML =
+            createEtcEstimateHtml(
+                best.estimatedToll,
+                best.tollLabel
+            );
     }
+
+    setDashboardRouteTimeClasses(
+        "time-good",
+        "time-bad"
+    );
 }
 
 function updateDashboardWithBestExitIcV2() {
@@ -5833,23 +5946,27 @@ function updateDashboardWithBestExitIcV2() {
         }
 
         if (dashboardHighway) {
-            dashboardHighway.textContent =
-                "全高速 " +
-                getAllHighwayMinutesTextFromExitV2Results();
+            dashboardHighway.innerHTML =
+                createRouteTimeHtml(
+                    getAllHighwayMinutesFromExitV2Results()
+                );
         }
 
         if (dashboardHighwayDetail) {
             dashboardHighwayDetail.textContent =
-                "比較基準";
+                createRouteDistanceText(
+                    getAllHighwayDistanceKmFromExitV2Results()
+                );
         }
 
         if (dashboardLocal) {
-            dashboardLocal.textContent = "--";
+            dashboardLocal.innerHTML =
+                createRouteTimeHtml(null);
         }
 
         if (dashboardLocalDetail) {
             dashboardLocalDetail.textContent =
-                "おすすめ出口なし";
+                createRouteDistanceText(null);
         }
 
         if (dashboardEfficiency) {
@@ -5859,6 +5976,11 @@ function updateDashboardWithBestExitIcV2() {
         if (dashboardCost) {
             dashboardCost.textContent = "--";
         }
+
+        setDashboardRouteTimeClasses(
+            "time-good",
+            "time-neutral"
+        );
 
         return;
     }
@@ -5881,61 +6003,54 @@ function updateDashboardWithBestExitIcV2() {
             "<div class=\"v2-best-exit-name\">" +
             escapeHtml(best.candidateIcName) +
             "</div>" +
-            "<div class=\"v2-best-time-badge\">" +
-            "<span class=\"v2-best-time-icon\">◷</span>" +
-            "<span class=\"v2-best-time-text\">あと" +
-            best.minutesToCandidate +
-            "分</span>" +
-            "</div>" +
             "<div class=\"v2-best-exit-detail\">" +
             escapeHtml(
                 best.savedToll.toLocaleString() +
                 "円節約"
             ) +
-            "<br>" +
+            " / " +
             escapeHtml(
                 best.differenceFromAllHighway +
                 "分遅い"
             ) +
+            "<div class=\"v2-best-unit\">" +
+            escapeHtml(
+                best.yenPerDelayedMinute.toLocaleString() +
+                "円/分"
+            ) +
             "</div>" +
-            "</div>";
+            "</div>" +
+            "</div>" +
+            createArrivalPredictionCardHtml(
+                "おすすめ出口を利用した場合",
+                best.totalMinutes,
+                best.totalDistanceKm
+            );
     }
 
     if (dashboardValueJudge) {
         dashboardValueJudge.className = "";
-        dashboardValueJudge.classList.add(
-            "v2-best-exit-yenpm-badge"
-        );
-        dashboardValueJudge.textContent =
-            best.yenPerDelayedMinute.toLocaleString() +
-            "円/分";
+        dashboardValueJudge.textContent = "";
     }
 
     if (dashboardHighway) {
-        dashboardHighway.textContent =
-            best.allHighwayMinutes === null
-                ? "全高速 --"
-                : "全高速 " +
-                formatV2Duration(best.allHighwayMinutes);
+        dashboardHighway.innerHTML =
+            createRouteTimeHtml(best.allHighwayMinutes);
     }
 
     if (dashboardHighwayDetail) {
         dashboardHighwayDetail.textContent =
-            "高速継続";
+            createRouteDistanceText(best.allHighwayDistanceKm);
     }
 
     if (dashboardLocal) {
-        dashboardLocal.textContent =
-            "出口利用 " +
-            formatV2Duration(best.totalMinutes);
+        dashboardLocal.innerHTML =
+            createRouteTimeHtml(best.totalMinutes);
     }
 
     if (dashboardLocalDetail) {
         dashboardLocalDetail.textContent =
-            best.differenceFromAllHighway +
-            "分遅い / " +
-            best.savedToll.toLocaleString() +
-            "円節約";
+            createRouteDistanceText(best.totalDistanceKm);
     }
 
     if (dashboardEfficiency) {
@@ -5949,6 +6064,11 @@ function updateDashboardWithBestExitIcV2() {
             best.differenceFromAllHighway +
             "分遅い";
     }
+
+    setDashboardRouteTimeClasses(
+        "time-good",
+        "time-bad"
+    );
 }
 
 function setDashboardInfoLabels(
@@ -6016,6 +6136,39 @@ function getAllLocalMinutesFromV2Results() {
         );
 
     return result ? result.allLocalMinutes : null;
+}
+
+function getAllLocalDistanceKmFromV2Results() {
+
+    const result =
+        lastMultiIcV2Results.find(item =>
+            item.allLocalDistanceKm !== null &&
+            item.allLocalDistanceKm !== undefined
+        );
+
+    return result ? result.allLocalDistanceKm : null;
+}
+
+function getAllHighwayMinutesFromExitV2Results() {
+
+    const result =
+        lastExitIcV2Results.find(item =>
+            item.allHighwayMinutes !== null &&
+            item.allHighwayMinutes !== undefined
+        );
+
+    return result ? result.allHighwayMinutes : null;
+}
+
+function getAllHighwayDistanceKmFromExitV2Results() {
+
+    const result =
+        lastExitIcV2Results.find(item =>
+            item.allHighwayDistanceKm !== null &&
+            item.allHighwayDistanceKm !== undefined
+        );
+
+    return result ? result.allHighwayDistanceKm : null;
 }
 
 function getAllHighwayMinutesTextFromExitV2Results() {
@@ -8916,6 +9069,42 @@ function updateDashboardTimeColors(
     else {
         highwayElement.classList.add("time-neutral");
         localElement.classList.add("time-neutral");
+    }
+}
+
+function setDashboardRouteTimeClasses(
+    highwayClassName,
+    localClassName
+) {
+
+    const highwayElement =
+        document.getElementById("dashboardHighway");
+
+    const localElement =
+        document.getElementById("dashboardLocal");
+
+    if (!highwayElement || !localElement) {
+        return;
+    }
+
+    highwayElement.classList.remove(
+        "time-good",
+        "time-bad",
+        "time-neutral"
+    );
+
+    localElement.classList.remove(
+        "time-good",
+        "time-bad",
+        "time-neutral"
+    );
+
+    if (highwayClassName) {
+        highwayElement.classList.add(highwayClassName);
+    }
+
+    if (localClassName) {
+        localElement.classList.add(localClassName);
     }
 }
 

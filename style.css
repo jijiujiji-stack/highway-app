@@ -214,10 +214,10 @@ button {
 
 #dashboardReason .v2-best-name {
     color: #2ecc71;
-    font-size: 44px;
+    font-size: 34px;
     font-weight: bold;
     line-height: 1.1;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 #dashboardReason .v2-best-time-badge {
@@ -258,16 +258,23 @@ button {
 
 #dashboardReason .v2-best-exit-name {
     color: #f1c40f;
-    font-size: 44px;
+    font-size: 34px;
     font-weight: bold;
     line-height: 1.1;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 #dashboardReason .v2-best-exit-detail {
     font-size: 14px;
     color: #ddd;
     line-height: 1.7;
+}
+
+.v2-best-unit {
+    margin-top: 4px;
+    font-size: 14px;
+    color: #ffffff;
+    font-weight: 700;
 }
 
 #dashboardValueJudge.v2-best-yenpm-badge {
@@ -365,6 +372,40 @@ button {
     font-size: inherit;
     color: inherit;
     font-weight: inherit;
+}
+
+.v2-arrival-prediction-card {
+    background: #222;
+    border: 1px solid #555;
+    border-radius: 12px;
+    padding: 14px;
+    margin: 14px 0;
+    text-align: center;
+}
+
+.v2-arrival-prediction-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 2px;
+}
+
+.v2-arrival-prediction-sub {
+    font-size: 12px;
+    color: #bbb;
+    margin-bottom: 12px;
+}
+
+.v2-arrival-prediction-time {
+    color: #2ecc71;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.v2-arrival-prediction-distance {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #ccc;
 }
 
 
@@ -1320,7 +1361,7 @@ details#searchPanel .origin-row input {
     background: #2a220d;
     border: 2px solid #f1c40f;
     border-radius: 14px;
-    padding: 16px;
+    padding: 12px;
     margin-bottom: 14px;
     text-align: center;
 }
@@ -1333,10 +1374,10 @@ details#searchPanel .origin-row input {
 }
 
 .v2-best-exit-name {
-    font-size: 30px;
+    font-size: 26px;
     font-weight: bold;
     color: #f1c40f;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
 }
 
 .v2-best-exit-main {
@@ -1349,7 +1390,7 @@ details#searchPanel .origin-row input {
 .v2-best-exit-detail {
     font-size: 14px;
     color: #ddd;
-    line-height: 1.7;
+    line-height: 1.5;
 }
 
 .v2-best-exit-empty {
@@ -1362,7 +1403,7 @@ details#searchPanel .origin-row input {
     background: #10251a;
     border: 2px solid #2ecc71;
     border-radius: 14px;
-    padding: 16px;
+    padding: 12px;
     margin-bottom: 14px;
     text-align: center;
 }
@@ -1375,9 +1416,9 @@ details#searchPanel .origin-row input {
 }
 
 .v2-best-name {
-    font-size: 30px;
+    font-size: 26px;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
 }
 
 .v2-best-main {
@@ -1390,7 +1431,7 @@ details#searchPanel .origin-row input {
 .v2-best-detail {
     font-size: 14px;
     color: #ddd;
-    line-height: 1.7;
+    line-height: 1.5;
 }
 
 .v2-best-empty {

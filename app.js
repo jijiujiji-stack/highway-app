@@ -435,7 +435,9 @@ const IC_MASTER = {
                 displayName: "浮島IC",
                 googleName: "首都高速湾岸線 浮島インターチェンジ",
                 lat: 35.521,
-                lng: 139.788
+                lng: 139.788,
+                routeBranch: "aqualine",
+                branchOrder: 1
             },
             {
                 order: 2,
@@ -443,7 +445,9 @@ const IC_MASTER = {
                 googleName: "東京湾アクアライン 海ほたるパーキングエリア",
                 lat: 35.463,
                 lng: 139.875,
-                isSelectable: false
+                isSelectable: false,
+                routeBranch: "aqualine",
+                branchOrder: 1.5
             },
             {
                 order: 3,
@@ -452,7 +456,9 @@ const IC_MASTER = {
                 lat: 35.435,
                 lng: 139.921,
                 connection: true,
-                connectedRoads: ["aqualine", "tateyama"]
+                connectedRoads: ["aqualine", "tateyama"],
+                routeBranch: "aqualine",
+                branchOrder: 2
             },
             {
                 order: 4,
@@ -461,7 +467,9 @@ const IC_MASTER = {
                 lat: 35.418,
                 lng: 139.980,
                 connection: true,
-                connectedRoads: ["aqualine", "tateyama"]
+                connectedRoads: ["aqualine", "tateyama"],
+                routeBranch: "aqualine",
+                branchOrder: 3
             }
         ]
     },
@@ -473,13 +481,24 @@ const IC_MASTER = {
         label: "館山道方面",
         exits: [
             {
+                order: -3,
+                displayName: "浮島IC",
+                googleName: "首都高速湾岸線 浮島インターチェンジ",
+                lat: 35.521,
+                lng: 139.788,
+                routeBranch: "aqualine",
+                branchOrder: 1
+            },
+            {
                 order: -2,
                 displayName: "木更津金田IC",
                 googleName: "東京湾アクアライン 木更津金田インターチェンジ",
                 lat: 35.435,
                 lng: 139.921,
                 connection: true,
-                connectedRoads: ["aqualine", "tateyama"]
+                connectedRoads: ["aqualine", "tateyama"],
+                routeBranch: "aqualine",
+                branchOrder: 2
             },
             {
                 order: -1,
@@ -488,7 +507,9 @@ const IC_MASTER = {
                 lat: 35.418,
                 lng: 139.980,
                 connection: true,
-                connectedRoads: ["aqualine", "tateyama"]
+                connectedRoads: ["aqualine", "tateyama"],
+                routeBranch: "aqualine",
+                branchOrder: 3
             },
             {
                 order: 0,
@@ -497,7 +518,9 @@ const IC_MASTER = {
                 lat: 35.568,
                 lng: 140.158,
                 connection: true,
-                connectedRoads: ["keiyo", "tateyama", "tokan"]
+                connectedRoads: ["keiyo", "tateyama", "tokan"],
+                routeBranch: "keiyo",
+                branchOrder: 10
             },
             {
                 order: 1,
@@ -506,63 +529,81 @@ const IC_MASTER = {
                 lat: 35.498,
                 lng: 140.104,
                 connection: true,
-                connectedRoads: ["keiyo", "tateyama"]
+                connectedRoads: ["keiyo", "tateyama"],
+                routeBranch: "keiyo",
+                branchOrder: 11
             },
             {
                 order: 2,
                 displayName: "姉崎袖ケ浦IC",
                 googleName: "館山自動車道 姉崎袖ケ浦インターチェンジ",
                 lat: 35.432,
-                lng: 140.043
+                lng: 140.043,
+                routeBranch: "keiyo",
+                branchOrder: 12
             },
             {
                 order: 3,
                 displayName: "木更津北IC",
                 googleName: "館山自動車道 木更津北インターチェンジ",
                 lat: 35.394,
-                lng: 139.967
+                lng: 139.967,
+                routeBranch: "aqualine",
+                branchOrder: 4
             },
             {
                 order: 4,
                 displayName: "木更津南IC",
                 googleName: "館山自動車道 木更津南インターチェンジ",
                 lat: 35.365,
-                lng: 139.935
+                lng: 139.935,
+                routeBranch: "aqualine",
+                branchOrder: 5
             },
             {
                 order: 5,
                 displayName: "君津IC",
                 googleName: "館山自動車道 君津インターチェンジ",
                 lat: 35.333,
-                lng: 139.902
+                lng: 139.902,
+                routeBranch: "aqualine",
+                branchOrder: 6
             },
             {
                 order: 6,
                 displayName: "富津中央IC",
                 googleName: "館山自動車道 富津中央インターチェンジ",
                 lat: 35.273,
-                lng: 139.855
+                lng: 139.855,
+                routeBranch: "aqualine",
+                branchOrder: 7
             },
             {
                 order: 7,
                 displayName: "富津竹岡IC",
                 googleName: "富津館山道路 富津竹岡インターチェンジ",
                 lat: 35.204,
-                lng: 139.825
+                lng: 139.825,
+                routeBranch: "aqualine",
+                branchOrder: 8
             },
             {
                 order: 8,
                 displayName: "鋸南保田IC",
                 googleName: "富津館山道路 鋸南保田インターチェンジ",
                 lat: 35.140,
-                lng: 139.827
+                lng: 139.827,
+                routeBranch: "aqualine",
+                branchOrder: 9
             },
             {
                 order: 9,
                 displayName: "富浦IC",
                 googleName: "富津館山道路 富浦インターチェンジ",
                 lat: 35.034,
-                lng: 139.832
+                lng: 139.832,
+                routeBranch: "aqualine",
+                branchOrder: 10
             }
         ]
     },
@@ -587,63 +628,81 @@ const IC_MASTER = {
                 displayName: "篠崎IC",
                 googleName: "京葉道路 篠崎インターチェンジ",
                 lat: 35.707,
-                lng: 139.898
+                lng: 139.898,
+                routeBranch: "keiyo",
+                branchOrder: 1
             },
             {
                 order: 2,
                 displayName: "京葉市川IC",
                 googleName: "京葉道路 京葉市川インターチェンジ",
                 lat: 35.715,
-                lng: 139.931
+                lng: 139.931,
+                routeBranch: "keiyo",
+                branchOrder: 2
             },
             {
                 order: 3,
                 displayName: "原木IC",
                 googleName: "京葉道路 原木インターチェンジ",
                 lat: 35.704,
-                lng: 139.959
+                lng: 139.959,
+                routeBranch: "keiyo",
+                branchOrder: 3
             },
             {
                 order: 4,
                 displayName: "船橋IC",
                 googleName: "京葉道路 船橋インターチェンジ",
                 lat: 35.693,
-                lng: 139.990
+                lng: 139.990,
+                routeBranch: "keiyo",
+                branchOrder: 4
             },
             {
                 order: 5,
                 displayName: "花輪IC",
                 googleName: "京葉道路 花輪インターチェンジ",
                 lat: 35.689,
-                lng: 140.015
+                lng: 140.015,
+                routeBranch: "keiyo",
+                branchOrder: 5
             },
             {
                 order: 6,
                 displayName: "武石IC",
                 googleName: "京葉道路 武石インターチェンジ",
                 lat: 35.675,
-                lng: 140.061
+                lng: 140.061,
+                routeBranch: "keiyo",
+                branchOrder: 6
             },
             {
                 order: 7,
                 displayName: "穴川IC",
                 googleName: "京葉道路 穴川インターチェンジ",
                 lat: 35.644,
-                lng: 140.119
+                lng: 140.119,
+                routeBranch: "keiyo",
+                branchOrder: 7
             },
             {
                 order: 8,
                 displayName: "貝塚IC",
                 googleName: "京葉道路 貝塚インターチェンジ",
                 lat: 35.625,
-                lng: 140.150
+                lng: 140.150,
+                routeBranch: "keiyo",
+                branchOrder: 8
             },
             {
                 order: 9,
                 displayName: "松ヶ丘IC",
                 googleName: "京葉道路 松ヶ丘インターチェンジ",
                 lat: 35.583,
-                lng: 140.158
+                lng: 140.158,
+                routeBranch: "keiyo",
+                branchOrder: 9
             },
             {
                 order: 10,
@@ -652,7 +711,56 @@ const IC_MASTER = {
                 lat: 35.568,
                 lng: 140.158,
                 connection: true,
-                connectedRoads: ["keiyo", "tateyama", "tokan"]
+                connectedRoads: ["keiyo", "tateyama", "tokan"],
+                routeBranch: "keiyo",
+                branchOrder: 10
+            },
+            {
+                order: 11,
+                displayName: "市原IC",
+                googleName: "館山自動車道 市原インターチェンジ",
+                lat: 35.498,
+                lng: 140.104,
+                connection: true,
+                connectedRoads: ["keiyo", "tateyama"],
+                routeBranch: "keiyo",
+                branchOrder: 11
+            },
+            {
+                order: 12,
+                displayName: "姉崎袖ケ浦IC",
+                googleName: "館山自動車道 姉崎袖ケ浦インターチェンジ",
+                lat: 35.432,
+                lng: 140.043,
+                routeBranch: "keiyo",
+                branchOrder: 12
+            },
+            {
+                order: 13,
+                displayName: "木更津北IC",
+                googleName: "館山自動車道 木更津北インターチェンジ",
+                lat: 35.394,
+                lng: 139.967,
+                routeBranch: "keiyo",
+                branchOrder: 13
+            },
+            {
+                order: 14,
+                displayName: "木更津南IC",
+                googleName: "館山自動車道 木更津南インターチェンジ",
+                lat: 35.365,
+                lng: 139.935,
+                routeBranch: "keiyo",
+                branchOrder: 14
+            },
+            {
+                order: 15,
+                displayName: "君津IC",
+                googleName: "館山自動車道 君津インターチェンジ",
+                lat: 35.333,
+                lng: 139.902,
+                routeBranch: "keiyo",
+                branchOrder: 15
             }
         ]
     },
@@ -671,90 +779,132 @@ const IC_MASTER = {
             { order: -2, displayName: "大井南（首都高）", googleName: "首都高速湾岸線 大井南出入口", lat: 35.589, lng: 139.756, experimental: true, roadType: "首都高" },
             { order: -1, displayName: "空港中央（首都高）", googleName: "首都高速湾岸線 空港中央出入口", lat: 35.553, lng: 139.787, experimental: true, roadType: "首都高" },
             {
+                order: 0.1,
+                displayName: "葛西IC",
+                googleName: "首都高速湾岸線 葛西出入口",
+                lat: 35.652,
+                lng: 139.870,
+                routeBranch: "tokan",
+                branchOrder: 1
+            },
+            {
+                order: 0.2,
+                displayName: "湾岸市川IC",
+                googleName: "首都高速湾岸線 湾岸市川出入口",
+                lat: 35.672,
+                lng: 139.938,
+                routeBranch: "tokan",
+                branchOrder: 2
+            },
+            {
                 order: 0,
                 displayName: "蘇我IC",
                 googleName: "京葉道路 蘇我インターチェンジ",
                 lat: 35.568,
                 lng: 140.158,
                 connection: true,
-                connectedRoads: ["keiyo", "tokan", "tateyama"]
+                connectedRoads: ["keiyo", "tokan", "tateyama"],
+                routeBranch: "keiyo",
+                branchOrder: 10
             },
             {
                 order: 1,
                 displayName: "湾岸習志野IC",
                 googleName: "東関東自動車道 湾岸習志野インターチェンジ",
                 lat: 35.665,
-                lng: 140.016
+                lng: 140.016,
+                routeBranch: "tokan",
+                branchOrder: 3
             },
             {
                 order: 2,
                 displayName: "湾岸千葉IC",
                 googleName: "東関東自動車道 湾岸千葉インターチェンジ",
                 lat: 35.638,
-                lng: 140.060
+                lng: 140.060,
+                routeBranch: "tokan",
+                branchOrder: 4
             },
             {
                 order: 3,
                 displayName: "千葉北IC",
                 googleName: "東関東自動車道 千葉北インターチェンジ",
                 lat: 35.676,
-                lng: 140.131
+                lng: 140.131,
+                routeBranch: "tokan",
+                branchOrder: 5
             },
             {
                 order: 4,
                 displayName: "四街道IC",
                 googleName: "東関東自動車道 四街道インターチェンジ",
                 lat: 35.664,
-                lng: 140.187
+                lng: 140.187,
+                routeBranch: "tokan",
+                branchOrder: 6
             },
             {
                 order: 5,
                 displayName: "佐倉IC",
                 googleName: "東関東自動車道 佐倉インターチェンジ",
                 lat: 35.694,
-                lng: 140.248
+                lng: 140.248,
+                routeBranch: "tokan",
+                branchOrder: 7
             },
             {
                 order: 6,
                 displayName: "酒々井IC",
                 googleName: "東関東自動車道 酒々井インターチェンジ",
                 lat: 35.718,
-                lng: 140.300
+                lng: 140.300,
+                routeBranch: "tokan",
+                branchOrder: 8
             },
             {
                 order: 7,
                 displayName: "富里IC",
                 googleName: "東関東自動車道 富里インターチェンジ",
                 lat: 35.729,
-                lng: 140.343
+                lng: 140.343,
+                routeBranch: "tokan",
+                branchOrder: 9
             },
             {
                 order: 8,
                 displayName: "成田IC",
                 googleName: "東関東自動車道 成田インターチェンジ",
                 lat: 35.779,
-                lng: 140.365
+                lng: 140.365,
+                routeBranch: "tokan",
+                branchOrder: 10
             },
             {
                 order: 9,
                 displayName: "大栄IC",
                 googleName: "東関東自動車道 大栄インターチェンジ",
                 lat: 35.842,
-                lng: 140.470
+                lng: 140.470,
+                routeBranch: "tokan",
+                branchOrder: 11
             },
             {
                 order: 10,
                 displayName: "佐原香取IC",
                 googleName: "東関東自動車道 佐原香取インターチェンジ",
                 lat: 35.884,
-                lng: 140.548
+                lng: 140.548,
+                routeBranch: "tokan",
+                branchOrder: 12
             },
             {
                 order: 11,
                 displayName: "潮来IC",
                 googleName: "東関東自動車道 潮来インターチェンジ",
                 lat: 35.952,
-                lng: 140.574
+                lng: 140.574,
+                routeBranch: "tokan",
+                branchOrder: 13
             }
         ]
     }
@@ -3609,6 +3759,26 @@ function findNearestIcByMasterCoordinatesForAutoExitComparison(
     };
 }
 
+function resolveRouteBranchForIcArea(icArea) {
+    if (icArea === "aqualine") {
+        return "aqualine";
+    }
+
+    if (icArea === "keiyo") {
+        return "keiyo";
+    }
+
+    if (icArea === "tokan") {
+        return "tokan";
+    }
+
+    if (icArea === "tateyama") {
+        return "aqualine";
+    }
+
+    return null;
+}
+
 function selectExitCandidatesForAutoExitComparison(
     icArea,
     highwayStart,
@@ -3672,7 +3842,7 @@ function selectExitCandidatesForAutoExitComparison(
         destinationOrder === null ||
         destinationOrder > startOrder;
 
-    const mainlineCandidates =
+    const orderMainlineCandidates =
         selectableExits
             .filter(exit =>
                 !isShutoIc(exit) &&
@@ -3691,6 +3861,38 @@ function selectExitCandidatesForAutoExitComparison(
                     : (b.order ?? -999) - (a.order ?? -999)
             )
             .slice(0, mainlineCount);
+
+    const routeBranch =
+        resolveRouteBranchForIcArea(icArea);
+
+    const useBranchOrder =
+        routeBranch &&
+        selectableExits.some(exit =>
+            exit.routeBranch === routeBranch &&
+            exit.branchOrder !== undefined
+        );
+
+    let mainlineCandidates =
+        orderMainlineCandidates;
+
+    if (useBranchOrder) {
+        const branchCandidates =
+            selectableExits
+                .filter(exit =>
+                    !isShutoIc(exit) &&
+                    exit.routeBranch === routeBranch &&
+                    exit.branchOrder !== undefined
+                )
+                .slice()
+                .sort((a, b) =>
+                    a.branchOrder - b.branchOrder
+                )
+                .slice(0, mainlineCount);
+
+        if (branchCandidates.length >= mainlineCount) {
+            mainlineCandidates = branchCandidates;
+        }
+    }
 
     return [
         shutoCandidate,

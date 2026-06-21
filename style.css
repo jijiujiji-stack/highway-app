@@ -203,6 +203,28 @@ button {
     margin-bottom: 6px;
 }
 
+.v2-dashboard-entrance-active .recommendation,
+.v2-dashboard-exit-active .recommendation {
+    margin-bottom: 8px;
+}
+
+.v2-dashboard-entrance-active #dashboardReason,
+.v2-dashboard-exit-active #dashboardReason {
+    margin-top: 6px;
+}
+
+.v2-dashboard-entrance-active #dashboardValueJudge,
+.v2-dashboard-exit-active #dashboardValueJudge {
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.v2-dashboard-entrance-active .dashboard-times,
+.v2-dashboard-exit-active .dashboard-times {
+    margin-top: 8px;
+}
+
 #dashboardReason .v2-best-entrance-card {
     background: transparent;
     border: none;
@@ -378,8 +400,8 @@ button {
     background: #222;
     border: 1px solid #555;
     border-radius: 12px;
-    padding: 14px;
-    margin: 14px 0;
+    padding: 10px;
+    margin: 8px 0;
     text-align: center;
 }
 
@@ -393,7 +415,7 @@ button {
 .v2-arrival-prediction-sub {
     font-size: 12px;
     color: #bbb;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .v2-arrival-prediction-time {
@@ -403,7 +425,7 @@ button {
 }
 
 .v2-arrival-prediction-distance {
-    margin-top: 6px;
+    margin-top: 4px;
     font-size: 12px;
     color: #ccc;
 }

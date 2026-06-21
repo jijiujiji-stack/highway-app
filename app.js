@@ -349,6 +349,12 @@ const IC_MASTER = {
     chuo: {
         label: "中央道方面",
         exits: [
+            { order: -6, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.731, lng: 139.817, experimental: true, roadType: "首都高" },
+            { order: -5, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.712, lng: 139.779, experimental: true, roadType: "首都高" },
+            { order: -4, displayName: "高井戸（首都高）", googleName: "首都高速4号新宿線 高井戸出入口", lat: 35.684, lng: 139.615, experimental: true, roadType: "首都高" },
+            { order: -3, displayName: "外苑（首都高）", googleName: "首都高速4号新宿線 外苑出入口", lat: 35.677, lng: 139.718, experimental: true, roadType: "首都高" },
+            { order: -2, displayName: "代官町（首都高）", googleName: "首都高速都心環状線 代官町出入口", lat: 35.688, lng: 139.754, experimental: true, roadType: "首都高" },
+            { order: -1, displayName: "一ツ橋（首都高）", googleName: "首都高速都心環状線 一ツ橋出入口", lat: 35.692, lng: 139.758, experimental: true, roadType: "首都高" },
             { order: 1, displayName: "高井戸IC", googleName: "中央自動車道 高井戸インターチェンジ", lat: 35.684, lng: 139.611 },
             { order: 2, displayName: "調布IC", googleName: "中央自動車道 調布インターチェンジ", lat: 35.650, lng: 139.536 },
             { order: 3, displayName: "稲城IC", googleName: "中央自動車道 稲城インターチェンジ", lat: 35.638, lng: 139.510 },
@@ -378,6 +384,14 @@ const IC_MASTER = {
     tomei: {
         label: "東名道方面",
         exits: [
+            { order: -8, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.731, lng: 139.817, experimental: true, roadType: "首都高" },
+            { order: -7, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.712, lng: 139.779, experimental: true, roadType: "首都高" },
+            { order: -6, displayName: "用賀（首都高）", googleName: "首都高速3号渋谷線 用賀出入口", lat: 35.626, lng: 139.633, experimental: true, roadType: "首都高" },
+            { order: -5, displayName: "霞が関（首都高）", googleName: "首都高速都心環状線 霞が関出入口", lat: 35.671, lng: 139.751, experimental: true, roadType: "首都高" },
+            { order: -4, displayName: "外苑（首都高）", googleName: "首都高速4号新宿線 外苑出入口", lat: 35.677, lng: 139.718, experimental: true, roadType: "首都高" },
+            { order: -3, displayName: "代官町（首都高）", googleName: "首都高速都心環状線 代官町出入口", lat: 35.688, lng: 139.754, experimental: true, roadType: "首都高" },
+            { order: -2, displayName: "一ツ橋（首都高）", googleName: "首都高速都心環状線 一ツ橋出入口", lat: 35.692, lng: 139.758, experimental: true, roadType: "首都高" },
+            { order: -1, displayName: "戸越（首都高）", googleName: "首都高速2号目黒線 戸越出入口", lat: 35.615, lng: 139.716, experimental: true, roadType: "首都高" },
             { order: 1, displayName: "東京IC", googleName: "東名高速道路 東京インターチェンジ", lat: 35.625, lng: 139.632 },
             { order: 2, displayName: "東名川崎IC", googleName: "東名高速道路 東名川崎インターチェンジ", lat: 35.589, lng: 139.587 },
             { order: 3, displayName: "横浜青葉IC", googleName: "東名高速道路 横浜青葉インターチェンジ", lat: 35.542, lng: 139.537 },
@@ -408,6 +422,14 @@ const IC_MASTER = {
     aqualine: {
         label: "アクアライン方面",
         exits: [
+            { order: -8, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.731, lng: 139.817, experimental: true, roadType: "首都高" },
+            { order: -7, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.712, lng: 139.779, experimental: true, roadType: "首都高" },
+            { order: -6, displayName: "葛西（首都高）", googleName: "首都高速湾岸線 葛西出入口", lat: 35.652, lng: 139.870, experimental: true, roadType: "首都高" },
+            { order: -5, displayName: "湾岸市川（首都高）", googleName: "首都高速湾岸線 湾岸市川出入口", lat: 35.672, lng: 139.938, experimental: true, roadType: "首都高" },
+            { order: -4, displayName: "新木場（首都高）", googleName: "首都高速湾岸線 新木場出入口", lat: 35.645, lng: 139.827, experimental: true, roadType: "首都高" },
+            { order: -3, displayName: "有明（首都高）", googleName: "首都高速湾岸線 有明出入口", lat: 35.634, lng: 139.795, experimental: true, roadType: "首都高" },
+            { order: -2, displayName: "大井南（首都高）", googleName: "首都高速湾岸線 大井南出入口", lat: 35.589, lng: 139.756, experimental: true, roadType: "首都高" },
+            { order: -1, displayName: "空港中央（首都高）", googleName: "首都高速湾岸線 空港中央出入口", lat: 35.553, lng: 139.787, experimental: true, roadType: "首都高" },
             {
                 order: 1,
                 displayName: "浮島IC",
@@ -552,6 +574,14 @@ const IC_MASTER = {
     keiyo: {
         label: "京葉道路方面",
         exits: [
+            { order: -8, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.731, lng: 139.817, experimental: true, roadType: "首都高" },
+            { order: -7, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.712, lng: 139.779, experimental: true, roadType: "首都高" },
+            { order: -6, displayName: "葛西（首都高）", googleName: "首都高速湾岸線 葛西出入口", lat: 35.652, lng: 139.870, experimental: true, roadType: "首都高" },
+            { order: -5, displayName: "湾岸市川（首都高）", googleName: "首都高速湾岸線 湾岸市川出入口", lat: 35.672, lng: 139.938, experimental: true, roadType: "首都高" },
+            { order: -4, displayName: "新木場（首都高）", googleName: "首都高速湾岸線 新木場出入口", lat: 35.645, lng: 139.827, experimental: true, roadType: "首都高" },
+            { order: -3, displayName: "有明（首都高）", googleName: "首都高速湾岸線 有明出入口", lat: 35.634, lng: 139.795, experimental: true, roadType: "首都高" },
+            { order: -2, displayName: "大井南（首都高）", googleName: "首都高速湾岸線 大井南出入口", lat: 35.589, lng: 139.756, experimental: true, roadType: "首都高" },
+            { order: -1, displayName: "空港中央（首都高）", googleName: "首都高速湾岸線 空港中央出入口", lat: 35.553, lng: 139.787, experimental: true, roadType: "首都高" },
             {
                 order: 1,
                 displayName: "篠崎IC",
@@ -632,6 +662,14 @@ const IC_MASTER = {
     tokan: {
         label: "東関東道方面",
         exits: [
+            { order: -8, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.731, lng: 139.817, experimental: true, roadType: "首都高" },
+            { order: -7, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.712, lng: 139.779, experimental: true, roadType: "首都高" },
+            { order: -6, displayName: "葛西（首都高）", googleName: "首都高速湾岸線 葛西出入口", lat: 35.652, lng: 139.870, experimental: true, roadType: "首都高" },
+            { order: -5, displayName: "湾岸市川（首都高）", googleName: "首都高速湾岸線 湾岸市川出入口", lat: 35.672, lng: 139.938, experimental: true, roadType: "首都高" },
+            { order: -4, displayName: "新木場（首都高）", googleName: "首都高速湾岸線 新木場出入口", lat: 35.645, lng: 139.827, experimental: true, roadType: "首都高" },
+            { order: -3, displayName: "有明（首都高）", googleName: "首都高速湾岸線 有明出入口", lat: 35.634, lng: 139.795, experimental: true, roadType: "首都高" },
+            { order: -2, displayName: "大井南（首都高）", googleName: "首都高速湾岸線 大井南出入口", lat: 35.589, lng: 139.756, experimental: true, roadType: "首都高" },
+            { order: -1, displayName: "空港中央（首都高）", googleName: "首都高速湾岸線 空港中央出入口", lat: 35.553, lng: 139.787, experimental: true, roadType: "首都高" },
             {
                 order: 0,
                 displayName: "蘇我IC",
@@ -3565,7 +3603,9 @@ function findNearestIcByMasterCoordinatesForAutoExitComparison(
 
     return {
         exit: nearest,
-        distanceKm: Math.round(nearestDistance / 1000)
+        distanceKm: Math.round(nearestDistance / 1000),
+        baseLat: baseLat,
+        baseLng: baseLng
     };
 }
 
@@ -3573,12 +3613,54 @@ function selectExitCandidatesForAutoExitComparison(
     icArea,
     highwayStart,
     destinationNearestIc,
-    maxCount = getActiveIcCandidateCount()
+    maxCount = getActiveIcCandidateCount(),
+    baseLatLng = null
 ) {
 
-    if (!highwayStart) {
+    if (
+        !highwayStart ||
+        !baseLatLng ||
+        baseLatLng.lat === undefined ||
+        baseLatLng.lng === undefined
+    ) {
         return [];
     }
+
+    const selectableExits =
+        IC_MASTER[icArea].exits
+            .filter(exit =>
+                exit.isSelectable !== false &&
+                exit.lat !== undefined &&
+                exit.lng !== undefined
+            );
+
+    const sortByDistanceFromBase = (a, b) =>
+        calculateDistance(
+            baseLatLng.lat,
+            baseLatLng.lng,
+            a.lat,
+            a.lng
+        ) -
+        calculateDistance(
+            baseLatLng.lat,
+            baseLatLng.lng,
+            b.lat,
+            b.lng
+        );
+
+    const shutoCandidate =
+        selectableExits
+            .filter(exit =>
+                isShutoIc(exit)
+            )
+            .slice()
+            .sort(sortByDistanceFromBase)[0] ||
+        null;
+
+    const mainlineCount =
+        shutoCandidate
+            ? Math.max(0, maxCount - 1)
+            : maxCount;
 
     const startOrder =
         highwayStart.order ?? null;
@@ -3590,24 +3672,32 @@ function selectExitCandidatesForAutoExitComparison(
         destinationOrder === null ||
         destinationOrder > startOrder;
 
-    return IC_MASTER[icArea].exits
-        .slice()
-        .sort((a, b) =>
-            isForwardDirection
-                ? (a.order ?? 999) - (b.order ?? 999)
-                : (b.order ?? -999) - (a.order ?? -999)
-        )
-        .filter(exit =>
-            exit.googleName !== highwayStart.googleName &&
-            exit.isSelectable !== false &&
-            startOrder !== null &&
-            exit.order !== undefined &&
-            (
-                isForwardDirection
-                    ? exit.order > startOrder
-                    : exit.order < startOrder
+    const mainlineCandidates =
+        selectableExits
+            .filter(exit =>
+                !isShutoIc(exit) &&
+                startOrder !== null &&
+                exit.order !== undefined &&
+                (
+                    isForwardDirection
+                        ? exit.order > startOrder
+                        : exit.order < startOrder
+                )
             )
-        )
+            .slice()
+            .sort((a, b) =>
+                isForwardDirection
+                    ? (a.order ?? 999) - (b.order ?? 999)
+                    : (b.order ?? -999) - (a.order ?? -999)
+            )
+            .slice(0, mainlineCount);
+
+    return [
+        shutoCandidate,
+        ...mainlineCandidates
+    ]
+        .filter(Boolean)
+        .slice()
         .slice(0, maxCount);
 }
 
@@ -5089,7 +5179,8 @@ async function prepareV2SimpleDiagnosticCandidates(
             icArea,
             highwayStart,
             destinationNearestIc,
-            getActiveIcCandidateCount()
+            getActiveIcCandidateCount(),
+            originLatLng
         );
 
     const endIcName =
@@ -7347,7 +7438,11 @@ async function searchAutoExitIcComparison(
             icArea,
             highwayStart,
             destinationNearestIc,
-            getActiveIcCandidateCount()
+            getActiveIcCandidateCount(),
+            {
+                lat: highwayStartInfo.baseLat,
+                lng: highwayStartInfo.baseLng
+            }
         );
 
     console.log(
@@ -7848,7 +7943,8 @@ async function runCandidateIcTestCase(route) {
                 icArea,
                 highwayStartInfo.exit,
                 destinationNearestIc,
-                getActiveIcCandidateCount()
+                getActiveIcCandidateCount(),
+                originLatLng
             );
 
         result.candidates =

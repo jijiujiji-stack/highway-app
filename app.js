@@ -17,6 +17,52 @@ const PROD_IC_CANDIDATE_COUNT = 5;
 // 実際に使用する候補IC数
 let isRealDriveTestMode = false;
 
+let apiUsageStats = {
+    routeRequests: 0,
+    routeSearches: 0
+};
+
+function updateApiUsagePanel() {
+    const searchesElement =
+        document.getElementById("apiUsageSearches");
+
+    const routeRequestsElement =
+        document.getElementById("apiUsageRouteRequests");
+
+    const monthlyElement =
+        document.getElementById("apiUsageMonthly");
+
+    if (
+        !searchesElement ||
+        !routeRequestsElement ||
+        !monthlyElement
+    ) {
+        return;
+    }
+
+    const estimatedMonthly =
+        apiUsageStats.routeRequests * 30;
+
+    searchesElement.textContent =
+        "今日 " + apiUsageStats.routeSearches + "回";
+
+    routeRequestsElement.textContent =
+        "推定Routes " + apiUsageStats.routeRequests + "回";
+
+    monthlyElement.textContent =
+        estimatedMonthly + "回";
+}
+
+function incrementRouteSearchUsage() {
+    apiUsageStats.routeSearches++;
+    updateApiUsagePanel();
+}
+
+function incrementRouteRequestUsage() {
+    apiUsageStats.routeRequests++;
+    updateApiUsagePanel();
+}
+
 function getActiveIcCandidateCount() {
     return isRealDriveTestMode
         ? PROD_IC_CANDIDATE_COUNT
@@ -38,6 +84,26 @@ function getAutoUpdateTimeThreshold() {
 }
 
 const AUTO_RESEARCH_FAILURE_COOLDOWN_SECONDS = 60;
+
+const SHUTO_TOLL_ESTIMATE_YEN = 1000;
+
+function isShutoIc(ic) {
+    return Boolean(
+        ic &&
+        ic.roadType === "首都高"
+    );
+}
+
+function getShutoTollEstimateForIcPair(startIc, endIc) {
+    if (
+        isShutoIc(startIc) ||
+        isShutoIc(endIc)
+    ) {
+        return SHUTO_TOLL_ESTIMATE_YEN;
+    }
+
+    return 0;
+}
 
 const IC_MASTER = {
     // 接続道路のICは重複登録を許可する。
@@ -771,6 +837,8 @@ console.log("高速・下道コスパナビ起動");
 
 window.addEventListener("load", () => {
 
+    updateApiUsagePanel();
+
     loadGoogleMaps();
 
     getCurrentLocation(true);
@@ -1126,6 +1194,8 @@ async function searchRoute() {
 
     resetMultiExitIcResult();
 
+    incrementRouteSearchUsage();
+
 
     console.log("検索開始");
     console.log("出発地:", origin);
@@ -1272,6 +1342,8 @@ async function getHighwayRoute(
     destinationLatLng = null
 ) {
 
+    incrementRouteRequestUsage();
+
     const response = await fetch(
         "https://routes.googleapis.com/directions/v2:computeRoutes",
         {
@@ -1345,6 +1417,8 @@ async function getLocalRoute(
     originLatLng = null,
     destinationLatLng = null
 ) {
+
+    incrementRouteRequestUsage();
 
     const response = await fetch(
         "https://routes.googleapis.com/directions/v2:computeRoutes",
@@ -2059,13 +2133,24 @@ async function estimateMainHighwayToll(
         if (
             startIc.googleName === endIc.googleName
         ) {
+            const shutoToll =
+                getShutoTollEstimateForIcPair(
+                    startIc,
+                    endIc
+                );
+
             return {
-                amount: 0,
+                amount: shutoToll,
                 label:
                     "料金計算：" +
                     startIc.displayName +
                     "→" +
-                    endIc.displayName
+                    endIc.displayName +
+                    (
+                        shutoToll > 0
+                            ? " / 首都高概算含む"
+                            : ""
+                    )
             };
         }
 
@@ -2078,16 +2163,30 @@ async function estimateMainHighwayToll(
         const tollKm =
             tollRoute.distanceMeters / 1000;
 
+        const baseToll =
+            Math.round(
+                tollKm * 24
+            );
+
+        const shutoToll =
+            getShutoTollEstimateForIcPair(
+                startIc,
+                endIc
+            );
+
         return {
             amount:
-                Math.round(
-                    tollKm * 24
-                ),
+                baseToll + shutoToll,
             label:
                 "料金計算：" +
                 startIc.displayName +
                 "→" +
-                endIc.displayName
+                endIc.displayName +
+                (
+                    shutoToll > 0
+                        ? " / 首都高概算含む"
+                        : ""
+                )
         };
 
     } catch (error) {
@@ -2324,6 +2423,8 @@ async function searchFromCurrentLocation(
         autoCompareCheckbox.checked = false;
     }
 
+    incrementRouteSearchUsage();
+
 
     try {
 
@@ -2438,6 +2539,8 @@ async function getHighwayRouteFromGps(
     destinationLatLng = null
 ) {
 
+    incrementRouteRequestUsage();
+
     const response =
         await fetch(
             "https://routes.googleapis.com/directions/v2:computeRoutes",
@@ -2513,6 +2616,8 @@ async function getLocalRouteFromGps(
     destinationPlaceId = "",
     destinationLatLng = null
 ) {
+
+    incrementRouteRequestUsage();
 
     const response =
         await fetch(
@@ -3511,6 +3616,8 @@ async function getHighwayRouteForMultiExitComparison(
     destination
 ) {
 
+    incrementRouteRequestUsage();
+
     const response = await fetch(
         "https://routes.googleapis.com/directions/v2:computeRoutes",
         {
@@ -3568,6 +3675,8 @@ async function getLocalRouteForMultiExitComparison(
     origin,
     destination
 ) {
+
+    incrementRouteRequestUsage();
 
     const response = await fetch(
         "https://routes.googleapis.com/directions/v2:computeRoutes",
@@ -3705,6 +3814,11 @@ async function searchMultiExitIcComparison() {
                 lastTollStartIcGoogleName
             );
 
+        const highwayEndIc =
+            findIcDefinitionForMultiExitComparison(
+                lastTollEndIcGoogleName
+            );
+
         const isForwardDirection =
             !highwayStartIc ||
             lastTollEndIcOrder === null ||
@@ -3746,6 +3860,10 @@ async function searchMultiExitIcComparison() {
             keepHighwayToll =
                 Math.round(
                     (keepHighwayTollRoute.distanceMeters / 1000) * 24
+                ) +
+                getShutoTollEstimateForIcPair(
+                    highwayStartIc,
+                    highwayEndIc
                 );
         }
 
@@ -3860,6 +3978,10 @@ async function searchMultiExitIcComparison() {
                     estimatedToll =
                         Math.round(
                             estimatedTollKm * 24
+                        ) +
+                        getShutoTollEstimateForIcPair(
+                            highwayStartIc,
+                            exitIcDefinition
                         );
                 }
 
@@ -4020,13 +4142,25 @@ async function searchEntranceIcComparisonV2(options = {}) {
                     highwayFromCandidateRoute.distanceMeters
                 ) / 1000;
 
+            const endIc =
+                findIcDefinitionForMultiExitComparison(
+                    lastTollEndIcGoogleName
+                );
+
+            const shutoToll =
+                getShutoTollEstimateForIcPair(
+                    exit,
+                    endIc
+                );
+
             const estimatedToll =
                 Math.round(
                     (
                         highwayFromCandidateRoute.distanceMeters /
                         1000
                     ) * 24
-                );
+                ) +
+                shutoToll;
 
             const differenceFromAllLocal =
                 allLocalMinutes === null
@@ -4056,7 +4190,12 @@ async function searchEntranceIcComparisonV2(options = {}) {
                     lastTollEndIcName
                         ? exit.displayName +
                         "→" +
-                        lastTollEndIcName
+                        lastTollEndIcName +
+                        (
+                            shutoToll > 0
+                                ? " / 首都高概算含む"
+                                : ""
+                        )
                         : "",
                 allLocalMinutes: allLocalMinutes,
                 allLocalDistanceKm: allLocalDistanceKm,
@@ -4217,13 +4356,25 @@ async function searchExitIcComparisonV2(options = {}) {
                     localFromCandidateRoute.distanceMeters
                 ) / 1000;
 
+            const startIc =
+                findIcDefinitionForMultiExitComparison(
+                    lastTollStartIcGoogleName
+                );
+
+            const shutoToll =
+                getShutoTollEstimateForIcPair(
+                    startIc,
+                    exit
+                );
+
             const exitTollEstimate =
                 Math.round(
                     (
                         highwayToCandidateRoute.distanceMeters /
                         1000
                     ) * 24
-                );
+                ) +
+                shutoToll;
 
             const savedToll =
                 allHighwayToll === null
@@ -4259,6 +4410,19 @@ async function searchExitIcComparisonV2(options = {}) {
                 allHighwayDistanceKm: allHighwayDistanceKm,
                 allHighwayToll: allHighwayToll,
                 exitTollEstimate: exitTollEstimate,
+                tollLabel:
+                    startIc &&
+                    startIc.displayName &&
+                    exit.displayName
+                        ? startIc.displayName +
+                        "→" +
+                        exit.displayName +
+                        (
+                            shutoToll > 0
+                                ? " / 首都高概算含む"
+                                : ""
+                        )
+                        : "",
                 savedToll: savedToll,
                 differenceFromAllHighway:
                     differenceFromAllHighway,
@@ -10096,6 +10260,7 @@ async function findNearestIcInfoByPoint(
         displayName: nearest.displayName,
         googleName: nearest.googleName,
         order: nearest.order ?? null,
+        roadType: nearest.roadType,
         distanceKm: Math.round(nearestDistance / 1000)
     };
 }

@@ -1408,7 +1408,7 @@ async function displayRouteComparison(
 
     setDashboardInfoLabels(
         "効率率",
-        "単価"
+        "ETC概算"
     );
     setDashboardV2EntranceMode(false);
     setDashboardV2ExitMode(false);
@@ -1457,6 +1457,20 @@ async function displayRouteComparison(
 
     const estimatedToll =
         tollEstimate.amount;
+
+    const highwayArrivalTime =
+        formatArrivalTime(
+            highwayMinutes
+        );
+
+    const localArrivalTime =
+        formatArrivalTime(
+            localMinutes
+        );
+
+    const tollEstimateLabel =
+        String(tollEstimate.label || "")
+            .replace(/^料金計算：/, "");
 
     document
         .getElementById("highwayTime")
@@ -1585,9 +1599,7 @@ async function displayRouteComparison(
     highwayCard
         .querySelectorAll(".sub")[1]
         .textContent =
-        "概算ETC料金：" +
-        estimatedToll.toLocaleString() +
-        " 円（参考値）";
+        "";
 
     document
         .getElementById("costPerMinute")
@@ -1622,17 +1634,29 @@ async function displayRouteComparison(
 
     document
         .getElementById("dashboardHighway")
-        .textContent =
+        .innerHTML =
+        "<div class=\"arrival-label\">到着時刻</div>" +
+        "<div class=\"arrival-time\">" +
+        highwayArrivalTime +
+        "</div>" +
+        "<div class=\"main-route-time\">" +
         formatMinutes(
             highwayMinutes
-        );
+        ) +
+        "</div>";
 
     document
         .getElementById("dashboardLocal")
-        .textContent =
+        .innerHTML =
+        "<div class=\"arrival-label\">到着時刻</div>" +
+        "<div class=\"arrival-time\">" +
+        localArrivalTime +
+        "</div>" +
+        "<div class=\"main-route-time\">" +
         formatMinutes(
             localMinutes
-        );
+        ) +
+        "</div>";
 
     updateDashboardTimeColors(
         highwayMinutes,
@@ -1647,19 +1671,19 @@ async function displayRouteComparison(
     if (!suppressDashboardSummary) {
         document
             .getElementById("dashboardCost")
-            .textContent =
-            costPerMinute + "円/分";
+            .innerHTML =
+            "約" +
+            estimatedToll.toLocaleString() +
+            "円<br>" +
+            tollEstimateLabel;
     }
 
     document
         .getElementById("dashboardHighwayDetail")
-        .innerHTML =
+        .textContent =
         "距離：" +
         highwayKm +
-        "km / ETC概算：約" +
-        estimatedToll.toLocaleString() +
-        "円<br>" +
-        tollEstimate.label;
+        "km";
 
     document
         .getElementById("dashboardLocalDetail")
@@ -2903,6 +2927,21 @@ function formatMinutes(minutes) {
         "時間" +
         mins +
         "分"
+    );
+}
+
+function formatArrivalTime(minutesFromNow) {
+
+    const arrival =
+        new Date(
+            Date.now() +
+            minutesFromNow * 60 * 1000
+        );
+
+    return (
+        String(arrival.getHours()).padStart(2, "0") +
+        ":" +
+        String(arrival.getMinutes()).padStart(2, "0")
     );
 }
 

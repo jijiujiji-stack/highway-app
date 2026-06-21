@@ -347,6 +347,26 @@ button {
     color: white;
 }
 
+.arrival-label {
+    font-size: 14px;
+    color: #ffffff;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.arrival-time {
+    font-size: 18px;
+    color: inherit;
+    font-weight: 700;
+    margin-bottom: 14px;
+}
+
+.main-route-time {
+    font-size: inherit;
+    color: inherit;
+    font-weight: inherit;
+}
+
 
 .gps-info {
 

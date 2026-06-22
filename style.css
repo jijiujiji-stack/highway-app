@@ -396,6 +396,18 @@ button {
     font-weight: inherit;
 }
 
+.probably-no-toll-note {
+    margin: 6px 0 8px;
+    font-size: 0.40em;
+    color: #bbb;
+    font-weight: 400;
+}
+
+.probably-no-toll-note-spacer {
+    visibility: hidden;
+}
+
+
 .v2-arrival-prediction-card {
     background: #222;
     border: 1px solid #555;

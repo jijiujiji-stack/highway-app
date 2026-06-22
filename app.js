@@ -53,6 +53,69 @@ function updateApiUsagePanel() {
         estimatedMonthly + "回";
 }
 
+function isProbablyNoTollRouteByMetrics(
+    highwayDurationMinutes,
+    localDurationMinutes,
+    highwayDistanceKm,
+    localDistanceKm
+) {
+
+    const durationDiffMinutes =
+        Math.abs(
+            highwayDurationMinutes -
+            localDurationMinutes
+        );
+
+    const distanceDiffKm =
+        Math.abs(
+            Number(highwayDistanceKm) -
+            Number(localDistanceKm)
+        );
+
+    return (
+        durationDiffMinutes <= 3 &&
+        distanceDiffKm <= 2
+    );
+}
+
+function createProbablyNoTollRouteNoteHtml(
+    isProbablyNoTollRoute
+) {
+
+    return isProbablyNoTollRoute
+        ? "<div class=\"probably-no-toll-note\">※有料未使用かも</div>"
+        : "";
+}
+
+function updateProbablyNoTollRouteNote(
+    isProbablyNoTollRoute
+) {
+
+    const note =
+        document.getElementById("highwayNoTollNote");
+
+    const spacer =
+        document.getElementById("localNoTollSpacer");
+
+    if (!note || !spacer) {
+        return;
+    }
+
+    note.textContent =
+        isProbablyNoTollRoute
+            ? "※有料未使用かも"
+            : "";
+
+    note.hidden = !isProbablyNoTollRoute;
+
+    spacer.textContent =
+        isProbablyNoTollRoute
+            ? "※有料未使用かも"
+            : "";
+
+    spacer.hidden = !isProbablyNoTollRoute;
+}
+
 function incrementRouteSearchUsage() {
     apiUsageStats.routeSearches++;
     updateApiUsagePanel();
@@ -965,6 +1028,7 @@ let lastResolvedIcArea = null;
 
 let lastSearchMode = "";
 let lastLocalRouteMinutes = null;
+let lastProbablyNoTollRoute = false;
 
 let invalidIcResults = [];
 
@@ -1391,6 +1455,9 @@ async function searchRoute() {
 
     try {
 
+        lastProbablyNoTollRoute = false;
+        updateProbablyNoTollRouteNote(false);
+
         document.getElementById("highwayTime").textContent =
             "検索中...";
 
@@ -1714,6 +1781,20 @@ async function displayRouteComparison(
         (
             local.distanceMeters / 1000
         ).toFixed(1);
+
+    const isProbablyNoTollRoute =
+        isProbablyNoTollRouteByMetrics(
+            highwayMinutes,
+            localMinutes,
+            highwayKm,
+            localKm
+        );
+
+    lastProbablyNoTollRoute = isProbablyNoTollRoute;
+
+    updateProbablyNoTollRouteNote(
+        isProbablyNoTollRoute
+    );
 
     const resolvedIcArea =
         await resolveIcAreaForRoute(
@@ -2616,6 +2697,9 @@ async function searchFromCurrentLocation(
 
     try {
 
+        lastProbablyNoTollRoute = false;
+        updateProbablyNoTollRouteNote(false);
+
         document
             .getElementById(
                 "highwayTime"
@@ -3322,7 +3406,10 @@ function formatArrivalTime(minutesFromNow) {
     );
 }
 
-function createRouteTimeHtml(minutes) {
+function createRouteTimeHtml(
+    minutes,
+    isProbablyNoTollRoute = false
+) {
 
     if (
         minutes === null ||
@@ -3333,6 +3420,9 @@ function createRouteTimeHtml(minutes) {
     }
 
     return (
+        createProbablyNoTollRouteNoteHtml(
+            isProbablyNoTollRoute
+        ) +
         "<div class=\"arrival-label\">到着時刻</div>" +
         "<div class=\"arrival-time\">" +
         formatArrivalTime(minutes) +
@@ -3359,7 +3449,8 @@ function createRouteDistanceText(distanceKm) {
 function createArrivalPredictionCardHtml(
     subLabel,
     minutes,
-    distanceKm
+    distanceKm,
+    isProbablyNoTollRoute = false
 ) {
 
     return (
@@ -3371,7 +3462,10 @@ function createArrivalPredictionCardHtml(
         escapeHtml(subLabel) +
         "</div>" +
         "<div class=\"v2-arrival-prediction-time\">" +
-        createRouteTimeHtml(minutes) +
+        createRouteTimeHtml(
+            minutes,
+            isProbablyNoTollRoute
+        ) +
         "</div>" +
         "<div class=\"v2-arrival-prediction-distance\">" +
         escapeHtml(createRouteDistanceText(distanceKm)) +
@@ -6271,7 +6365,8 @@ function updateDashboardWithBestEntranceIcV2() {
             createArrivalPredictionCardHtml(
                 "おすすめ入口から高速利用時",
                 best.totalMinutes,
-                best.totalDistanceKm
+                best.totalDistanceKm,
+                lastProbablyNoTollRoute
             );
     }
 
@@ -6481,7 +6576,8 @@ function updateDashboardWithBestExitIcV2() {
             createArrivalPredictionCardHtml(
                 "おすすめ出口を利用した場合",
                 best.totalMinutes,
-                best.totalDistanceKm
+                best.totalDistanceKm,
+                lastProbablyNoTollRoute
             );
     }
 

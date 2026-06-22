@@ -6317,9 +6317,9 @@ function updateDashboardWithBestEntranceIcV2() {
             dashboardCost.textContent = "有料回避";
         }
 
-        setDashboardRouteTimeClasses(
-            "time-neutral",
-            "time-bad"
+        updateDashboardTimeColors(
+            null,
+            allLocalMinutes
         );
 
         return;
@@ -6408,9 +6408,9 @@ function updateDashboardWithBestEntranceIcV2() {
             );
     }
 
-    setDashboardRouteTimeClasses(
-        "time-good",
-        "time-bad"
+    updateDashboardTimeColors(
+        best.totalMinutes,
+        best.allLocalMinutes
     );
 }
 
@@ -6529,9 +6529,9 @@ function updateDashboardWithBestExitIcV2() {
             dashboardCost.textContent = "--";
         }
 
-        setDashboardRouteTimeClasses(
-            "time-good",
-            "time-neutral"
+        updateDashboardTimeColors(
+            getAllHighwayMinutesFromExitV2Results(),
+            null
         );
 
         return;
@@ -6618,9 +6618,9 @@ function updateDashboardWithBestExitIcV2() {
             "分遅い";
     }
 
-    setDashboardRouteTimeClasses(
-        "time-good",
-        "time-bad"
+    updateDashboardTimeColors(
+        best.allHighwayMinutes,
+        best.totalMinutes
     );
 }
 
@@ -9586,48 +9586,57 @@ function updateDashboardTimeColors(
     highwayMinutes,
     localMinutes
 ) {
-    const highwayElement =
-        document.getElementById("dashboardHighway");
+    const classes =
+        getTimeComparisonColorClasses(
+            highwayMinutes,
+            localMinutes
+        );
 
-    const localElement =
-        document.getElementById("dashboardLocal");
-
-    if (!highwayElement || !localElement) {
-        return;
-    }
-
-    const acceptableDelay =
-        Number(
-            document.getElementById("acceptableDelay")?.value
-        ) || 30;
-
-    const timeDifference =
-        localMinutes - highwayMinutes;
-
-    highwayElement.classList.remove(
-        "time-good",
-        "time-bad",
-        "time-neutral"
+    setDashboardRouteTimeClasses(
+        classes.highwayClass,
+        classes.localClass
     );
+}
 
-    localElement.classList.remove(
-        "time-good",
-        "time-bad",
-        "time-neutral"
-    );
+function getTimeComparisonColorClasses(
+    highwayMinutes,
+    localMinutes
+) {
 
-    if (timeDifference < acceptableDelay) {
-        highwayElement.classList.add("time-bad");
-        localElement.classList.add("time-good");
+    if (
+        !Number.isFinite(Number(highwayMinutes)) ||
+        !Number.isFinite(Number(localMinutes))
+    ) {
+        return {
+            highwayClass: "time-neutral",
+            localClass: "time-neutral"
+        };
     }
-    else if (timeDifference >= acceptableDelay * 2) {
-        highwayElement.classList.add("time-good");
-        localElement.classList.add("time-bad");
+
+    const diff =
+        Math.abs(
+            Number(highwayMinutes) -
+            Number(localMinutes)
+        );
+
+    if (diff <= 2) {
+        return {
+            highwayClass: "time-neutral",
+            localClass: "time-neutral"
+        };
     }
-    else {
-        highwayElement.classList.add("time-neutral");
-        localElement.classList.add("time-neutral");
+
+    if (Number(highwayMinutes) < Number(localMinutes)) {
+        return {
+            highwayClass: "time-good",
+            localClass: "time-bad"
+        };
     }
+
+    return {
+        highwayClass: "time-bad",
+        localClass: "time-good"
+    };
 }
 
 function setDashboardRouteTimeClasses(

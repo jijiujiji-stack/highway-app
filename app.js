@@ -1755,6 +1755,7 @@ async function displayRouteComparison(
     );
     setDashboardV2EntranceMode(false);
     setDashboardV2ExitMode(false);
+    setDashboardRouteDimmed(false, false);
 
     const highwayMinutes =
         Math.round(
@@ -5884,6 +5885,39 @@ function getBestExitIcV2(results) {
     return candidates[0] || null;
 }
 
+function getReferenceExitIcV2(results) {
+
+    if (!Array.isArray(results)) {
+        return null;
+    }
+
+    const candidates =
+        results
+            .filter(result =>
+                !result.error &&
+                result.totalMinutes !== null &&
+                result.totalMinutes !== undefined &&
+                result.allHighwayMinutes !== null &&
+                result.allHighwayMinutes !== undefined
+            )
+            .sort((a, b) => {
+
+                if (
+                    a.differenceFromAllHighway !==
+                    b.differenceFromAllHighway
+                ) {
+                    return (
+                        a.differenceFromAllHighway -
+                        b.differenceFromAllHighway
+                    );
+                }
+
+                return a.totalMinutes - b.totalMinutes;
+            });
+
+    return candidates[0] || null;
+}
+
 function buildBestExitIcV2Html(results) {
 
     const best =
@@ -6161,6 +6195,36 @@ function getBestEntranceIcV2(results) {
     return candidates[0] || null;
 }
 
+function getReferenceEntranceIcV2(results) {
+
+    if (!Array.isArray(results)) {
+        return null;
+    }
+
+    const candidates =
+        results
+            .filter(result =>
+                !result.error &&
+                result.totalMinutes !== null &&
+                result.totalMinutes !== undefined &&
+                result.allLocalMinutes !== null &&
+                result.allLocalMinutes !== undefined
+            )
+            .sort((a, b) => {
+
+                if (a.totalMinutes !== b.totalMinutes) {
+                    return a.totalMinutes - b.totalMinutes;
+                }
+
+                return (
+                    (b.differenceFromAllLocal ?? -Infinity) -
+                    (a.differenceFromAllLocal ?? -Infinity)
+                );
+            });
+
+    return candidates[0] || null;
+}
+
 function buildBestEntranceIcV2Html(results) {
 
     const best =
@@ -6263,6 +6327,16 @@ function updateDashboardWithBestEntranceIcV2() {
         const allLocalMinutes =
             getAllLocalMinutesFromV2Results();
 
+        const reference =
+            getReferenceEntranceIcV2(
+                lastMultiIcV2Results
+            );
+
+        setDashboardRouteDimmed(
+            Boolean(reference),
+            false
+        );
+
         if (dashboardStars) {
             dashboardStars.textContent = "🚗";
         }
@@ -6276,8 +6350,36 @@ function updateDashboardWithBestEntranceIcV2() {
             "おすすめ入口なし";
 
         if (dashboardReason) {
-            dashboardReason.textContent =
-                "この条件では全下道の方がよさそうです";
+            dashboardReason.innerHTML =
+                reference
+                    ? "<div class=\"v2-best-entrance-card reference-candidate\">" +
+                    "<div class=\"v2-best-label\">おすすめ入口なし</div>" +
+                    "<div class=\"v2-best-name\">" +
+                    escapeHtml(
+                        "参考入口 " +
+                        (reference.candidateIcName || "--") +
+                        "（条件外）"
+                    ) +
+                    "</div>" +
+                    "<div class=\"v2-best-detail\">" +
+                    escapeHtml(
+                        formatV2SavingText(
+                            reference.differenceFromAllLocal
+                        )
+                    ) +
+                    " / " +
+                    escapeHtml(
+                        reference.yenPerSavedMinute !== null
+                            ? reference.yenPerSavedMinute.toLocaleString() +
+                            "円/分"
+                            : "円/分なし"
+                    ) +
+                    "<div class=\"v2-reference-note\">" +
+                    "※許容条件外" +
+                    "</div>" +
+                    "</div>" +
+                    "</div>"
+                    : "この条件では全下道の方がよさそうです";
         }
 
         if (dashboardValueJudge) {
@@ -6289,23 +6391,37 @@ function updateDashboardWithBestEntranceIcV2() {
 
         if (dashboardHighway) {
             dashboardHighway.innerHTML =
-                createRouteTimeHtml(null);
+                createRouteTimeHtml(
+                    reference
+                        ? reference.totalMinutes
+                        : null
+                );
         }
 
         if (dashboardHighwayDetail) {
             dashboardHighwayDetail.textContent =
-                createRouteDistanceText(null);
+                createRouteDistanceText(
+                    reference
+                        ? reference.totalDistanceKm
+                        : null
+                );
         }
 
         if (dashboardLocal) {
             dashboardLocal.innerHTML =
-                createRouteTimeHtml(allLocalMinutes);
+                createRouteTimeHtml(
+                    reference
+                        ? reference.allLocalMinutes
+                        : allLocalMinutes
+                );
         }
 
         if (dashboardLocalDetail) {
             dashboardLocalDetail.textContent =
                 createRouteDistanceText(
-                    getAllLocalDistanceKmFromV2Results()
+                    reference
+                        ? reference.allLocalDistanceKm
+                        : getAllLocalDistanceKmFromV2Results()
                 );
         }
 
@@ -6318,8 +6434,12 @@ function updateDashboardWithBestEntranceIcV2() {
         }
 
         updateDashboardTimeColors(
-            null,
-            allLocalMinutes
+            reference
+                ? reference.totalMinutes
+                : null,
+            reference
+                ? reference.allLocalMinutes
+                : allLocalMinutes
         );
 
         return;
@@ -6328,6 +6448,8 @@ function updateDashboardWithBestEntranceIcV2() {
     if (dashboardStars) {
         dashboardStars.textContent = "🚙";
     }
+
+    setDashboardRouteDimmed(false, false);
 
     if (dashboardRecommendation) {
         dashboardRecommendation.textContent =
@@ -6473,6 +6595,16 @@ function updateDashboardWithBestExitIcV2() {
 
     if (!best) {
 
+        const reference =
+            getReferenceExitIcV2(
+                lastExitIcV2Results
+            );
+
+        setDashboardRouteDimmed(
+            false,
+            Boolean(reference)
+        );
+
         if (dashboardStars) {
             dashboardStars.textContent = "🚙";
         }
@@ -6486,8 +6618,35 @@ function updateDashboardWithBestExitIcV2() {
             "おすすめ出口なし";
 
         if (dashboardReason) {
-            dashboardReason.textContent =
-                "この条件では高速継続がよさそうです";
+            dashboardReason.innerHTML =
+                reference
+                    ? "<div class=\"v2-best-exit-card reference-candidate\">" +
+                    "<div class=\"v2-best-exit-label\">おすすめ出口なし</div>" +
+                    "<div class=\"v2-best-exit-name\">" +
+                    escapeHtml(
+                        "参考出口 " +
+                        (reference.candidateIcName || "--") +
+                        "（条件外）"
+                    ) +
+                    "</div>" +
+                    "<div class=\"v2-best-exit-detail\">" +
+                    escapeHtml(
+                        formatExitV2SavingText(
+                            reference.savedToll
+                        )
+                    ) +
+                    " / " +
+                    escapeHtml(
+                        formatExitV2DelayText(
+                            reference.differenceFromAllHighway
+                        ).replace(/<br>/g, " ")
+                    ) +
+                    "<div class=\"v2-reference-note\">" +
+                    "※許容遅れ超過" +
+                    "</div>" +
+                    "</div>" +
+                    "</div>"
+                    : "この条件では高速継続がよさそうです";
         }
 
         if (dashboardValueJudge) {
@@ -6500,25 +6659,37 @@ function updateDashboardWithBestExitIcV2() {
         if (dashboardHighway) {
             dashboardHighway.innerHTML =
                 createRouteTimeHtml(
-                    getAllHighwayMinutesFromExitV2Results()
+                    reference
+                        ? reference.allHighwayMinutes
+                        : getAllHighwayMinutesFromExitV2Results()
                 );
         }
 
         if (dashboardHighwayDetail) {
             dashboardHighwayDetail.textContent =
                 createRouteDistanceText(
-                    getAllHighwayDistanceKmFromExitV2Results()
+                    reference
+                        ? reference.allHighwayDistanceKm
+                        : getAllHighwayDistanceKmFromExitV2Results()
                 );
         }
 
         if (dashboardLocal) {
             dashboardLocal.innerHTML =
-                createRouteTimeHtml(null);
+                createRouteTimeHtml(
+                    reference
+                        ? reference.totalMinutes
+                        : null
+                );
         }
 
         if (dashboardLocalDetail) {
             dashboardLocalDetail.textContent =
-                createRouteDistanceText(null);
+                createRouteDistanceText(
+                    reference
+                        ? reference.totalDistanceKm
+                        : null
+                );
         }
 
         if (dashboardEfficiency) {
@@ -6530,8 +6701,12 @@ function updateDashboardWithBestExitIcV2() {
         }
 
         updateDashboardTimeColors(
-            getAllHighwayMinutesFromExitV2Results(),
-            null
+            reference
+                ? reference.allHighwayMinutes
+                : getAllHighwayMinutesFromExitV2Results(),
+            reference
+                ? reference.totalMinutes
+                : null
         );
 
         return;
@@ -6540,6 +6715,8 @@ function updateDashboardWithBestExitIcV2() {
     if (dashboardStars) {
         dashboardStars.textContent = "🚗";
     }
+
+    setDashboardRouteDimmed(false, false);
 
     if (dashboardRecommendation) {
         dashboardRecommendation.textContent =
@@ -9672,6 +9849,36 @@ function setDashboardRouteTimeClasses(
 
     if (localClassName) {
         localElement.classList.add(localClassName);
+    }
+}
+
+function setDashboardRouteDimmed(
+    highwayDimmed,
+    localDimmed
+) {
+
+    const highwayCard =
+        document
+            .getElementById("dashboardHighway")
+            ?.closest(".time-box");
+
+    const localCard =
+        document
+            .getElementById("dashboardLocal")
+            ?.closest(".time-box");
+
+    if (highwayCard) {
+        highwayCard.classList.toggle(
+            "dashboard-route-dimmed",
+            highwayDimmed
+        );
+    }
+
+    if (localCard) {
+        localCard.classList.toggle(
+            "dashboard-route-dimmed",
+            localDimmed
+        );
     }
 }
 

@@ -1688,6 +1688,68 @@ async function getHighwayRoute(
     return data.routes[0];
 }
 
+async function getHighwayRouteForTollEstimate(
+    origin,
+    destination
+) {
+
+    // ETC概算用。TRAFFIC_AWAREなしのためEssentials相当を想定。
+    incrementRouteRequestUsage();
+
+    const response = await fetch(
+        "https://routes.googleapis.com/directions/v2:computeRoutes",
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json",
+                "X-Goog-Api-Key":
+                    CONFIG.GOOGLE_MAPS_API_KEY,
+
+                "X-Goog-FieldMask":
+                    "routes.distanceMeters"
+            },
+
+            body: JSON.stringify({
+
+                origin:
+                    buildRoutesLocationForIcOrAddress(origin),
+
+                destination:
+                    buildRoutesLocationForIcOrAddress(destination),
+
+                travelMode: "DRIVE",
+
+                routeModifiers: {
+                    avoidTolls: false
+                }
+            })
+        }
+    );
+
+    const data =
+        await response.json();
+
+    if (
+        !data.routes ||
+        data.routes.length === 0
+    ) {
+        console.error(
+            "ETC概算用ルート取得失敗レスポンス",
+            data
+        );
+
+        throw new Error(
+            "ETC概算用ルート取得に失敗しました: " +
+            origin +
+            " -> " +
+            destination
+        );
+    }
+
+    return data.routes[0];
+}
+
 async function getLocalRoute(
     origin,
     destination,
@@ -2449,7 +2511,7 @@ async function estimateMainHighwayToll(
         }
 
         const tollRoute =
-            await getHighwayRoute(
+            await getHighwayRouteForTollEstimate(
                 startIc.googleName,
                 endIc.googleName
             );
@@ -4260,7 +4322,7 @@ async function searchMultiExitIcComparison() {
         ) {
 
             const keepHighwayTollRoute =
-                await getHighwayRouteForMultiExitComparison(
+                await getHighwayRouteForTollEstimate(
                     lastTollStartIcGoogleName,
                     lastTollEndIcGoogleName
                 );
@@ -4375,7 +4437,7 @@ async function searchMultiExitIcComparison() {
                 ) {
 
                     const exitIcTollRoute =
-                        await getHighwayRouteForMultiExitComparison(
+                        await getHighwayRouteForTollEstimate(
                             lastTollStartIcGoogleName,
                             exitIc
                         );
@@ -4561,12 +4623,27 @@ async function searchEntranceIcComparisonV2(options = {}) {
                     endIc
                 );
 
+            let tollDistanceMeters =
+                highwayFromCandidateRoute.distanceMeters;
+
+            if (
+                lastTollEndIcGoogleName &&
+                exit.googleName !== lastTollEndIcGoogleName
+            ) {
+
+                const tollRoute =
+                    await getHighwayRouteForTollEstimate(
+                        exit.googleName,
+                        lastTollEndIcGoogleName
+                    );
+
+                tollDistanceMeters =
+                    tollRoute.distanceMeters;
+            }
+
             const estimatedToll =
                 Math.round(
-                    (
-                        highwayFromCandidateRoute.distanceMeters /
-                        1000
-                    ) * 24
+                    (tollDistanceMeters / 1000) * 24
                 ) +
                 shutoToll;
 
@@ -4772,12 +4849,27 @@ async function searchExitIcComparisonV2(options = {}) {
                     exit
                 );
 
+            let tollDistanceMeters =
+                highwayToCandidateRoute.distanceMeters;
+
+            if (
+                lastTollStartIcGoogleName &&
+                exit.googleName !== lastTollStartIcGoogleName
+            ) {
+
+                const tollRoute =
+                    await getHighwayRouteForTollEstimate(
+                        lastTollStartIcGoogleName,
+                        exit.googleName
+                    );
+
+                tollDistanceMeters =
+                    tollRoute.distanceMeters;
+            }
+
             const exitTollEstimate =
                 Math.round(
-                    (
-                        highwayToCandidateRoute.distanceMeters /
-                        1000
-                    ) * 24
+                    (tollDistanceMeters / 1000) * 24
                 ) +
                 shutoToll;
 

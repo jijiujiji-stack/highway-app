@@ -1,3 +1,11 @@
+:root {
+    --color-good: #2ecc71;
+    --color-bad: #ff6b6b;
+    --color-equal: #81d4fa;
+    --color-warning: #f1c40f;
+    --color-text-main: #ffffff;
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -185,7 +193,7 @@ button {
 .v2-dashboard-countdown {
     font-size: 18px;
     font-weight: bold;
-    color: #2ecc71;
+    color: var(--color-good);
     margin: 4px 0;
 }
 
@@ -235,7 +243,7 @@ button {
 }
 
 #dashboardReason .v2-best-name {
-    color: #2ecc71;
+    color: var(--color-good);
     font-size: 34px;
     font-weight: bold;
     line-height: 1.1;
@@ -248,7 +256,7 @@ button {
     gap: 6px;
     background: rgba(255, 193, 7, 0.15);
     border: 2px solid #ffc107;
-    color: #ffc107;
+    color: var(--color-warning);
     font-weight: bold;
     padding: 8px 16px;
     border-radius: 12px;
@@ -279,7 +287,7 @@ button {
 }
 
 #dashboardReason .v2-best-exit-name {
-    color: #f1c40f;
+    color: var(--color-warning);
     font-size: 34px;
     font-weight: bold;
     line-height: 1.1;
@@ -313,7 +321,7 @@ button {
     display: inline-block;
     background: rgba(255, 193, 7, 0.15);
     border: 2px solid #ffc107;
-    color: #ffc107;
+    color: var(--color-warning);
     font-size: 20px;
     font-weight: bold;
     padding: 6px 16px;
@@ -325,7 +333,7 @@ button {
     display: inline-block;
     background: rgba(255, 193, 7, 0.15);
     border: 2px solid #ffc107;
-    color: #ffc107;
+    color: var(--color-warning);
     font-size: 20px;
     font-weight: bold;
     padding: 6px 16px;
@@ -346,15 +354,15 @@ button {
 }
 
 .recommend-highway #dashboardRecommendation {
-    color: #2ecc71;
+    color: var(--color-good);
 }
 
 .recommend-neutral #dashboardRecommendation {
-    color: #f1c40f;
+    color: var(--color-warning);
 }
 
 .recommend-local #dashboardRecommendation {
-    color: #e74c3c;
+    color: var(--color-bad);
 }
 
 .time-box {
@@ -445,7 +453,7 @@ button {
 }
 
 .v2-arrival-prediction-time {
-    color: #2ecc71;
+    color: var(--color-good);
     font-size: 32px;
     font-weight: bold;
 }
@@ -506,7 +514,7 @@ button {
 }
 
 .value-super {
-    color: #2ecc71;
+    color: var(--color-good);
 }
 
 .value-good {
@@ -514,7 +522,7 @@ button {
 }
 
 .value-normal {
-    color: #f1c40f;
+    color: var(--color-warning);
 }
 
 .value-expensive {
@@ -522,7 +530,7 @@ button {
 }
 
 .value-high {
-    color: #e74c3c;
+    color: var(--color-bad);
 }
 
 .exit-ic-card {
@@ -531,7 +539,7 @@ button {
 
 #exitIcJudge {
     font-weight: bold;
-    color: #f1c40f;
+    color: var(--color-warning);
 }
 
 .multi-exit-ic-card {
@@ -541,7 +549,7 @@ button {
 .multi-best {
     font-size: 20px;
     font-weight: bold;
-    color: #2ecc71;
+    color: var(--color-good);
     margin-bottom: 12px;
 }
 
@@ -579,7 +587,7 @@ button {
 
 .multi-recommended-row span:first-child::before {
     content: "おすすめ ";
-    color: #2ecc71;
+    color: var(--color-good);
     font-weight: bold;
 }
 
@@ -809,17 +817,17 @@ details#searchPanel .auto-compare-toggle input {
 }
 
 .gps-status-normal {
-    color: #2ecc71 !important;
+    color: var(--color-good) !important;
     font-weight: bold;
 }
 
 .gps-status-warning {
-    color: #f1c40f !important;
+    color: var(--color-warning) !important;
     font-weight: bold;
 }
 
 .gps-status-error {
-    color: #e74c3c !important;
+    color: var(--color-bad) !important;
     font-weight: bold;
 }
 
@@ -862,15 +870,15 @@ details#searchPanel .auto-compare-toggle input {
 }
 
 .time-good {
-    color: #2ecc71 !important;
+    color: var(--color-good) !important;
 }
 
 .time-bad {
-    color: #e74c3c !important;
+    color: var(--color-bad) !important;
 }
 
 .time-neutral {
-    color: white !important;
+    color: var(--color-equal) !important;
 }
 
 #icArea {
@@ -886,12 +894,12 @@ details#searchPanel .auto-compare-toggle input {
 }
 
 .location-warning {
-    color: #f1c40f !important;
+    color: var(--color-warning) !important;
     font-weight: bold;
 }
 
 .location-error {
-    color: #e74c3c !important;
+    color: var(--color-bad) !important;
     font-weight: bold;
 }
 
@@ -900,12 +908,12 @@ details#searchPanel .auto-compare-toggle input {
 }
 
 .data-update-working {
-    color: #f1c40f !important;
+    color: var(--color-warning) !important;
     font-weight: bold;
 }
 
 .data-update-error {
-    color: #e74c3c !important;
+    color: var(--color-bad) !important;
     font-weight: bold;
 }
 
@@ -952,7 +960,7 @@ details#searchPanel .auto-compare-toggle input {
 }
 
 .data-update-paused {
-    color: #f1c40f !important;
+    color: var(--color-warning) !important;
     font-weight: bold;
 }
 
@@ -973,7 +981,7 @@ details#searchPanel .auto-compare-toggle input {
 }
 
 .route-mode-neutral {
-    color: #f1c40f !important;
+    color: var(--color-warning) !important;
     font-weight: bold;
 }
 
@@ -1020,7 +1028,7 @@ details#searchPanel .auto-compare-toggle input {
 
 
 .arrival-good {
-    color: #2ecc71;
+    color: var(--color-good);
     font-weight: bold;
 }
 
@@ -1030,7 +1038,7 @@ details#searchPanel .auto-compare-toggle input {
 }
 
 .arrival-bad {
-    color: #e74c3c;
+    color: var(--color-bad);
     font-weight: bold;
 }
 
@@ -1184,12 +1192,12 @@ details#searchPanel .origin-row input {
 
 
 .arrival-diff-good {
-    color: #2ecc71;
+    color: var(--color-good);
     font-weight: bold;
 }
 
 .arrival-diff-bad {
-    color: #e74c3c;
+    color: var(--color-bad);
     font-weight: bold;
 }
 
@@ -1199,12 +1207,12 @@ details#searchPanel .origin-row input {
 }
 
 .multi-best-reason.value-good {
-    color: #2ecc71 !important;
+    color: var(--color-good) !important;
     font-weight: bold;
 }
 
 .multi-best-reason.value-high {
-    color: #e74c3c !important;
+    color: var(--color-bad) !important;
     font-weight: bold;
 }
 
@@ -1219,12 +1227,12 @@ details#searchPanel .origin-row input {
 }
 
 .reason-green {
-    color: #2ecc71 !important;
+    color: var(--color-good) !important;
     font-weight: bold;
 }
 
 .reason-red {
-    color: #e74c3c !important;
+    color: var(--color-bad) !important;
     font-weight: bold;
 }
 
@@ -1346,7 +1354,7 @@ details#searchPanel .origin-row input {
 .v2-ic-main {
     font-size: 18px;
     font-weight: bold;
-    color: #2ecc71;
+    color: var(--color-good);
     margin-bottom: 6px;
 }
 
@@ -1370,7 +1378,7 @@ details#searchPanel .origin-row input {
 .v2-exit-excluded-note {
     margin-top: 6px;
     font-size: 12px;
-    color: #f1c40f;
+    color: var(--color-warning);
 }
 
 .v2-ic-error {
@@ -1400,7 +1408,7 @@ details#searchPanel .origin-row input {
 .v2-exit-main {
     font-size: 18px;
     font-weight: bold;
-    color: #f1c40f;
+    color: var(--color-warning);
     margin-bottom: 6px;
 }
 
@@ -1430,7 +1438,7 @@ details#searchPanel .origin-row input {
 
 .v2-best-exit-label {
     font-size: 14px;
-    color: #f1c40f;
+    color: var(--color-warning);
     font-weight: bold;
     margin-bottom: 6px;
 }
@@ -1438,14 +1446,14 @@ details#searchPanel .origin-row input {
 .v2-best-exit-name {
     font-size: 26px;
     font-weight: bold;
-    color: #f1c40f;
+    color: var(--color-warning);
     margin-bottom: 6px;
 }
 
 .v2-best-exit-main {
     font-size: 22px;
     font-weight: bold;
-    color: #f1c40f;
+    color: var(--color-warning);
     margin-bottom: 8px;
 }
 
@@ -1486,7 +1494,7 @@ details#searchPanel .origin-row input {
 .v2-best-main {
     font-size: 22px;
     font-weight: bold;
-    color: #2ecc71;
+    color: var(--color-good);
     margin-bottom: 8px;
 }
 

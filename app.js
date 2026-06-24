@@ -2021,10 +2021,10 @@ async function displayRouteComparison(
         localMinutes
     );
 
-    document
-        .getElementById("dashboardEfficiency")
-        .textContent =
-        efficiencyRate;
+    updateDashboardEfficiencyRate(
+        highwayMinutes,
+        localMinutes
+    );
 
     if (!suppressDashboardSummary) {
         document
@@ -6274,7 +6274,7 @@ function updateDashboardWithBestEntranceIcV2() {
         "時間短縮",
         "ETC料金"
     );
-    setDashboardV2EntranceMode(Boolean(best));
+    setDashboardV2EntranceMode(true);
     setDashboardV2ExitMode(false);
 
     const dashboardCard =
@@ -6426,14 +6426,34 @@ function updateDashboardWithBestEntranceIcV2() {
         }
 
         if (dashboardEfficiency) {
-            dashboardEfficiency.textContent = "--";
+            dashboardEfficiency.textContent =
+                reference
+                    ? formatV2SavingText(
+                        reference.differenceFromAllLocal
+                    ).replace(/<br>/g, " ")
+                    : "--";
         }
 
         if (dashboardCost) {
-            dashboardCost.textContent = "有料回避";
+            dashboardCost.innerHTML =
+                reference
+                    ? createEtcEstimateHtml(
+                        reference.estimatedToll,
+                        reference.tollLabel
+                    )
+                    : "--";
         }
 
         updateDashboardTimeColors(
+            reference
+                ? reference.totalMinutes
+                : null,
+            reference
+                ? reference.allLocalMinutes
+                : allLocalMinutes
+        );
+
+        updateDashboardEfficiencyRate(
             reference
                 ? reference.totalMinutes
                 : null,
@@ -6534,6 +6554,11 @@ function updateDashboardWithBestEntranceIcV2() {
         best.totalMinutes,
         best.allLocalMinutes
     );
+
+    updateDashboardEfficiencyRate(
+        best.totalMinutes,
+        best.allLocalMinutes
+    );
 }
 
 function updateDashboardWithBestExitIcV2() {
@@ -6546,7 +6571,7 @@ function updateDashboardWithBestExitIcV2() {
         "到着差"
     );
     setDashboardV2EntranceMode(false);
-    setDashboardV2ExitMode(Boolean(best));
+    setDashboardV2ExitMode(true);
 
     const dashboardCard =
         document.querySelector(".dashboard-card");
@@ -6693,14 +6718,33 @@ function updateDashboardWithBestExitIcV2() {
         }
 
         if (dashboardEfficiency) {
-            dashboardEfficiency.textContent = "--";
+            dashboardEfficiency.textContent =
+                reference
+                    ? formatExitV2SavingText(
+                        reference.savedToll
+                    ).replace(/<br>/g, " ")
+                    : "--";
         }
 
         if (dashboardCost) {
-            dashboardCost.textContent = "--";
+            dashboardCost.textContent =
+                reference
+                    ? formatExitV2DelayText(
+                        reference.differenceFromAllHighway
+                    ).replace(/<br>/g, " ")
+                    : "--";
         }
 
         updateDashboardTimeColors(
+            reference
+                ? reference.allHighwayMinutes
+                : getAllHighwayMinutesFromExitV2Results(),
+            reference
+                ? reference.totalMinutes
+                : null
+        );
+
+        updateDashboardEfficiencyRate(
             reference
                 ? reference.allHighwayMinutes
                 : getAllHighwayMinutesFromExitV2Results(),
@@ -6799,6 +6843,11 @@ function updateDashboardWithBestExitIcV2() {
         best.allHighwayMinutes,
         best.totalMinutes
     );
+
+    updateDashboardEfficiencyRate(
+        best.allHighwayMinutes,
+        best.totalMinutes
+    );
 }
 
 function setDashboardInfoLabels(
@@ -6825,6 +6874,68 @@ function setDashboardInfoLabels(
         costLabel.textContent =
             costLabelText;
     }
+}
+
+function updateDashboardEfficiencyRate(
+    highwayMinutes,
+    localMinutes
+) {
+
+    const row =
+        document.getElementById(
+            "dashboardEfficiencyRateRow"
+        );
+
+    const value =
+        document.getElementById(
+            "dashboardEfficiencyRateValue"
+        );
+
+    if (!row || !value) {
+        return;
+    }
+
+    const highwayValue =
+        Number(highwayMinutes);
+
+    const localValue =
+        Number(localMinutes);
+
+    value.classList.remove(
+        "efficiency-low",
+        "efficiency-equal",
+        "efficiency-high"
+    );
+
+    if (
+        !Number.isFinite(highwayValue) ||
+        !Number.isFinite(localValue) ||
+        highwayValue <= 0 ||
+        localValue <= 0
+    ) {
+        value.textContent = "--";
+        row.hidden = true;
+        return;
+    }
+
+    const efficiencyRate =
+        localValue / highwayValue;
+
+    value.textContent =
+        efficiencyRate.toFixed(1) +
+        "倍";
+
+    if (efficiencyRate < 1.8) {
+        value.classList.add("efficiency-low");
+    }
+    else if (efficiencyRate <= 2.2) {
+        value.classList.add("efficiency-equal");
+    }
+    else {
+        value.classList.add("efficiency-high");
+    }
+
+    row.hidden = false;
 }
 
 function setDashboardV2EntranceMode(isActive) {

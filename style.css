@@ -150,9 +150,14 @@ button {
 
 .dashboard-info {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
     margin-top: 15px;
+}
+
+.v2-dashboard-entrance-active .dashboard-info,
+.v2-dashboard-exit-active .dashboard-info {
+    grid-template-columns: 1fr 1fr 1fr;
 }
 
 .dashboard-info div {
@@ -161,6 +166,15 @@ button {
     padding: 8px 4px;
     font-size: 12px;
     text-align: center;
+}
+
+.dashboard-info-extra {
+    display: none;
+}
+
+.v2-dashboard-entrance-active .dashboard-info-extra,
+.v2-dashboard-exit-active .dashboard-info-extra {
+    display: block;
 }
 
 .dashboard-info span {
@@ -176,6 +190,37 @@ button {
     font-size: 12px !important;
     font-weight: normal !important;
     margin-top: 0 !important;
+}
+
+.dashboard-efficiency-rate {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: #222;
+    border: 1px solid #444;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.dashboard-efficiency-rate-label {
+    color: var(--color-text-main);
+}
+
+.dashboard-efficiency-rate-value {
+    margin-left: 6px;
+}
+
+.dashboard-efficiency-rate-value.efficiency-low {
+    color: var(--color-bad);
+}
+
+.dashboard-efficiency-rate-value.efficiency-equal {
+    color: var(--color-equal);
+}
+
+.dashboard-efficiency-rate-value.efficiency-high {
+    color: var(--color-good);
 }
 
 #dashboardReason {

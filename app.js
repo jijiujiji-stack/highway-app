@@ -157,6 +157,28 @@ function isShutoIc(ic) {
     );
 }
 
+function formatIcDisplayName(ic) {
+    if (!ic) {
+        return "";
+    }
+
+    const displayName =
+        (ic.displayName || "")
+            .replace(/（首都高）$/, "");
+
+    return isShutoIc(ic)
+        ? "🛣 " + displayName
+        : displayName;
+}
+
+function formatTollRouteLabel(startIc, endIc) {
+    return (
+        formatIcDisplayName(startIc) +
+        " → " +
+        formatIcDisplayName(endIc)
+    );
+}
+
 function getShutoTollEstimateForIcPair(startIc, endIc) {
     if (
         isShutoIc(startIc) ||
@@ -1013,9 +1035,11 @@ let lastNearestIcDistanceKm = null;
 let lastTollStartIcName = "";
 let lastTollStartIcGoogleName = "";
 let lastTollStartIcOrder = null;
+let lastTollStartIc = null;
 let lastTollEndIcName = "";
 let lastTollEndIcGoogleName = "";
 let lastTollEndIcOrder = null;
+let lastTollEndIc = null;
 
 
 let lastGpsReceivedTime = null;
@@ -2384,6 +2408,8 @@ async function estimateMainHighwayToll(
 
         lastTollStartIcName =
             startIc.displayName;
+        lastTollStartIc =
+            startIc;
 
         lastTollStartIcGoogleName =
             startIc.googleName;
@@ -2393,6 +2419,8 @@ async function estimateMainHighwayToll(
 
         lastTollEndIcName =
             endIc.displayName;
+        lastTollEndIc =
+            endIc;
 
         lastTollEndIcGoogleName =
             endIc.googleName;
@@ -2413,13 +2441,9 @@ async function estimateMainHighwayToll(
                 amount: shutoToll,
                 label:
                     "料金計算：" +
-                    startIc.displayName +
-                    "→" +
-                    endIc.displayName +
-                    (
-                        shutoToll > 0
-                            ? " / 首都高概算含む"
-                            : ""
+                    formatTollRouteLabel(
+                        startIc,
+                        endIc
                     )
             };
         }
@@ -2449,13 +2473,9 @@ async function estimateMainHighwayToll(
                 baseToll + shutoToll,
             label:
                 "料金計算：" +
-                startIc.displayName +
-                "→" +
-                endIc.displayName +
-                (
-                    shutoToll > 0
-                        ? " / 首都高概算含む"
-                        : ""
+                formatTollRouteLabel(
+                    startIc,
+                    endIc
                 )
         };
 
@@ -3801,6 +3821,7 @@ async function findDestinationNearestIcForAutoExitComparison(
         displayName: nearestInfo.exit.displayName,
         googleName: nearestInfo.exit.googleName,
         order: nearestInfo.exit.order ?? null,
+        roadType: nearestInfo.exit.roadType,
         distanceKm: nearestInfo.distanceKm
     };
 }
@@ -4573,15 +4594,11 @@ async function searchEntranceIcComparisonV2(options = {}) {
                 totalDistanceKm: totalDistanceKm,
                 estimatedToll: estimatedToll,
                 tollLabel:
-                    exit.displayName &&
-                    lastTollEndIcName
-                        ? exit.displayName +
-                        "→" +
-                        lastTollEndIcName +
-                        (
-                            shutoToll > 0
-                                ? " / 首都高概算含む"
-                                : ""
+                    exit &&
+                    lastTollEndIc
+                        ? formatTollRouteLabel(
+                            exit,
+                            lastTollEndIc
                         )
                         : "",
                 allLocalMinutes: allLocalMinutes,
@@ -4614,11 +4631,12 @@ async function searchEntranceIcComparisonV2(options = {}) {
                 totalDistanceKm: null,
                 estimatedToll: null,
                 tollLabel:
-                    exit.displayName &&
-                    lastTollEndIcName
-                        ? exit.displayName +
-                        "→" +
-                        lastTollEndIcName
+                    exit &&
+                    lastTollEndIc
+                        ? formatTollRouteLabel(
+                            exit,
+                            lastTollEndIc
+                        )
                         : "",
                 allLocalMinutes: allLocalMinutes,
                 allLocalDistanceKm: allLocalDistanceKm,
@@ -4799,15 +4817,10 @@ async function searchExitIcComparisonV2(options = {}) {
                 exitTollEstimate: exitTollEstimate,
                 tollLabel:
                     startIc &&
-                    startIc.displayName &&
-                    exit.displayName
-                        ? startIc.displayName +
-                        "→" +
-                        exit.displayName +
-                        (
-                            shutoToll > 0
-                                ? " / 首都高概算含む"
-                                : ""
+                    exit
+                        ? formatTollRouteLabel(
+                            startIc,
+                            exit
                         )
                         : "",
                 savedToll: savedToll,
@@ -5429,6 +5442,8 @@ async function prepareV2SimpleDiagnosticCandidates(
         highwayStartInfo.distanceKm;
     lastTollStartIcName =
         highwayStart.displayName;
+    lastTollStartIc =
+        highwayStart;
     lastTollStartIcGoogleName =
         highwayStart.googleName;
     lastTollStartIcOrder =
@@ -5457,6 +5472,8 @@ async function prepareV2SimpleDiagnosticCandidates(
                     destinationNearestInfo.exit.googleName,
                 order:
                     destinationNearestInfo.exit.order ?? null,
+                roadType:
+                    destinationNearestInfo.exit.roadType,
                 distanceKm:
                     destinationNearestInfo.distanceKm
             }
@@ -5465,10 +5482,15 @@ async function prepareV2SimpleDiagnosticCandidates(
     if (destinationNearestIc) {
         lastTollEndIcName =
             destinationNearestIc.displayName;
+        lastTollEndIc =
+            destinationNearestIc;
         lastTollEndIcGoogleName =
             destinationNearestIc.googleName;
         lastTollEndIcOrder =
             destinationNearestIc.order;
+    } else {
+        lastTollEndIc =
+            null;
     }
 
     const selectedExits =
@@ -8007,6 +8029,9 @@ async function searchAutoExitIcComparison(
     lastTollStartIcName =
         highwayStart.displayName;
 
+    lastTollStartIc =
+        highwayStart;
+
     lastTollStartIcGoogleName =
         highwayStart.googleName;
 
@@ -8091,6 +8116,9 @@ async function searchAutoExitIcComparison(
         lastTollEndIcName =
             destinationNearestIc.displayName;
 
+        lastTollEndIc =
+            destinationNearestIc;
+
         lastTollEndIcGoogleName =
             destinationNearestIc.googleName;
 
@@ -8100,6 +8128,9 @@ async function searchAutoExitIcComparison(
         reasonText +=
             " / 目的地側IC：" +
             lastTollEndIcName;
+    } else {
+        lastTollEndIc =
+            null;
     }
 
     reasonText =
@@ -10728,6 +10759,9 @@ async function findNearestIcIndexByPoint(
 
     lastTollStartIcName =
         exits[nearestIndex].displayName;
+
+    lastTollStartIc =
+        exits[nearestIndex];
 
     lastTollStartIcGoogleName =
         exits[nearestIndex].googleName;

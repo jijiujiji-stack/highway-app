@@ -6567,8 +6567,8 @@ function updateDashboardWithBestExitIcV2() {
         getBestExitIcV2(lastExitIcV2Results);
 
     setDashboardInfoLabels(
-        "節約額",
-        "到着差"
+        "到着差",
+        "節約額"
     );
     setDashboardV2EntranceMode(false);
     setDashboardV2ExitMode(true);
@@ -6720,8 +6720,8 @@ function updateDashboardWithBestExitIcV2() {
         if (dashboardEfficiency) {
             dashboardEfficiency.textContent =
                 reference
-                    ? formatExitV2SavingText(
-                        reference.savedToll
+                    ? formatExitV2DelayText(
+                        reference.differenceFromAllHighway
                     ).replace(/<br>/g, " ")
                     : "--";
         }
@@ -6729,8 +6729,8 @@ function updateDashboardWithBestExitIcV2() {
         if (dashboardCost) {
             dashboardCost.textContent =
                 reference
-                    ? formatExitV2DelayText(
-                        reference.differenceFromAllHighway
+                    ? formatExitV2SavingText(
+                        reference.savedToll
                     ).replace(/<br>/g, " ")
                     : "--";
         }
@@ -6829,14 +6829,14 @@ function updateDashboardWithBestExitIcV2() {
 
     if (dashboardEfficiency) {
         dashboardEfficiency.textContent =
-            best.savedToll.toLocaleString() +
-            "円節約";
+            best.differenceFromAllHighway +
+            "分遅い";
     }
 
     if (dashboardCost) {
         dashboardCost.textContent =
-            best.differenceFromAllHighway +
-            "分遅い";
+            best.savedToll.toLocaleString() +
+            "円節約";
     }
 
     updateDashboardTimeColors(
@@ -6914,7 +6914,7 @@ function updateDashboardEfficiencyRate(
         localValue <= 0
     ) {
         value.textContent = "--";
-        row.hidden = true;
+        row.hidden = false;
         return;
     }
 

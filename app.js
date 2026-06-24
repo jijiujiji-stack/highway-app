@@ -1481,7 +1481,7 @@ async function searchRoute() {
 
         closeSearchPanel();
 
-        scrollToTopPanel();
+        scrollToDashboardCard();
 
 
     } catch (error) {
@@ -2784,7 +2784,7 @@ async function searchFromCurrentLocation(
         }
 
         if (shouldClosePanel) {
-            scrollToTopPanel();
+            scrollToDashboardCard();
         }
 
 
@@ -8269,7 +8269,7 @@ async function searchAutoExitIcComparison(
     }
 
     if (shouldClosePanel) {
-        scrollToTopPanel();
+        scrollToDashboardCard();
     }
 
     } catch (error) {
@@ -10747,10 +10747,24 @@ function resetMultiExitIcResult() {
         "候補IC自動比較は未実行です";
 }
 
-function scrollToTopPanel() {
+function scrollToDashboardCard() {
+
+    const dashboard =
+        document.querySelector(
+            ".dashboard-card"
+        );
+
+    if (!dashboard) {
+        return;
+    }
+
+    const top =
+        dashboard.getBoundingClientRect().top +
+        window.scrollY -
+        8;
 
     window.scrollTo({
-        top: 0,
+        top: Math.max(0, top),
         behavior: "smooth"
     });
 }

@@ -18,11 +18,120 @@ const PROD_IC_CANDIDATE_COUNT = 5;
 let isRealDriveTestMode = false;
 
 let apiUsageStats = {
-    routeRequests: 0,
-    routeSearches: 0
+    dateKey: "",
+    monthKey: "",
+    routeSearches: 0,
+    proToday: 0,
+    essToday: 0,
+    proMonth: 0,
+    essMonth: 0
 };
 
+const API_USAGE_STORAGE_KEY =
+    "highwayCospaNaviApiUsageStats";
+
+function getApiUsageDateInfo() {
+    const now =
+        new Date();
+
+    const year =
+        now.getFullYear();
+
+    const month =
+        String(now.getMonth() + 1).padStart(2, "0");
+
+    const day =
+        String(now.getDate()).padStart(2, "0");
+
+    return {
+        dateKey:
+            year + "-" + month + "-" + day,
+        monthKey:
+            year + "-" + month,
+        monthLabel:
+            (now.getMonth() + 1) + "月累計"
+    };
+}
+
+function saveApiUsageStats() {
+    try {
+        localStorage.setItem(
+            API_USAGE_STORAGE_KEY,
+            JSON.stringify(apiUsageStats)
+        );
+    } catch (error) {
+        console.warn(
+            "API使用量の保存に失敗しました",
+            error
+        );
+    }
+}
+
+function resetApiUsageToday(dateKey) {
+    apiUsageStats.dateKey =
+        dateKey;
+
+    apiUsageStats.routeSearches = 0;
+    apiUsageStats.proToday = 0;
+    apiUsageStats.essToday = 0;
+}
+
+function resetApiUsageMonth(monthKey) {
+    apiUsageStats.monthKey =
+        monthKey;
+
+    apiUsageStats.proMonth = 0;
+    apiUsageStats.essMonth = 0;
+}
+
+function normalizeApiUsageStats() {
+    const dateInfo =
+        getApiUsageDateInfo();
+
+    let changed = false;
+
+    if (apiUsageStats.monthKey !== dateInfo.monthKey) {
+        resetApiUsageMonth(dateInfo.monthKey);
+
+        changed = true;
+    }
+
+    if (apiUsageStats.dateKey !== dateInfo.dateKey) {
+        resetApiUsageToday(dateInfo.dateKey);
+
+        changed = true;
+    }
+
+    if (changed) {
+        saveApiUsageStats();
+    }
+}
+
+function loadApiUsageStats() {
+    try {
+        const rawStats =
+            localStorage.getItem(API_USAGE_STORAGE_KEY);
+
+        if (rawStats) {
+            apiUsageStats = {
+                ...apiUsageStats,
+                ...JSON.parse(rawStats)
+            };
+        }
+    } catch (error) {
+        console.warn(
+            "API使用量の読み込みに失敗しました",
+            error
+        );
+    }
+
+    normalizeApiUsageStats();
+    saveApiUsageStats();
+}
+
 function updateApiUsagePanel() {
+    normalizeApiUsageStats();
+
     const searchesElement =
         document.getElementById("apiUsageSearches");
 
@@ -40,17 +149,55 @@ function updateApiUsagePanel() {
         return;
     }
 
-    const estimatedMonthly =
-        apiUsageStats.routeRequests * 30;
+    const dateInfo =
+        getApiUsageDateInfo();
+
+    const searchesLabelElement =
+        searchesElement.parentElement?.firstChild;
+
+    const routeRequestsLabelElement =
+        routeRequestsElement.parentElement?.firstChild;
+
+    const monthlyLabelElement =
+        monthlyElement.parentElement?.firstChild;
+
+    if (searchesLabelElement) {
+        searchesLabelElement.textContent =
+            "API目安";
+    }
+
+    if (routeRequestsLabelElement) {
+        routeRequestsLabelElement.textContent =
+            "推定Routes";
+    }
+
+    if (monthlyLabelElement) {
+        monthlyLabelElement.textContent =
+            dateInfo.monthLabel;
+    }
+
+    const proToday =
+        Number(apiUsageStats.proToday) || 0;
+
+    const essToday =
+        Number(apiUsageStats.essToday) || 0;
+
+    const proMonth =
+        Number(apiUsageStats.proMonth) || 0;
+
+    const essMonth =
+        Number(apiUsageStats.essMonth) || 0;
 
     searchesElement.textContent =
         "今日 " + apiUsageStats.routeSearches + "回";
 
     routeRequestsElement.textContent =
-        "推定Routes " + apiUsageStats.routeRequests + "回";
+        "Pro " + proToday +
+        "\nEss " + essToday;
 
     monthlyElement.textContent =
-        estimatedMonthly + "回";
+        "Pro " + proMonth +
+        "\nEss " + essMonth;
 }
 
 function isProbablyNoTollRouteByMetrics(
@@ -117,12 +264,37 @@ function updateProbablyNoTollRouteNote(
 }
 
 function incrementRouteSearchUsage() {
+    normalizeApiUsageStats();
     apiUsageStats.routeSearches++;
+    saveApiUsageStats();
     updateApiUsagePanel();
 }
 
-function incrementRouteRequestUsage() {
-    apiUsageStats.routeRequests++;
+function incrementRouteRequestUsage(routeTier = "pro") {
+    normalizeApiUsageStats();
+
+    if (routeTier === "ess") {
+        apiUsageStats.essToday++;
+        apiUsageStats.essMonth++;
+    }
+    else {
+        apiUsageStats.proToday++;
+        apiUsageStats.proMonth++;
+    }
+
+    saveApiUsageStats();
+    updateApiUsagePanel();
+}
+
+loadApiUsageStats();
+
+if (document.readyState === "loading") {
+    document.addEventListener(
+        "DOMContentLoaded",
+        updateApiUsagePanel
+    );
+}
+else {
     updateApiUsagePanel();
 }
 
@@ -1621,7 +1793,7 @@ async function getHighwayRoute(
     destinationLatLng = null
 ) {
 
-    incrementRouteRequestUsage();
+    incrementRouteRequestUsage("pro");
 
     const response = await fetch(
         "https://routes.googleapis.com/directions/v2:computeRoutes",
@@ -1694,7 +1866,7 @@ async function getHighwayRouteForTollEstimate(
 ) {
 
     // ETC概算用。TRAFFIC_AWAREなしのためEssentials相当を想定。
-    incrementRouteRequestUsage();
+    incrementRouteRequestUsage("ess");
 
     const response = await fetch(
         "https://routes.googleapis.com/directions/v2:computeRoutes",
@@ -1759,7 +1931,7 @@ async function getLocalRoute(
     destinationLatLng = null
 ) {
 
-    incrementRouteRequestUsage();
+    incrementRouteRequestUsage("pro");
 
     const response = await fetch(
         "https://routes.googleapis.com/directions/v2:computeRoutes",
@@ -2894,7 +3066,7 @@ async function getHighwayRouteFromGps(
     destinationLatLng = null
 ) {
 
-    incrementRouteRequestUsage();
+    incrementRouteRequestUsage("pro");
 
     const response =
         await fetch(
@@ -2972,7 +3144,7 @@ async function getLocalRouteFromGps(
     destinationLatLng = null
 ) {
 
-    incrementRouteRequestUsage();
+    incrementRouteRequestUsage("pro");
 
     const response =
         await fetch(
@@ -4086,7 +4258,7 @@ async function getHighwayRouteForMultiExitComparison(
     destination
 ) {
 
-    incrementRouteRequestUsage();
+    incrementRouteRequestUsage("pro");
 
     const response = await fetch(
         "https://routes.googleapis.com/directions/v2:computeRoutes",
@@ -4146,7 +4318,7 @@ async function getLocalRouteForMultiExitComparison(
     destination
 ) {
 
-    incrementRouteRequestUsage();
+    incrementRouteRequestUsage("pro");
 
     const response = await fetch(
         "https://routes.googleapis.com/directions/v2:computeRoutes",

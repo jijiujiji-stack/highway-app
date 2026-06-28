@@ -1192,7 +1192,7 @@ let currentLongitude = null;
 
 const geocodeLatLngCache = new Map();
 
-const ROUTES_CACHE_TTL_MS = 60 * 1000;
+const ROUTES_CACHE_TTL_MS = 120 * 1000;
 const ROUTES_CACHE_LOCATION_RADIUS_METERS = 100;
 const routesResponseCache = new Map();
 
@@ -1230,17 +1230,107 @@ function createRoutesCacheKey(
     });
 }
 
-function getCachedRoutesResponse(key) {
+function createRoutesCacheRequest(
+    functionName,
+    origin,
+    destination,
+    routeOptions
+) {
+    return {
+        key: createRoutesCacheKey(
+            origin,
+            destination,
+            routeOptions
+        ),
+        functionName: functionName,
+        origin: origin,
+        destination: destination,
+        routeOptionsKey: JSON.stringify(routeOptions)
+    };
+}
+
+function formatRoutesCacheLogValue(value) {
+    if (
+        value &&
+        typeof value === "object" &&
+        value.currentLocation
+    ) {
+        return (
+            "current-location(" +
+            currentLatitude +
+            "," +
+            currentLongitude +
+            ")"
+        );
+    }
+
+    if (typeof value === "object") {
+        return JSON.stringify(value);
+    }
+
+    return String(value ?? "");
+}
+
+function logRoutesCacheResult(
+    result,
+    request,
+    reason = ""
+) {
+    let message =
+        "[Routes Cache " + result + "] " +
+        request.functionName +
+        " origin=" +
+        formatRoutesCacheLogValue(request.origin) +
+        " destination=" +
+        formatRoutesCacheLogValue(request.destination);
+
+    if (reason) {
+        message += " reason=" + reason;
+    }
+
+    console.log(message);
+}
+
+function getCachedRoutesResponse(request) {
     const cached =
-        routesResponseCache.get(key);
+        routesResponseCache.get(request.key);
+
+    if (isAutoReSearchRunning) {
+        logRoutesCacheResult(
+            "MISS",
+            request,
+            "auto-update"
+        );
+        return undefined;
+    }
+
+    if (!cached) {
+        const hasSameRouteOptions =
+            Array.from(routesResponseCache.values())
+                .some(entry =>
+                    entry.routeOptionsKey ===
+                    request.routeOptionsKey
+                );
+
+        logRoutesCacheResult(
+            "MISS",
+            request,
+            hasSameRouteOptions
+                ? "different-key"
+                : "no-cache"
+        );
+        return undefined;
+    }
 
     if (
-        isAutoReSearchRunning ||
-        !cached ||
         currentLatitude === null ||
         currentLongitude === null
     ) {
-        console.log("[Routes Cache MISS]");
+        logRoutesCacheResult(
+            "MISS",
+            request,
+            "location-unavailable"
+        );
         return undefined;
     }
 
@@ -1255,20 +1345,31 @@ function getCachedRoutesResponse(key) {
             currentLongitude
         );
 
-    if (
-        age > ROUTES_CACHE_TTL_MS ||
-        distance > ROUTES_CACHE_LOCATION_RADIUS_METERS
-    ) {
-        routesResponseCache.delete(key);
-        console.log("[Routes Cache MISS]");
+    if (age > ROUTES_CACHE_TTL_MS) {
+        routesResponseCache.delete(request.key);
+        logRoutesCacheResult(
+            "MISS",
+            request,
+            "expired"
+        );
         return undefined;
     }
 
-    console.log("[Routes Cache HIT]");
+    if (distance > ROUTES_CACHE_LOCATION_RADIUS_METERS) {
+        routesResponseCache.delete(request.key);
+        logRoutesCacheResult(
+            "MISS",
+            request,
+            "location-too-far"
+        );
+        return undefined;
+    }
+
+    logRoutesCacheResult("HIT", request);
     return cached.response;
 }
 
-function cacheRoutesResponse(key, response) {
+function cacheRoutesResponse(request, response) {
     if (
         currentLatitude === null ||
         currentLongitude === null
@@ -1276,12 +1377,13 @@ function cacheRoutesResponse(key, response) {
         return;
     }
 
-    routesResponseCache.set(key, {
-        key: key,
+    routesResponseCache.set(request.key, {
+        key: request.key,
         response: response,
         createdAt: Date.now(),
         latitude: currentLatitude,
-        longitude: currentLongitude
+        longitude: currentLongitude,
+        routeOptionsKey: request.routeOptionsKey
     });
 }
 
@@ -1886,7 +1988,8 @@ async function getHighwayRoute(
     destinationLatLng = null
 ) {
 
-    const cacheKey = createRoutesCacheKey(
+    const cacheRequest = createRoutesCacheRequest(
+        "getHighwayRoute",
         createRoutesCacheEndpointKey(origin),
         createRoutesCacheEndpointKey(destination),
         {
@@ -1896,7 +1999,7 @@ async function getHighwayRoute(
         }
     );
 
-    const cachedResponse = getCachedRoutesResponse(cacheKey);
+    const cachedResponse = getCachedRoutesResponse(cacheRequest);
 
     if (cachedResponse !== undefined) {
         return cachedResponse;
@@ -1968,7 +2071,7 @@ async function getHighwayRoute(
 
     const route = data.routes[0];
 
-    cacheRoutesResponse(cacheKey, route);
+    cacheRoutesResponse(cacheRequest, route);
 
     return route;
 }
@@ -2044,7 +2147,8 @@ async function getLocalRoute(
     destinationLatLng = null
 ) {
 
-    const cacheKey = createRoutesCacheKey(
+    const cacheRequest = createRoutesCacheRequest(
+        "getLocalRoute",
         createRoutesCacheEndpointKey(origin),
         createRoutesCacheEndpointKey(destination),
         {
@@ -2054,7 +2158,7 @@ async function getLocalRoute(
         }
     );
 
-    const cachedResponse = getCachedRoutesResponse(cacheKey);
+    const cachedResponse = getCachedRoutesResponse(cacheRequest);
 
     if (cachedResponse !== undefined) {
         return cachedResponse;
@@ -2125,7 +2229,7 @@ async function getLocalRoute(
 
     const route = data.routes[0];
 
-    cacheRoutesResponse(cacheKey, route);
+    cacheRoutesResponse(cacheRequest, route);
 
     return route;
 }
@@ -3199,7 +3303,8 @@ async function getHighwayRouteFromGps(
     destinationLatLng = null
 ) {
 
-    const cacheKey = createRoutesCacheKey(
+    const cacheRequest = createRoutesCacheRequest(
+        "getHighwayRouteFromGps",
         createRoutesCacheEndpointKey(null, true),
         createRoutesCacheEndpointKey(destination),
         {
@@ -3209,7 +3314,7 @@ async function getHighwayRouteFromGps(
         }
     );
 
-    const cachedResponse = getCachedRoutesResponse(cacheKey);
+    const cachedResponse = getCachedRoutesResponse(cacheRequest);
 
     if (cachedResponse !== undefined) {
         return cachedResponse;
@@ -3286,7 +3391,7 @@ async function getHighwayRouteFromGps(
 
     const route = data.routes[0];
 
-    cacheRoutesResponse(cacheKey, route);
+    cacheRoutesResponse(cacheRequest, route);
 
     return route;
 }
@@ -3297,7 +3402,8 @@ async function getLocalRouteFromGps(
     destinationLatLng = null
 ) {
 
-    const cacheKey = createRoutesCacheKey(
+    const cacheRequest = createRoutesCacheRequest(
+        "getLocalRouteFromGps",
         createRoutesCacheEndpointKey(null, true),
         createRoutesCacheEndpointKey(destination),
         {
@@ -3307,7 +3413,7 @@ async function getLocalRouteFromGps(
         }
     );
 
-    const cachedResponse = getCachedRoutesResponse(cacheKey);
+    const cachedResponse = getCachedRoutesResponse(cacheRequest);
 
     if (cachedResponse !== undefined) {
         return cachedResponse;
@@ -3388,7 +3494,7 @@ async function getLocalRouteFromGps(
 
     const route = data.routes[0];
 
-    cacheRoutesResponse(cacheKey, route);
+    cacheRoutesResponse(cacheRequest, route);
 
     return route;
 
@@ -4431,7 +4537,8 @@ async function getHighwayRouteForMultiExitComparison(
     destination
 ) {
 
-    const cacheKey = createRoutesCacheKey(
+    const cacheRequest = createRoutesCacheRequest(
+        "getHighwayRouteForMultiExitComparison",
         createRoutesCacheEndpointKey(
             origin,
             isCurrentLocationRouteOrigin(origin)
@@ -4444,7 +4551,7 @@ async function getHighwayRouteForMultiExitComparison(
         }
     );
 
-    const cachedResponse = getCachedRoutesResponse(cacheKey);
+    const cachedResponse = getCachedRoutesResponse(cacheRequest);
 
     if (cachedResponse !== undefined) {
         return cachedResponse;
@@ -4504,7 +4611,7 @@ async function getHighwayRouteForMultiExitComparison(
 
     const route = data.routes[0];
 
-    cacheRoutesResponse(cacheKey, route);
+    cacheRoutesResponse(cacheRequest, route);
 
     return route;
 }
@@ -4514,7 +4621,8 @@ async function getLocalRouteForMultiExitComparison(
     destination
 ) {
 
-    const cacheKey = createRoutesCacheKey(
+    const cacheRequest = createRoutesCacheRequest(
+        "getLocalRouteForMultiExitComparison",
         createRoutesCacheEndpointKey(
             origin,
             isCurrentLocationRouteOrigin(origin)
@@ -4527,7 +4635,7 @@ async function getLocalRouteForMultiExitComparison(
         }
     );
 
-    const cachedResponse = getCachedRoutesResponse(cacheKey);
+    const cachedResponse = getCachedRoutesResponse(cacheRequest);
 
     if (cachedResponse !== undefined) {
         return cachedResponse;
@@ -4587,7 +4695,7 @@ async function getLocalRouteForMultiExitComparison(
 
     const route = data.routes[0];
 
-    cacheRoutesResponse(cacheKey, route);
+    cacheRoutesResponse(cacheRequest, route);
 
     return route;
 }

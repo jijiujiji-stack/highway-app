@@ -2460,10 +2460,15 @@ async function displayRouteComparison(
         costPerMinute +
         " 円/分";
 
-    let valueJudge =
-        "料金を払う価値：低い";
+    let valueJudge = "";
 
-    if (costPerMinute <= 20) {
+    if (estimatedToll === 0) {
+        valueJudge =
+            savedMinutes >= 3
+                ? "料金判断：無料で時間短縮"
+                : "料金判断：料金差なし";
+    }
+    else if (costPerMinute <= 20) {
         valueJudge =
             "料金を払う価値：非常に高い";
     }
@@ -2478,6 +2483,10 @@ async function displayRouteComparison(
     else if (costPerMinute <= 100) {
         valueJudge =
             "料金を払う価値：やや低い";
+    }
+    else {
+        valueJudge =
+            "料金を払う価値：低い";
     }
 
     document
@@ -2557,7 +2566,12 @@ async function displayRouteComparison(
 
         dashboardValueJudge.className = "";
 
-        if (
+        if (estimatedToll === 0) {
+            dashboardValueJudge.classList.add(
+                "value-super"
+            );
+        }
+        else if (
             valueJudge ===
             "料金を払う価値：非常に高い"
         ) {

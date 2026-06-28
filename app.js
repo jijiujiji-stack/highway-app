@@ -2902,14 +2902,8 @@ async function estimateMainHighwayToll(
         if (
             startIc.googleName === endIc.googleName
         ) {
-            const shutoToll =
-                getShutoTollEstimateForIcPair(
-                    startIc,
-                    endIc
-                );
-
             return {
-                amount: shutoToll,
+                amount: 0,
                 label:
                     "料金計算：" +
                     formatTollRouteLabel(

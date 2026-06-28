@@ -1192,6 +1192,99 @@ let currentLongitude = null;
 
 const geocodeLatLngCache = new Map();
 
+const ROUTES_CACHE_TTL_MS = 60 * 1000;
+const ROUTES_CACHE_LOCATION_RADIUS_METERS = 100;
+const routesResponseCache = new Map();
+
+function createRoutesCacheEndpointKey(
+    value,
+    isCurrentLocation = false
+) {
+    if (isCurrentLocation) {
+        return {
+            currentLocation: true
+        };
+    }
+
+    return value;
+}
+
+function isCurrentLocationRouteOrigin(value) {
+    return Boolean(
+        value &&
+        typeof value === "object" &&
+        value.lat !== undefined &&
+        value.lng !== undefined
+    );
+}
+
+function createRoutesCacheKey(
+    origin,
+    destination,
+    routeOptions
+) {
+    return JSON.stringify({
+        origin: origin,
+        destination: destination,
+        routeOptions: routeOptions
+    });
+}
+
+function getCachedRoutesResponse(key) {
+    const cached =
+        routesResponseCache.get(key);
+
+    if (
+        isAutoReSearchRunning ||
+        !cached ||
+        currentLatitude === null ||
+        currentLongitude === null
+    ) {
+        console.log("[Routes Cache MISS]");
+        return undefined;
+    }
+
+    const age =
+        Date.now() - cached.createdAt;
+
+    const distance =
+        calculateDistance(
+            cached.latitude,
+            cached.longitude,
+            currentLatitude,
+            currentLongitude
+        );
+
+    if (
+        age > ROUTES_CACHE_TTL_MS ||
+        distance > ROUTES_CACHE_LOCATION_RADIUS_METERS
+    ) {
+        routesResponseCache.delete(key);
+        console.log("[Routes Cache MISS]");
+        return undefined;
+    }
+
+    console.log("[Routes Cache HIT]");
+    return cached.response;
+}
+
+function cacheRoutesResponse(key, response) {
+    if (
+        currentLatitude === null ||
+        currentLongitude === null
+    ) {
+        return;
+    }
+
+    routesResponseCache.set(key, {
+        key: key,
+        response: response,
+        createdAt: Date.now(),
+        latitude: currentLatitude,
+        longitude: currentLongitude
+    });
+}
+
 let lastSearchLatitude = null;
 let lastSearchLongitude = null;
 
@@ -1793,6 +1886,22 @@ async function getHighwayRoute(
     destinationLatLng = null
 ) {
 
+    const cacheKey = createRoutesCacheKey(
+        createRoutesCacheEndpointKey(origin),
+        createRoutesCacheEndpointKey(destination),
+        {
+            travelMode: "DRIVE",
+            routingPreference: "TRAFFIC_AWARE",
+            avoidTolls: false
+        }
+    );
+
+    const cachedResponse = getCachedRoutesResponse(cacheKey);
+
+    if (cachedResponse !== undefined) {
+        return cachedResponse;
+    }
+
     incrementRouteRequestUsage("pro");
 
     const response = await fetch(
@@ -1857,7 +1966,11 @@ async function getHighwayRoute(
     }
 
 
-    return data.routes[0];
+    const route = data.routes[0];
+
+    cacheRoutesResponse(cacheKey, route);
+
+    return route;
 }
 
 async function getHighwayRouteForTollEstimate(
@@ -1931,6 +2044,22 @@ async function getLocalRoute(
     destinationLatLng = null
 ) {
 
+    const cacheKey = createRoutesCacheKey(
+        createRoutesCacheEndpointKey(origin),
+        createRoutesCacheEndpointKey(destination),
+        {
+            travelMode: "DRIVE",
+            routingPreference: "TRAFFIC_AWARE",
+            avoidTolls: true
+        }
+    );
+
+    const cachedResponse = getCachedRoutesResponse(cacheKey);
+
+    if (cachedResponse !== undefined) {
+        return cachedResponse;
+    }
+
     incrementRouteRequestUsage("pro");
 
     const response = await fetch(
@@ -1994,7 +2123,11 @@ async function getLocalRoute(
         );
     }
 
-    return data.routes[0];
+    const route = data.routes[0];
+
+    cacheRoutesResponse(cacheKey, route);
+
+    return route;
 }
 
 async function displayRouteComparison(
@@ -3066,6 +3199,22 @@ async function getHighwayRouteFromGps(
     destinationLatLng = null
 ) {
 
+    const cacheKey = createRoutesCacheKey(
+        createRoutesCacheEndpointKey(null, true),
+        createRoutesCacheEndpointKey(destination),
+        {
+            travelMode: "DRIVE",
+            routingPreference: "TRAFFIC_AWARE",
+            avoidTolls: false
+        }
+    );
+
+    const cachedResponse = getCachedRoutesResponse(cacheKey);
+
+    if (cachedResponse !== undefined) {
+        return cachedResponse;
+    }
+
     incrementRouteRequestUsage("pro");
 
     const response =
@@ -3135,7 +3284,11 @@ async function getHighwayRouteFromGps(
         );
     }
 
-    return data.routes[0];
+    const route = data.routes[0];
+
+    cacheRoutesResponse(cacheKey, route);
+
+    return route;
 }
 
 async function getLocalRouteFromGps(
@@ -3143,6 +3296,22 @@ async function getLocalRouteFromGps(
     destinationPlaceId = "",
     destinationLatLng = null
 ) {
+
+    const cacheKey = createRoutesCacheKey(
+        createRoutesCacheEndpointKey(null, true),
+        createRoutesCacheEndpointKey(destination),
+        {
+            travelMode: "DRIVE",
+            routingPreference: "TRAFFIC_AWARE",
+            avoidTolls: true
+        }
+    );
+
+    const cachedResponse = getCachedRoutesResponse(cacheKey);
+
+    if (cachedResponse !== undefined) {
+        return cachedResponse;
+    }
 
     incrementRouteRequestUsage("pro");
 
@@ -3217,7 +3386,11 @@ async function getLocalRouteFromGps(
         );
     }
 
-    return data.routes[0];
+    const route = data.routes[0];
+
+    cacheRoutesResponse(cacheKey, route);
+
+    return route;
 
 }
 
@@ -4258,6 +4431,25 @@ async function getHighwayRouteForMultiExitComparison(
     destination
 ) {
 
+    const cacheKey = createRoutesCacheKey(
+        createRoutesCacheEndpointKey(
+            origin,
+            isCurrentLocationRouteOrigin(origin)
+        ),
+        createRoutesCacheEndpointKey(destination),
+        {
+            travelMode: "DRIVE",
+            routingPreference: "TRAFFIC_AWARE",
+            avoidTolls: false
+        }
+    );
+
+    const cachedResponse = getCachedRoutesResponse(cacheKey);
+
+    if (cachedResponse !== undefined) {
+        return cachedResponse;
+    }
+
     incrementRouteRequestUsage("pro");
 
     const response = await fetch(
@@ -4310,13 +4502,36 @@ async function getHighwayRouteForMultiExitComparison(
         );
     }
 
-    return data.routes[0];
+    const route = data.routes[0];
+
+    cacheRoutesResponse(cacheKey, route);
+
+    return route;
 }
 
 async function getLocalRouteForMultiExitComparison(
     origin,
     destination
 ) {
+
+    const cacheKey = createRoutesCacheKey(
+        createRoutesCacheEndpointKey(
+            origin,
+            isCurrentLocationRouteOrigin(origin)
+        ),
+        createRoutesCacheEndpointKey(destination),
+        {
+            travelMode: "DRIVE",
+            routingPreference: "TRAFFIC_AWARE",
+            avoidTolls: true
+        }
+    );
+
+    const cachedResponse = getCachedRoutesResponse(cacheKey);
+
+    if (cachedResponse !== undefined) {
+        return cachedResponse;
+    }
 
     incrementRouteRequestUsage("pro");
 
@@ -4370,7 +4585,11 @@ async function getLocalRouteForMultiExitComparison(
         );
     }
 
-    return data.routes[0];
+    const route = data.routes[0];
+
+    cacheRoutesResponse(cacheKey, route);
+
+    return route;
 }
 
 async function searchMultiExitIcComparison() {

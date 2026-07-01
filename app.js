@@ -2264,7 +2264,7 @@ async function getHighwayRoute(
                     CONFIG.GOOGLE_MAPS_API_KEY,
 
                 "X-Goog-FieldMask":
-                    "routes.duration,routes.distanceMeters"
+                    "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline"
             },
 
             body: JSON.stringify({
@@ -2553,6 +2553,12 @@ async function displayRouteComparison(
             destination,
             resolvedIcArea
         );
+
+    logHighwayRoutePolylineAnalysis(
+        highway,
+        origin,
+        destination
+    );
 
     const estimatedToll =
         tollEstimate.amount;
@@ -3591,7 +3597,7 @@ async function getHighwayRouteFromGps(
                         CONFIG.GOOGLE_MAPS_API_KEY,
 
                     "X-Goog-FieldMask":
-                        "routes.duration,routes.distanceMeters"
+                        "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline"
 
                 },
 
@@ -3800,6 +3806,641 @@ function calculateDistance(
         );
 
     return R * c;
+}
+
+function decodeRoutesEncodedPolyline(encodedPolyline) {
+
+    if (!encodedPolyline) {
+        return [];
+    }
+
+    const points = [];
+    let index = 0;
+    let latitude = 0;
+    let longitude = 0;
+
+    const decodeValue = () => {
+        let result = 0;
+        let shift = 0;
+        let byte = 0;
+
+        do {
+            if (index >= encodedPolyline.length) {
+                throw new Error("encodedPolylineの末尾が不正です");
+            }
+
+            byte =
+                encodedPolyline.charCodeAt(index++) - 63;
+
+            result |=
+                (byte & 0x1f) << shift;
+
+            shift += 5;
+        }
+        while (byte >= 0x20);
+
+        return (result & 1)
+            ? ~(result >> 1)
+            : result >> 1;
+    };
+
+    while (index < encodedPolyline.length) {
+        latitude += decodeValue();
+        longitude += decodeValue();
+
+        points.push({
+            lat: latitude / 1e5,
+            lng: longitude / 1e5
+        });
+    }
+
+    return points;
+}
+
+function sampleRoutePointsByDistance(
+    routePoints,
+    intervalMeters = 2000
+) {
+
+    if (!routePoints.length) {
+        return [];
+    }
+
+    const sampledPoints = [{
+        ...routePoints[0],
+        routeDistanceMeters: 0
+    }];
+
+    let totalDistanceMeters = 0;
+    let nextSampleDistanceMeters = intervalMeters;
+
+    for (let index = 1; index < routePoints.length; index++) {
+        const previousPoint = routePoints[index - 1];
+        const currentPoint = routePoints[index];
+
+        const segmentDistanceMeters =
+            calculateDistance(
+                previousPoint.lat,
+                previousPoint.lng,
+                currentPoint.lat,
+                currentPoint.lng
+            );
+
+        const segmentStartDistanceMeters =
+            totalDistanceMeters;
+
+        totalDistanceMeters += segmentDistanceMeters;
+
+        while (
+            segmentDistanceMeters > 0 &&
+            nextSampleDistanceMeters <= totalDistanceMeters
+        ) {
+            const ratio =
+                (
+                    nextSampleDistanceMeters -
+                    segmentStartDistanceMeters
+                ) /
+                segmentDistanceMeters;
+
+            sampledPoints.push({
+                lat:
+                    previousPoint.lat +
+                    (currentPoint.lat - previousPoint.lat) * ratio,
+                lng:
+                    previousPoint.lng +
+                    (currentPoint.lng - previousPoint.lng) * ratio,
+                routeDistanceMeters: nextSampleDistanceMeters
+            });
+
+            nextSampleDistanceMeters += intervalMeters;
+        }
+    }
+
+    const lastPoint = routePoints[routePoints.length - 1];
+    const lastSample = sampledPoints[sampledPoints.length - 1];
+
+    const distanceToLastPointMeters =
+        calculateDistance(
+            lastSample.lat,
+            lastSample.lng,
+            lastPoint.lat,
+            lastPoint.lng
+        );
+
+    if (distanceToLastPointMeters > 1) {
+        sampledPoints.push({
+            ...lastPoint,
+            routeDistanceMeters: totalDistanceMeters
+        });
+    }
+
+    return sampledPoints;
+}
+
+function findNearestIcMasterEntryForRoutePoint(routePoint) {
+
+    let nearest = null;
+    let nearestDistanceMeters = Infinity;
+
+    for (const icArea in IC_MASTER) {
+        for (const exit of IC_MASTER[icArea].exits) {
+            if (
+                exit.lat === undefined ||
+                exit.lng === undefined
+            ) {
+                continue;
+            }
+
+            const distanceMeters =
+                calculateDistance(
+                    routePoint.lat,
+                    routePoint.lng,
+                    exit.lat,
+                    exit.lng
+                );
+
+            if (distanceMeters < nearestDistanceMeters) {
+                nearest = {
+                    icArea,
+                    exit
+                };
+                nearestDistanceMeters = distanceMeters;
+            }
+        }
+    }
+
+    if (!nearest) {
+        return null;
+    }
+
+    return {
+        ...nearest,
+        distanceMeters: nearestDistanceMeters
+    };
+}
+
+function findNearbyIcMasterEntriesForRoutePoint(
+    routePoint,
+    maxDistanceMeters = 5000,
+    limit = 5
+) {
+
+    const nearbyByIdentity = new Map();
+
+    for (const icArea in IC_MASTER) {
+        for (const exit of IC_MASTER[icArea].exits) {
+            if (
+                exit.lat === undefined ||
+                exit.lng === undefined
+            ) {
+                continue;
+            }
+
+            const distanceMeters =
+                calculateDistance(
+                    routePoint.lat,
+                    routePoint.lng,
+                    exit.lat,
+                    exit.lng
+                );
+
+            if (distanceMeters > maxDistanceMeters) {
+                continue;
+            }
+
+            const identity =
+                exit.googleName ||
+                exit.displayName + "|" + exit.lat + "|" + exit.lng;
+
+            const registered =
+                nearbyByIdentity.get(identity);
+
+            if (
+                !registered ||
+                distanceMeters < registered.distanceMeters
+            ) {
+                nearbyByIdentity.set(identity, {
+                    icArea,
+                    exit,
+                    distanceMeters
+                });
+            }
+        }
+    }
+
+    return [...nearbyByIdentity.values()]
+        .sort((a, b) =>
+            a.distanceMeters - b.distanceMeters
+        )
+        .slice(0, limit);
+}
+
+function logHighwayRoutePolylineAnalysis(
+    highwayRoute,
+    origin,
+    destination
+) {
+
+    const encodedPolyline =
+        highwayRoute?.polyline?.encodedPolyline;
+
+    if (!encodedPolyline) {
+        console.warn(
+            "[ROUTE POLYLINE調査] encodedPolylineなし",
+            { origin, destination }
+        );
+        return;
+    }
+
+    try {
+        const routePoints =
+            decodeRoutesEncodedPolyline(encodedPolyline);
+
+        const sampledPoints =
+            sampleRoutePointsByDistance(routePoints, 2000);
+
+        const areaCounts =
+            Object.fromEntries(
+                Object.keys(IC_MASTER).map(icArea =>
+                    [icArea, 0]
+                )
+            );
+
+        const routePointLogs = [];
+        const routeTrace = [];
+        const passedIcEntries = [];
+
+        sampledPoints.forEach((routePoint, index) => {
+            const nearest =
+                findNearestIcMasterEntryForRoutePoint(routePoint);
+
+            if (!nearest) {
+                return;
+            }
+
+            areaCounts[nearest.icArea]++;
+
+            const displayName =
+                nearest.exit.displayName;
+
+            const roadLabel =
+                nearest.exit.roadType === "首都高"
+                    ? "首都高"
+                    : IC_MASTER[nearest.icArea]?.label ||
+                        nearest.icArea;
+
+            const icIdentity =
+                nearest.exit.googleName ||
+                nearest.icArea + "|" + displayName;
+
+            if (
+                passedIcEntries[passedIcEntries.length - 1]
+                    ?.identity !== icIdentity
+            ) {
+                passedIcEntries.push({
+                    identity: icIdentity,
+                    icArea: nearest.icArea,
+                    exit: nearest.exit
+                });
+            }
+
+            const distanceKm =
+                Math.round(nearest.distanceMeters / 100) / 10;
+
+            const routeDistanceKm =
+                Math.round(routePoint.routeDistanceMeters / 100) / 10;
+
+            routePointLogs.push({
+                routePoint: index + 1,
+                routeDistanceKm,
+                lat: routePoint.lat,
+                lng: routePoint.lng,
+                icArea: nearest.icArea,
+                roadLabel,
+                nearestIc: displayName,
+                distanceKm
+            });
+
+            routeTrace.push({
+                routeDistanceMeters:
+                    routePoint.routeDistanceMeters,
+                lat: routePoint.lat,
+                lng: routePoint.lng,
+                roadLabel,
+                icArea: nearest.icArea,
+                exit: nearest.exit
+            });
+        });
+
+        const roadSwitches = [];
+
+        for (let index = 1; index < routeTrace.length; index++) {
+            const previous = routeTrace[index - 1];
+            const current = routeTrace[index];
+
+            if (previous.roadLabel === current.roadLabel) {
+                continue;
+            }
+
+            const switchPoint = {
+                lat: (previous.lat + current.lat) / 2,
+                lng: (previous.lng + current.lng) / 2
+            };
+
+            const routeDistanceMeters =
+                (
+                    previous.routeDistanceMeters +
+                    current.routeDistanceMeters
+                ) / 2;
+
+            const nearbyIcs =
+                findNearbyIcMasterEntriesForRoutePoint(
+                    switchPoint,
+                    5000,
+                    5
+                );
+
+            roadSwitches.push({
+                fromRoad: previous.roadLabel,
+                toRoad: current.roadLabel,
+                traceIndex: index,
+                routeDistanceMeters,
+                beforeExit: previous.exit,
+                afterExit: current.exit,
+                nearbyIcs
+            });
+        }
+
+        const roadSequence = [];
+        const roadDistanceMeters = {};
+
+        routeTrace.forEach((item, index) => {
+            if (
+                roadSequence[roadSequence.length - 1] !==
+                item.roadLabel
+            ) {
+                roadSequence.push(item.roadLabel);
+            }
+
+            const previousDistanceMeters =
+                index > 0
+                    ? item.routeDistanceMeters -
+                        routeTrace[index - 1].routeDistanceMeters
+                    : 0;
+
+            const nextDistanceMeters =
+                index < routeTrace.length - 1
+                    ? routeTrace[index + 1].routeDistanceMeters -
+                        item.routeDistanceMeters
+                    : 0;
+
+            const estimatedDistanceMeters =
+                (
+                    previousDistanceMeters +
+                    nextDistanceMeters
+                ) / 2;
+
+            roadDistanceMeters[item.roadLabel] =
+                (roadDistanceMeters[item.roadLabel] || 0) +
+                estimatedDistanceMeters;
+        });
+
+        const uniqueRoadLabels =
+            [...new Set(roadSequence)];
+
+        const roadDistanceLogs =
+            uniqueRoadLabels.map(roadLabel => ({
+                road: roadLabel,
+                approximateDistanceKm:
+                    Math.round(
+                        (roadDistanceMeters[roadLabel] || 0) /
+                        1000
+                    )
+            }));
+
+        const selectablePassedIcs =
+            passedIcEntries.filter(item =>
+                item.exit.isSelectable !== false
+            );
+
+        const shutoExitSwitch =
+            roadSwitches.find(roadSwitch =>
+                roadSwitch.fromRoad === "首都高" &&
+                roadSwitch.toRoad !== "首都高"
+            );
+
+        let entranceCandidate =
+            selectablePassedIcs[0]?.exit || null;
+
+        if (shutoExitSwitch) {
+            entranceCandidate =
+                routeTrace
+                    .slice(shutoExitSwitch.traceIndex)
+                    .find(item =>
+                        item.roadLabel !== "首都高" &&
+                        item.exit.isSelectable !== false
+                    )
+                    ?.exit ||
+                entranceCandidate;
+        }
+
+        const exitCandidate =
+            selectablePassedIcs[
+                selectablePassedIcs.length - 1
+            ]?.exit || null;
+
+        console.group(
+            "[ROUTE POLYLINE調査] " +
+            origin + " → " + destination
+        );
+
+        console.log(
+            "デコード点数:",
+            routePoints.length,
+            "サンプル点数:",
+            sampledPoints.length
+        );
+
+        routePointLogs.forEach(item => {
+            console.log(
+                "RoutePoint " + item.routePoint +
+                "\n→ " + item.nearestIc +
+                "\n距離 " + item.distanceKm + "km"
+            );
+        });
+
+        console.table(routePointLogs);
+
+        console.table(
+            Object.entries(areaCounts).map(
+                ([icArea, pointCount]) => ({
+                    icArea,
+                    pointCount
+                })
+            )
+        );
+
+        console.log(
+            "通過IC順:",
+            passedIcEntries
+                .map(item => item.exit.displayName)
+                .join(" → ")
+        );
+
+        roadSwitches.forEach((roadSwitch, index) => {
+            const routeDistanceKm =
+                Math.round(
+                    roadSwitch.routeDistanceMeters / 1000
+                );
+
+            const nearbyIcLogs =
+                roadSwitch.nearbyIcs.map(item => ({
+                    ic: item.exit.displayName,
+                    icArea: item.icArea,
+                    distanceKm:
+                        Math.round(item.distanceMeters / 100) / 10,
+                    isSelectable:
+                        item.exit.isSelectable !== false
+                }));
+
+            console.group(
+                "[ROUTE ROAD SWITCH] " + (index + 1)
+            );
+
+            console.log(
+                roadSwitch.fromRoad +
+                " → " +
+                roadSwitch.toRoad
+            );
+
+            console.log(
+                "距離地点: 約" + routeDistanceKm + "km"
+            );
+
+            console.log(
+                "直前IC:",
+                roadSwitch.beforeExit.displayName
+            );
+
+            console.log(
+                "直後IC:",
+                roadSwitch.afterExit.displayName
+            );
+
+            console.log("近傍IC候補:");
+            console.table(nearbyIcLogs);
+
+            console.groupEnd();
+        });
+
+        console.group("[ROUTE TRACE SUMMARY]");
+
+        console.log(
+            "想定道路順:",
+            roadSequence.join(" → ")
+        );
+
+        console.log("道路別距離:");
+
+        roadDistanceLogs.forEach(item => {
+            console.log(
+                item.road +
+                " 約" +
+                item.approximateDistanceKm +
+                "km"
+            );
+        });
+
+        console.table(roadDistanceLogs);
+
+        console.log("道路切替点:");
+
+        console.table(
+            roadSwitches.map((roadSwitch, index) => ({
+                number: index + 1,
+                roadSwitch:
+                    roadSwitch.fromRoad +
+                    " → " +
+                    roadSwitch.toRoad,
+                routeDistanceKm:
+                    Math.round(
+                        roadSwitch.routeDistanceMeters / 1000
+                    ),
+                nearbyIc:
+                    roadSwitch.nearbyIcs[0]
+                        ?.exit.displayName ||
+                    roadSwitch.beforeExit.displayName
+            }))
+        );
+
+        console.log(
+            "入口候補:",
+            entranceCandidate?.displayName || "なし"
+        );
+
+        console.log(
+            "出口候補:",
+            exitCandidate?.displayName || "なし"
+        );
+
+        console.groupEnd();
+
+        console.group("[ROUTE IC COMPARE]");
+
+        console.table([
+            {
+                logic: "旧ロジック",
+                entranceIc:
+                    lastTollStartIc?.displayName || "なし",
+                exitIc:
+                    lastTollEndIc?.displayName || "なし"
+            },
+            {
+                logic: "新ロジック",
+                entranceIc:
+                    entranceCandidate?.displayName || "なし",
+                exitIc:
+                    exitCandidate?.displayName || "なし"
+            }
+        ]);
+
+        console.log(
+            "想定道路順:",
+            roadSequence.join(" → ")
+        );
+
+        console.log("道路別距離:");
+        console.table(roadDistanceLogs);
+
+        console.log("道路切替点:");
+        console.table(
+            roadSwitches.map((roadSwitch, index) => ({
+                number: index + 1,
+                roadSwitch:
+                    roadSwitch.fromRoad +
+                    " → " +
+                    roadSwitch.toRoad,
+                routeDistanceKm:
+                    Math.round(
+                        roadSwitch.routeDistanceMeters / 1000
+                    ),
+                beforeIc:
+                    roadSwitch.beforeExit.displayName,
+                afterIc:
+                    roadSwitch.afterExit.displayName
+            }))
+        );
+
+        console.groupEnd();
+
+        console.groupEnd();
+    }
+    catch (error) {
+        console.warn(
+            "[ROUTE POLYLINE調査] 解析失敗",
+            error
+        );
+    }
 }
 
 

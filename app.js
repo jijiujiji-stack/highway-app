@@ -4141,6 +4141,145 @@ function findNearbyIcMasterEntriesForRoutePoint(
         .slice(0, limit);
 }
 
+function correctShortRoadSegments(
+    roadSegments,
+    thresholdMeters = 5000
+) {
+
+    const protectedRoadLabels = new Set(
+        [
+            "アクアライン方面",
+            IC_MASTER.aqualine?.label
+        ].filter(Boolean)
+    );
+
+    const correctedSegments =
+        roadSegments.map(segment => ({ ...segment }));
+
+    let corrected = true;
+
+    while (corrected) {
+        corrected = false;
+
+        for (
+            let index = 1;
+            index < correctedSegments.length - 1;
+            index++
+        ) {
+            const previous = correctedSegments[index - 1];
+            const current = correctedSegments[index];
+            const next = correctedSegments[index + 1];
+
+            if (
+                current.distanceMeters >= thresholdMeters ||
+                previous.roadLabel !== next.roadLabel ||
+                protectedRoadLabels.has(current.roadLabel)
+            ) {
+                continue;
+            }
+
+            correctedSegments.splice(
+                index - 1,
+                3,
+                {
+                    roadLabel: previous.roadLabel,
+                    distanceMeters:
+                        previous.distanceMeters +
+                        current.distanceMeters +
+                        next.distanceMeters,
+                    startTraceIndex:
+                        previous.startTraceIndex,
+                    endTraceIndex:
+                        next.endTraceIndex
+                }
+            );
+
+            corrected = true;
+            break;
+        }
+    }
+
+    return correctedSegments;
+}
+
+function summarizeRoadSegments(roadSegments) {
+
+    const roadSequence =
+        roadSegments.map(segment => segment.roadLabel);
+
+    const roadDistanceMeters = {};
+
+    roadSegments.forEach(segment => {
+        roadDistanceMeters[segment.roadLabel] =
+            (roadDistanceMeters[segment.roadLabel] || 0) +
+            segment.distanceMeters;
+    });
+
+    const roadDistances =
+        [...new Set(roadSequence)].map(roadLabel => ({
+            road: roadLabel,
+            approximateDistanceKm:
+                Math.round(
+                    (roadDistanceMeters[roadLabel] || 0) /
+                    1000
+                )
+        }));
+
+    return {
+        roadSequence,
+        roadDistances
+    };
+}
+
+function createRoadSwitchesFromSegments(
+    roadSegments,
+    routeTrace
+) {
+
+    const roadSwitches = [];
+
+    for (let index = 1; index < roadSegments.length; index++) {
+        const previousSegment = roadSegments[index - 1];
+        const currentSegment = roadSegments[index];
+        const previous =
+            routeTrace[previousSegment.endTraceIndex];
+        const current =
+            routeTrace[currentSegment.startTraceIndex];
+
+        if (!previous || !current) {
+            continue;
+        }
+
+        const switchPoint = {
+            lat: (previous.lat + current.lat) / 2,
+            lng: (previous.lng + current.lng) / 2
+        };
+
+        const routeDistanceMeters =
+            (
+                previous.routeDistanceMeters +
+                current.routeDistanceMeters
+            ) / 2;
+
+        roadSwitches.push({
+            fromRoad: previousSegment.roadLabel,
+            toRoad: currentSegment.roadLabel,
+            traceIndex: currentSegment.startTraceIndex,
+            routeDistanceMeters,
+            beforeExit: previous.exit,
+            afterExit: current.exit,
+            nearbyIcs:
+                findNearbyIcMasterEntriesForRoutePoint(
+                    switchPoint,
+                    5000,
+                    5
+                )
+        });
+    }
+
+    return roadSwitches;
+}
+
 function analyzeHighwayRoutePolyline(highwayRoute) {
 
     const encodedPolyline =
@@ -4274,6 +4413,7 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
 
         const roadSequence = [];
         const roadDistanceMeters = {};
+        const roadSegments = [];
 
         routeTrace.forEach((item, index) => {
             if (
@@ -4304,6 +4444,26 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             roadDistanceMeters[item.roadLabel] =
                 (roadDistanceMeters[item.roadLabel] || 0) +
                 estimatedDistanceMeters;
+
+            const currentRoadSegment =
+                roadSegments[roadSegments.length - 1];
+
+            if (
+                currentRoadSegment?.roadLabel ===
+                item.roadLabel
+            ) {
+                currentRoadSegment.distanceMeters +=
+                    estimatedDistanceMeters;
+                currentRoadSegment.endTraceIndex = index;
+            }
+            else {
+                roadSegments.push({
+                    roadLabel: item.roadLabel,
+                    distanceMeters: estimatedDistanceMeters,
+                    startTraceIndex: index,
+                    endTraceIndex: index
+                });
+            }
         });
 
         const uniqueRoadLabels =
@@ -4318,6 +4478,18 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                         1000
                     )
             }));
+
+        const correctedRoadSegments =
+            correctShortRoadSegments(roadSegments, 5000);
+
+        const correctedRoadSummary =
+            summarizeRoadSegments(correctedRoadSegments);
+
+        const correctedRoadSwitches =
+            createRoadSwitchesFromSegments(
+                correctedRoadSegments,
+                routeTrace
+            );
 
         const selectablePassedIcs =
             passedIcEntries.filter(item =>
@@ -4351,17 +4523,22 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             ]?.exit || null;
 
         return {
-            roadSequence,
-            roadDistances: roadDistanceLogs,
+            roadSequence:
+                correctedRoadSummary.roadSequence,
+            roadDistances:
+                correctedRoadSummary.roadDistances,
             entranceIc: entranceCandidate,
             exitIc: exitCandidate,
+            rawRoadSequence: roadSequence,
+            rawRoadDistances: roadDistanceLogs,
+            rawRoadSwitches: roadSwitches,
             routePoints,
             sampledPoints,
             areaCounts,
             routePointLogs,
             routeTrace,
             passedIcEntries,
-            roadSwitches
+            roadSwitches: correctedRoadSwitches
         };
     }
     catch (error) {
@@ -4394,12 +4571,15 @@ function logHighwayRoutePolylineAnalysis(
         roadDistances: roadDistanceLogs,
         entranceIc: entranceCandidate,
         exitIc: exitCandidate,
+        roadSwitches,
+        rawRoadSequence = roadSequence,
+        rawRoadDistances = roadDistanceLogs,
+        rawRoadSwitches = roadSwitches,
         routePoints,
         sampledPoints,
         areaCounts,
         routePointLogs,
-        passedIcEntries,
-        roadSwitches
+        passedIcEntries
     } = result;
 
     try {
@@ -4487,6 +4667,52 @@ function logHighwayRoutePolylineAnalysis(
 
             console.groupEnd();
         });
+
+        console.group("[ROUTE ROAD CORRECTION]");
+
+        console.log(
+            "補正前道路順:",
+            rawRoadSequence.join(" → ")
+        );
+        console.table(rawRoadDistances);
+
+        console.log("補正前道路切替点:");
+        console.table(
+            rawRoadSwitches.map((roadSwitch, index) => ({
+                number: index + 1,
+                roadSwitch:
+                    roadSwitch.fromRoad +
+                    " → " +
+                    roadSwitch.toRoad,
+                routeDistanceKm:
+                    Math.round(
+                        roadSwitch.routeDistanceMeters / 1000
+                    )
+            }))
+        );
+
+        console.log(
+            "補正後道路順:",
+            roadSequence.join(" → ")
+        );
+        console.table(roadDistanceLogs);
+
+        console.log("補正後道路切替点:");
+        console.table(
+            roadSwitches.map((roadSwitch, index) => ({
+                number: index + 1,
+                roadSwitch:
+                    roadSwitch.fromRoad +
+                    " → " +
+                    roadSwitch.toRoad,
+                routeDistanceKm:
+                    Math.round(
+                        roadSwitch.routeDistanceMeters / 1000
+                    )
+            }))
+        );
+
+        console.groupEnd();
 
         console.group("[ROUTE TRACE SUMMARY]");
 

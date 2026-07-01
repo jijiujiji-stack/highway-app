@@ -641,6 +641,81 @@ const IC_MASTER = {
         ]
     },
 
+    keno: {
+        label: "圏央道方面",
+        exits: [
+            {
+                order: 1,
+                displayName: "海老名JCT",
+                googleName: "首都圏中央連絡自動車道 海老名ジャンクション",
+                lat: 35.422,
+                lng: 139.375,
+                isSelectable: false,
+                connection: true,
+                connectedRoads: ["keno", "tomei"],
+                routeBranch: "west",
+                branchOrder: 1
+            },
+            {
+                order: 2,
+                displayName: "圏央厚木IC",
+                googleName: "首都圏中央連絡自動車道 圏央厚木インターチェンジ",
+                lat: 35.480,
+                lng: 139.372,
+                routeBranch: "west",
+                branchOrder: 2
+            },
+            {
+                order: 3,
+                displayName: "厚木PA SIC",
+                googleName: "首都圏中央連絡自動車道 厚木PAスマートインターチェンジ",
+                lat: 35.490,
+                lng: 139.369,
+                routeBranch: "west",
+                branchOrder: 3
+            },
+            {
+                order: 4,
+                displayName: "相模原愛川IC",
+                googleName: "首都圏中央連絡自動車道 相模原愛川インターチェンジ",
+                lat: 35.527,
+                lng: 139.359,
+                routeBranch: "west",
+                branchOrder: 4
+            },
+            {
+                order: 5,
+                displayName: "相模原IC",
+                googleName: "首都圏中央連絡自動車道 相模原インターチェンジ",
+                lat: 35.582,
+                lng: 139.293,
+                routeBranch: "west",
+                branchOrder: 5
+            },
+            {
+                order: 6,
+                displayName: "高尾山IC",
+                googleName: "首都圏中央連絡自動車道 高尾山インターチェンジ",
+                lat: 35.623,
+                lng: 139.263,
+                routeBranch: "west",
+                branchOrder: 6
+            },
+            {
+                order: 7,
+                displayName: "八王子JCT",
+                googleName: "首都圏中央連絡自動車道 八王子ジャンクション",
+                lat: 35.640,
+                lng: 139.254,
+                isSelectable: false,
+                connection: true,
+                connectedRoads: ["keno", "chuo"],
+                routeBranch: "west",
+                branchOrder: 7
+            }
+        ]
+    },
+
 
     chuo: {
         label: "中央道方面",
@@ -3634,7 +3709,8 @@ function findNearestIcIndex(icArea) {
             )
             .filter(exit =>
                 exit.lat !== undefined &&
-                exit.lng !== undefined
+                exit.lng !== undefined &&
+                exit.isSelectable !== false
             );
 
     if (exits.length === 0) {
@@ -9288,6 +9364,7 @@ async function suggestIcAreaByNearestIc(
 
             if (
                 exit.experimental === true ||
+                exit.isSelectable === false ||
                 exit.lat === undefined ||
                 exit.lng === undefined
             ) {
@@ -9322,7 +9399,7 @@ async function suggestIcAreaByNearestIc(
 }
 
 // 標準判定ロジック
-// 出発地最寄りIC + 目的地最寄りIC + 距離合計で候補道路を選ぶ。
+// 目的地最寄りICの距離を優先し、同距離なら出発地との距離合計で選ぶ。
 function suggestIcAreaByDistanceOnlyForTest(
     originLatLng,
     destinationLatLng
@@ -9381,7 +9458,10 @@ function suggestIcAreaByDistanceOnlyForTest(
         });
     }
 
-    scores.sort((a, b) => a.score - b.score);
+    scores.sort((a, b) =>
+        a.destinationDistanceKm - b.destinationDistanceKm ||
+        a.score - b.score
+    );
 
     if (!scores[0]) {
         return null;
@@ -9406,6 +9486,7 @@ function findNearestRegisteredIcForDistanceOnlyTest(
 
         if (
             exit.experimental === true ||
+            exit.isSelectable === false ||
             exit.lat === undefined ||
             exit.lng === undefined
         ) {
@@ -9565,7 +9646,10 @@ async function findNearestIcForGeometryTest(
 
     for (const exit of exits) {
 
-        if (exit.experimental === true) {
+        if (
+            exit.experimental === true ||
+            exit.isSelectable === false
+        ) {
             continue;
         }
 
@@ -9632,6 +9716,10 @@ async function findNearestHighwayStartByPointForCandidateIcTest(
     let nearestDistance = Infinity;
 
     for (const exit of exits) {
+
+        if (exit.isSelectable === false) {
+            continue;
+        }
 
         let exitLat = exit.lat;
         let exitLng = exit.lng;
@@ -11374,6 +11462,10 @@ async function findNearestIcIndexByPoint(
 
         const exit = exits[index];
 
+        if (exit.isSelectable === false) {
+            continue;
+        }
+
         let exitLat = exit.lat;
         let exitLng = exit.lng;
 
@@ -11643,6 +11735,10 @@ async function findNearestIcInfoByPoint(
     let nearestDistance = Infinity;
 
     for (const exit of exits) {
+
+        if (exit.isSelectable === false) {
+            continue;
+        }
 
         let exitLat = exit.lat;
         let exitLng = exit.lng;

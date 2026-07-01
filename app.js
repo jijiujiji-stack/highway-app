@@ -2558,6 +2558,8 @@ async function displayRouteComparison(
             polylineAnalysis
         );
 
+    logMainHighwayTollCalculation(tollEstimate);
+
     logHighwayRoutePolylineAnalysis(
         highway,
         origin,
@@ -3062,18 +3064,24 @@ async function estimateMainHighwayToll(
             fallbackKm * 24
         );
 
-    const fallbackResult = {
+    let legacyStartIc = null;
+    let legacyEndIc = null;
+
+    const createFallbackResult = fallbackReason => ({
         amount: fallbackAmount,
         label: "料金計算：ルート総距離ベース",
-        legacyStartIc: null,
-        legacyEndIc: null,
-        usedPolylineAnalysis: false
-    };
+        usedPolylineAnalysis: false,
+        startIc: null,
+        endIc: null,
+        legacyStartIc,
+        legacyEndIc,
+        fallbackReason
+    });
 
     try {
 
         if (!destination) {
-            return fallbackResult;
+            return createFallbackResult("目的地未指定");
         }
 
         const autoIcAreaEnabled =
@@ -3104,9 +3112,6 @@ async function estimateMainHighwayToll(
                 icArea = suggestedIcArea;
             }
         }
-
-        let legacyStartIc = null;
-        let legacyEndIc = null;
 
         if (
             icArea &&
@@ -3168,7 +3173,20 @@ async function estimateMainHighwayToll(
             !startIc.googleName ||
             !endIc.googleName
         ) {
-            return fallbackResult;
+            let fallbackReason = "IC未取得";
+
+            if (
+                !icArea ||
+                !IC_MASTER[icArea]
+            ) {
+                fallbackReason = "IC_MASTER未一致";
+            }
+            else if (!polylineAnalysis) {
+                fallbackReason =
+                    "Polyline解析失敗 / IC未取得";
+            }
+
+            return createFallbackResult(fallbackReason);
         }
 
         if (
@@ -3212,7 +3230,10 @@ async function estimateMainHighwayToll(
                 legacyStartIc,
                 legacyEndIc,
                 usedPolylineAnalysis:
-                    canUsePolylineAnalysis
+                    canUsePolylineAnalysis,
+                startIc,
+                endIc,
+                fallbackReason: null
             };
         }
 
@@ -3248,7 +3269,10 @@ async function estimateMainHighwayToll(
             legacyStartIc,
             legacyEndIc,
             usedPolylineAnalysis:
-                canUsePolylineAnalysis
+                canUsePolylineAnalysis,
+            startIc,
+            endIc,
+            fallbackReason: null
         };
 
     } catch (error) {
@@ -3258,8 +3282,49 @@ async function estimateMainHighwayToll(
             error
         );
 
-        return fallbackResult;
+        return createFallbackResult("料金計算失敗");
     }
+}
+
+function logMainHighwayTollCalculation(tollEstimate) {
+
+    const usedPolylineAnalysis =
+        tollEstimate?.usedPolylineAnalysis === true;
+
+    const usedIcCalculation =
+        Boolean(
+            tollEstimate?.startIc &&
+            tollEstimate?.endIc
+        );
+
+    const calculationLogic =
+        usedPolylineAnalysis
+            ? "Polyline解析IC"
+            : usedIcCalculation
+                ? "旧ロジックIC"
+                : "距離ベース";
+
+    console.group("[ETC概算 料金計算]");
+    console.log("料金計算ロジック：", calculationLogic);
+
+    if (usedIcCalculation) {
+        console.log(
+            "入口IC：",
+            tollEstimate.startIc.displayName
+        );
+        console.log(
+            "出口IC：",
+            tollEstimate.endIc.displayName
+        );
+    }
+    else {
+        console.log(
+            "理由：",
+            tollEstimate?.fallbackReason || "不明"
+        );
+    }
+
+    console.groupEnd();
 }
 
 

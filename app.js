@@ -2546,18 +2546,24 @@ async function displayRouteComparison(
             destinationLatLng
         );
 
+    const polylineAnalysis =
+        analyzeHighwayRoutePolyline(highway);
+
     const tollEstimate =
         await estimateMainHighwayToll(
             highway,
             origin,
             destination,
-            resolvedIcArea
+            resolvedIcArea,
+            polylineAnalysis
         );
 
     logHighwayRoutePolylineAnalysis(
         highway,
         origin,
-        destination
+        destination,
+        polylineAnalysis,
+        tollEstimate
     );
 
     const estimatedToll =
@@ -3044,7 +3050,8 @@ async function estimateMainHighwayToll(
     highwayRoute,
     origin,
     destination,
-    preferredIcArea = null
+    preferredIcArea = null,
+    polylineAnalysis = null
 ) {
 
     const fallbackKm =
@@ -3057,7 +3064,10 @@ async function estimateMainHighwayToll(
 
     const fallbackResult = {
         amount: fallbackAmount,
-        label: "料金計算：ルート総距離ベース"
+        label: "料金計算：ルート総距離ベース",
+        legacyStartIc: null,
+        legacyEndIc: null,
+        usedPolylineAnalysis: false
     };
 
     try {
@@ -3095,44 +3105,62 @@ async function estimateMainHighwayToll(
             }
         }
 
+        let legacyStartIc = null;
+        let legacyEndIc = null;
+
         if (
-            !icArea ||
-            !IC_MASTER[icArea]
+            icArea &&
+            IC_MASTER[icArea]
         ) {
-            return fallbackResult;
-        }
+            setResolvedIcArea(icArea);
 
-        setResolvedIcArea(icArea);
+            if (origin) {
+                legacyStartIc =
+                    await findNearestIcInfoByAddress(
+                        origin,
+                        icArea
+                    );
+            }
+            else if (
+                currentLatitude !== null &&
+                currentLongitude !== null
+            ) {
+                legacyStartIc =
+                    await findNearestIcInfoByPoint(
+                        icArea,
+                        currentLatitude,
+                        currentLongitude
+                    );
+            }
 
-        let startIc = null;
-
-        if (origin) {
-
-            startIc =
+            legacyEndIc =
                 await findNearestIcInfoByAddress(
-                    origin,
+                    destination,
                     icArea
                 );
-
         }
-        else if (
-            currentLatitude !== null &&
-            currentLongitude !== null
-        ) {
 
-            startIc =
-                await findNearestIcInfoByPoint(
-                    icArea,
-                    currentLatitude,
-                    currentLongitude
-                );
-        }
+        const analyzedStartIc =
+            polylineAnalysis?.entranceIc;
+
+        const analyzedEndIc =
+            polylineAnalysis?.exitIc;
+
+        const canUsePolylineAnalysis =
+            Boolean(
+                analyzedStartIc?.googleName &&
+                analyzedEndIc?.googleName
+            );
+
+        const startIc =
+            canUsePolylineAnalysis
+                ? analyzedStartIc
+                : legacyStartIc;
 
         const endIc =
-            await findNearestIcInfoByAddress(
-                destination,
-                icArea
-            );
+            canUsePolylineAnalysis
+                ? analyzedEndIc
+                : legacyEndIc;
 
         if (
             !startIc ||
@@ -3143,27 +3171,32 @@ async function estimateMainHighwayToll(
             return fallbackResult;
         }
 
-        lastTollStartIcName =
-            startIc.displayName;
-        lastTollStartIc =
-            startIc;
+        if (
+            legacyStartIc?.googleName &&
+            legacyEndIc?.googleName
+        ) {
+            lastTollStartIcName =
+                legacyStartIc.displayName;
+            lastTollStartIc =
+                legacyStartIc;
 
-        lastTollStartIcGoogleName =
-            startIc.googleName;
+            lastTollStartIcGoogleName =
+                legacyStartIc.googleName;
 
-        lastTollStartIcOrder =
-            startIc.order;
+            lastTollStartIcOrder =
+                legacyStartIc.order;
 
-        lastTollEndIcName =
-            endIc.displayName;
-        lastTollEndIc =
-            endIc;
+            lastTollEndIcName =
+                legacyEndIc.displayName;
+            lastTollEndIc =
+                legacyEndIc;
 
-        lastTollEndIcGoogleName =
-            endIc.googleName;
+            lastTollEndIcGoogleName =
+                legacyEndIc.googleName;
 
-        lastTollEndIcOrder =
-            endIc.order;
+            lastTollEndIcOrder =
+                legacyEndIc.order;
+        }
 
         if (
             startIc.googleName === endIc.googleName
@@ -3175,7 +3208,11 @@ async function estimateMainHighwayToll(
                     formatTollRouteLabel(
                         startIc,
                         endIc
-                    )
+                    ),
+                legacyStartIc,
+                legacyEndIc,
+                usedPolylineAnalysis:
+                    canUsePolylineAnalysis
             };
         }
 
@@ -3207,7 +3244,11 @@ async function estimateMainHighwayToll(
                 formatTollRouteLabel(
                     startIc,
                     endIc
-                )
+                ),
+            legacyStartIc,
+            legacyEndIc,
+            usedPolylineAnalysis:
+                canUsePolylineAnalysis
         };
 
     } catch (error) {
@@ -4035,21 +4076,16 @@ function findNearbyIcMasterEntriesForRoutePoint(
         .slice(0, limit);
 }
 
-function logHighwayRoutePolylineAnalysis(
-    highwayRoute,
-    origin,
-    destination
-) {
+function analyzeHighwayRoutePolyline(highwayRoute) {
 
     const encodedPolyline =
         highwayRoute?.polyline?.encodedPolyline;
 
     if (!encodedPolyline) {
         console.warn(
-            "[ROUTE POLYLINE調査] encodedPolylineなし",
-            { origin, destination }
+            "[ROUTE POLYLINE調査] encodedPolylineなし"
         );
-        return;
+        return null;
     }
 
     try {
@@ -4249,6 +4285,60 @@ function logHighwayRoutePolylineAnalysis(
                 selectablePassedIcs.length - 1
             ]?.exit || null;
 
+        return {
+            roadSequence,
+            roadDistances: roadDistanceLogs,
+            entranceIc: entranceCandidate,
+            exitIc: exitCandidate,
+            routePoints,
+            sampledPoints,
+            areaCounts,
+            routePointLogs,
+            routeTrace,
+            passedIcEntries,
+            roadSwitches
+        };
+    }
+    catch (error) {
+        console.warn(
+            "[ROUTE POLYLINE調査] 解析失敗",
+            error
+        );
+        return null;
+    }
+}
+
+function logHighwayRoutePolylineAnalysis(
+    highwayRoute,
+    origin,
+    destination,
+    analysis = null,
+    tollEstimate = null
+) {
+
+    const result =
+        analysis ||
+        analyzeHighwayRoutePolyline(highwayRoute);
+
+    if (!result) {
+        return;
+    }
+
+    const {
+        roadSequence,
+        roadDistances: roadDistanceLogs,
+        entranceIc: entranceCandidate,
+        exitIc: exitCandidate,
+        routePoints,
+        sampledPoints,
+        areaCounts,
+        routePointLogs,
+        passedIcEntries,
+        roadSwitches
+    } = result;
+
+    try {
+
         console.group(
             "[ROUTE POLYLINE調査] " +
             origin + " → " + destination
@@ -4391,9 +4481,11 @@ function logHighwayRoutePolylineAnalysis(
             {
                 logic: "旧ロジック",
                 entranceIc:
-                    lastTollStartIc?.displayName || "なし",
+                    tollEstimate?.legacyStartIc
+                        ?.displayName || "なし",
                 exitIc:
-                    lastTollEndIc?.displayName || "なし"
+                    tollEstimate?.legacyEndIc
+                        ?.displayName || "なし"
             },
             {
                 logic: "新ロジック",
@@ -4437,7 +4529,7 @@ function logHighwayRoutePolylineAnalysis(
     }
     catch (error) {
         console.warn(
-            "[ROUTE POLYLINE調査] 解析失敗",
+            "[ROUTE POLYLINE調査] ログ出力失敗",
             error
         );
     }

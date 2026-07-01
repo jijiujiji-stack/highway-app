@@ -712,6 +712,117 @@ const IC_MASTER = {
                 connectedRoads: ["keno", "chuo"],
                 routeBranch: "west",
                 branchOrder: 7
+            },
+            {
+                order: 8,
+                displayName: "あきる野IC",
+                googleName: "首都圏中央連絡自動車道 あきる野インターチェンジ",
+                lat: 35.718,
+                lng: 139.284,
+                routeBranch: "northwest",
+                branchOrder: 8
+            },
+            {
+                order: 9,
+                displayName: "日の出IC",
+                googleName: "首都圏中央連絡自動車道 日の出インターチェンジ",
+                lat: 35.736,
+                lng: 139.282,
+                routeBranch: "northwest",
+                branchOrder: 9
+            },
+            {
+                order: 10,
+                displayName: "青梅IC",
+                googleName: "首都圏中央連絡自動車道 青梅インターチェンジ",
+                lat: 35.797,
+                lng: 139.323,
+                routeBranch: "northwest",
+                branchOrder: 10
+            },
+            {
+                order: 11,
+                displayName: "入間IC",
+                googleName: "首都圏中央連絡自動車道 入間インターチェンジ",
+                lat: 35.818,
+                lng: 139.369,
+                routeBranch: "northwest",
+                branchOrder: 11
+            },
+            {
+                order: 12,
+                displayName: "狭山日高IC",
+                googleName: "首都圏中央連絡自動車道 狭山日高インターチェンジ",
+                lat: 35.865,
+                lng: 139.378,
+                routeBranch: "northwest",
+                branchOrder: 12
+            },
+            {
+                order: 13,
+                displayName: "圏央鶴ヶ島IC",
+                googleName: "首都圏中央連絡自動車道 圏央鶴ヶ島インターチェンジ",
+                lat: 35.920,
+                lng: 139.389,
+                routeBranch: "northwest",
+                branchOrder: 13
+            },
+            {
+                order: 14,
+                displayName: "坂戸IC",
+                googleName: "首都圏中央連絡自動車道 坂戸インターチェンジ",
+                lat: 35.967,
+                lng: 139.444,
+                routeBranch: "northwest",
+                branchOrder: 14
+            },
+            {
+                order: 15,
+                displayName: "川島IC",
+                googleName: "首都圏中央連絡自動車道 川島インターチェンジ",
+                lat: 35.981,
+                lng: 139.466,
+                routeBranch: "northwest",
+                branchOrder: 15
+            },
+            {
+                order: 16,
+                displayName: "桶川北本IC",
+                googleName: "首都圏中央連絡自動車道 桶川北本インターチェンジ",
+                lat: 36.002,
+                lng: 139.520,
+                routeBranch: "northwest",
+                branchOrder: 16
+            },
+            {
+                order: 17,
+                displayName: "桶川加納IC",
+                googleName: "首都圏中央連絡自動車道 桶川加納インターチェンジ",
+                lat: 36.022,
+                lng: 139.565,
+                routeBranch: "northwest",
+                branchOrder: 17
+            },
+            {
+                order: 18,
+                displayName: "白岡菖蒲IC",
+                googleName: "首都圏中央連絡自動車道 白岡菖蒲インターチェンジ",
+                lat: 36.047,
+                lng: 139.623,
+                routeBranch: "northwest",
+                branchOrder: 18
+            },
+            {
+                order: 19,
+                displayName: "久喜白岡JCT",
+                googleName: "首都圏中央連絡自動車道 久喜白岡ジャンクション",
+                lat: 36.049,
+                lng: 139.658,
+                isSelectable: false,
+                connection: true,
+                connectedRoads: ["keno", "tohoku"],
+                routeBranch: "northwest",
+                branchOrder: 19
             }
         ]
     },

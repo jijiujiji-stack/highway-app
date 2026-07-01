@@ -405,6 +405,13 @@ const IC_MASTER = {
                 lng: 139.872
             },
             {
+                order: 1.5,
+                displayName: "三郷料金所SIC",
+                googleName: "常磐自動車道 三郷料金所スマートインターチェンジ",
+                lat: 35.865,
+                lng: 139.883
+            },
+            {
                 order: 2,
                 displayName: "流山IC",
                 googleName: "常磐自動車道 流山インターチェンジ",
@@ -461,11 +468,26 @@ const IC_MASTER = {
                 lng: 140.259
             },
             {
+                order: 9.5,
+                displayName: "石岡小美玉SIC",
+                googleName: "常磐自動車道 石岡小美玉スマートインターチェンジ",
+                lat: 36.221,
+                lng: 140.281
+            },
+            {
                 order: 10,
                 displayName: "岩間IC",
                 googleName: "常磐自動車道 岩間インターチェンジ",
                 lat: 36.300,
                 lng: 140.306
+            },
+
+            {
+                order: 10.5,
+                displayName: "友部SA SIC",
+                googleName: "常磐自動車道 友部SAスマートインターチェンジ",
+                lat: 36.309,
+                lng: 140.341
             },
 
             {
@@ -484,11 +506,25 @@ const IC_MASTER = {
                 lng: 140.366
             },
             {
+                order: 12.5,
+                displayName: "水戸北SIC",
+                googleName: "常磐自動車道 水戸北スマートインターチェンジ",
+                lat: 36.417,
+                lng: 140.425
+            },
+            {
                 order: 13,
                 displayName: "那珂IC",
                 googleName: "常磐自動車道 那珂インターチェンジ",
                 lat: 36.486,
                 lng: 140.472
+            },
+            {
+                order: 13.5,
+                displayName: "東海SIC",
+                googleName: "常磐自動車道 東海スマートインターチェンジ",
+                lat: 36.485,
+                lng: 140.551
             },
             {
                 order: 14,

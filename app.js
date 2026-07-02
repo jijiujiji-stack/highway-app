@@ -4799,6 +4799,19 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 item.exit.isSelectable !== false
             );
 
+        const selectablePassedNexcoIcs =
+            selectablePassedIcs.filter(item =>
+                !isShutoIcForRouteAnalysis(item.exit)
+            );
+
+        const nexcoEntranceCandidate =
+            selectablePassedNexcoIcs[0]?.exit || null;
+
+        const nexcoExitCandidate =
+            selectablePassedNexcoIcs[
+                selectablePassedNexcoIcs.length - 1
+            ]?.exit || null;
+
         const shutoExitSwitch =
             roadSwitches.find(roadSwitch =>
                 roadSwitch.fromRoad === "首都高" &&
@@ -4899,6 +4912,8 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 correctedRoadSummary.roadDistances,
             entranceIc: entranceCandidate,
             exitIc: exitCandidate,
+            nexcoEntranceIc: nexcoEntranceCandidate,
+            nexcoExitIc: nexcoExitCandidate,
             shutoEntranceIc:
                 shutoEntranceAnalysis.selectedIc,
             shutoExitIc:
@@ -4967,6 +4982,8 @@ function logHighwayRoutePolylineAnalysis(
         roadDistances: roadDistanceLogs,
         entranceIc: entranceCandidate,
         exitIc: exitCandidate,
+        nexcoEntranceIc = null,
+        nexcoExitIc = null,
         shutoEntranceIc = null,
         shutoExitIc = null,
         shutoDetail = {
@@ -5129,6 +5146,41 @@ function logHighwayRoutePolylineAnalysis(
         console.log(
             "選定首都高出口:",
             shutoExitIc?.displayName || "なし"
+        );
+
+        console.groupEnd();
+
+        console.group("[ROUTE TOLL IC DETAIL]");
+
+        console.log(
+            "通過IC順:",
+            passedIcEntries
+                .map(item => item.exit.displayName)
+                .join(" → ")
+        );
+        console.log(
+            "料金計算用NEXCO入口:",
+            nexcoEntranceIc?.displayName || "なし"
+        );
+        console.log(
+            "料金計算用NEXCO出口:",
+            nexcoExitIc?.displayName || "なし"
+        );
+        console.log(
+            "首都高入口:",
+            shutoEntranceIc?.displayName || "なし"
+        );
+        console.log(
+            "首都高出口:",
+            shutoExitIc?.displayName || "なし"
+        );
+        console.log(
+            "現在のentranceIc:",
+            entranceCandidate?.displayName || "なし"
+        );
+        console.log(
+            "現在のexitIc:",
+            exitCandidate?.displayName || "なし"
         );
 
         console.groupEnd();

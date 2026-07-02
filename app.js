@@ -8524,12 +8524,50 @@ function evaluateEntranceCandidateEligibility(result) {
     };
 }
 
+function buildExitCandidateValueNote(result) {
+    if (
+        !result ||
+        result.savedToll === null ||
+        result.savedToll === undefined ||
+        result.savedToll <= 0 ||
+        result.differenceFromAllHighway === null ||
+        result.differenceFromAllHighway === undefined
+    ) {
+        return "";
+    }
+
+    if (result.differenceFromAllHighway <= 0) {
+        return "遅れなしで節約あり";
+    }
+
+    const efficiencyText =
+        result.yenPerDelayedMinute === null ||
+        result.yenPerDelayedMinute === undefined
+            ? ""
+            : "（1分あたり" +
+                result.yenPerDelayedMinute +
+                "円）";
+
+    return (
+        result.differenceFromAllHighway +
+        "分の遅れで" +
+        result.savedToll +
+        "円節約" +
+        efficiencyText +
+        "。時間優先なら通常出口がおすすめ"
+    );
+}
+
 function evaluateExitCandidateEligibility(result) {
+
+    const valueNote =
+        buildExitCandidateValueNote(result);
 
     if (result.error) {
         return {
             recommendationEligibility: "error",
-            weakReason: "計算エラー"
+            weakReason: "計算エラー",
+            valueNote
         };
     }
 
@@ -8541,7 +8579,8 @@ function evaluateExitCandidateEligibility(result) {
     ) {
         return {
             recommendationEligibility: "weak",
-            weakReason: "全高速との差分または節約額不明"
+            weakReason: "全高速との差分または節約額不明",
+            valueNote
         };
     }
 
@@ -8551,27 +8590,45 @@ function evaluateExitCandidateEligibility(result) {
     ) {
         return {
             recommendationEligibility: "weak",
-            weakReason: "逆に高く、時間も遅い"
+            weakReason: "逆に高く、時間も遅い",
+            valueNote
         };
     }
 
     if (result.savedToll < 0) {
         return {
             recommendationEligibility: "weak",
-            weakReason: "逆に高い"
+            weakReason: "逆に高い",
+            valueNote
         };
     }
 
     if (result.savedToll === 0) {
         return {
             recommendationEligibility: "weak",
-            weakReason: "節約なし"
+            weakReason: "節約なし",
+            valueNote
+        };
+    }
+
+    const acceptableDelayMinutes =
+        getAcceptableDelayMinutes();
+
+    if (
+        result.differenceFromAllHighway >
+        acceptableDelayMinutes
+    ) {
+        return {
+            recommendationEligibility: "weak",
+            weakReason: "許容遅れ超過",
+            valueNote
         };
     }
 
     return {
         recommendationEligibility: "eligible",
-        weakReason: ""
+        weakReason: "",
+        valueNote
     };
 }
 
@@ -8667,8 +8724,9 @@ function logExitComparisonResultSummary(results) {
                 (
                     result.differenceFromAllHighway <= 0
                         ? "節約あり、全高速より速いまたは同等"
-                        : "節約あり"
-                )
+                        : "許容遅れ内で節約あり"
+                ),
+            valueNote: evaluation.valueNote
         };
     });
 
@@ -10654,6 +10712,13 @@ function buildExitIcComparisonV2CardHtml(result) {
                 "</div>"
             : "";
 
+    const valueNote =
+        result.valueNote
+            ? "<div class=\"v2-exit-value-note\">" +
+                escapeHtml(result.valueNote) +
+                "</div>"
+            : "";
+
     return (
         "<div class=\"" + classNames + "\">" +
         "<div class=\"v2-exit-name\">" +
@@ -10672,6 +10737,7 @@ function buildExitIcComparisonV2CardHtml(result) {
         "<br>合計" +
         formatV2Duration(result.totalMinutes) +
         excludedNote +
+        valueNote +
         weakCandidateNote +
         "</div>" +
         "</div>"

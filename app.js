@@ -10735,11 +10735,10 @@ async function prepareV2SimpleDiagnosticCandidates(
     }
 
     if (icAreaReason) {
-        icAreaReason.textContent =
-            "方面判定：" +
-            IC_MASTER[icArea].label +
-            " / " +
-            reasonText;
+        icAreaReason.innerHTML =
+            buildPolylineComparisonSummaryHtml(
+                lastHighwayRoutePolylineAnalysis
+            );
     }
 
     const candidateReason =
@@ -13294,6 +13293,83 @@ function shortenIcName(name) {
         .replace("スマートインターチェンジ", "SIC");
 }
 
+function buildPolylineComparisonSummaryHtml(
+    polylineAnalysis
+) {
+
+    if (!polylineAnalysis) {
+        return "解析方式：Polyline解析（解析結果なし）";
+    }
+
+    const lines = [];
+
+    const roadNames = [
+        ...new Set(
+            (polylineAnalysis.roadSequence || [])
+                .filter(Boolean)
+        )
+    ];
+
+    if (roadNames.length > 0) {
+        lines.push(
+            "想定道路：" + roadNames.join(" → ")
+        );
+    }
+
+    const entranceNames = [];
+    const entranceIdentities = new Set();
+
+    [
+        polylineAnalysis.shutoEntranceIc,
+        polylineAnalysis.nexcoEntranceIc
+    ].forEach(exit => {
+        const identity =
+            exit?.googleName ||
+            (
+                exit
+                    ? exit.displayName + "|" +
+                        exit.lat + "|" + exit.lng
+                    : ""
+            );
+
+        if (
+            !identity ||
+            entranceIdentities.has(identity)
+        ) {
+            return;
+        }
+
+        entranceIdentities.add(identity);
+        entranceNames.push(exit.displayName);
+    });
+
+    if (entranceNames.length > 0) {
+        lines.push(
+            "通常入口：" + entranceNames.join(" → ")
+        );
+    }
+
+    const normalExit =
+        polylineAnalysis.nexcoExitIc ||
+        polylineAnalysis.exitIc;
+
+    if (normalExit?.displayName) {
+        lines.push(
+            "通常出口：" + normalExit.displayName
+        );
+    }
+
+    if (lines.length === 0) {
+        lines.push("解析方式：Polyline解析");
+    }
+
+    return lines
+        .map(line =>
+            "<div>" + escapeHtml(line) + "</div>"
+        )
+        .join("");
+}
+
 
 async function searchAutoExitIcComparison(
     shouldClosePanel = true
@@ -13386,6 +13462,11 @@ async function searchAutoExitIcComparison(
     const icAreaReason =
         document.getElementById("icAreaReason");
 
+    if (icAreaReason) {
+        icAreaReason.textContent =
+            "Polyline解析結果を確認中...";
+    }
+
     let distanceOnlyIcAreaInfo = null;
 
     if (autoIcAreaEnabled) {
@@ -13423,25 +13504,6 @@ async function searchAutoExitIcComparison(
 
             setResolvedIcArea(icArea);
 
-            icAreaReason.innerHTML =
-                "<span style='color:#4CAF50'>" +
-                "方面判定：距離だけ方式（" +
-                IC_MASTER[icArea].label +
-                "） / 出発地最寄りIC：" +
-                distanceOnlyIcAreaInfo.originIc.displayName +
-                "（約" +
-                distanceOnlyIcAreaInfo.originDistanceKm +
-                "km）" +
-                " / 目的地最寄りIC：" +
-                distanceOnlyIcAreaInfo.destinationIc.displayName +
-                "（約" +
-                distanceOnlyIcAreaInfo.destinationDistanceKm +
-                "km）" +
-                " / 距離合計：約" +
-                distanceOnlyIcAreaInfo.score +
-                "km" +
-                "</span>";
-
         }
         else {
 
@@ -13456,41 +13518,11 @@ async function searchAutoExitIcComparison(
 
                     setResolvedIcArea(suggestedIcArea);
 
-                    icAreaReason.innerHTML =
-                        "<span style='color:#4CAF50'>" +
-                        "方面判定：" +
-                        IC_MASTER[suggestedIcArea].label +
-                        "（" +
-                        getIcAreaDecisionLabel() +
-                        "）" +
-                        "</span>";
-
-                }
-                else {
-                    icAreaReason.textContent =
-                        "方面判定：未判定";
                 }
 
-            }
-            else {
-                icAreaReason.innerHTML =
-                    "<span style='color:#f1c40f'>" +
-                    "方面判定：距離だけ方式で未判定 / 手動選択を使用（" +
-                    IC_MASTER[icArea].label +
-                    "）" +
-                    "</span>";
             }
         }
 
-    }
-    else {
-
-        icAreaReason.innerHTML =
-            "<span style='color:#f1c40f'>" +
-            "方面判定：手動選択を使用（" +
-            IC_MASTER[icArea].label +
-            "）" +
-            "</span>";
     }
 
     const highwayStartInfo =
@@ -13702,6 +13734,13 @@ async function searchAutoExitIcComparison(
     if (selectedExits.length === 0) {
         reasonText =
             noExitCandidatesMessage;
+    }
+
+    if (icAreaReason) {
+        icAreaReason.innerHTML =
+            buildPolylineComparisonSummaryHtml(
+                lastHighwayRoutePolylineAnalysis
+            );
     }
 
     document

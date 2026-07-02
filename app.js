@@ -890,7 +890,7 @@ const IC_MASTER = {
             { order: 3, displayName: "横浜青葉IC", googleName: "東名高速道路 横浜青葉インターチェンジ", lat: 35.542, lng: 139.537 },
             { order: 4, displayName: "横浜町田IC", googleName: "東名高速道路 横浜町田インターチェンジ", lat: 35.513, lng: 139.474 },
             { order: 5, displayName: "綾瀬SIC", googleName: "東名高速道路 綾瀬スマートインターチェンジ", lat: 35.436, lng: 139.429 },
-            { order: 6, displayName: "厚木IC", googleName: "東名高速道路 厚木インターチェンジ", lat: 35.417, lng: 139.364 },
+            { order: 6, displayName: "厚木IC", googleName: "東名高速道路 厚木インターチェンジ", lat: 35.417, lng: 139.364, connection: true, connectedRoads: ["tomei", "odawaraAtsugi"] },
             { order: 7, displayName: "秦野中井IC", googleName: "東名高速道路 秦野中井インターチェンジ", lat: 35.374, lng: 139.214 },
             { order: 8, displayName: "大井松田IC", googleName: "東名高速道路 大井松田インターチェンジ", lat: 35.344, lng: 139.152 },
             { order: 8.5, displayName: "足柄SIC", googleName: "東名高速道路 足柄スマートインターチェンジ", lat: 35.314, lng: 138.966 },
@@ -914,6 +914,105 @@ const IC_MASTER = {
             { order: 21, displayName: "磐田IC", googleName: "東名高速道路 磐田インターチェンジ", lat: 34.783, lng: 137.823 },
             { order: 21.5, displayName: "遠州豊田SIC", googleName: "東名高速道路 遠州豊田スマートインターチェンジ", lat: 34.748, lng: 137.840 },
             { order: 22, displayName: "浜松IC", googleName: "東名高速道路 浜松インターチェンジ", lat: 34.758, lng: 137.773 }
+        ]
+    },
+
+
+    odawaraAtsugi: {
+        label: "小田原厚木道路方面",
+        exits: [
+            {
+                order: 1,
+                displayName: "厚木IC",
+                googleName: "小田原厚木道路 厚木インターチェンジ",
+                lat: 35.417,
+                lng: 139.364,
+                roadType: "小田原厚木道路",
+                routeBranch: "odawaraAtsugi",
+                branchOrder: 1,
+                connection: true,
+                connectedRoads: ["tomei", "odawaraAtsugi"]
+            },
+            {
+                order: 2,
+                displayName: "厚木西IC",
+                googleName: "小田原厚木道路 厚木西インターチェンジ",
+                lat: 35.41657,
+                lng: 139.3509,
+                roadType: "小田原厚木道路",
+                routeBranch: "odawaraAtsugi",
+                branchOrder: 2
+            },
+            {
+                order: 3,
+                displayName: "伊勢原IC",
+                googleName: "小田原厚木道路 伊勢原インターチェンジ",
+                lat: 35.38629,
+                lng: 139.3314,
+                roadType: "小田原厚木道路",
+                routeBranch: "odawaraAtsugi",
+                branchOrder: 3
+            },
+            {
+                order: 4,
+                displayName: "平塚IC",
+                googleName: "小田原厚木道路 平塚インターチェンジ",
+                lat: 35.35883,
+                lng: 139.3028,
+                roadType: "小田原厚木道路",
+                routeBranch: "odawaraAtsugi",
+                branchOrder: 4
+            },
+            {
+                order: 5,
+                displayName: "大磯IC",
+                googleName: "小田原厚木道路 大磯インターチェンジ",
+                lat: 35.31957,
+                lng: 139.2719,
+                roadType: "小田原厚木道路",
+                routeBranch: "odawaraAtsugi",
+                branchOrder: 5
+            },
+            {
+                order: 6,
+                displayName: "二宮IC",
+                googleName: "小田原厚木道路 二宮インターチェンジ",
+                lat: 35.30803,
+                lng: 139.2378,
+                roadType: "小田原厚木道路",
+                routeBranch: "odawaraAtsugi",
+                branchOrder: 6
+            },
+            {
+                order: 7,
+                displayName: "小田原東IC",
+                googleName: "小田原厚木道路 小田原東インターチェンジ",
+                lat: 35.28621,
+                lng: 139.1697,
+                roadType: "小田原厚木道路",
+                routeBranch: "odawaraAtsugi",
+                branchOrder: 7
+            },
+            {
+                order: 8,
+                displayName: "荻窪IC",
+                googleName: "小田原厚木道路 荻窪インターチェンジ",
+                lat: 35.25742,
+                lng: 139.13601,
+                roadType: "小田原厚木道路",
+                routeBranch: "odawaraAtsugi",
+                branchOrder: 8
+            },
+            {
+                order: 9,
+                displayName: "小田原西IC",
+                googleName: "小田原厚木道路 小田原西インターチェンジ",
+                lat: 35.2446,
+                lng: 139.1352,
+                roadType: "小田原厚木道路",
+                routeBranch: "odawaraAtsugi",
+                branchOrder: 9
+            }
         ]
     },
 

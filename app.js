@@ -17,6 +17,9 @@ const DEV_IC_CANDIDATE_COUNT = 3;
 // 通常運用時の候補IC数
 const PROD_IC_CANDIDATE_COUNT = 5;
 
+// 入口比較でおすすめ対象にする最低短縮時間
+const MIN_ENTRANCE_RECOMMEND_SAVED_MINUTES = 5;
+
 // 実際に使用する候補IC数
 let isRealDriveTestMode = false;
 
@@ -9637,6 +9640,219 @@ function displayExitIcComparisonV2Results(results) {
         "</div>";
 }
 
+const bestIcV2DebugLoggedResults = {
+    entrance: new WeakSet(),
+    exit: new WeakSet()
+};
+
+function summarizeRecommendScoreDetail(detail) {
+    if (!detail) {
+        return "";
+    }
+
+    const summary =
+        typeof detail === "string"
+            ? detail
+            : Object.entries(detail)
+                .map(([key, value]) =>
+                    key + ":" + String(value)
+                )
+                .join(" / ");
+
+    return summary.length > 100
+        ? summary.slice(0, 100) + "..."
+        : summary;
+}
+
+function getBestIcV2ExclusionReason(
+    mode,
+    result,
+    inRecommendationPool,
+    acceptableDelayMinutes
+) {
+    if (!inRecommendationPool) {
+        return "eligible候補を優先したためpool外";
+    }
+
+    if (result.error) {
+        return "計算エラー";
+    }
+
+    if (mode === "entrance") {
+        if (!(result.differenceFromAllLocal > 0)) {
+            return "differenceFromAllLocalが0以下";
+        }
+        if (
+            !(
+                result.differenceFromAllLocal >=
+                MIN_ENTRANCE_RECOMMEND_SAVED_MINUTES
+            )
+        ) {
+            return "短縮時間が入口おすすめ最低短縮分未満";
+        }
+        if (result.yenPerSavedMinute === null) {
+            return "yenPerSavedMinuteがnull";
+        }
+    }
+    else {
+        if (!(result.savedToll > 0)) {
+            return "savedTollが0以下";
+        }
+        if (!(result.differenceFromAllHighway > 0)) {
+            return "differenceFromAllHighwayが0以下";
+        }
+        if (
+            !(
+                result.differenceFromAllHighway <=
+                acceptableDelayMinutes
+            )
+        ) {
+            return "遅延時間が許容時間条件超過";
+        }
+        if (result.yenPerDelayedMinute === null) {
+            return "yenPerDelayedMinuteがnull";
+        }
+    }
+
+    if (result.recommendScore === null) {
+        return "recommendScoreがnull";
+    }
+
+    return "なし";
+}
+
+function logBestIcV2Debug({
+    mode,
+    results,
+    eligibleResults,
+    recommendationPool,
+    candidates,
+    bestResult,
+    acceptableDelayMinutes
+}) {
+    if (bestIcV2DebugLoggedResults[mode].has(results)) {
+        return;
+    }
+
+    bestIcV2DebugLoggedResults[mode].add(results);
+
+    const recommendationPoolSet =
+        new Set(recommendationPool);
+
+    const finalCandidateSet = new Set(candidates);
+
+    const candidateRows = results.map(result => {
+        const inRecommendationPool =
+            recommendationPoolSet.has(result);
+
+        const comparisonValues =
+            mode === "entrance"
+                ? {
+                    differenceFromAllLocal:
+                        result.differenceFromAllLocal,
+                    yenPerSavedMinute:
+                        result.yenPerSavedMinute,
+                    estimatedToll:
+                        result.estimatedToll
+                }
+                : {
+                    savedToll: result.savedToll,
+                    differenceFromAllHighway:
+                        result.differenceFromAllHighway,
+                    yenPerDelayedMinute:
+                        result.yenPerDelayedMinute
+                };
+
+        return {
+            candidateIcName: result.candidateIcName,
+            eligibility:
+                result.recommendationEligibility,
+            weakReason: result.weakReason || "",
+            ...comparisonValues,
+            recommendScore: result.recommendScore,
+            scoreDetailSummary:
+                summarizeRecommendScoreDetail(
+                    result.recommendScoreDetail
+                ),
+            inRecommendationPool,
+            inFinalCandidates:
+                finalCandidateSet.has(result),
+            exclusionReason:
+                getBestIcV2ExclusionReason(
+                    mode,
+                    result,
+                    inRecommendationPool,
+                    acceptableDelayMinutes
+                )
+        };
+    });
+
+    const poolExclusionReasons = [
+        ...new Set(
+            candidateRows
+                .filter(row =>
+                    row.inRecommendationPool &&
+                    !row.inFinalCandidates
+                )
+                .map(row => row.exclusionReason)
+        )
+    ];
+
+    let noBestReason = "なし";
+
+    if (!bestResult) {
+        if (results.length === 0) {
+            noBestReason = "results自体が空";
+        }
+        else if (recommendationPool.length === 0) {
+            noBestReason =
+                "bestResult計算前に候補が0件";
+        }
+        else if (candidates.length === 0) {
+            noBestReason =
+                (
+                    eligibleResults.length > 0
+                        ? "eligible候補はあるが、"
+                        : "recommendationPoolはあるが、"
+                ) +
+                "getBest内の絞り込み後 candidates が空" +
+                (
+                    poolExclusionReasons.length > 0
+                        ? "（" +
+                            poolExclusionReasons.join(" / ") +
+                            "）"
+                        : ""
+                );
+        }
+    }
+
+    console.group(
+        mode === "entrance"
+            ? "[ENTRANCE BEST DEBUG]"
+            : "[EXIT BEST DEBUG]"
+    );
+    console.log("全results件数:", results.length);
+    console.log(
+        "eligibleResults件数:",
+        eligibleResults.length
+    );
+    console.log(
+        "recommendationPool件数:",
+        recommendationPool.length
+    );
+    console.log("candidates件数:", candidates.length);
+    console.log(
+        "最終bestResult:",
+        bestResult?.candidateIcName || "なし"
+    );
+    console.log(
+        "bestResultなし推定理由:",
+        noBestReason
+    );
+    console.table(candidateRows);
+    console.groupEnd();
+}
+
 function getBestExitIcV2(results) {
 
     if (!Array.isArray(results)) {
@@ -9695,7 +9911,19 @@ function getBestExitIcV2(results) {
                 );
             });
 
-    return candidates[0] || null;
+    const bestResult = candidates[0] || null;
+
+    logBestIcV2Debug({
+        mode: "exit",
+        results,
+        eligibleResults,
+        recommendationPool,
+        candidates,
+        bestResult,
+        acceptableDelayMinutes
+    });
+
+    return bestResult;
 }
 
 function getReferenceExitIcV2(results) {
@@ -9967,9 +10195,6 @@ function getBestEntranceIcV2(results) {
         return null;
     }
 
-    const acceptableDelayMinutes =
-        getAcceptableDelayMinutes();
-
     const eligibleResults =
         results.filter(result =>
             result.recommendationEligibility === "eligible"
@@ -9986,7 +10211,7 @@ function getBestEntranceIcV2(results) {
                 !result.error &&
                 result.differenceFromAllLocal > 0 &&
                 result.differenceFromAllLocal >=
-                    acceptableDelayMinutes &&
+                    MIN_ENTRANCE_RECOMMEND_SAVED_MINUTES &&
                 result.yenPerSavedMinute !== null &&
                 result.recommendScore !== null
             )
@@ -10028,7 +10253,19 @@ function getBestEntranceIcV2(results) {
                 );
             });
 
-    return candidates[0] || null;
+    const bestResult = candidates[0] || null;
+
+    logBestIcV2Debug({
+        mode: "entrance",
+        results,
+        eligibleResults,
+        recommendationPool,
+        candidates,
+        bestResult,
+        acceptableDelayMinutes: null
+    });
+
+    return bestResult;
 }
 
 function getReferenceEntranceIcV2(results) {

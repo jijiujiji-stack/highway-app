@@ -3071,8 +3071,17 @@ async function estimateMainHighwayToll(
         amount: fallbackAmount,
         label: "料金計算：ルート総距離ベース",
         usedPolylineAnalysis: false,
+        usedNexcoPolylineIc: false,
         startIc: null,
         endIc: null,
+        polylineStartIc:
+            polylineAnalysis?.entranceIc || null,
+        polylineEndIc:
+            polylineAnalysis?.exitIc || null,
+        nexcoStartIc:
+            polylineAnalysis?.nexcoEntranceIc || null,
+        nexcoEndIc:
+            polylineAnalysis?.nexcoExitIc || null,
         legacyStartIc,
         legacyEndIc,
         fallbackReason
@@ -3145,27 +3154,47 @@ async function estimateMainHighwayToll(
                 );
         }
 
-        const analyzedStartIc =
+        const polylineStartIc =
             polylineAnalysis?.entranceIc;
 
-        const analyzedEndIc =
+        const polylineEndIc =
             polylineAnalysis?.exitIc;
 
-        const canUsePolylineAnalysis =
+        const nexcoStartIc =
+            polylineAnalysis?.nexcoEntranceIc;
+
+        const nexcoEndIc =
+            polylineAnalysis?.nexcoExitIc;
+
+        const canUseNexcoPolylineIcs =
             Boolean(
-                analyzedStartIc?.googleName &&
-                analyzedEndIc?.googleName
+                nexcoStartIc?.googleName &&
+                nexcoEndIc?.googleName
             );
 
+        const canUseDefaultPolylineIcs =
+            Boolean(
+                polylineStartIc?.googleName &&
+                polylineEndIc?.googleName
+            );
+
+        const canUsePolylineAnalysis =
+            canUseNexcoPolylineIcs ||
+            canUseDefaultPolylineIcs;
+
         const startIc =
-            canUsePolylineAnalysis
-                ? analyzedStartIc
-                : legacyStartIc;
+            canUseNexcoPolylineIcs
+                ? nexcoStartIc
+                : canUseDefaultPolylineIcs
+                    ? polylineStartIc
+                    : legacyStartIc;
 
         const endIc =
-            canUsePolylineAnalysis
-                ? analyzedEndIc
-                : legacyEndIc;
+            canUseNexcoPolylineIcs
+                ? nexcoEndIc
+                : canUseDefaultPolylineIcs
+                    ? polylineEndIc
+                    : legacyEndIc;
 
         if (
             !startIc ||
@@ -3216,11 +3245,30 @@ async function estimateMainHighwayToll(
                 legacyEndIc.order;
         }
 
+        const shutoTollStartIc =
+            canUseDefaultPolylineIcs
+                ? polylineStartIc
+                : startIc;
+
+        const shutoTollEndIc =
+            canUseDefaultPolylineIcs
+                ? polylineEndIc
+                : endIc;
+
+        const shutoToll =
+            getShutoTollEstimateForIcPair(
+                shutoTollStartIc,
+                shutoTollEndIc
+            );
+
         if (
             startIc.googleName === endIc.googleName
         ) {
             return {
-                amount: 0,
+                amount:
+                    canUseNexcoPolylineIcs
+                        ? shutoToll
+                        : 0,
                 label:
                     "料金計算：" +
                     formatTollRouteLabel(
@@ -3231,6 +3279,12 @@ async function estimateMainHighwayToll(
                 legacyEndIc,
                 usedPolylineAnalysis:
                     canUsePolylineAnalysis,
+                usedNexcoPolylineIc:
+                    canUseNexcoPolylineIcs,
+                polylineStartIc,
+                polylineEndIc,
+                nexcoStartIc,
+                nexcoEndIc,
                 startIc,
                 endIc,
                 fallbackReason: null
@@ -3251,12 +3305,6 @@ async function estimateMainHighwayToll(
                 tollKm * 24
             );
 
-        const shutoToll =
-            getShutoTollEstimateForIcPair(
-                startIc,
-                endIc
-            );
-
         return {
             amount:
                 baseToll + shutoToll,
@@ -3270,6 +3318,12 @@ async function estimateMainHighwayToll(
             legacyEndIc,
             usedPolylineAnalysis:
                 canUsePolylineAnalysis,
+            usedNexcoPolylineIc:
+                canUseNexcoPolylineIcs,
+            polylineStartIc,
+            polylineEndIc,
+            nexcoStartIc,
+            nexcoEndIc,
             startIc,
             endIc,
             fallbackReason: null
@@ -3288,6 +3342,9 @@ async function estimateMainHighwayToll(
 
 function logMainHighwayTollCalculation(tollEstimate) {
 
+    const usedNexcoPolylineIc =
+        tollEstimate?.usedNexcoPolylineIc === true;
+
     const usedPolylineAnalysis =
         tollEstimate?.usedPolylineAnalysis === true;
 
@@ -3298,11 +3355,13 @@ function logMainHighwayTollCalculation(tollEstimate) {
         );
 
     const calculationLogic =
-        usedPolylineAnalysis
-            ? "Polyline解析IC"
-            : usedIcCalculation
-                ? "旧ロジックIC"
-                : "距離ベース";
+        usedNexcoPolylineIc
+            ? "Polyline解析NEXCO IC"
+            : usedPolylineAnalysis
+                ? "Polyline解析IC"
+                : usedIcCalculation
+                    ? "旧ロジックIC"
+                    : "距離ベース";
 
     console.group("[ETC概算 料金計算]");
     console.log("料金計算ロジック：", calculationLogic);

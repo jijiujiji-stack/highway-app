@@ -1690,6 +1690,7 @@ let currentMultiIcMode = "entrance";
 let lastMultiIcV2Results = [];
 let lastExitIcV2Results = [];
 let lastHighwayRoutePolylineAnalysis = null;
+let lastHighwayRoutePolylineAnalysisKey = "";
 
 const V2_DIAGNOSTIC_DESTINATIONS = [
     "筑波山",
@@ -1698,6 +1699,31 @@ const V2_DIAGNOSTIC_DESTINATIONS = [
 ];
 
 const TEST_ORIGIN = "荒川区役所";
+
+function buildRouteAnalysisKey(origin, destination) {
+    return (
+        String(origin || "").trim() +
+        " -> " +
+        String(destination || "").trim()
+    );
+}
+
+function clearLastHighwayRoutePolylineAnalysis(reason) {
+    if (
+        !lastHighwayRoutePolylineAnalysis &&
+        !lastHighwayRoutePolylineAnalysisKey
+    ) {
+        return;
+    }
+
+    lastHighwayRoutePolylineAnalysis = null;
+    lastHighwayRoutePolylineAnalysisKey = "";
+
+    console.log(
+        "[ROUTE POLYLINE ANALYSIS CLEARED]",
+        reason
+    );
+}
 
 const TEST_DESTINATIONS = [
     { area: "joban", name: "筑波山" },
@@ -1778,6 +1804,10 @@ window.addEventListener("load", () => {
         "input",
         function () {
 
+            clearLastHighwayRoutePolylineAnalysis(
+                "目的地入力変更"
+            );
+
             selectedDestinationAddress = "";
             selectedDestinationDisplayName = "";
             selectedDestinationPlaceId = "";
@@ -1795,6 +1825,10 @@ window.addEventListener("load", () => {
         "input",
         function () {
 
+            clearLastHighwayRoutePolylineAnalysis(
+                "出発地入力変更"
+            );
+
             selectedOriginAddress = "";
             selectedOriginPlaceId = "";
             selectedOriginLatLng = null;
@@ -1809,6 +1843,10 @@ window.addEventListener("load", () => {
     clearDestinationButton.addEventListener(
         "click",
         function () {
+
+            clearLastHighwayRoutePolylineAnalysis(
+                "目的地クリア"
+            );
 
             destinationInput.value = "";
             selectedDestinationAddress = "";
@@ -1835,6 +1873,10 @@ window.addEventListener("load", () => {
     clearOriginButton.addEventListener(
         "click",
         function () {
+
+            clearLastHighwayRoutePolylineAnalysis(
+                "出発地クリア"
+            );
 
             originInput.value = "";
             selectedOriginAddress = "";
@@ -1987,6 +2029,10 @@ function initializeAutocomplete() {
 
     originAutocomplete.addListener("place_changed", () => {
 
+        clearLastHighwayRoutePolylineAnalysis(
+            "出発地Autocomplete選択"
+        );
+
         const place =
             originAutocomplete.getPlace();
 
@@ -2016,6 +2062,10 @@ function initializeAutocomplete() {
     });
 
     destinationAutocomplete.addListener("place_changed", () => {
+
+        clearLastHighwayRoutePolylineAnalysis(
+            "目的地Autocomplete選択"
+        );
 
         const place =
             destinationAutocomplete.getPlace();
@@ -2557,6 +2607,11 @@ async function displayRouteComparison(
 
     lastHighwayRoutePolylineAnalysis =
         polylineAnalysis;
+
+    lastHighwayRoutePolylineAnalysisKey =
+        polylineAnalysis
+            ? buildRouteAnalysisKey(origin, destination)
+            : "";
 
     const tollEstimate =
         await estimateMainHighwayToll(
@@ -5292,6 +5347,175 @@ function selectLimitedComparisonIcCandidates(
         startIndex,
         startIndex + limitedCount
     );
+}
+
+function selectPolylineBasedMultiIcCandidates({
+    mode,
+    legacySelectedExits,
+    origin,
+    destination
+}) {
+
+    const apiCandidateLimit =
+        getActiveIcCandidateCount();
+
+    const currentRouteAnalysisKey =
+        buildRouteAnalysisKey(origin, destination);
+
+    const hasPolylineAnalysis =
+        Boolean(lastHighwayRoutePolylineAnalysis);
+
+    const analysisKeyMatches =
+        hasPolylineAnalysis &&
+        lastHighwayRoutePolylineAnalysisKey ===
+            currentRouteAnalysisKey;
+
+    const candidateProperty =
+        mode === "entrance"
+            ? "entranceCandidateIcs"
+            : "exitCandidateIcs";
+
+    const referenceProperty =
+        mode === "entrance"
+            ? "nexcoEntranceIc"
+            : "nexcoExitIc";
+
+    const nexcoMissingReason =
+        mode === "entrance"
+            ? "NEXCO入口ICなし"
+            : "NEXCO出口ICなし";
+
+    let polylineApiCandidates = [];
+
+    if (analysisKeyMatches) {
+        const polylineCandidatePreview =
+            buildPolylineBasedComparisonIcCandidates(
+                lastHighwayRoutePolylineAnalysis
+            );
+
+        polylineApiCandidates =
+            selectLimitedComparisonIcCandidates(
+                polylineCandidatePreview?.[candidateProperty] || [],
+                lastHighwayRoutePolylineAnalysis[referenceProperty],
+                apiCandidateLimit
+            );
+    }
+
+    let selectedExits = [];
+    let candidateSelectionLogic = "候補なし";
+    let fallbackReason = "なし";
+
+    if (polylineApiCandidates.length > 0) {
+        selectedExits =
+            polylineApiCandidates.map(candidate =>
+                candidate.exit
+            );
+        candidateSelectionLogic = "Polyline解析候補";
+    }
+    else {
+        if (!hasPolylineAnalysis) {
+            fallbackReason = "Polyline解析結果なし";
+        }
+        else if (!analysisKeyMatches) {
+            fallbackReason =
+                "Polyline解析結果が現在の出発地・目的地と不一致";
+        }
+        else if (
+            !lastHighwayRoutePolylineAnalysis[referenceProperty]
+        ) {
+            fallbackReason = nexcoMissingReason;
+        }
+        else {
+            fallbackReason = "Polyline解析候補なし";
+        }
+
+        if (legacySelectedExits.length > 0) {
+            selectedExits = legacySelectedExits;
+            candidateSelectionLogic = "既存ロジック候補";
+        }
+    }
+
+    const candidateNames =
+        selectedExits
+            .map(exit =>
+                exit.displayName +
+                (
+                    isShutoIcForRouteAnalysis(exit)
+                        ? " [首都高]"
+                        : ""
+                )
+            )
+            .join(" → ");
+
+    return {
+        selectedExits,
+        candidateSelectionLogic,
+        fallbackReason,
+        apiCandidateLimit,
+        candidateNames,
+        apiCallCount: selectedExits.length,
+        analysisKeyMatches,
+        savedRouteAnalysisKey:
+            lastHighwayRoutePolylineAnalysisKey,
+        currentRouteAnalysisKey
+    };
+}
+
+function logMultiIcCandidateSelection(mode, selection) {
+
+    const isEntrance = mode === "entrance";
+
+    console.group(
+        isEntrance
+            ? "[ENTRANCE COMPARISON CANDIDATES]"
+            : "[EXIT COMPARISON CANDIDATES]"
+    );
+    console.log(
+        "候補選定ロジック:",
+        selection.candidateSelectionLogic
+    );
+    console.log(
+        "解析キー一致:",
+        selection.analysisKeyMatches
+    );
+
+    if (
+        DEBUG_ROUTE_VERBOSE &&
+        !selection.analysisKeyMatches
+    ) {
+        console.log(
+            "保存済み解析キー:",
+            selection.savedRouteAnalysisKey || "なし"
+        );
+        console.log(
+            "現在の検索キー:",
+            selection.currentRouteAnalysisKey
+        );
+    }
+
+    console.log(
+        "API候補上限:",
+        selection.apiCandidateLimit
+    );
+    console.log(
+        "実車テストモード:",
+        isRealDriveTestMode ? "ON" : "OFF"
+    );
+    console.log(
+        isEntrance
+            ? "API実行入口候補IC:"
+            : "API実行出口候補IC:",
+        selection.candidateNames || "なし"
+    );
+    console.log(
+        "API呼び出し予定件数:",
+        selection.apiCallCount
+    );
+    console.log(
+        "フォールバック理由:",
+        selection.fallbackReason
+    );
+    console.groupEnd();
 }
 
 function logHighwayRoutePolylineAnalysis(
@@ -11265,192 +11489,21 @@ async function searchAutoExitIcComparison(
             }
         );
 
-    let selectedExits = legacySelectedExits;
+    const multiIcCandidateSelection =
+        selectPolylineBasedMultiIcCandidates({
+            mode: currentMultiIcMode,
+            legacySelectedExits,
+            origin,
+            destination
+        });
 
-    if (currentMultiIcMode === "entrance") {
-        const apiCandidateLimit =
-            getActiveIcCandidateCount();
+    const selectedExits =
+        multiIcCandidateSelection.selectedExits;
 
-        const polylineCandidatePreview =
-            buildPolylineBasedComparisonIcCandidates(
-                lastHighwayRoutePolylineAnalysis
-            );
-
-        const polylineApiCandidates =
-            selectLimitedComparisonIcCandidates(
-                polylineCandidatePreview
-                    ?.entranceCandidateIcs || [],
-                lastHighwayRoutePolylineAnalysis
-                    ?.nexcoEntranceIc,
-                apiCandidateLimit
-            );
-
-        let candidateSelectionLogic = "候補なし";
-        let fallbackReason = "なし";
-
-        if (polylineApiCandidates.length > 0) {
-            selectedExits =
-                polylineApiCandidates.map(candidate =>
-                    candidate.exit
-                );
-            candidateSelectionLogic = "Polyline解析候補";
-        }
-        else if (legacySelectedExits.length > 0) {
-            selectedExits = legacySelectedExits;
-            candidateSelectionLogic = "既存ロジック候補";
-
-            if (!lastHighwayRoutePolylineAnalysis) {
-                fallbackReason =
-                    "通常検索のPolyline解析結果なし";
-            }
-            else if (
-                !lastHighwayRoutePolylineAnalysis
-                    .nexcoEntranceIc
-            ) {
-                fallbackReason = "NEXCO入口ICなし";
-            }
-            else {
-                fallbackReason = "Polyline解析候補なし";
-            }
-        }
-        else {
-            selectedExits = [];
-            fallbackReason =
-                lastHighwayRoutePolylineAnalysis
-                    ? "Polyline解析候補・既存候補ともになし"
-                    : "Polyline解析結果・既存候補ともになし";
-        }
-
-        const entranceCandidateNames =
-            selectedExits
-                .map(exit =>
-                    exit.displayName +
-                    (
-                        isShutoIcForRouteAnalysis(exit)
-                            ? " [首都高]"
-                            : ""
-                    )
-                )
-                .join(" → ");
-
-        console.group(
-            "[ENTRANCE COMPARISON CANDIDATES]"
-        );
-        console.log(
-            "候補選定ロジック:",
-            candidateSelectionLogic
-        );
-        console.log("API候補上限:", apiCandidateLimit);
-        console.log(
-            "実車テストモード:",
-            isRealDriveTestMode ? "ON" : "OFF"
-        );
-        console.log(
-            "API実行入口候補IC:",
-            entranceCandidateNames || "なし"
-        );
-        console.log(
-            "API呼び出し予定件数:",
-            selectedExits.length
-        );
-        console.log(
-            "フォールバック理由:",
-            fallbackReason
-        );
-        console.groupEnd();
-    }
-    else if (currentMultiIcMode === "exit") {
-        const apiCandidateLimit =
-            getActiveIcCandidateCount();
-
-        const polylineCandidatePreview =
-            buildPolylineBasedComparisonIcCandidates(
-                lastHighwayRoutePolylineAnalysis
-            );
-
-        const polylineApiCandidates =
-            selectLimitedComparisonIcCandidates(
-                polylineCandidatePreview
-                    ?.exitCandidateIcs || [],
-                lastHighwayRoutePolylineAnalysis
-                    ?.nexcoExitIc,
-                apiCandidateLimit
-            );
-
-        let candidateSelectionLogic = "候補なし";
-        let fallbackReason = "なし";
-
-        if (polylineApiCandidates.length > 0) {
-            selectedExits =
-                polylineApiCandidates.map(candidate =>
-                    candidate.exit
-                );
-            candidateSelectionLogic = "Polyline解析候補";
-        }
-        else if (legacySelectedExits.length > 0) {
-            selectedExits = legacySelectedExits;
-            candidateSelectionLogic = "既存ロジック候補";
-
-            if (!lastHighwayRoutePolylineAnalysis) {
-                fallbackReason =
-                    "通常検索のPolyline解析結果なし";
-            }
-            else if (
-                !lastHighwayRoutePolylineAnalysis
-                    .nexcoExitIc
-            ) {
-                fallbackReason = "NEXCO出口ICなし";
-            }
-            else {
-                fallbackReason = "Polyline解析候補なし";
-            }
-        }
-        else {
-            selectedExits = [];
-            fallbackReason =
-                lastHighwayRoutePolylineAnalysis
-                    ? "Polyline解析候補・既存候補ともになし"
-                    : "Polyline解析結果・既存候補ともになし";
-        }
-
-        const exitCandidateNames =
-            selectedExits
-                .map(exit =>
-                    exit.displayName +
-                    (
-                        isShutoIcForRouteAnalysis(exit)
-                            ? " [首都高]"
-                            : ""
-                    )
-                )
-                .join(" → ");
-
-        console.group(
-            "[EXIT COMPARISON CANDIDATES]"
-        );
-        console.log(
-            "候補選定ロジック:",
-            candidateSelectionLogic
-        );
-        console.log("API候補上限:", apiCandidateLimit);
-        console.log(
-            "実車テストモード:",
-            isRealDriveTestMode ? "ON" : "OFF"
-        );
-        console.log(
-            "API実行出口候補IC:",
-            exitCandidateNames || "なし"
-        );
-        console.log(
-            "API呼び出し予定件数:",
-            selectedExits.length
-        );
-        console.log(
-            "フォールバック理由:",
-            fallbackReason
-        );
-        console.groupEnd();
-    }
+    logMultiIcCandidateSelection(
+        currentMultiIcMode,
+        multiIcCandidateSelection
+    );
 
     console.log(
         "[IC DEBUG] auto exit candidates",

@@ -7299,35 +7299,106 @@ async function searchMultiExitIcComparison() {
     }
 }
 
+function evaluateEntranceCandidateEligibility(result) {
+
+    if (result.error) {
+        return {
+            recommendationEligibility: "error",
+            weakReason: "計算エラー"
+        };
+    }
+
+    if (
+        result.differenceFromAllLocal === null ||
+        result.differenceFromAllLocal === undefined
+    ) {
+        return {
+            recommendationEligibility: "weak",
+            weakReason: "下道との差分不明"
+        };
+    }
+
+    if (result.differenceFromAllLocal <= 0) {
+        return {
+            recommendationEligibility: "weak",
+            weakReason: "下道より遅い、または同等"
+        };
+    }
+
+    if (
+        result.yenPerSavedMinute !== null &&
+        result.yenPerSavedMinute !== undefined &&
+        result.yenPerSavedMinute > 100
+    ) {
+        return {
+            recommendationEligibility: "weak",
+            weakReason:
+                "1分短縮あたり料金が高い（100円/分超）"
+        };
+    }
+
+    return {
+        recommendationEligibility: "eligible",
+        weakReason: ""
+    };
+}
+
+function evaluateExitCandidateEligibility(result) {
+
+    if (result.error) {
+        return {
+            recommendationEligibility: "error",
+            weakReason: "計算エラー"
+        };
+    }
+
+    if (
+        result.savedToll === null ||
+        result.savedToll === undefined ||
+        result.differenceFromAllHighway === null ||
+        result.differenceFromAllHighway === undefined
+    ) {
+        return {
+            recommendationEligibility: "weak",
+            weakReason: "全高速との差分または節約額不明"
+        };
+    }
+
+    if (
+        result.savedToll < 0 &&
+        result.differenceFromAllHighway > 0
+    ) {
+        return {
+            recommendationEligibility: "weak",
+            weakReason: "逆に高く、時間も遅い"
+        };
+    }
+
+    if (result.savedToll < 0) {
+        return {
+            recommendationEligibility: "weak",
+            weakReason: "逆に高い"
+        };
+    }
+
+    if (result.savedToll === 0) {
+        return {
+            recommendationEligibility: "weak",
+            weakReason: "節約なし"
+        };
+    }
+
+    return {
+        recommendationEligibility: "eligible",
+        weakReason: ""
+    };
+}
+
 function logEntranceComparisonResultSummary(results) {
 
     const summaryRows = results.map(result => {
-        let isWeakCandidate = false;
-        let reason = "下道より短縮";
-
-        if (result.error) {
-            isWeakCandidate = true;
-            reason = "計算エラー";
-        }
-        else if (
-            result.differenceFromAllLocal === null ||
-            result.differenceFromAllLocal === undefined
-        ) {
-            isWeakCandidate = true;
-            reason = "下道との差分不明";
-        }
-        else if (result.differenceFromAllLocal <= 0) {
-            isWeakCandidate = true;
-            reason = "下道より遅い、または同等";
-        }
-        else if (
-            result.yenPerSavedMinute !== null &&
-            result.yenPerSavedMinute !== undefined &&
-            result.yenPerSavedMinute > 100
-        ) {
-            isWeakCandidate = true;
-            reason = "1分短縮あたり料金が高い（100円/分超）";
-        }
+        const evaluation =
+            evaluateEntranceCandidateEligibility(result);
 
         const timeComparison =
             result.differenceFromAllLocal === null ||
@@ -7350,8 +7421,12 @@ function logEntranceComparisonResultSummary(results) {
             estimatedToll: result.estimatedToll,
             yenPerSavedMinute:
                 result.yenPerSavedMinute,
-            isWeakCandidate,
-            reason
+            recommendationEligibility:
+                evaluation.recommendationEligibility,
+            isWeakCandidate:
+                evaluation.recommendationEligibility !==
+                "eligible",
+            reason: evaluation.weakReason || "下道より短縮"
         };
     });
 
@@ -7365,40 +7440,8 @@ function logEntranceComparisonResultSummary(results) {
 function logExitComparisonResultSummary(results) {
 
     const summaryRows = results.map(result => {
-        let isWeakCandidate = false;
-        let reason = "節約あり";
-
-        if (result.error) {
-            isWeakCandidate = true;
-            reason = "計算エラー";
-        }
-        else if (
-            result.savedToll === null ||
-            result.savedToll === undefined ||
-            result.differenceFromAllHighway === null ||
-            result.differenceFromAllHighway === undefined
-        ) {
-            isWeakCandidate = true;
-            reason = "全高速との差分または節約額不明";
-        }
-        else if (
-            result.savedToll < 0 &&
-            result.differenceFromAllHighway > 0
-        ) {
-            isWeakCandidate = true;
-            reason = "逆に高く、時間も遅い";
-        }
-        else if (result.savedToll < 0) {
-            isWeakCandidate = true;
-            reason = "逆に高い";
-        }
-        else if (result.savedToll === 0) {
-            isWeakCandidate = true;
-            reason = "節約なし";
-        }
-        else if (result.differenceFromAllHighway <= 0) {
-            reason = "節約あり、全高速より速いまたは同等";
-        }
+        const evaluation =
+            evaluateExitCandidateEligibility(result);
 
         const timeComparison =
             result.differenceFromAllHighway === null ||
@@ -7433,8 +7476,18 @@ function logExitComparisonResultSummary(results) {
             tollComparison,
             yenPerDelayedMinute:
                 result.yenPerDelayedMinute,
-            isWeakCandidate,
-            reason
+            recommendationEligibility:
+                evaluation.recommendationEligibility,
+            isWeakCandidate:
+                evaluation.recommendationEligibility !==
+                "eligible",
+            reason:
+                evaluation.weakReason ||
+                (
+                    result.differenceFromAllHighway <= 0
+                        ? "節約あり、全高速より速いまたは同等"
+                        : "節約あり"
+                )
         };
     });
 
@@ -7442,6 +7495,68 @@ function logExitComparisonResultSummary(results) {
         "[EXIT COMPARISON RESULT SUMMARY]"
     );
     console.table(summaryRows);
+    console.groupEnd();
+}
+
+function logComparisonRecommendationFilter(
+    mode,
+    results,
+    bestResult
+) {
+
+    const eligibleResults =
+        results.filter(result =>
+            result.recommendationEligibility === "eligible"
+        );
+
+    const weakResults =
+        results.filter(result =>
+            result.recommendationEligibility === "weak"
+        );
+
+    const nonEligibleResults =
+        results.filter(result =>
+            result.recommendationEligibility !== "eligible"
+        );
+
+    const groupName =
+        mode === "entrance"
+            ? "[ENTRANCE RECOMMENDATION FILTER]"
+            : "[EXIT RECOMMENDATION FILTER]";
+
+    console.group(groupName);
+    console.log("全候補数:", results.length);
+    console.log("eligible候補数:", eligibleResults.length);
+    console.log("weak候補数:", weakResults.length);
+    console.log(
+        "おすすめ選定対象:",
+        eligibleResults.length > 0
+            ? "eligible候補のみ"
+            : "eligibleなしのため全候補"
+    );
+
+    if (eligibleResults.length === 0) {
+        console.log(
+            "eligible候補なしのため弱い候補から選定"
+        );
+    }
+
+    console.log(
+        "最終おすすめIC:",
+        bestResult?.candidateIcName || "なし"
+    );
+    console.log(
+        "弱扱い候補:",
+        nonEligibleResults.length > 0
+            ? nonEligibleResults
+                .map(result =>
+                    result.candidateIcName +
+                    ": " +
+                    (result.weakReason || "理由不明")
+                )
+                .join(" / ")
+            : "なし"
+    );
     console.groupEnd();
 }
 
@@ -7646,8 +7761,21 @@ async function searchEntranceIcComparisonV2(options = {}) {
         }
     }
 
+    lastMultiIcV2Results.forEach(result => {
+        Object.assign(
+            result,
+            evaluateEntranceCandidateEligibility(result)
+        );
+    });
+
     logEntranceComparisonResultSummary(
         lastMultiIcV2Results
+    );
+
+    logComparisonRecommendationFilter(
+        "entrance",
+        lastMultiIcV2Results,
+        getBestEntranceIcV2(lastMultiIcV2Results)
     );
 
     if (DEBUG_ROUTE_VERBOSE) {
@@ -7881,8 +8009,21 @@ async function searchExitIcComparisonV2(options = {}) {
         }
     }
 
+    lastExitIcV2Results.forEach(result => {
+        Object.assign(
+            result,
+            evaluateExitCandidateEligibility(result)
+        );
+    });
+
     logExitComparisonResultSummary(
         lastExitIcV2Results
+    );
+
+    logComparisonRecommendationFilter(
+        "exit",
+        lastExitIcV2Results,
+        getBestExitIcV2(lastExitIcV2Results)
     );
 
     if (DEBUG_ROUTE_VERBOSE) {
@@ -8887,8 +9028,18 @@ function getBestExitIcV2(results) {
     const acceptableDelayMinutes =
         getAcceptableDelayMinutes();
 
+    const eligibleResults =
+        results.filter(result =>
+            result.recommendationEligibility === "eligible"
+        );
+
+    const recommendationPool =
+        eligibleResults.length > 0
+            ? eligibleResults
+            : results;
+
     const candidates =
-        results
+        recommendationPool
             .filter(result =>
                 !result.error &&
                 result.savedToll > 0 &&
@@ -9006,6 +9157,9 @@ function buildExitIcComparisonV2CardHtml(result) {
 
     const hasError = Boolean(result.error);
 
+    const isWeakCandidate =
+        result.recommendationEligibility === "weak";
+
     const hasNoSaving =
         !hasError &&
         result.savedToll !== null &&
@@ -9024,6 +9178,7 @@ function buildExitIcComparisonV2CardHtml(result) {
         "v2-exit-result-card",
         hasNoSaving ? "v2-exit-no-saving" : "",
         isExitOverThreshold ? "v2-exit-excluded" : "",
+        isWeakCandidate ? "weak-comparison-candidate" : "",
         hasError ? "v2-exit-error" : ""
     ]
         .filter(Boolean)
@@ -9073,6 +9228,14 @@ function buildExitIcComparisonV2CardHtml(result) {
             "</div>"
             : "";
 
+    const weakCandidateNote =
+        isWeakCandidate
+            ? "<div class=\"weak-comparison-note\">" +
+                "※おすすめ対象外: " +
+                escapeHtml(result.weakReason || "理由不明") +
+                "</div>"
+            : "";
+
     return (
         "<div class=\"" + classNames + "\">" +
         "<div class=\"v2-exit-name\">" +
@@ -9091,6 +9254,7 @@ function buildExitIcComparisonV2CardHtml(result) {
         "<br>合計" +
         formatV2Duration(result.totalMinutes) +
         excludedNote +
+        weakCandidateNote +
         "</div>" +
         "</div>"
     );
@@ -9188,8 +9352,18 @@ function getBestEntranceIcV2(results) {
     const acceptableDelayMinutes =
         getAcceptableDelayMinutes();
 
+    const eligibleResults =
+        results.filter(result =>
+            result.recommendationEligibility === "eligible"
+        );
+
+    const recommendationPool =
+        eligibleResults.length > 0
+            ? eligibleResults
+            : results;
+
     const candidates =
-        results
+        recommendationPool
             .filter(result =>
                 !result.error &&
                 result.differenceFromAllLocal > 0 &&
@@ -10073,6 +10247,9 @@ function buildEntranceIcComparisonV2CardHtml(result) {
 
     const hasError = Boolean(result.error);
 
+    const isWeakCandidate =
+        result.recommendationEligibility === "weak";
+
     const hasNoSaving =
         !hasError &&
         result.differenceFromAllLocal !== null &&
@@ -10091,6 +10268,7 @@ function buildEntranceIcComparisonV2CardHtml(result) {
         "v2-ic-result-card",
         hasNoSaving ? "v2-ic-no-saving" : "",
         isEntranceBelowThreshold ? "v2-ic-excluded" : "",
+        isWeakCandidate ? "weak-comparison-candidate" : "",
         hasError ? "v2-ic-error" : ""
     ]
         .filter(Boolean)
@@ -10135,6 +10313,14 @@ function buildEntranceIcComparisonV2CardHtml(result) {
             "</div>"
             : "";
 
+    const weakCandidateNote =
+        isWeakCandidate
+            ? "<div class=\"weak-comparison-note\">" +
+                "※おすすめ対象外: " +
+                escapeHtml(result.weakReason || "理由不明") +
+                "</div>"
+            : "";
+
     return (
         "<div class=\"" + classNames + "\">" +
         "<div class=\"v2-ic-name\">" +
@@ -10155,6 +10341,7 @@ function buildEntranceIcComparisonV2CardHtml(result) {
         "<br>合計" +
         formatV2Duration(result.totalMinutes) +
         excludedNote +
+        weakCandidateNote +
         "</div>" +
         "</div>"
     );

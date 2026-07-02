@@ -1472,6 +1472,26 @@ details#searchPanel .origin-row input {
     border-color: #e74c3c;
 }
 
+.weak-comparison-candidate {
+    opacity: 0.65;
+}
+
+.v2-ic-no-saving.weak-comparison-candidate,
+.v2-exit-no-saving.weak-comparison-candidate {
+    opacity: 0.6;
+}
+
+.v2-ic-excluded.weak-comparison-candidate,
+.v2-exit-excluded.weak-comparison-candidate {
+    opacity: 0.45;
+}
+
+.weak-comparison-note {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--color-warning);
+}
+
 .v2-best-exit-card {
     background: #2a220d;
     border: 2px solid #f1c40f;

@@ -2022,6 +2022,7 @@ function logDestinationTestSummary() {
     };
 
     console.group("[DESTINATION TEST SUMMARY]");
+    console.log("===== テスト結果コピー開始 =====");
 
     console.log("基本情報:");
     console.log("出発地:", basic.origin || "現在地");
@@ -2060,8 +2061,10 @@ function logDestinationTestSummary() {
     logComparison("出口比較", exit);
 
     console.log("判定メモ用:");
-    console.log("違和感:");
-    console.log("未記入");
+    console.log("結果: 未記入");
+    console.log("違和感: 未記入");
+    console.log("次回確認: 未記入");
+    console.log("===== テスト結果コピー終了 =====");
 
     console.groupEnd();
 }

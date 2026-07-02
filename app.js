@@ -9250,14 +9250,29 @@ function buildExitCandidateValueNote(result) {
                 result.yenPerDelayedMinute +
                 "円）";
 
+    const normalExitIcName =
+        getNormalHighwayExitIcName();
+
+    const normalExitRecommendation =
+        normalExitIcName
+            ? "通常出口（" + normalExitIcName + "）がおすすめ"
+            : "通常出口がおすすめ";
+
     return (
         result.differenceFromAllHighway +
         "分の遅れで" +
         result.savedToll +
         "円節約" +
         efficiencyText +
-        "。時間優先なら通常出口がおすすめ"
+        "。時間優先なら" +
+        normalExitRecommendation
     );
+}
+
+function getNormalHighwayExitIcName() {
+
+    return lastHighwayRoutePolylineAnalysis
+        ?.nexcoExitIc?.displayName || "";
 }
 
 function evaluateExitCandidateEligibility(result) {
@@ -10961,7 +10976,19 @@ function displayExitIcComparisonV2Results(results) {
             )
         );
 
+    const normalExitIcName =
+        getNormalHighwayExitIcName();
+
+    const normalExitHtml =
+        normalExitIcName
+            ? "<div class=\"v2-normal-exit\">" +
+                "通常出口：<strong>" +
+                escapeHtml(normalExitIcName) +
+                "</strong></div>"
+            : "";
+
     resultArea.innerHTML =
+        normalExitHtml +
         buildBestExitIcV2Html(results) +
         "<div class=\"v2-exit-result-list\">" +
         sortedResults
@@ -11427,7 +11454,7 @@ function buildExitIcComparisonV2CardHtml(result) {
         icName +
         "</div>" +
         "<div class=\"v2-exit-main\">" +
-        "あと" +
+        "出口まで" +
         result.minutesToCandidate +
         "分" +
         "</div>" +

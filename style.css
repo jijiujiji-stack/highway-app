@@ -1490,6 +1490,20 @@ details#searchPanel .origin-row input {
     gap: 10px;
 }
 
+.v2-normal-exit {
+    margin-bottom: 12px;
+    padding: 8px 10px;
+    border: 1px solid #555;
+    border-radius: 10px;
+    color: #ddd;
+    font-size: 14px;
+    text-align: center;
+}
+
+.v2-normal-exit strong {
+    color: #b9d8ff;
+}
+
 .v2-exit-result-card {
     background: #111;
     border: 1px solid #444;

@@ -6698,6 +6698,47 @@ function buildForwardExitComparisonIcCandidates(
     const maxPolylineDistanceMeters = 5000;
     const candidatesByIdentity = new Map();
 
+    const normalExitIdentities = new Set(
+        [
+            polylineAnalysis?.nexcoExitIc,
+            polylineAnalysis?.exitIc
+        ]
+            .map(exit => getIcIdentity(exit))
+            .filter(Boolean)
+    );
+
+    const entranceExclusionReasons = new Map();
+
+    const registerEntranceExclusion = (
+        exit,
+        reason
+    ) => {
+        const identity = getIcIdentity(exit);
+
+        if (
+            !identity ||
+            normalExitIdentities.has(identity) ||
+            entranceExclusionReasons.has(identity)
+        ) {
+            return;
+        }
+
+        entranceExclusionReasons.set(identity, reason);
+    };
+
+    registerEntranceExclusion(
+        polylineAnalysis?.shutoEntranceIc,
+        "首都高入口ICのため出口比較から除外"
+    );
+    registerEntranceExclusion(
+        polylineAnalysis?.nexcoEntranceIc,
+        "NEXCO入口ICのため出口比較から除外"
+    );
+    registerEntranceExclusion(
+        polylineAnalysis?.entranceIc,
+        "入口側ICのため出口比較から除外"
+    );
+
     routeTrace.forEach(routePoint => {
         const exit = routePoint.exit;
         const identity = getIcIdentity(exit);
@@ -6753,6 +6794,7 @@ function buildForwardExitComparisonIcCandidates(
         )
         .forEach(candidate => {
             const exit = candidate.exit;
+            const identity = getIcIdentity(exit);
             let exclusionReason = "";
 
             const isConnectionJunction =
@@ -6767,6 +6809,10 @@ function buildForwardExitComparisonIcCandidates(
             }
             else if (isConnectionJunction) {
                 exclusionReason = "接続用JCT";
+            }
+            else if (entranceExclusionReasons.has(identity)) {
+                exclusionReason =
+                    entranceExclusionReasons.get(identity);
             }
             else if (candidate.distanceFromBaseMeters <= 0) {
                 exclusionReason = "現在地基準地点以前";

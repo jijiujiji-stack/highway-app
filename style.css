@@ -222,6 +222,45 @@ button {
     color: var(--color-good);
 }
 
+.dashboard-assumed-route {
+    display: none;
+    justify-content: center;
+    margin-top: 8px;
+    padding: 9px 10px;
+    background: #222;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.normal-search-active .dashboard-assumed-route {
+    display: flex;
+}
+
+.normal-search-active #dashboardStars {
+    display: none;
+}
+
+.dashboard-assumed-route-value {
+    display: -webkit-box;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    font-weight: bold;
+    text-align: center;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.dashboard-toll-breakdown {
+    display: block;
+    margin-top: 3px;
+    color: #bbb;
+    font-size: 11px;
+    font-weight: normal;
+    line-height: 1.3;
+}
+
 #dashboardReason {
 
     margin-top: 10px;

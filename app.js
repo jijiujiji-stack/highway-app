@@ -368,6 +368,117 @@ function getShutoTollEstimateForIcPair(startIc, endIc) {
     return 0;
 }
 
+function shortenHighwayRoadName(roadName) {
+    const value = String(roadName || "").trim();
+
+    const roadNameRules = [
+        [/首都(?:高速|高)/, "首都高"],
+        [/小田原厚木|小田厚/, "小田厚"],
+        [/東関東/, "東関東道"],
+        [/上信越/, "上信越道"],
+        [/アクアライン/, "アクアライン"],
+        [/常磐/, "常磐道"],
+        [/東北/, "東北道"],
+        [/関越/, "関越道"],
+        [/圏央/, "圏央道"],
+        [/中央/, "中央道"],
+        [/東名/, "東名"],
+        [/京葉/, "京葉道路"],
+        [/館山/, "館山道"]
+    ];
+
+    const matchedRule =
+        roadNameRules.find(([pattern]) => pattern.test(value));
+
+    return matchedRule
+        ? matchedRule[1]
+        : value.replace(/方面$/, "");
+}
+
+function formatAssumedRouteIcName(ic) {
+    return String(ic?.displayName || "")
+        .replace(/（首都高）$/, "")
+        .trim();
+}
+
+function buildAssumedRouteText(polylineAnalysis) {
+    if (!polylineAnalysis) {
+        return "";
+    }
+
+    const shutoEntranceIc =
+        polylineAnalysis.shutoEntranceIc;
+
+    const entranceIc =
+        polylineAnalysis.nexcoEntranceIc ||
+        polylineAnalysis.entranceIc;
+
+    const exitIc =
+        polylineAnalysis.nexcoExitIc ||
+        polylineAnalysis.exitIc;
+
+    const routeRoads = [
+        ...new Set(
+            (polylineAnalysis.roadSequence || [])
+                .map(shortenHighwayRoadName)
+                .filter(roadName =>
+                    roadName && roadName !== "首都高"
+                )
+        )
+    ];
+
+    const routeParts = [];
+
+    if (shutoEntranceIc) {
+        routeParts.push(
+            "首都高 " +
+            formatAssumedRouteIcName(shutoEntranceIc)
+        );
+    }
+
+    routeParts.push(formatAssumedRouteIcName(entranceIc));
+    routeParts.push(...routeRoads);
+    routeParts.push(formatAssumedRouteIcName(exitIc));
+
+    return routeParts
+        .filter((part, index, parts) =>
+            part && part !== parts[index - 1]
+        )
+        .join(" → ");
+}
+
+function createMainTollEstimateHtml(tollEstimate) {
+    const amount = Number(tollEstimate?.amount) || 0;
+    const shutoToll = Number(tollEstimate?.shutoToll) || 0;
+    const highwayToll =
+        Number(tollEstimate?.highwayToll) || 0;
+
+    let html =
+        "約" + amount.toLocaleString() + "円";
+
+    if (shutoToll > 0) {
+        html +=
+            "<small class=\"dashboard-toll-breakdown\">" +
+            "首都高" + shutoToll.toLocaleString() +
+            " + 高速" + highwayToll.toLocaleString() +
+            "</small>";
+    }
+
+    return html;
+}
+
+function setDashboardNormalSearchMode(isActive) {
+    const dashboardCard =
+        document.querySelector(".dashboard-card");
+
+    if (dashboardCard) {
+        dashboardCard.classList.toggle(
+            "normal-search-active",
+            isActive
+        );
+    }
+}
+
 const IC_MASTER = {
     // 接続道路のICは重複登録を許可する。
     // 例: 木更津金田ICをアクアライン・館山道双方へ保持する。
@@ -3011,6 +3122,10 @@ async function displayRouteComparison(
     destinationLatLng = null
 ) {
 
+    setDashboardNormalSearchMode(
+        !suppressDashboardSummary
+    );
+
     setDashboardInfoLabels(
         "効率率",
         "ETC概算"
@@ -3110,10 +3225,6 @@ async function displayRouteComparison(
         formatArrivalTime(
             localMinutes
         );
-
-    const tollEstimateLabel =
-        String(tollEstimate.label || "")
-            .replace(/^料金計算：/, "");
 
     document
         .getElementById("highwayTime")
@@ -3321,13 +3432,20 @@ async function displayRouteComparison(
     );
 
     if (!suppressDashboardSummary) {
+        const assumedRouteText =
+            buildAssumedRouteText(
+                lastHighwayRoutePolylineAnalysis
+            );
+
         document
             .getElementById("dashboardCost")
             .innerHTML =
-            "約" +
-            estimatedToll.toLocaleString() +
-            "円<br>" +
-            tollEstimateLabel;
+            createMainTollEstimateHtml(tollEstimate);
+
+        document
+            .getElementById("dashboardAssumedRouteValue")
+            .textContent =
+            assumedRouteText || "ルート情報なし";
     }
 
     document
@@ -3594,11 +3712,18 @@ async function estimateMainHighwayToll(
             fallbackKm * 24
         );
 
+    const shutoTollEstimate =
+        polylineAnalysis?.shutoEntranceIc
+            ? SHUTO_TOLL_ESTIMATE_YEN
+            : 0;
+
     let legacyStartIc = null;
     let legacyEndIc = null;
 
     const createFallbackResult = fallbackReason => ({
-        amount: fallbackAmount,
+        amount: fallbackAmount + shutoTollEstimate,
+        highwayToll: fallbackAmount,
+        shutoToll: shutoTollEstimate,
         label: "料金計算：ルート総距離ベース",
         usedPolylineAnalysis: false,
         usedNexcoPolylineIc: false,
@@ -3775,30 +3900,15 @@ async function estimateMainHighwayToll(
                 legacyEndIc.order;
         }
 
-        const shutoTollStartIc =
-            canUseDefaultPolylineIcs
-                ? polylineStartIc
-                : startIc;
-
-        const shutoTollEndIc =
-            canUseDefaultPolylineIcs
-                ? polylineEndIc
-                : endIc;
-
-        const shutoToll =
-            getShutoTollEstimateForIcPair(
-                shutoTollStartIc,
-                shutoTollEndIc
-            );
+        const shutoToll = shutoTollEstimate;
 
         if (
             startIc.googleName === endIc.googleName
         ) {
             return {
-                amount:
-                    canUseNexcoPolylineIcs
-                        ? shutoToll
-                        : 0,
+                amount: shutoToll,
+                highwayToll: 0,
+                shutoToll,
                 label:
                     "料金計算：" +
                     formatTollRouteLabel(
@@ -3838,6 +3948,8 @@ async function estimateMainHighwayToll(
         return {
             amount:
                 baseToll + shutoToll,
+            highwayToll: baseToll,
+            shutoToll,
             label:
                 "料金計算：" +
                 formatTollRouteLabel(
@@ -11662,6 +11774,10 @@ function setDashboardV2EntranceMode(isActive) {
         "v2-dashboard-entrance-active",
         isActive
     );
+
+    if (isActive) {
+        setDashboardNormalSearchMode(false);
+    }
 }
 
 function setDashboardV2ExitMode(isActive) {
@@ -11677,6 +11793,10 @@ function setDashboardV2ExitMode(isActive) {
         "v2-dashboard-exit-active",
         isActive
     );
+
+    if (isActive) {
+        setDashboardNormalSearchMode(false);
+    }
 }
 
 function getAllLocalMinutesFromV2Results() {
@@ -11905,6 +12025,8 @@ function displayMultiExitIcComparison(
     acceptableDelay,
     tollStartIcName
 ) {
+
+    setDashboardNormalSearchMode(false);
 
     setDashboardInfoLabels(
         "効率率",

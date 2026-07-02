@@ -11012,6 +11012,98 @@ async function searchAutoExitIcComparison(
         );
         console.groupEnd();
     }
+    else if (currentMultiIcMode === "exit") {
+        const apiCandidateLimit =
+            getActiveIcCandidateCount();
+
+        const polylineCandidatePreview =
+            buildPolylineBasedComparisonIcCandidates(
+                lastHighwayRoutePolylineAnalysis
+            );
+
+        const polylineApiCandidates =
+            selectLimitedComparisonIcCandidates(
+                polylineCandidatePreview
+                    ?.exitCandidateIcs || [],
+                lastHighwayRoutePolylineAnalysis
+                    ?.nexcoExitIc,
+                apiCandidateLimit
+            );
+
+        let candidateSelectionLogic = "候補なし";
+        let fallbackReason = "なし";
+
+        if (polylineApiCandidates.length > 0) {
+            selectedExits =
+                polylineApiCandidates.map(candidate =>
+                    candidate.exit
+                );
+            candidateSelectionLogic = "Polyline解析候補";
+        }
+        else if (legacySelectedExits.length > 0) {
+            selectedExits = legacySelectedExits;
+            candidateSelectionLogic = "既存ロジック候補";
+
+            if (!lastHighwayRoutePolylineAnalysis) {
+                fallbackReason =
+                    "通常検索のPolyline解析結果なし";
+            }
+            else if (
+                !lastHighwayRoutePolylineAnalysis
+                    .nexcoExitIc
+            ) {
+                fallbackReason = "NEXCO出口ICなし";
+            }
+            else {
+                fallbackReason = "Polyline解析候補なし";
+            }
+        }
+        else {
+            selectedExits = [];
+            fallbackReason =
+                lastHighwayRoutePolylineAnalysis
+                    ? "Polyline解析候補・既存候補ともになし"
+                    : "Polyline解析結果・既存候補ともになし";
+        }
+
+        const exitCandidateNames =
+            selectedExits
+                .map(exit =>
+                    exit.displayName +
+                    (
+                        isShutoIcForRouteAnalysis(exit)
+                            ? " [首都高]"
+                            : ""
+                    )
+                )
+                .join(" → ");
+
+        console.group(
+            "[EXIT COMPARISON CANDIDATES]"
+        );
+        console.log(
+            "候補選定ロジック:",
+            candidateSelectionLogic
+        );
+        console.log("API候補上限:", apiCandidateLimit);
+        console.log(
+            "実車テストモード:",
+            isRealDriveTestMode ? "ON" : "OFF"
+        );
+        console.log(
+            "API実行出口候補IC:",
+            exitCandidateNames || "なし"
+        );
+        console.log(
+            "API呼び出し予定件数:",
+            selectedExits.length
+        );
+        console.log(
+            "フォールバック理由:",
+            fallbackReason
+        );
+        console.groupEnd();
+    }
 
     console.log(
         "[IC DEBUG] auto exit candidates",

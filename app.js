@@ -4043,6 +4043,79 @@ function sampleRoutePointsByDistance(
     return sampledPoints;
 }
 
+function sampleRoutePointsByDistanceRange(
+    routePoints,
+    startDistanceMeters,
+    endDistanceMeters,
+    intervalMeters = 500
+) {
+
+    if (
+        routePoints.length < 2 ||
+        endDistanceMeters <= startDistanceMeters
+    ) {
+        return [];
+    }
+
+    const sampledPoints = [];
+    let totalDistanceMeters = 0;
+    let nextSampleDistanceMeters =
+        startDistanceMeters + intervalMeters;
+
+    for (let index = 1; index < routePoints.length; index++) {
+        const previousPoint = routePoints[index - 1];
+        const currentPoint = routePoints[index];
+
+        const segmentDistanceMeters =
+            calculateDistance(
+                previousPoint.lat,
+                previousPoint.lng,
+                currentPoint.lat,
+                currentPoint.lng
+            );
+
+        const segmentStartDistanceMeters =
+            totalDistanceMeters;
+
+        totalDistanceMeters += segmentDistanceMeters;
+
+        while (
+            segmentDistanceMeters > 0 &&
+            nextSampleDistanceMeters <= totalDistanceMeters &&
+            nextSampleDistanceMeters <= endDistanceMeters
+        ) {
+            const ratio =
+                (
+                    nextSampleDistanceMeters -
+                    segmentStartDistanceMeters
+                ) /
+                segmentDistanceMeters;
+
+            sampledPoints.push({
+                lat:
+                    previousPoint.lat +
+                    (currentPoint.lat - previousPoint.lat) * ratio,
+                lng:
+                    previousPoint.lng +
+                    (currentPoint.lng - previousPoint.lng) * ratio,
+                routeDistanceMeters:
+                    nextSampleDistanceMeters
+            });
+
+            nextSampleDistanceMeters += intervalMeters;
+        }
+
+        if (
+            totalDistanceMeters >= endDistanceMeters ||
+            nextSampleDistanceMeters > endDistanceMeters
+        ) {
+            break;
+        }
+    }
+
+    return sampledPoints;
+}
+
 function findNearestIcMasterEntryForRoutePoint(routePoint) {
 
     let nearest = null;
@@ -4082,6 +4155,236 @@ function findNearestIcMasterEntryForRoutePoint(routePoint) {
     return {
         ...nearest,
         distanceMeters: nearestDistanceMeters
+    };
+}
+
+function isShutoIcForRouteAnalysis(exit) {
+
+    return (
+        exit.roadType === "首都高" ||
+        String(exit.displayName || "")
+            .includes("（首都高）")
+    );
+}
+
+function findNearestShutoIcForRoutePoint(routePoint) {
+
+    let nearest = null;
+    let nearestDistanceMeters = Infinity;
+
+    for (const icArea in IC_MASTER) {
+        for (const exit of IC_MASTER[icArea].exits) {
+            if (
+                !isShutoIcForRouteAnalysis(exit) ||
+                exit.isSelectable === false ||
+                exit.lat === undefined ||
+                exit.lng === undefined
+            ) {
+                continue;
+            }
+
+            const distanceMeters =
+                calculateDistance(
+                    routePoint.lat,
+                    routePoint.lng,
+                    exit.lat,
+                    exit.lng
+                );
+
+            if (distanceMeters < nearestDistanceMeters) {
+                nearest = exit;
+                nearestDistanceMeters = distanceMeters;
+            }
+        }
+    }
+
+    if (!nearest) {
+        return null;
+    }
+
+    return {
+        exit: nearest,
+        distanceMeters: nearestDistanceMeters
+    };
+}
+
+function analyzeShutoIcCandidates(
+    sampledPoints,
+    preferLaterOccurrence = false,
+    maxDistanceMeters = 5000
+) {
+
+    const candidatesByIdentity = new Map();
+
+    const sampleStartDistanceMeters =
+        sampledPoints[0]?.routeDistanceMeters || 0;
+
+    const sampleEndDistanceMeters =
+        sampledPoints[sampledPoints.length - 1]
+            ?.routeDistanceMeters ||
+        sampleStartDistanceMeters;
+
+    const sampleDistanceSpanMeters =
+        Math.max(
+            1,
+            sampleEndDistanceMeters -
+            sampleStartDistanceMeters
+        );
+
+    sampledPoints.forEach(routePoint => {
+        const nearest =
+            findNearestShutoIcForRoutePoint(routePoint);
+
+        if (
+            !nearest ||
+            nearest.distanceMeters > maxDistanceMeters
+        ) {
+            return;
+        }
+
+        const identity =
+            nearest.exit.googleName ||
+            nearest.exit.displayName;
+
+        let candidate =
+            candidatesByIdentity.get(identity);
+
+        if (!candidate) {
+            candidate = {
+                exit: nearest.exit,
+                count: 0,
+                minDistanceMeters: Infinity,
+                totalDistanceMeters: 0,
+                proximityScore: 0,
+                lastRouteDistanceMeters: 0
+            };
+            candidatesByIdentity.set(identity, candidate);
+        }
+
+        candidate.count++;
+        candidate.minDistanceMeters =
+            Math.min(
+                candidate.minDistanceMeters,
+                nearest.distanceMeters
+            );
+        candidate.totalDistanceMeters +=
+            nearest.distanceMeters;
+        candidate.proximityScore +=
+            Math.max(
+                0,
+                5 - nearest.distanceMeters / 1000
+            );
+        candidate.lastRouteDistanceMeters =
+            routePoint.routeDistanceMeters;
+    });
+
+    const candidates =
+        [...candidatesByIdentity.values()]
+            .map(candidate => ({
+                ...candidate,
+                averageDistanceMeters:
+                    candidate.totalDistanceMeters /
+                    candidate.count,
+                score:
+                    candidate.count * 10 +
+                    candidate.proximityScore +
+                    (
+                        preferLaterOccurrence
+                            ? (
+                                candidate.lastRouteDistanceMeters -
+                                sampleStartDistanceMeters
+                            ) /
+                                sampleDistanceSpanMeters * 5
+                            : 0
+                    )
+            }))
+            .sort((a, b) => {
+                if (b.score !== a.score) {
+                    return b.score - a.score;
+                }
+
+                if (
+                    preferLaterOccurrence &&
+                    b.lastRouteDistanceMeters !==
+                        a.lastRouteDistanceMeters
+                ) {
+                    return (
+                        b.lastRouteDistanceMeters -
+                        a.lastRouteDistanceMeters
+                    );
+                }
+
+                return (
+                    a.minDistanceMeters -
+                    b.minDistanceMeters
+                );
+            });
+
+    return {
+        candidates,
+        selectedIc: candidates[0]?.exit || null
+    };
+}
+
+function selectShutoIcCandidateWindow(
+    sampledPoints,
+    fromEnd = false,
+    maxDistanceMeters = 3000,
+    windowDistanceMeters = 5000
+) {
+
+    const orderedSamples = fromEnd
+        ? sampledPoints.slice().reverse()
+        : sampledPoints;
+
+    const anchorSample =
+        orderedSamples.find(routePoint => {
+            const nearest =
+                findNearestShutoIcForRoutePoint(routePoint);
+
+            return (
+                nearest &&
+                nearest.distanceMeters <= maxDistanceMeters
+            );
+        });
+
+    if (!anchorSample) {
+        return {
+            samples: [],
+            startDistanceMeters: null,
+            endDistanceMeters: null
+        };
+    }
+
+    const anchorDistanceMeters =
+        anchorSample.routeDistanceMeters;
+
+    const startDistanceMeters = fromEnd
+        ? Math.max(
+            sampledPoints[0]?.routeDistanceMeters || 0,
+            anchorDistanceMeters - windowDistanceMeters
+        )
+        : anchorDistanceMeters;
+
+    const endDistanceMeters = fromEnd
+        ? anchorDistanceMeters
+        : Math.min(
+            sampledPoints[sampledPoints.length - 1]
+                ?.routeDistanceMeters ||
+                anchorDistanceMeters,
+            anchorDistanceMeters + windowDistanceMeters
+        );
+
+    return {
+        samples:
+            sampledPoints.filter(routePoint =>
+                routePoint.routeDistanceMeters >=
+                    startDistanceMeters &&
+                routePoint.routeDistanceMeters <=
+                    endDistanceMeters
+            ),
+        startDistanceMeters,
+        endDistanceMeters
     };
 }
 
@@ -4522,6 +4825,73 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 selectablePassedIcs.length - 1
             ]?.exit || null;
 
+        const totalRouteDistanceMeters =
+            sampledPoints[sampledPoints.length - 1]
+                ?.routeDistanceMeters || 0;
+
+        const shutoDetailStartSamples =
+            sampleRoutePointsByDistanceRange(
+                routePoints,
+                0,
+                Math.min(20000, totalRouteDistanceMeters),
+                500
+            );
+
+        const shutoDetailEndSamples =
+            sampleRoutePointsByDistanceRange(
+                routePoints,
+                Math.max(
+                    0,
+                    totalRouteDistanceMeters - 20000
+                ),
+                totalRouteDistanceMeters,
+                500
+            );
+
+        const usesShuto =
+            routeTrace.some(item =>
+                isShutoIcForRouteAnalysis(item.exit)
+            );
+
+        const emptyShutoWindow = {
+            samples: [],
+            startDistanceMeters: null,
+            endDistanceMeters: null
+        };
+
+        const shutoEntranceWindow =
+            usesShuto
+                ? selectShutoIcCandidateWindow(
+                    shutoDetailStartSamples
+                )
+                : emptyShutoWindow;
+
+        const shutoExitWindow =
+            usesShuto
+                ? selectShutoIcCandidateWindow(
+                    shutoDetailEndSamples,
+                    true
+                )
+                : emptyShutoWindow;
+
+        const shutoEntranceAnalysis =
+            usesShuto
+                ? analyzeShutoIcCandidates(
+                    shutoEntranceWindow.samples,
+                    false,
+                    3000
+                )
+                : { candidates: [], selectedIc: null };
+
+        const shutoExitAnalysis =
+            usesShuto
+                ? analyzeShutoIcCandidates(
+                    shutoExitWindow.samples,
+                    true,
+                    3000
+                )
+                : { candidates: [], selectedIc: null };
+
         return {
             roadSequence:
                 correctedRoadSummary.roadSequence,
@@ -4529,6 +4899,32 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 correctedRoadSummary.roadDistances,
             entranceIc: entranceCandidate,
             exitIc: exitCandidate,
+            shutoEntranceIc:
+                shutoEntranceAnalysis.selectedIc,
+            shutoExitIc:
+                shutoExitAnalysis.selectedIc,
+            shutoDetail: {
+                startSampleCount:
+                    shutoDetailStartSamples.length,
+                endSampleCount:
+                    shutoDetailEndSamples.length,
+                entranceSampleCount:
+                    shutoEntranceWindow.samples.length,
+                entranceWindowStartDistanceMeters:
+                    shutoEntranceWindow.startDistanceMeters,
+                entranceWindowEndDistanceMeters:
+                    shutoEntranceWindow.endDistanceMeters,
+                exitSampleCount:
+                    shutoExitWindow.samples.length,
+                exitWindowStartDistanceMeters:
+                    shutoExitWindow.startDistanceMeters,
+                exitWindowEndDistanceMeters:
+                    shutoExitWindow.endDistanceMeters,
+                entranceCandidates:
+                    shutoEntranceAnalysis.candidates,
+                exitCandidates:
+                    shutoExitAnalysis.candidates
+            },
             rawRoadSequence: roadSequence,
             rawRoadDistances: roadDistanceLogs,
             rawRoadSwitches: roadSwitches,
@@ -4571,6 +4967,20 @@ function logHighwayRoutePolylineAnalysis(
         roadDistances: roadDistanceLogs,
         entranceIc: entranceCandidate,
         exitIc: exitCandidate,
+        shutoEntranceIc = null,
+        shutoExitIc = null,
+        shutoDetail = {
+            startSampleCount: 0,
+            endSampleCount: 0,
+            entranceSampleCount: 0,
+            entranceWindowStartDistanceMeters: null,
+            entranceWindowEndDistanceMeters: null,
+            exitSampleCount: 0,
+            exitWindowStartDistanceMeters: null,
+            exitWindowEndDistanceMeters: null,
+            entranceCandidates: [],
+            exitCandidates: []
+        },
         roadSwitches,
         rawRoadSequence = roadSequence,
         rawRoadDistances = roadDistanceLogs,
@@ -4621,6 +5031,107 @@ function logHighwayRoutePolylineAnalysis(
                 .map(item => item.exit.displayName)
                 .join(" → ")
         );
+
+        const formatShutoCandidatesForLog = candidates =>
+            candidates.map(candidate => ({
+                ic: candidate.exit.displayName,
+                score:
+                    Math.round(candidate.score * 10) / 10,
+                count: candidate.count,
+                minDistanceKm:
+                    Math.round(
+                        candidate.minDistanceMeters / 100
+                    ) / 10,
+                averageDistanceKm:
+                    Math.round(
+                        candidate.averageDistanceMeters / 100
+                    ) / 10,
+                lastRouteDistanceKm:
+                    Math.round(
+                        candidate.lastRouteDistanceMeters / 100
+                    ) / 10
+            }));
+
+        const formatRouteDistanceKm = distanceMeters =>
+            (
+                distanceMeters === null ||
+                distanceMeters === undefined
+            )
+                ? "なし"
+                : Math.round(distanceMeters / 100) / 10;
+
+        console.group("[ROUTE SHUTO DETAIL]");
+
+        console.log(
+            "先頭詳細サンプル数:",
+            shutoDetail.startSampleCount
+        );
+        console.log(
+            "末尾詳細サンプル数:",
+            shutoDetail.endSampleCount
+        );
+
+        console.log(
+            "入口判定サンプル数:",
+            shutoDetail.entranceSampleCount
+        );
+        console.log(
+            "入口判定ウィンドウ開始距離km:",
+            formatRouteDistanceKm(
+                shutoDetail
+                    .entranceWindowStartDistanceMeters
+            )
+        );
+        console.log(
+            "入口判定ウィンドウ終了距離km:",
+            formatRouteDistanceKm(
+                shutoDetail
+                    .entranceWindowEndDistanceMeters
+            )
+        );
+
+        console.log("首都高入口候補:");
+        console.table(
+            formatShutoCandidatesForLog(
+                shutoDetail.entranceCandidates
+            )
+        );
+
+        console.log(
+            "選定首都高入口:",
+            shutoEntranceIc?.displayName || "なし"
+        );
+
+        console.log(
+            "出口判定サンプル数:",
+            shutoDetail.exitSampleCount
+        );
+        console.log(
+            "出口判定ウィンドウ開始距離km:",
+            formatRouteDistanceKm(
+                shutoDetail.exitWindowStartDistanceMeters
+            )
+        );
+        console.log(
+            "出口判定ウィンドウ終了距離km:",
+            formatRouteDistanceKm(
+                shutoDetail.exitWindowEndDistanceMeters
+            )
+        );
+
+        console.log("首都高出口候補:");
+        console.table(
+            formatShutoCandidatesForLog(
+                shutoDetail.exitCandidates
+            )
+        );
+
+        console.log(
+            "選定首都高出口:",
+            shutoExitIc?.displayName || "なし"
+        );
+
+        console.groupEnd();
 
         roadSwitches.forEach((roadSwitch, index) => {
             const routeDistanceKm =

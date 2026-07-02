@@ -1275,8 +1275,8 @@ const IC_MASTER = {
             { order: -1, displayName: "戸越（首都高）", googleName: "首都高速2号目黒線 戸越出入口", lat: 35.615, lng: 139.716, experimental: true, roadType: "首都高" },
             { order: 1, displayName: "東京IC", googleName: "東名高速道路 東京インターチェンジ", lat: 35.625, lng: 139.632 },
             { order: 2, displayName: "東名川崎IC", googleName: "東名高速道路 東名川崎インターチェンジ", lat: 35.589, lng: 139.587 },
-            { order: 3, displayName: "横浜青葉IC", googleName: "東名高速道路 横浜青葉インターチェンジ", lat: 35.542, lng: 139.537 },
-            { order: 4, displayName: "横浜町田IC", googleName: "東名高速道路 横浜町田インターチェンジ", lat: 35.513, lng: 139.474 },
+            { order: 3, displayName: "横浜青葉IC", googleName: "東名高速道路 横浜青葉インターチェンジ", lat: 35.542, lng: 139.537, connection: true, connectedRoads: ["tomei", "shutoKanagawaK7Hokusei"] },
+            { order: 4, displayName: "横浜町田IC", googleName: "東名高速道路 横浜町田インターチェンジ", lat: 35.513, lng: 139.474, connection: true, connectedRoads: ["tomei", "hodogayaBypass"] },
             { order: 5, displayName: "綾瀬SIC", googleName: "東名高速道路 綾瀬スマートインターチェンジ", lat: 35.436, lng: 139.429 },
             { order: 6, displayName: "厚木IC", googleName: "東名高速道路 厚木インターチェンジ", lat: 35.417, lng: 139.364, connection: true, connectedRoads: ["tomei", "odawaraAtsugi"] },
             { order: 7, displayName: "秦野中井IC", googleName: "東名高速道路 秦野中井インターチェンジ", lat: 35.374, lng: 139.214 },
@@ -1302,6 +1302,88 @@ const IC_MASTER = {
             { order: 21, displayName: "磐田IC", googleName: "東名高速道路 磐田インターチェンジ", lat: 34.783, lng: 137.823 },
             { order: 21.5, displayName: "遠州豊田SIC", googleName: "東名高速道路 遠州豊田スマートインターチェンジ", lat: 34.748, lng: 137.840 },
             { order: 22, displayName: "浜松IC", googleName: "東名高速道路 浜松インターチェンジ", lat: 34.758, lng: 137.773 }
+        ]
+    },
+
+
+    daisanKeihin: {
+        label: "第三京浜方面",
+        exits: [
+            { order: 1, displayName: "玉川IC", googleName: "第三京浜道路 玉川インターチェンジ", lat: 35.604, lng: 139.645, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 1 },
+            { order: 2, displayName: "京浜川崎IC", googleName: "第三京浜道路 京浜川崎インターチェンジ", lat: 35.578, lng: 139.627, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 2 },
+            { order: 3, displayName: "都筑IC", googleName: "第三京浜道路 都筑インターチェンジ", lat: 35.544, lng: 139.592, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 3 },
+            { order: 4, displayName: "港北IC", googleName: "第三京浜道路 港北インターチェンジ", lat: 35.519, lng: 139.600, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 4, connection: true, connectedRoads: ["daisanKeihin", "shutoKanagawaK7", "shutoKanagawaK7Hokusei"] },
+            { order: 5, displayName: "羽沢IC", googleName: "第三京浜道路 羽沢インターチェンジ", lat: 35.492, lng: 139.592, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 5 },
+            { order: 6, displayName: "保土ヶ谷IC", googleName: "第三京浜道路 保土ヶ谷インターチェンジ", lat: 35.474, lng: 139.586, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 6, connection: true, connectedRoads: ["daisanKeihin", "yokohamaShindo"] }
+        ]
+    },
+
+
+    yokohamaShindo: {
+        label: "横浜新道方面",
+        exits: [
+            { order: 1, displayName: "保土ヶ谷IC", googleName: "横浜新道 保土ヶ谷インターチェンジ", lat: 35.474, lng: 139.586, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 1, connection: true, connectedRoads: ["yokohamaShindo", "daisanKeihin"] },
+            { order: 2, displayName: "常盤台出口", googleName: "横浜新道 常盤台出口", lat: 35.473, lng: 139.590, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 2 },
+            { order: 3, displayName: "峰岡出口", googleName: "横浜新道 峰岡出口", lat: 35.463, lng: 139.590, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 3 },
+            { order: 4, displayName: "星川入口", googleName: "横浜新道 星川入口", lat: 35.459, lng: 139.588, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 4 },
+            { order: 5, displayName: "藤塚IC", googleName: "横浜新道 藤塚インターチェンジ", lat: 35.458, lng: 139.567, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 5 },
+            { order: 6, displayName: "新保土ヶ谷IC", googleName: "横浜新道 新保土ヶ谷インターチェンジ", lat: 35.455, lng: 139.557, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 6, connection: true, connectedRoads: ["yokohamaShindo", "hodogayaBypass"] },
+            { order: 7, displayName: "今井IC", googleName: "横浜新道 今井インターチェンジ", lat: 35.441, lng: 139.551, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 7 },
+            { order: 8, displayName: "川上IC", googleName: "横浜新道 川上インターチェンジ", lat: 35.429, lng: 139.542, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 8 },
+            { order: 9, displayName: "上矢部IC", googleName: "横浜新道 上矢部インターチェンジ", lat: 35.409, lng: 139.529, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 9 },
+            { order: 10, displayName: "戸塚終点", googleName: "横浜新道 戸塚終点", lat: 35.397, lng: 139.530, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 10 }
+        ]
+    },
+
+
+    hodogayaBypass: {
+        label: "保土ヶ谷バイパス方面",
+        exits: [
+            { order: 1, displayName: "新保土ヶ谷IC", googleName: "保土ヶ谷バイパス 新保土ヶ谷インターチェンジ", lat: 35.455, lng: 139.557, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 1, connection: true, connectedRoads: ["hodogayaBypass", "yokohamaShindo"] },
+            { order: 2, displayName: "新桜ヶ丘IC", googleName: "保土ヶ谷バイパス 新桜ヶ丘インターチェンジ", lat: 35.451, lng: 139.542, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 2 },
+            { order: 3, displayName: "南本宿IC", googleName: "保土ヶ谷バイパス 南本宿インターチェンジ", lat: 35.457, lng: 139.526, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 3 },
+            { order: 4, displayName: "本村IC", googleName: "保土ヶ谷バイパス 本村インターチェンジ", lat: 35.466, lng: 139.514, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 4 },
+            { order: 5, displayName: "下川井IC", googleName: "保土ヶ谷バイパス 下川井インターチェンジ", lat: 35.486, lng: 139.506, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 5 },
+            { order: 6, displayName: "上川井IC", googleName: "保土ヶ谷バイパス 上川井インターチェンジ", lat: 35.497, lng: 139.494, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 6 },
+            { order: 7, displayName: "横浜町田IC", googleName: "保土ヶ谷バイパス 横浜町田インターチェンジ", lat: 35.513, lng: 139.474, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 7, connection: true, connectedRoads: ["hodogayaBypass", "tomei"] }
+        ]
+    },
+
+
+    shutoKanagawaK1: {
+        label: "首都高神奈川横羽線方面",
+        exits: [
+            { order: 1, displayName: "大師", googleName: "首都高速神奈川1号横羽線 大師出入口", lat: 35.535, lng: 139.726, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 1 },
+            { order: 2, displayName: "浅田", googleName: "首都高速神奈川1号横羽線 浅田出入口", lat: 35.520, lng: 139.706, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 2 },
+            { order: 3, displayName: "浜川崎", googleName: "首都高速神奈川1号横羽線 浜川崎出入口", lat: 35.522, lng: 139.718, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 3 },
+            { order: 4, displayName: "生麦", googleName: "首都高速神奈川1号横羽線 生麦出入口", lat: 35.495, lng: 139.668, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 4, connection: true, connectedRoads: ["shutoKanagawaK1", "shutoKanagawaK7"] },
+            { order: 5, displayName: "汐入", googleName: "首都高速神奈川1号横羽線 汐入出入口", lat: 35.501, lng: 139.682, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 5 },
+            { order: 6, displayName: "守屋町", googleName: "首都高速神奈川1号横羽線 守屋町出口", lat: 35.481, lng: 139.660, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 6, isSelectable: false },
+            { order: 7, displayName: "子安", googleName: "首都高速神奈川1号横羽線 子安出入口", lat: 35.483, lng: 139.646, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 7 },
+            { order: 8, displayName: "東神奈川", googleName: "首都高速神奈川1号横羽線 東神奈川出入口", lat: 35.476, lng: 139.636, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 8 },
+            { order: 9, displayName: "横浜駅東口", googleName: "首都高速神奈川1号横羽線 横浜駅東口出入口", lat: 35.466, lng: 139.626, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 9 },
+            { order: 10, displayName: "みなとみらい", googleName: "首都高速神奈川1号横羽線 みなとみらい出入口", lat: 35.457, lng: 139.632, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 10 },
+            { order: 11, displayName: "横浜公園", googleName: "首都高速神奈川1号横羽線 横浜公園出入口", lat: 35.444, lng: 139.642, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 11 }
+        ]
+    },
+
+
+    shutoKanagawaK7: {
+        label: "首都高横浜北線方面",
+        exits: [
+            { order: 1, displayName: "岸谷生麦", googleName: "首都高速神奈川7号横浜北線 岸谷生麦出入口", lat: 35.495, lng: 139.667, roadType: "首都高", routeBranch: "shutoKanagawaK7", branchOrder: 1, connection: true, connectedRoads: ["shutoKanagawaK7", "shutoKanagawaK1"] },
+            { order: 2, displayName: "馬場", googleName: "首都高速神奈川7号横浜北線 馬場出入口", lat: 35.504, lng: 139.646, roadType: "首都高", routeBranch: "shutoKanagawaK7", branchOrder: 2 },
+            { order: 3, displayName: "新横浜", googleName: "首都高速神奈川7号横浜北線 新横浜出入口", lat: 35.513, lng: 139.618, roadType: "首都高", routeBranch: "shutoKanagawaK7", branchOrder: 3 },
+            { order: 4, displayName: "横浜港北", googleName: "首都高速神奈川7号横浜北線 横浜港北出入口", lat: 35.519, lng: 139.600, roadType: "首都高", routeBranch: "shutoKanagawaK7", branchOrder: 4, isSelectable: false, connection: true, connectedRoads: ["shutoKanagawaK7", "shutoKanagawaK7Hokusei", "daisanKeihin"] }
+        ]
+    },
+
+
+    shutoKanagawaK7Hokusei: {
+        label: "首都高横浜北西線方面",
+        exits: [
+            { order: 1, displayName: "横浜港北", googleName: "首都高速神奈川7号横浜北西線 横浜港北出入口", lat: 35.519, lng: 139.600, roadType: "首都高", routeBranch: "shutoKanagawaK7Hokusei", branchOrder: 1, isSelectable: false, connection: true, connectedRoads: ["shutoKanagawaK7Hokusei", "shutoKanagawaK7", "daisanKeihin"] },
+            { order: 2, displayName: "横浜青葉", googleName: "首都高速神奈川7号横浜北西線 横浜青葉出入口", lat: 35.542, lng: 139.537, roadType: "首都高", routeBranch: "shutoKanagawaK7Hokusei", branchOrder: 2, connection: true, connectedRoads: ["shutoKanagawaK7Hokusei", "tomei"] }
         ]
     },
 

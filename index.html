@@ -285,28 +285,33 @@
                 <input type="number" id="acceptableDelay" value="30" min="0">
 
 
-                <label for="icArea">
-                    IC候補エリア
-                </label>
-                <select id="icArea">
-                    <option value="joban">常磐道方面</option>
-                    <option value="keiyo">京葉道路方面</option>
-                    <option value="tokan">東関東道方面</option>
-                    <option value="aqualine">アクアライン方面</option>
-                    <option value="tateyama">館山道方面</option>
-                    <option value="tohoku">東北道方面</option>
-                    <option value="kanetsu">関越道方面</option>
-                    <option value="joshinetsu">上信越道方面</option>
-                    <option value="keno">圏央道方面</option>
-                    <option value="chuo">中央道方面</option>
-                    <option value="tomei">東名道方面</option>
-                </select>
+                <!--
+                    Polyline候補が取得できない場合のフォールバックと
+                    比較料金用ICの補助判定に使うため、DOMと既定値は残す。
+                -->
+                <div id="legacyIcAreaSettings" hidden>
+                    <label for="icArea">
+                        IC候補エリア
+                    </label>
+                    <select id="icArea">
+                        <option value="joban">常磐道方面</option>
+                        <option value="keiyo">京葉道路方面</option>
+                        <option value="tokan">東関東道方面</option>
+                        <option value="aqualine">アクアライン方面</option>
+                        <option value="tateyama">館山道方面</option>
+                        <option value="tohoku">東北道方面</option>
+                        <option value="kanetsu">関越道方面</option>
+                        <option value="joshinetsu">上信越道方面</option>
+                        <option value="keno">圏央道方面</option>
+                        <option value="chuo">中央道方面</option>
+                        <option value="tomei">東名道方面</option>
+                    </select>
 
-
-                <label class="auto-compare-toggle">
-                    <input type="checkbox" id="autoIcAreaEnabled" checked>
-                    IC候補エリアを自動判定する（補助設定）
-                </label>
+                    <label class="auto-compare-toggle">
+                        <input type="checkbox" id="autoIcAreaEnabled" checked>
+                        IC候補エリアを自動判定する（補助設定）
+                    </label>
+                </div>
 
                 <div id="icAreaReason" class="ic-area-reason">
                     Polyline解析結果：未取得

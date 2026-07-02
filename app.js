@@ -5455,6 +5455,471 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
     }
 }
 
+const entranceSectionFilterLoggedAnalyses = new WeakSet();
+
+function filterEntranceCandidatesByRouteSection({
+    polylineAnalysis,
+    candidates,
+    candidateAreas,
+    getIcIdentity
+}) {
+    const referenceIc =
+        polylineAnalysis.nexcoEntranceIc;
+
+    const shutoEntranceIc =
+        polylineAnalysis.shutoEntranceIc;
+
+    const workingCandidates = [...candidates];
+    const excludedCandidates = [];
+
+    const findExitInArea = (icArea, targetIc) => {
+        const targetIdentity = getIcIdentity(targetIc);
+
+        if (!targetIdentity || !IC_MASTER[icArea]) {
+            return null;
+        }
+
+        return IC_MASTER[icArea].exits.find(exit =>
+            getIcIdentity(exit) === targetIdentity
+        ) || null;
+    };
+
+    const referenceAreaIndex =
+        candidateAreas.findIndex(icArea =>
+            Boolean(findExitInArea(icArea, referenceIc))
+        );
+
+    const referenceArea =
+        referenceAreaIndex >= 0
+            ? candidateAreas[referenceAreaIndex]
+            : null;
+
+    const getComparablePosition = (exit, reference) => {
+        if (!exit || !reference) {
+            return null;
+        }
+
+        if (
+            exit.routeBranch &&
+            reference.routeBranch &&
+            exit.routeBranch !== reference.routeBranch
+        ) {
+            return null;
+        }
+
+        if (
+            Number.isFinite(exit.branchOrder) &&
+            Number.isFinite(reference.branchOrder)
+        ) {
+            return exit.branchOrder;
+        }
+
+        return Number.isFinite(exit.order)
+            ? exit.order
+            : null;
+    };
+
+    const inferTravelDirection = icArea => {
+        const referenceInArea =
+            findExitInArea(icArea, referenceIc);
+
+        const referencePosition =
+            getComparablePosition(
+                referenceInArea,
+                referenceInArea
+            );
+
+        if (referencePosition === null) {
+            return null;
+        }
+
+        const passedIcs =
+            polylineAnalysis.passedIcEntries || [];
+
+        const referencePassedIndex =
+            passedIcs.findIndex(item =>
+                getIcIdentity(item.exit) ===
+                    getIcIdentity(referenceIc)
+            );
+
+        if (referencePassedIndex < 0) {
+            return null;
+        }
+
+        for (
+            let index = referencePassedIndex + 1;
+            index < passedIcs.length;
+            index++
+        ) {
+            const nextExit =
+                findExitInArea(
+                    icArea,
+                    passedIcs[index].exit
+                );
+
+            const nextPosition =
+                getComparablePosition(
+                    nextExit,
+                    referenceInArea
+                );
+
+            if (
+                nextPosition !== null &&
+                nextPosition !== referencePosition
+            ) {
+                return Math.sign(
+                    nextPosition - referencePosition
+                );
+            }
+        }
+
+        for (
+            let index = referencePassedIndex - 1;
+            index >= 0;
+            index--
+        ) {
+            const previousExit =
+                findExitInArea(
+                    icArea,
+                    passedIcs[index].exit
+                );
+
+            const previousPosition =
+                getComparablePosition(
+                    previousExit,
+                    referenceInArea
+                );
+
+            if (
+                previousPosition !== null &&
+                previousPosition !== referencePosition
+            ) {
+                return Math.sign(
+                    referencePosition - previousPosition
+                );
+            }
+        }
+
+        return null;
+    };
+
+    const getForwardStepCount = (
+        icArea,
+        candidateExit,
+        travelDirection
+    ) => {
+        if (!travelDirection) {
+            return null;
+        }
+
+        const referenceInArea =
+            findExitInArea(icArea, referenceIc);
+
+        const exitsInTravelOrder =
+            IC_MASTER[icArea].exits
+                .filter(exit =>
+                    exit.isSelectable !== false &&
+                    !isShutoIcForRouteAnalysis(exit) &&
+                    getComparablePosition(
+                        exit,
+                        referenceInArea
+                    ) !== null
+                )
+                .slice()
+                .sort((a, b) =>
+                    (
+                        getComparablePosition(
+                            a,
+                            referenceInArea
+                        ) -
+                        getComparablePosition(
+                            b,
+                            referenceInArea
+                        )
+                    ) * travelDirection
+                );
+
+        const referenceIndex =
+            exitsInTravelOrder.findIndex(exit =>
+                getIcIdentity(exit) ===
+                    getIcIdentity(referenceIc)
+            );
+
+        const candidateIndex =
+            exitsInTravelOrder.findIndex(exit =>
+                getIcIdentity(exit) ===
+                    getIcIdentity(candidateExit)
+            );
+
+        if (referenceIndex < 0 || candidateIndex < 0) {
+            return null;
+        }
+
+        return candidateIndex - referenceIndex;
+    };
+
+    const connectsToLaterRoadSection = exit => {
+        if (
+            referenceAreaIndex < 0 ||
+            !exit?.connection ||
+            !Array.isArray(exit.connectedRoads)
+        ) {
+            return false;
+        }
+
+        const laterAreas =
+            candidateAreas.slice(referenceAreaIndex + 1);
+
+        return exit.connectedRoads.some(connectedRoad =>
+            laterAreas.includes(connectedRoad)
+        );
+    };
+
+    if (shutoEntranceIc) {
+        const shutoIdentity =
+            getIcIdentity(shutoEntranceIc);
+
+        const alreadyIncluded =
+            workingCandidates.some(candidate =>
+                getIcIdentity(candidate.exit) === shutoIdentity
+            );
+
+        if (!alreadyIncluded) {
+            const shutoArea =
+                candidateAreas.find(icArea =>
+                    Boolean(
+                        findExitInArea(
+                            icArea,
+                            shutoEntranceIc
+                        )
+                    )
+                ) || referenceArea;
+
+            workingCandidates.push({
+                icArea: shutoArea,
+                exit: shutoEntranceIc,
+                isShuto: true
+            });
+        }
+    }
+
+    const beforeCandidates = [...workingCandidates];
+
+    const filteredCandidates =
+        workingCandidates.filter(candidate => {
+            const exit = candidate.exit;
+
+            if (
+                shutoEntranceIc &&
+                isShutoIcForRouteAnalysis(exit) &&
+                getIcIdentity(exit) !==
+                    getIcIdentity(shutoEntranceIc)
+            ) {
+                excludedCandidates.push({
+                    candidate,
+                    reason:
+                        "Polyline解析の首都高入口を優先"
+                });
+                return false;
+            }
+
+            if (
+                isShutoIcForRouteAnalysis(exit) ||
+                getIcIdentity(exit) ===
+                    getIcIdentity(referenceIc)
+            ) {
+                return true;
+            }
+
+            const candidateAreaIndex =
+                candidateAreas.indexOf(candidate.icArea);
+
+            if (
+                referenceAreaIndex >= 0 &&
+                candidateAreaIndex > referenceAreaIndex
+            ) {
+                excludedCandidates.push({
+                    candidate,
+                    reason:
+                        "基準入口より後方の道路セクション"
+                });
+                return false;
+            }
+
+            if (
+                referenceArea &&
+                candidate.icArea === referenceArea
+            ) {
+                const referenceInArea =
+                    findExitInArea(referenceArea, referenceIc);
+
+                const candidateInArea =
+                    findExitInArea(referenceArea, exit);
+
+                const referencePosition =
+                    getComparablePosition(
+                        referenceInArea,
+                        referenceInArea
+                    );
+
+                const candidatePosition =
+                    getComparablePosition(
+                        candidateInArea,
+                        referenceInArea
+                    );
+
+                const travelDirection =
+                    inferTravelDirection(referenceArea);
+
+                const forwardStepCount =
+                    getForwardStepCount(
+                        referenceArea,
+                        candidateInArea,
+                        travelDirection
+                    );
+
+                if (
+                    referencePosition !== null &&
+                    candidatePosition !== null &&
+                    travelDirection !== null &&
+                    (
+                        candidatePosition -
+                        referencePosition
+                    ) * travelDirection > 0 &&
+                    (
+                        forwardStepCount > 1 ||
+                        connectsToLaterRoadSection(
+                            candidateInArea
+                        )
+                    )
+                ) {
+                    excludedCandidates.push({
+                        candidate,
+                        reason:
+                            connectsToLaterRoadSection(
+                                candidateInArea
+                            )
+                                ? "次の道路セクションへの接続IC"
+                                : "基準入口の直後1件より後方のIC"
+                    });
+                    return false;
+                }
+            }
+
+            return true;
+        });
+
+    if (shutoEntranceIc) {
+        const shutoIdentity =
+            getIcIdentity(shutoEntranceIc);
+
+        const shutoIndex =
+            filteredCandidates.findIndex(candidate =>
+                getIcIdentity(candidate.exit) === shutoIdentity
+            );
+
+        const referenceIndex =
+            filteredCandidates.findIndex(candidate =>
+                getIcIdentity(candidate.exit) ===
+                    getIcIdentity(referenceIc)
+            );
+
+        if (
+            shutoIndex >= 0 &&
+            referenceIndex >= 0 &&
+            shutoIndex !== referenceIndex - 1
+        ) {
+            const [shutoCandidate] =
+                filteredCandidates.splice(shutoIndex, 1);
+
+            const updatedReferenceIndex =
+                filteredCandidates.findIndex(candidate =>
+                    getIcIdentity(candidate.exit) ===
+                        getIcIdentity(referenceIc)
+                );
+
+            filteredCandidates.splice(
+                Math.max(0, updatedReferenceIndex),
+                0,
+                shutoCandidate
+            );
+        }
+    }
+
+    if (
+        !entranceSectionFilterLoggedAnalyses.has(
+            polylineAnalysis
+        )
+    ) {
+        entranceSectionFilterLoggedAnalyses.add(
+            polylineAnalysis
+        );
+
+        const formatNames = items =>
+            items
+                .map(item =>
+                    item.exit.displayName +
+                    (
+                        isShutoIcForRouteAnalysis(item.exit)
+                            ? " [首都高]"
+                            : ""
+                    )
+                )
+                .join(" → ") || "なし";
+
+        console.group(
+            "[ENTRANCE CANDIDATE SECTION FILTER]"
+        );
+        console.log(
+            "基準入口IC:",
+            referenceIc?.displayName || "なし"
+        );
+        console.log(
+            "基準道路:",
+            referenceArea
+                ? IC_MASTER[referenceArea]?.label ||
+                    referenceArea
+                : "なし"
+        );
+        console.log(
+            "Polyline首都高入口:",
+            shutoEntranceIc?.displayName || "なし"
+        );
+        console.log(
+            "除外前候補:",
+            formatNames(beforeCandidates)
+        );
+        console.log(
+            "除外後候補:",
+            formatNames(filteredCandidates)
+        );
+        console.log(
+            "除外候補:",
+            excludedCandidates.length > 0
+                ? excludedCandidates
+                    .map(item =>
+                        item.candidate.exit.displayName
+                    )
+                    .join(" → ")
+                : "なし"
+        );
+        console.log(
+            "除外理由:",
+            excludedCandidates.length > 0
+                ? excludedCandidates
+                    .map(item =>
+                        item.candidate.exit.displayName +
+                        ": " + item.reason
+                    )
+                    .join(" / ")
+                : "なし"
+        );
+        console.groupEnd();
+    }
+
+    return filteredCandidates;
+}
+
 function buildPolylineBasedComparisonIcCandidates(
     polylineAnalysis
 ) {
@@ -5584,11 +6049,19 @@ function buildPolylineBasedComparisonIcCandidates(
         return candidates;
     };
 
-    const entranceCandidateIcs =
+    const unfilteredEntranceCandidateIcs =
         buildSurroundingCandidates(
             polylineAnalysis.nexcoEntranceIc,
             2
         );
+
+    const entranceCandidateIcs =
+        filterEntranceCandidatesByRouteSection({
+            polylineAnalysis,
+            candidates: unfilteredEntranceCandidateIcs,
+            candidateAreas,
+            getIcIdentity
+        });
 
     const exitCandidateIcs =
         buildSurroundingCandidates(

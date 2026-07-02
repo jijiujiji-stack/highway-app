@@ -6863,10 +6863,12 @@ async function getHighwayRouteForMultiExitComparison(
     const data =
         await response.json();
 
-    console.log(
-        "multi exit highway route detail",
-        JSON.stringify(data, null, 2)
-    );
+    if (DEBUG_ROUTE_VERBOSE) {
+        console.log(
+            "multi exit highway route detail",
+            JSON.stringify(data, null, 2)
+        );
+    }
 
     if (
         !data.routes ||
@@ -7297,6 +7299,152 @@ async function searchMultiExitIcComparison() {
     }
 }
 
+function logEntranceComparisonResultSummary(results) {
+
+    const summaryRows = results.map(result => {
+        let isWeakCandidate = false;
+        let reason = "下道より短縮";
+
+        if (result.error) {
+            isWeakCandidate = true;
+            reason = "計算エラー";
+        }
+        else if (
+            result.differenceFromAllLocal === null ||
+            result.differenceFromAllLocal === undefined
+        ) {
+            isWeakCandidate = true;
+            reason = "下道との差分不明";
+        }
+        else if (result.differenceFromAllLocal <= 0) {
+            isWeakCandidate = true;
+            reason = "下道より遅い、または同等";
+        }
+        else if (
+            result.yenPerSavedMinute !== null &&
+            result.yenPerSavedMinute !== undefined &&
+            result.yenPerSavedMinute > 100
+        ) {
+            isWeakCandidate = true;
+            reason = "1分短縮あたり料金が高い（100円/分超）";
+        }
+
+        const timeComparison =
+            result.differenceFromAllLocal === null ||
+            result.differenceFromAllLocal === undefined
+                ? "不明"
+                : result.differenceFromAllLocal > 0
+                    ? result.differenceFromAllLocal + "分短縮"
+                    : result.differenceFromAllLocal < 0
+                        ? Math.abs(
+                            result.differenceFromAllLocal
+                        ) + "分遅い"
+                        : "同等";
+
+        return {
+            candidateIc: result.candidateIcName,
+            totalMinutes: result.totalMinutes,
+            differenceFromAllLocal:
+                result.differenceFromAllLocal,
+            timeComparison,
+            estimatedToll: result.estimatedToll,
+            yenPerSavedMinute:
+                result.yenPerSavedMinute,
+            isWeakCandidate,
+            reason
+        };
+    });
+
+    console.group(
+        "[ENTRANCE COMPARISON RESULT SUMMARY]"
+    );
+    console.table(summaryRows);
+    console.groupEnd();
+}
+
+function logExitComparisonResultSummary(results) {
+
+    const summaryRows = results.map(result => {
+        let isWeakCandidate = false;
+        let reason = "節約あり";
+
+        if (result.error) {
+            isWeakCandidate = true;
+            reason = "計算エラー";
+        }
+        else if (
+            result.savedToll === null ||
+            result.savedToll === undefined ||
+            result.differenceFromAllHighway === null ||
+            result.differenceFromAllHighway === undefined
+        ) {
+            isWeakCandidate = true;
+            reason = "全高速との差分または節約額不明";
+        }
+        else if (
+            result.savedToll < 0 &&
+            result.differenceFromAllHighway > 0
+        ) {
+            isWeakCandidate = true;
+            reason = "逆に高く、時間も遅い";
+        }
+        else if (result.savedToll < 0) {
+            isWeakCandidate = true;
+            reason = "逆に高い";
+        }
+        else if (result.savedToll === 0) {
+            isWeakCandidate = true;
+            reason = "節約なし";
+        }
+        else if (result.differenceFromAllHighway <= 0) {
+            reason = "節約あり、全高速より速いまたは同等";
+        }
+
+        const timeComparison =
+            result.differenceFromAllHighway === null ||
+            result.differenceFromAllHighway === undefined
+                ? "不明"
+                : result.differenceFromAllHighway > 0
+                    ? result.differenceFromAllHighway + "分遅い"
+                    : result.differenceFromAllHighway < 0
+                        ? Math.abs(
+                            result.differenceFromAllHighway
+                        ) + "分早い"
+                        : "同等";
+
+        const tollComparison =
+            result.savedToll === null ||
+            result.savedToll === undefined
+                ? "不明"
+                : result.savedToll > 0
+                    ? result.savedToll + "円節約"
+                    : result.savedToll < 0
+                        ? Math.abs(result.savedToll) +
+                            "円逆に高い"
+                        : "節約なし";
+
+        return {
+            candidateIc: result.candidateIcName,
+            totalMinutes: result.totalMinutes,
+            differenceFromAllHighway:
+                result.differenceFromAllHighway,
+            timeComparison,
+            savedToll: result.savedToll,
+            tollComparison,
+            yenPerDelayedMinute:
+                result.yenPerDelayedMinute,
+            isWeakCandidate,
+            reason
+        };
+    });
+
+    console.group(
+        "[EXIT COMPARISON RESULT SUMMARY]"
+    );
+    console.table(summaryRows);
+    console.groupEnd();
+}
+
 async function searchEntranceIcComparisonV2(options = {}) {
 
     const origin =
@@ -7498,12 +7646,18 @@ async function searchEntranceIcComparisonV2(options = {}) {
         }
     }
 
-    console.log(
-        "複数IC比較V2 entrance results",
+    logEntranceComparisonResultSummary(
         lastMultiIcV2Results
     );
 
-    console.table(lastMultiIcV2Results);
+    if (DEBUG_ROUTE_VERBOSE) {
+        console.log(
+            "複数IC比較V2 entrance results",
+            lastMultiIcV2Results
+        );
+
+        console.table(lastMultiIcV2Results);
+    }
 
     displayEntranceIcComparisonV2Results(
         lastMultiIcV2Results
@@ -7727,12 +7881,18 @@ async function searchExitIcComparisonV2(options = {}) {
         }
     }
 
-    console.log(
-        "複数IC比較V2 exit results",
+    logExitComparisonResultSummary(
         lastExitIcV2Results
     );
 
-    console.table(lastExitIcV2Results);
+    if (DEBUG_ROUTE_VERBOSE) {
+        console.log(
+            "複数IC比較V2 exit results",
+            lastExitIcV2Results
+        );
+
+        console.table(lastExitIcV2Results);
+    }
 
     displayExitIcComparisonV2Results(
         lastExitIcV2Results

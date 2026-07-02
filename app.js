@@ -1081,6 +1081,111 @@ const IC_MASTER = {
                 connectedRoads: ["keno", "tokan"],
                 routeBranch: "northeast",
                 branchOrder: 34
+            },
+            {
+                order: 35,
+                displayName: "松尾横芝IC",
+                googleName: "首都圏中央連絡自動車道 松尾横芝インターチェンジ",
+                lat: 35.663,
+                lng: 140.438,
+                routeBranch: "southeast",
+                branchOrder: 35
+            },
+            {
+                order: 36,
+                displayName: "山武成東IC",
+                googleName: "首都圏中央連絡自動車道 山武成東インターチェンジ",
+                lat: 35.618,
+                lng: 140.383,
+                routeBranch: "southeast",
+                branchOrder: 36
+            },
+            {
+                order: 37,
+                displayName: "東金JCT",
+                googleName: "首都圏中央連絡自動車道 東金ジャンクション",
+                lat: 35.574,
+                lng: 140.316,
+                isSelectable: false,
+                connection: true,
+                connectedRoads: ["keno"],
+                routeBranch: "southeast",
+                branchOrder: 37
+            },
+            {
+                order: 38,
+                displayName: "東金IC",
+                googleName: "首都圏中央連絡自動車道 東金インターチェンジ",
+                lat: 35.571,
+                lng: 140.316,
+                routeBranch: "southeast",
+                branchOrder: 38
+            },
+            {
+                order: 39,
+                displayName: "大網白里SIC",
+                googleName: "首都圏中央連絡自動車道 大網白里スマートインターチェンジ",
+                lat: 35.514,
+                lng: 140.295,
+                routeBranch: "southeast",
+                branchOrder: 39
+            },
+            {
+                order: 40,
+                displayName: "茂原北IC",
+                googleName: "首都圏中央連絡自動車道 茂原北インターチェンジ",
+                lat: 35.487,
+                lng: 140.271,
+                routeBranch: "southeast",
+                branchOrder: 40
+            },
+            {
+                order: 41,
+                displayName: "茂原長柄SIC",
+                googleName: "首都圏中央連絡自動車道 茂原長柄スマートインターチェンジ",
+                lat: 35.448,
+                lng: 140.248,
+                routeBranch: "southeast",
+                branchOrder: 41
+            },
+            {
+                order: 42,
+                displayName: "茂原長南IC",
+                googleName: "首都圏中央連絡自動車道 茂原長南インターチェンジ",
+                lat: 35.402,
+                lng: 140.245,
+                routeBranch: "southeast",
+                branchOrder: 42
+            },
+            {
+                order: 43,
+                displayName: "市原鶴舞IC",
+                googleName: "首都圏中央連絡自動車道 市原鶴舞インターチェンジ",
+                lat: 35.363,
+                lng: 140.185,
+                routeBranch: "southeast",
+                branchOrder: 43
+            },
+            {
+                order: 44,
+                displayName: "木更津東IC",
+                googleName: "首都圏中央連絡自動車道 木更津東インターチェンジ",
+                lat: 35.361,
+                lng: 140.052,
+                routeBranch: "southeast",
+                branchOrder: 44
+            },
+            {
+                order: 45,
+                displayName: "木更津JCT",
+                googleName: "首都圏中央連絡自動車道 木更津ジャンクション",
+                lat: 35.372,
+                lng: 139.974,
+                isSelectable: false,
+                connection: true,
+                connectedRoads: ["keno", "tateyama", "aqualine"],
+                routeBranch: "southeast",
+                branchOrder: 45
             }
         ]
     },

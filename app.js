@@ -940,6 +940,147 @@ const IC_MASTER = {
                 connectedRoads: ["keno", "tohoku"],
                 routeBranch: "northwest",
                 branchOrder: 19
+            },
+            {
+                order: 20,
+                displayName: "幸手IC",
+                googleName: "首都圏中央連絡自動車道 幸手インターチェンジ",
+                lat: 36.075,
+                lng: 139.753,
+                routeBranch: "northeast",
+                branchOrder: 20
+            },
+            {
+                order: 21,
+                displayName: "五霞IC",
+                googleName: "首都圏中央連絡自動車道 五霞インターチェンジ",
+                lat: 36.101,
+                lng: 139.774,
+                routeBranch: "northeast",
+                branchOrder: 21
+            },
+            {
+                order: 22,
+                displayName: "境古河IC",
+                googleName: "首都圏中央連絡自動車道 境古河インターチェンジ",
+                lat: 36.113,
+                lng: 139.833,
+                routeBranch: "northeast",
+                branchOrder: 22
+            },
+            {
+                order: 23,
+                displayName: "坂東IC",
+                googleName: "首都圏中央連絡自動車道 坂東インターチェンジ",
+                lat: 36.063,
+                lng: 139.914,
+                routeBranch: "northeast",
+                branchOrder: 23
+            },
+            {
+                order: 24,
+                displayName: "常総IC",
+                googleName: "首都圏中央連絡自動車道 常総インターチェンジ",
+                lat: 36.044,
+                lng: 140.012,
+                routeBranch: "northeast",
+                branchOrder: 24
+            },
+            {
+                order: 25,
+                displayName: "つくば中央IC",
+                googleName: "首都圏中央連絡自動車道 つくば中央インターチェンジ",
+                lat: 36.079,
+                lng: 140.073,
+                routeBranch: "northeast",
+                branchOrder: 25
+            },
+            {
+                order: 26,
+                displayName: "つくばJCT",
+                googleName: "首都圏中央連絡自動車道 つくばジャンクション",
+                lat: 36.091,
+                lng: 140.111,
+                isSelectable: false,
+                connection: true,
+                connectedRoads: ["keno", "joban"],
+                routeBranch: "northeast",
+                branchOrder: 26
+            },
+            {
+                order: 27,
+                displayName: "つくば牛久IC",
+                googleName: "首都圏中央連絡自動車道 つくば牛久インターチェンジ",
+                lat: 36.037,
+                lng: 140.119,
+                routeBranch: "northeast",
+                branchOrder: 27
+            },
+            {
+                order: 28,
+                displayName: "牛久阿見IC",
+                googleName: "首都圏中央連絡自動車道 牛久阿見インターチェンジ",
+                lat: 35.982,
+                lng: 140.170,
+                routeBranch: "northeast",
+                branchOrder: 28
+            },
+            {
+                order: 29,
+                displayName: "阿見東IC",
+                googleName: "首都圏中央連絡自動車道 阿見東インターチェンジ",
+                lat: 35.969,
+                lng: 140.234,
+                routeBranch: "northeast",
+                branchOrder: 29
+            },
+            {
+                order: 30,
+                displayName: "稲敷IC",
+                googleName: "首都圏中央連絡自動車道 稲敷インターチェンジ",
+                lat: 35.947,
+                lng: 140.323,
+                routeBranch: "northeast",
+                branchOrder: 30
+            },
+            {
+                order: 31,
+                displayName: "稲敷東IC",
+                googleName: "首都圏中央連絡自動車道 稲敷東インターチェンジ",
+                lat: 35.919,
+                lng: 140.383,
+                routeBranch: "northeast",
+                branchOrder: 31
+            },
+            {
+                order: 32,
+                displayName: "神崎IC",
+                googleName: "首都圏中央連絡自動車道 神崎インターチェンジ",
+                lat: 35.894,
+                lng: 140.408,
+                routeBranch: "northeast",
+                branchOrder: 32
+            },
+            {
+                order: 33,
+                displayName: "下総IC",
+                googleName: "首都圏中央連絡自動車道 下総インターチェンジ",
+                lat: 35.873,
+                lng: 140.432,
+                routeBranch: "northeast",
+                branchOrder: 33
+            },
+            {
+                order: 34,
+                displayName: "大栄JCT",
+                googleName: "首都圏中央連絡自動車道 大栄ジャンクション",
+                lat: 35.851,
+                lng: 140.468,
+                isSelectable: false,
+                connection: true,
+                connectedRoads: ["keno", "tokan"],
+                routeBranch: "northeast",
+                branchOrder: 34
             }
         ]
     },

@@ -5029,6 +5029,176 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
     }
 }
 
+function buildPolylineBasedComparisonIcCandidates(
+    polylineAnalysis
+) {
+
+    if (!polylineAnalysis) {
+        return null;
+    }
+
+    const candidateAreas = [];
+
+    (polylineAnalysis.roadSequence || []).forEach(roadLabel => {
+        if (roadLabel === "首都高") {
+            return;
+        }
+
+        const matchedArea =
+            Object.keys(IC_MASTER).find(icArea =>
+                icArea === roadLabel ||
+                IC_MASTER[icArea]?.label === roadLabel
+            );
+
+        if (
+            matchedArea &&
+            !candidateAreas.includes(matchedArea)
+        ) {
+            candidateAreas.push(matchedArea);
+        }
+    });
+
+    const getIcIdentity = exit =>
+        exit?.googleName ||
+        (
+            exit
+                ? exit.displayName + "|" + exit.lat + "|" + exit.lng
+                : ""
+        );
+
+    const appendAreasContainingIc = referenceIc => {
+        const referenceIdentity = getIcIdentity(referenceIc);
+
+        if (!referenceIdentity) {
+            return;
+        }
+
+        Object.keys(IC_MASTER).forEach(icArea => {
+            const containsReference =
+                IC_MASTER[icArea].exits.some(exit =>
+                    getIcIdentity(exit) === referenceIdentity
+                );
+
+            if (
+                containsReference &&
+                !candidateAreas.includes(icArea)
+            ) {
+                candidateAreas.push(icArea);
+            }
+        });
+    };
+
+    if (candidateAreas.length === 0) {
+        appendAreasContainingIc(
+            polylineAnalysis.nexcoEntranceIc
+        );
+        appendAreasContainingIc(
+            polylineAnalysis.nexcoExitIc
+        );
+    }
+
+    const buildSurroundingCandidates = (
+        referenceIc,
+        surroundingCount
+    ) => {
+        const referenceIdentity = getIcIdentity(referenceIc);
+
+        if (!referenceIdentity) {
+            return [];
+        }
+
+        const candidates = [];
+        const registeredIdentities = new Set();
+
+        candidateAreas.forEach(icArea => {
+            const exits =
+                IC_MASTER[icArea].exits
+                    .slice()
+                    .sort((a, b) =>
+                        (a.order ?? 999) - (b.order ?? 999)
+                    )
+                    .filter(exit =>
+                        exit.isSelectable !== false
+                    );
+
+            const referenceIndex =
+                exits.findIndex(exit =>
+                    getIcIdentity(exit) === referenceIdentity
+                );
+
+            if (referenceIndex < 0) {
+                return;
+            }
+
+            exits
+                .slice(
+                    Math.max(
+                        0,
+                        referenceIndex - surroundingCount
+                    ),
+                    referenceIndex + surroundingCount + 1
+                )
+                .forEach(exit => {
+                    const identity = getIcIdentity(exit);
+
+                    if (registeredIdentities.has(identity)) {
+                        return;
+                    }
+
+                    registeredIdentities.add(identity);
+                    candidates.push({
+                        icArea,
+                        exit,
+                        isShuto:
+                            isShutoIcForRouteAnalysis(exit)
+                    });
+                });
+        });
+
+        return candidates;
+    };
+
+    const entranceCandidateIcs =
+        buildSurroundingCandidates(
+            polylineAnalysis.nexcoEntranceIc,
+            2
+        );
+
+    const exitCandidateIcs =
+        buildSurroundingCandidates(
+            polylineAnalysis.nexcoExitIc,
+            3
+        );
+
+    let reason =
+        "Polyline解析NEXCO入口出口を基準に" +
+        "IC_MASTER周辺候補を抽出";
+
+    if (candidateAreas.length > 1) {
+        reason =
+            "複数道路のため暫定候補：" + reason;
+    }
+    else if (candidateAreas.length === 0) {
+        reason =
+            "Polyline道路エリアを特定できないため候補なし";
+    }
+    else if (
+        entranceCandidateIcs.length === 0 ||
+        exitCandidateIcs.length === 0
+    ) {
+        reason =
+            "NEXCO基準ICがIC_MASTER内で見つからないため" +
+            "一部候補なし";
+    }
+
+    return {
+        candidateAreas,
+        entranceCandidateIcs,
+        exitCandidateIcs,
+        reason
+    };
+}
+
 function logHighwayRoutePolylineAnalysis(
     highwayRoute,
     origin,
@@ -5076,6 +5246,9 @@ function logHighwayRoutePolylineAnalysis(
         routePointLogs,
         passedIcEntries
     } = result;
+
+    const comparisonCandidatePreview =
+        buildPolylineBasedComparisonIcCandidates(result);
 
     try {
 
@@ -5252,6 +5425,54 @@ function logHighwayRoutePolylineAnalysis(
             "現在のexitIc:",
             exitCandidate?.displayName || "なし"
         );
+
+        console.groupEnd();
+
+        console.group(
+            "[ROUTE COMPARISON CANDIDATE PREVIEW]"
+        );
+
+        const formatComparisonCandidateNames = candidates =>
+            candidates
+                .map(candidate =>
+                    candidate.exit.displayName +
+                    (candidate.isShuto ? " [首都高]" : "")
+                )
+                .join(" → ");
+
+        console.log(
+            "candidateAreas:",
+            comparisonCandidatePreview?.candidateAreas
+                .join(" → ") || "なし"
+        );
+        console.log(
+            "入口比較基準IC:",
+            nexcoEntranceIc?.displayName || "なし"
+        );
+        console.log(
+            "入口比較候補IC:",
+            formatComparisonCandidateNames(
+                comparisonCandidatePreview
+                    ?.entranceCandidateIcs || []
+            ) || "なし"
+        );
+        console.log(
+            "出口比較基準IC:",
+            nexcoExitIc?.displayName || "なし"
+        );
+        console.log(
+            "出口比較候補IC:",
+            formatComparisonCandidateNames(
+                comparisonCandidatePreview
+                    ?.exitCandidateIcs || []
+            ) || "なし"
+        );
+        console.log(
+            "reason:",
+            comparisonCandidatePreview?.reason ||
+                "Polyline解析結果なし"
+        );
+        console.log("API追加呼び出し: なし");
 
         console.groupEnd();
 

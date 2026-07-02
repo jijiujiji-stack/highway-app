@@ -6633,15 +6633,18 @@ function buildPolylineBasedComparisonIcCandidates(
             getIcIdentity
         });
 
-    const exitCandidateIcs =
-        buildSurroundingCandidates(
-            polylineAnalysis.nexcoExitIc,
-            3
+    const forwardExitSelection =
+        buildForwardExitComparisonIcCandidates(
+            polylineAnalysis,
+            getIcIdentity
         );
 
+    const exitCandidateIcs =
+        forwardExitSelection.candidates;
+
     let reason =
-        "Polyline解析NEXCO入口出口を基準に" +
-        "IC_MASTER周辺候補を抽出";
+        "入口はPolyline解析NEXCO入口周辺、" +
+        "出口は現在地基準より先のPolyline通過順で抽出";
 
     if (candidateAreas.length > 1) {
         reason =
@@ -6651,21 +6654,168 @@ function buildPolylineBasedComparisonIcCandidates(
         reason =
             "Polyline道路エリアを特定できないため候補なし";
     }
-    else if (
-        entranceCandidateIcs.length === 0 ||
-        exitCandidateIcs.length === 0
-    ) {
+    else if (entranceCandidateIcs.length === 0) {
         reason =
-            "NEXCO基準ICがIC_MASTER内で見つからないため" +
-            "一部候補なし";
+            "NEXCO入口基準ICがIC_MASTER内で" +
+            "見つからないため入口候補なし";
+    }
+    else if (exitCandidateIcs.length === 0) {
+        reason =
+            "現在地基準より先に選択可能な" +
+            "Polyline出口候補なし";
     }
 
     return {
         candidateAreas,
         entranceCandidateIcs,
         exitCandidateIcs,
+        exitCandidateBaseDistanceMeters:
+            forwardExitSelection.baseDistanceMeters,
+        excludedExitCandidateIcs:
+            forwardExitSelection.excludedCandidates,
         reason
     };
+}
+
+function buildForwardExitComparisonIcCandidates(
+    polylineAnalysis,
+    getIcIdentity
+) {
+
+    const routeTrace =
+        polylineAnalysis?.routeTrace || [];
+
+    // Routes API のPolylineはorigin（現在地/出発地）から始まり、
+    // sampledPoints[0]はその先頭をrouteDistanceMeters: 0で保持する。
+    // IC検出結果であるrouteTraceではなく、このoriginサンプルを
+    // 出口比較の現在地基準として使う。
+    const baseDistanceMeters =
+        polylineAnalysis?.sampledPoints?.[0]
+            ?.routeDistanceMeters ??
+        routeTrace[0]?.routeDistanceMeters ??
+        0;
+
+    const maxPolylineDistanceMeters = 5000;
+    const candidatesByIdentity = new Map();
+
+    routeTrace.forEach(routePoint => {
+        const exit = routePoint.exit;
+        const identity = getIcIdentity(exit);
+
+        if (
+            !identity ||
+            exit?.lat === undefined ||
+            exit?.lng === undefined ||
+            !Number.isFinite(routePoint.routeDistanceMeters)
+        ) {
+            return;
+        }
+
+        const polylineDistanceMeters =
+            calculateDistance(
+                routePoint.lat,
+                routePoint.lng,
+                exit.lat,
+                exit.lng
+            );
+
+        const existing =
+            candidatesByIdentity.get(identity);
+
+        if (
+            existing &&
+            existing.polylineDistanceMeters <=
+                polylineDistanceMeters
+        ) {
+            return;
+        }
+
+        candidatesByIdentity.set(identity, {
+            icArea: routePoint.icArea,
+            exit,
+            isShuto:
+                isShutoIcForRouteAnalysis(exit),
+            routeDistanceMeters:
+                routePoint.routeDistanceMeters,
+            distanceFromBaseMeters:
+                routePoint.routeDistanceMeters -
+                baseDistanceMeters,
+            polylineDistanceMeters
+        });
+    });
+
+    const candidates = [];
+    const excludedCandidates = [];
+
+    [...candidatesByIdentity.values()]
+        .sort((a, b) =>
+            a.routeDistanceMeters - b.routeDistanceMeters
+        )
+        .forEach(candidate => {
+            const exit = candidate.exit;
+            let exclusionReason = "";
+
+            const isConnectionJunction =
+                exit.connection === true &&
+                /JCT|ジャンクション/i.test(
+                    exit.displayName || exit.googleName || ""
+                );
+
+            if (exit.isSelectable === false) {
+                exclusionReason =
+                    "isSelectable:false（選択不可IC/JCT）";
+            }
+            else if (isConnectionJunction) {
+                exclusionReason = "接続用JCT";
+            }
+            else if (candidate.distanceFromBaseMeters <= 0) {
+                exclusionReason = "現在地基準地点以前";
+            }
+            else if (
+                candidate.polylineDistanceMeters >
+                    maxPolylineDistanceMeters
+            ) {
+                exclusionReason =
+                    "高速ルートPolylineから5km超";
+            }
+
+            if (exclusionReason) {
+                excludedCandidates.push({
+                    ...candidate,
+                    reason: exclusionReason
+                });
+                return;
+            }
+
+            candidates.push(candidate);
+        });
+
+    return {
+        baseDistanceMeters,
+        candidates,
+        excludedCandidates
+    };
+}
+
+function selectForwardComparisonIcCandidates(
+    candidates,
+    maxCount
+) {
+
+    if (!Array.isArray(candidates) || maxCount <= 0) {
+        return [];
+    }
+
+    return candidates
+        .filter(candidate =>
+            candidate?.exit &&
+            candidate.exit.isSelectable !== false
+        )
+        .slice()
+        .sort((a, b) =>
+            a.routeDistanceMeters - b.routeDistanceMeters
+        )
+        .slice(0, maxCount);
 }
 
 function selectLimitedComparisonIcCandidates(
@@ -6796,19 +6946,28 @@ function selectPolylineBasedMultiIcCandidates({
             : "NEXCO出口ICなし";
 
     let polylineApiCandidates = [];
+    let polylineCandidatePreview = null;
 
     if (analysisKeyMatches) {
-        const polylineCandidatePreview =
+        polylineCandidatePreview =
             buildPolylineBasedComparisonIcCandidates(
                 lastHighwayRoutePolylineAnalysis
             );
 
         polylineApiCandidates =
-            selectLimitedComparisonIcCandidates(
-                polylineCandidatePreview?.[candidateProperty] || [],
-                lastHighwayRoutePolylineAnalysis[referenceProperty],
-                apiCandidateLimit
-            );
+            mode === "entrance"
+                ? selectLimitedComparisonIcCandidates(
+                    polylineCandidatePreview
+                        ?.[candidateProperty] || [],
+                    lastHighwayRoutePolylineAnalysis
+                        [referenceProperty],
+                    apiCandidateLimit
+                )
+                : selectForwardComparisonIcCandidates(
+                    polylineCandidatePreview
+                        ?.exitCandidateIcs || [],
+                    apiCandidateLimit
+                );
     }
 
     let selectedExits = [];
@@ -6820,7 +6979,10 @@ function selectPolylineBasedMultiIcCandidates({
             polylineApiCandidates.map(candidate =>
                 candidate.exit
             );
-        candidateSelectionLogic = "Polyline解析候補";
+        candidateSelectionLogic =
+            mode === "entrance"
+                ? "Polyline解析候補"
+                : "Polyline現在地以降・進行方向順候補";
     }
     else {
         if (!hasPolylineAnalysis) {
@@ -6831,6 +6993,7 @@ function selectPolylineBasedMultiIcCandidates({
                 "Polyline解析結果が現在の出発地・目的地と不一致";
         }
         else if (
+            mode === "entrance" &&
             !lastHighwayRoutePolylineAnalysis[referenceProperty]
         ) {
             fallbackReason = nexcoMissingReason;
@@ -6867,7 +7030,13 @@ function selectPolylineBasedMultiIcCandidates({
         analysisKeyMatches,
         savedRouteAnalysisKey:
             lastHighwayRoutePolylineAnalysisKey,
-        currentRouteAnalysisKey
+        currentRouteAnalysisKey,
+        exitCandidateBaseDistanceMeters:
+            polylineCandidatePreview
+                ?.exitCandidateBaseDistanceMeters ?? null,
+        excludedExitCandidateIcs:
+            polylineCandidatePreview
+                ?.excludedExitCandidateIcs || []
     };
 }
 
@@ -6878,8 +7047,45 @@ function logMultiIcCandidateSelection(mode, selection) {
     console.group(
         isEntrance
             ? "[ENTRANCE COMPARISON CANDIDATES]"
-            : "[EXIT COMPARISON CANDIDATES]"
+            : "[EXIT CANDIDATE SELECTION]"
     );
+    if (!isEntrance) {
+        console.log("出口比較モード: この先IC比較");
+        console.log(
+            "現在地基準距離:",
+            selection.exitCandidateBaseDistanceMeters === null
+                ? "なし"
+                : Math.round(
+                    selection.exitCandidateBaseDistanceMeters /
+                    100
+                ) / 10 + "km"
+        );
+        console.log(
+            "候補IC:",
+            selection.candidateNames || "なし"
+        );
+        console.log(
+            "除外IC:",
+            selection.excludedExitCandidateIcs.length > 0
+                ? selection.excludedExitCandidateIcs
+                    .map(candidate =>
+                        candidate.exit.displayName
+                    )
+                    .join(" → ")
+                : "なし"
+        );
+        console.log(
+            "理由:",
+            selection.excludedExitCandidateIcs.length > 0
+                ? selection.excludedExitCandidateIcs
+                    .map(candidate =>
+                        candidate.exit.displayName +
+                        ": " + candidate.reason
+                    )
+                    .join(" / ")
+                : "除外なし"
+        );
+    }
     console.log(
         "候補選定ロジック:",
         selection.candidateSelectionLogic
@@ -6997,10 +7203,9 @@ function logHighwayRoutePolylineAnalysis(
         );
 
     const exitApiCandidateIcs =
-        selectLimitedComparisonIcCandidates(
+        selectForwardComparisonIcCandidates(
             comparisonCandidatePreview
                 ?.exitCandidateIcs || [],
-            nexcoExitIc,
             comparisonApiCandidateLimit
         );
 
@@ -7229,8 +7434,21 @@ function logHighwayRoutePolylineAnalysis(
             ) || "なし"
         );
         console.log(
-            "出口比較基準IC:",
-            nexcoExitIc?.displayName || "なし"
+            "出口比較モード:",
+            "この先IC比較"
+        );
+        console.log(
+            "出口比較現在地基準距離:",
+            comparisonCandidatePreview
+                ?.exitCandidateBaseDistanceMeters === null ||
+            comparisonCandidatePreview
+                ?.exitCandidateBaseDistanceMeters === undefined
+                ? "なし"
+                : Math.round(
+                    comparisonCandidatePreview
+                        .exitCandidateBaseDistanceMeters /
+                    100
+                ) / 10 + "km"
         );
         console.log(
             "出口比較候補IC:",
@@ -7244,6 +7462,19 @@ function logHighwayRoutePolylineAnalysis(
             formatComparisonCandidateNames(
                 exitApiCandidateIcs
             ) || "なし"
+        );
+        console.log(
+            "出口比較除外IC:",
+            comparisonCandidatePreview
+                ?.excludedExitCandidateIcs?.length > 0
+                ? comparisonCandidatePreview
+                    .excludedExitCandidateIcs
+                    .map(candidate =>
+                        candidate.exit.displayName +
+                        ": " + candidate.reason
+                    )
+                    .join(" / ")
+                : "なし"
         );
         console.log(
             "reason:",

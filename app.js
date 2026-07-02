@@ -5199,6 +5199,97 @@ function buildPolylineBasedComparisonIcCandidates(
     };
 }
 
+function selectLimitedComparisonIcCandidates(
+    candidates,
+    referenceIc,
+    maxCount
+) {
+
+    if (
+        !Array.isArray(candidates) ||
+        !referenceIc ||
+        referenceIc.isSelectable === false ||
+        maxCount <= 0
+    ) {
+        return [];
+    }
+
+    const getIcIdentity = exit =>
+        exit?.googleName ||
+        (
+            exit
+                ? exit.displayName + "|" + exit.lat + "|" + exit.lng
+                : ""
+        );
+
+    const uniqueCandidates = [];
+    const registeredIdentities = new Set();
+
+    candidates.forEach(candidate => {
+        if (
+            !candidate?.exit ||
+            candidate.exit.isSelectable === false
+        ) {
+            return;
+        }
+
+        const identity = getIcIdentity(candidate.exit);
+
+        if (
+            !identity ||
+            registeredIdentities.has(identity)
+        ) {
+            return;
+        }
+
+        registeredIdentities.add(identity);
+        uniqueCandidates.push(candidate);
+    });
+
+    const referenceIdentity = getIcIdentity(referenceIc);
+
+    let referenceIndex =
+        uniqueCandidates.findIndex(candidate =>
+            getIcIdentity(candidate.exit) === referenceIdentity
+        );
+
+    if (referenceIndex < 0) {
+        uniqueCandidates.unshift({
+            icArea: null,
+            exit: referenceIc,
+            isShuto:
+                isShutoIcForRouteAnalysis(referenceIc)
+        });
+        referenceIndex = 0;
+    }
+
+    const limitedCount =
+        Math.min(maxCount, uniqueCandidates.length);
+
+    const candidatesBeforeReference =
+        Math.floor(limitedCount / 2);
+
+    let startIndex =
+        referenceIndex - candidatesBeforeReference;
+
+    startIndex = Math.max(0, startIndex);
+
+    if (
+        startIndex + limitedCount >
+        uniqueCandidates.length
+    ) {
+        startIndex = Math.max(
+            0,
+            uniqueCandidates.length - limitedCount
+        );
+    }
+
+    return uniqueCandidates.slice(
+        startIndex,
+        startIndex + limitedCount
+    );
+}
+
 function logHighwayRoutePolylineAnalysis(
     highwayRoute,
     origin,
@@ -5249,6 +5340,25 @@ function logHighwayRoutePolylineAnalysis(
 
     const comparisonCandidatePreview =
         buildPolylineBasedComparisonIcCandidates(result);
+
+    const comparisonApiCandidateLimit =
+        getActiveIcCandidateCount();
+
+    const entranceApiCandidateIcs =
+        selectLimitedComparisonIcCandidates(
+            comparisonCandidatePreview
+                ?.entranceCandidateIcs || [],
+            nexcoEntranceIc,
+            comparisonApiCandidateLimit
+        );
+
+    const exitApiCandidateIcs =
+        selectLimitedComparisonIcCandidates(
+            comparisonCandidatePreview
+                ?.exitCandidateIcs || [],
+            nexcoExitIc,
+            comparisonApiCandidateLimit
+        );
 
     try {
 
@@ -5457,6 +5567,12 @@ function logHighwayRoutePolylineAnalysis(
             ) || "なし"
         );
         console.log(
+            "入口比較API候補IC:",
+            formatComparisonCandidateNames(
+                entranceApiCandidateIcs
+            ) || "なし"
+        );
+        console.log(
             "出口比較基準IC:",
             nexcoExitIc?.displayName || "なし"
         );
@@ -5468,9 +5584,23 @@ function logHighwayRoutePolylineAnalysis(
             ) || "なし"
         );
         console.log(
+            "出口比較API候補IC:",
+            formatComparisonCandidateNames(
+                exitApiCandidateIcs
+            ) || "なし"
+        );
+        console.log(
             "reason:",
             comparisonCandidatePreview?.reason ||
                 "Polyline解析結果なし"
+        );
+        console.log(
+            "API実行候補上限:",
+            comparisonApiCandidateLimit
+        );
+        console.log(
+            "実車テストモード:",
+            isRealDriveTestMode ? "ON" : "OFF"
         );
         console.log("API追加呼び出し: なし");
 

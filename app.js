@@ -8,6 +8,9 @@ const ENABLE_KEYWORD_AREA_HINT = false;
 // 開発中のGoogle API使用量を抑えるための設定
 const DEV_API_SAVING_MODE = true;
 
+// Polyline解析とRoutesレスポンスの詳細ログを表示する。
+const DEBUG_ROUTE_VERBOSE = false;
+
 // 開発中は候補IC数を少なめにする
 const DEV_IC_CANDIDATE_COUNT = 3;
 
@@ -2292,10 +2295,12 @@ async function getHighwayRoute(
     const data =
         await response.json();
 
-    console.log(
-        "高速ルート詳細",
-        JSON.stringify(data, null, 2)
-    );
+    if (DEBUG_ROUTE_VERBOSE) {
+        console.log(
+            "高速ルート詳細",
+            JSON.stringify(data, null, 2)
+        );
+    }
 
     if (
         !data.routes ||
@@ -3799,10 +3804,12 @@ async function getHighwayRouteFromGps(
     const data =
         await response.json();
 
-    console.log(
-        "GPS高速ルート",
-        JSON.stringify(data, null, 2)
-    );
+    if (DEBUG_ROUTE_VERBOSE) {
+        console.log(
+            "GPS高速ルート",
+            JSON.stringify(data, null, 2)
+        );
+    }
 
     if (
         !data.routes ||
@@ -3902,10 +3909,12 @@ async function getLocalRouteFromGps(
     const data =
         await response.json();
 
-    console.log(
-        "GPS下道ルート",
-        JSON.stringify(data, null, 2)
-    );
+    if (DEBUG_ROUTE_VERBOSE) {
+        console.log(
+            "GPS下道ルート",
+            JSON.stringify(data, null, 2)
+        );
+    }
 
     if (
         !data.routes ||
@@ -5075,38 +5084,40 @@ function logHighwayRoutePolylineAnalysis(
             origin + " → " + destination
         );
 
-        console.log(
-            "デコード点数:",
-            routePoints.length,
-            "サンプル点数:",
-            sampledPoints.length
-        );
-
-        routePointLogs.forEach(item => {
+        if (DEBUG_ROUTE_VERBOSE) {
             console.log(
-                "RoutePoint " + item.routePoint +
-                "\n→ " + item.nearestIc +
-                "\n距離 " + item.distanceKm + "km"
+                "デコード点数:",
+                routePoints.length,
+                "サンプル点数:",
+                sampledPoints.length
             );
-        });
 
-        console.table(routePointLogs);
+            routePointLogs.forEach(item => {
+                console.log(
+                    "RoutePoint " + item.routePoint +
+                    "\n→ " + item.nearestIc +
+                    "\n距離 " + item.distanceKm + "km"
+                );
+            });
 
-        console.table(
-            Object.entries(areaCounts).map(
-                ([icArea, pointCount]) => ({
-                    icArea,
-                    pointCount
-                })
-            )
-        );
+            console.table(routePointLogs);
 
-        console.log(
-            "通過IC順:",
-            passedIcEntries
-                .map(item => item.exit.displayName)
-                .join(" → ")
-        );
+            console.table(
+                Object.entries(areaCounts).map(
+                    ([icArea, pointCount]) => ({
+                        icArea,
+                        pointCount
+                    })
+                )
+            );
+
+            console.log(
+                "通過IC順:",
+                passedIcEntries
+                    .map(item => item.exit.displayName)
+                    .join(" → ")
+            );
+        }
 
         const formatShutoCandidatesForLog = candidates =>
             candidates.map(candidate => ({
@@ -5244,51 +5255,55 @@ function logHighwayRoutePolylineAnalysis(
 
         console.groupEnd();
 
-        roadSwitches.forEach((roadSwitch, index) => {
-            const routeDistanceKm =
-                Math.round(
-                    roadSwitch.routeDistanceMeters / 1000
+        if (DEBUG_ROUTE_VERBOSE) {
+            roadSwitches.forEach((roadSwitch, index) => {
+                const routeDistanceKm =
+                    Math.round(
+                        roadSwitch.routeDistanceMeters / 1000
+                    );
+
+                const nearbyIcLogs =
+                    roadSwitch.nearbyIcs.map(item => ({
+                        ic: item.exit.displayName,
+                        icArea: item.icArea,
+                        distanceKm:
+                            Math.round(
+                                item.distanceMeters / 100
+                            ) / 10,
+                        isSelectable:
+                            item.exit.isSelectable !== false
+                    }));
+
+                console.group(
+                    "[ROUTE ROAD SWITCH] " + (index + 1)
                 );
 
-            const nearbyIcLogs =
-                roadSwitch.nearbyIcs.map(item => ({
-                    ic: item.exit.displayName,
-                    icArea: item.icArea,
-                    distanceKm:
-                        Math.round(item.distanceMeters / 100) / 10,
-                    isSelectable:
-                        item.exit.isSelectable !== false
-                }));
+                console.log(
+                    roadSwitch.fromRoad +
+                    " → " +
+                    roadSwitch.toRoad
+                );
 
-            console.group(
-                "[ROUTE ROAD SWITCH] " + (index + 1)
-            );
+                console.log(
+                    "距離地点: 約" + routeDistanceKm + "km"
+                );
 
-            console.log(
-                roadSwitch.fromRoad +
-                " → " +
-                roadSwitch.toRoad
-            );
+                console.log(
+                    "直前IC:",
+                    roadSwitch.beforeExit.displayName
+                );
 
-            console.log(
-                "距離地点: 約" + routeDistanceKm + "km"
-            );
+                console.log(
+                    "直後IC:",
+                    roadSwitch.afterExit.displayName
+                );
 
-            console.log(
-                "直前IC:",
-                roadSwitch.beforeExit.displayName
-            );
+                console.log("近傍IC候補:");
+                console.table(nearbyIcLogs);
 
-            console.log(
-                "直後IC:",
-                roadSwitch.afterExit.displayName
-            );
-
-            console.log("近傍IC候補:");
-            console.table(nearbyIcLogs);
-
-            console.groupEnd();
-        });
+                console.groupEnd();
+            });
+        }
 
         console.group("[ROUTE ROAD CORRECTION]");
 

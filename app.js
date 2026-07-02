@@ -1691,6 +1691,8 @@ let lastMultiIcV2Results = [];
 let lastExitIcV2Results = [];
 let lastHighwayRoutePolylineAnalysis = null;
 let lastHighwayRoutePolylineAnalysisKey = "";
+let lastDestinationTestSummary =
+    createEmptyDestinationTestSummary();
 
 const V2_DIAGNOSTIC_DESTINATIONS = [
     "筑波山",
@@ -1708,7 +1710,365 @@ function buildRouteAnalysisKey(origin, destination) {
     );
 }
 
+function createEmptyDestinationTestSummary() {
+    return {
+        basic: null,
+        route: null,
+        entrance: null,
+        exit: null
+    };
+}
+
+function clearDestinationTestSummary(reason) {
+    const hadSummary = Boolean(
+        lastDestinationTestSummary.basic ||
+        lastDestinationTestSummary.route ||
+        lastDestinationTestSummary.entrance ||
+        lastDestinationTestSummary.exit
+    );
+
+    lastDestinationTestSummary =
+        createEmptyDestinationTestSummary();
+
+    if (DEBUG_ROUTE_VERBOSE && hadSummary) {
+        console.log(
+            "[DESTINATION TEST SUMMARY CLEARED]",
+            reason
+        );
+    }
+}
+
+function formatDestinationTestIcCandidates(candidates) {
+    if (!Array.isArray(candidates)) {
+        return [];
+    }
+
+    return candidates
+        .map(candidate => {
+            const exit = candidate?.exit || candidate;
+
+            if (!exit) {
+                return "";
+            }
+
+            const isShuto =
+                candidate?.isShuto === true ||
+                isShutoIcForRouteAnalysis(exit);
+
+            return (
+                exit.displayName +
+                (isShuto ? " [首都高]" : "")
+            );
+        })
+        .filter(Boolean);
+}
+
+function saveDestinationTestRouteSummary({
+    origin,
+    destination,
+    analysis,
+    comparisonCandidatePreview,
+    entranceApiCandidateIcs,
+    exitApiCandidateIcs,
+    apiCandidateLimit,
+    resetComparisonResults
+}) {
+    const routeAnalysisKey =
+        buildRouteAnalysisKey(origin, destination);
+
+    const canPreserveComparisonResults =
+        !resetComparisonResults &&
+        lastDestinationTestSummary.basic
+            ?.routeAnalysisKey === routeAnalysisKey;
+
+    const previousEntrance =
+        canPreserveComparisonResults
+            ? lastDestinationTestSummary.entrance
+            : null;
+
+    const previousExit =
+        canPreserveComparisonResults
+            ? lastDestinationTestSummary.exit
+            : null;
+
+    lastDestinationTestSummary = {
+        basic: {
+            origin,
+            destination,
+            currentMultiIcMode,
+            isRealDriveTestMode,
+            apiCandidateLimit,
+            routeAnalysisKey,
+            savedRouteAnalysisKey:
+                lastHighwayRoutePolylineAnalysisKey,
+            analysisKeyMatches:
+                Boolean(analysis) &&
+                lastHighwayRoutePolylineAnalysisKey ===
+                    routeAnalysisKey
+        },
+        route: {
+            roadSequence: [...(analysis.roadSequence || [])],
+            roadDistances:
+                (analysis.roadDistances || []).map(item => ({
+                    road: item.road,
+                    approximateDistanceKm:
+                        item.approximateDistanceKm
+                })),
+            nexcoEntranceIc:
+                analysis.nexcoEntranceIc?.displayName || "なし",
+            nexcoExitIc:
+                analysis.nexcoExitIc?.displayName || "なし",
+            shutoEntranceIc:
+                analysis.shutoEntranceIc?.displayName || "なし",
+            shutoExitIc:
+                analysis.shutoExitIc?.displayName || "なし",
+            candidateAreas: [
+                ...(comparisonCandidatePreview
+                    ?.candidateAreas || [])
+            ],
+            entranceCandidateIcs:
+                formatDestinationTestIcCandidates(
+                    comparisonCandidatePreview
+                        ?.entranceCandidateIcs || []
+                ),
+            entranceApiCandidateIcs:
+                formatDestinationTestIcCandidates(
+                    entranceApiCandidateIcs
+                ),
+            exitCandidateIcs:
+                formatDestinationTestIcCandidates(
+                    comparisonCandidatePreview
+                        ?.exitCandidateIcs || []
+                ),
+            exitApiCandidateIcs:
+                formatDestinationTestIcCandidates(
+                    exitApiCandidateIcs
+                )
+        },
+        entrance: previousEntrance,
+        exit: previousExit
+    };
+}
+
+function saveDestinationTestCandidateSelection(mode, selection) {
+    if (!lastDestinationTestSummary.basic) {
+        return;
+    }
+
+    Object.assign(
+        lastDestinationTestSummary.basic,
+        {
+            currentMultiIcMode: mode,
+            isRealDriveTestMode,
+            apiCandidateLimit:
+                selection.apiCandidateLimit,
+            analysisKeyMatches:
+                selection.analysisKeyMatches
+        }
+    );
+
+    lastDestinationTestSummary[mode] = {
+        status: "候補選定済み",
+        candidateSelectionLogic:
+            selection.candidateSelectionLogic,
+        analysisKeyMatches:
+            selection.analysisKeyMatches,
+        apiCandidateLimit:
+            selection.apiCandidateLimit,
+        isRealDriveTestMode,
+        candidateNames:
+            selection.candidateNames || "なし",
+        apiCallCount: selection.apiCallCount,
+        fallbackReason:
+            selection.fallbackReason || "なし",
+        results: [],
+        recommendedIc: "なし",
+        eligibleCount: 0,
+        weakCount: 0,
+        weakCandidates: []
+    };
+}
+
+function saveDestinationTestComparisonResults(mode, results) {
+    if (!lastDestinationTestSummary.basic) {
+        return;
+    }
+
+    const current =
+        lastDestinationTestSummary[mode] || {};
+
+    const bestResult =
+        mode === "entrance"
+            ? getBestEntranceIcV2(results)
+            : getBestExitIcV2(results);
+
+    const eligibleResults =
+        results.filter(result =>
+            result.recommendationEligibility === "eligible"
+        );
+
+    const weakResults =
+        results.filter(result =>
+            result.recommendationEligibility === "weak"
+        );
+
+    lastDestinationTestSummary[mode] = {
+        ...current,
+        status: "実行済み",
+        candidateNames:
+            current.candidateNames ||
+            results
+                .map(result => result.candidateIcName)
+                .join(" → ") ||
+            "なし",
+        apiCallCount:
+            current.apiCallCount ?? results.length,
+        results: results.map(result => ({
+            candidateIcName: result.candidateIcName,
+            recommendationEligibility:
+                result.recommendationEligibility,
+            weakReason: result.weakReason || ""
+        })),
+        recommendedIc:
+            bestResult?.candidateIcName || "なし",
+        eligibleCount: eligibleResults.length,
+        weakCount: weakResults.length,
+        weakCandidates: weakResults.map(result => ({
+            candidateIcName: result.candidateIcName,
+            reason: result.weakReason || "理由不明"
+        }))
+    };
+}
+
+function logDestinationTestSummary() {
+    const { basic, route, entrance, exit } =
+        lastDestinationTestSummary;
+
+    if (!basic || !route) {
+        return;
+    }
+
+    const formatCandidateNames = candidates =>
+        candidates?.length > 0
+            ? candidates.join(" → ")
+            : "なし";
+
+    const formatWeakCandidates = comparison =>
+        comparison?.weakCandidates?.length > 0
+            ? comparison.weakCandidates
+                .map(candidate =>
+                    candidate.candidateIcName +
+                    ": " +
+                    candidate.reason
+                )
+                .join(" / ")
+            : "なし";
+
+    const roadDistanceText =
+        route.roadDistances.length > 0
+            ? route.roadDistances
+                .map(item =>
+                    item.road +
+                    " 約" +
+                    item.approximateDistanceKm +
+                    "km"
+                )
+                .join(" / ")
+            : "なし";
+
+    const logComparison = (label, comparison) => {
+        console.log(label + ":");
+
+        if (!comparison || comparison.status !== "実行済み") {
+            console.log("状態: 未実行");
+            return;
+        }
+
+        console.log("状態: 実行済み");
+        console.log(
+            "候補選定ロジック:",
+            comparison.candidateSelectionLogic || "不明"
+        );
+        console.log(
+            "API実行候補:",
+            comparison.candidateNames || "なし"
+        );
+        console.log(
+            "API呼び出し予定件数:",
+            comparison.apiCallCount
+        );
+        console.log(
+            label === "入口比較"
+                ? "おすすめ入口:"
+                : "おすすめ出口:",
+            comparison.recommendedIc
+        );
+        console.log(
+            "eligible候補数:",
+            comparison.eligibleCount
+        );
+        console.log(
+            "weak候補数:",
+            comparison.weakCount
+        );
+        console.log(
+            "weak候補:",
+            formatWeakCandidates(comparison)
+        );
+        console.log(
+            "フォールバック理由:",
+            comparison.fallbackReason || "なし"
+        );
+    };
+
+    console.group("[DESTINATION TEST SUMMARY]");
+
+    console.log("基本情報:");
+    console.log("出発地:", basic.origin || "現在地");
+    console.log("目的地:", basic.destination || "なし");
+    console.log(
+        "実車テストモード:",
+        basic.isRealDriveTestMode ? "ON" : "OFF"
+    );
+    console.log("API候補上限:", basic.apiCandidateLimit);
+    console.log("解析キー一致:", basic.analysisKeyMatches);
+
+    console.log("通常検索:");
+    console.log(
+        "想定道路順:",
+        route.roadSequence.join(" → ") || "なし"
+    );
+    console.log("道路別距離:", roadDistanceText);
+    console.log("NEXCO入口:", route.nexcoEntranceIc);
+    console.log("NEXCO出口:", route.nexcoExitIc);
+    console.log("首都高入口:", route.shutoEntranceIc);
+    console.log("首都高出口:", route.shutoExitIc);
+    console.log(
+        "候補エリア:",
+        route.candidateAreas.join(" → ") || "なし"
+    );
+    console.log(
+        "入口API候補プレビュー:",
+        formatCandidateNames(route.entranceApiCandidateIcs)
+    );
+    console.log(
+        "出口API候補プレビュー:",
+        formatCandidateNames(route.exitApiCandidateIcs)
+    );
+
+    logComparison("入口比較", entrance);
+    logComparison("出口比較", exit);
+
+    console.log("判定メモ用:");
+    console.log("違和感:");
+    console.log("未記入");
+
+    console.groupEnd();
+}
+
 function clearLastHighwayRoutePolylineAnalysis(reason) {
+    clearDestinationTestSummary(reason);
+
     if (
         !lastHighwayRoutePolylineAnalysis &&
         !lastHighwayRoutePolylineAnalysisKey
@@ -2629,7 +2989,8 @@ async function displayRouteComparison(
         origin,
         destination,
         polylineAnalysis,
-        tollEstimate
+        tollEstimate,
+        !suppressDashboardSummary
     );
 
     const estimatedToll =
@@ -5523,7 +5884,8 @@ function logHighwayRoutePolylineAnalysis(
     origin,
     destination,
     analysis = null,
-    tollEstimate = null
+    tollEstimate = null,
+    resetComparisonResults = true
 ) {
 
     const result =
@@ -5531,6 +5893,11 @@ function logHighwayRoutePolylineAnalysis(
         analyzeHighwayRoutePolyline(highwayRoute);
 
     if (!result) {
+        if (resetComparisonResults) {
+            clearDestinationTestSummary(
+                "Polyline解析結果なし"
+            );
+        }
         return;
     }
 
@@ -5587,6 +5954,18 @@ function logHighwayRoutePolylineAnalysis(
             nexcoExitIc,
             comparisonApiCandidateLimit
         );
+
+    saveDestinationTestRouteSummary({
+        origin,
+        destination,
+        analysis: result,
+        comparisonCandidatePreview,
+        entranceApiCandidateIcs,
+        exitApiCandidateIcs,
+        apiCandidateLimit:
+            comparisonApiCandidateLimit,
+        resetComparisonResults
+    });
 
     try {
 
@@ -8016,6 +8395,12 @@ async function searchEntranceIcComparisonV2(options = {}) {
     );
 
     updateDashboardWithBestEntranceIcV2();
+
+    saveDestinationTestComparisonResults(
+        "entrance",
+        lastMultiIcV2Results
+    );
+    logDestinationTestSummary();
 }
 
 async function searchExitIcComparisonV2(options = {}) {
@@ -8264,6 +8649,12 @@ async function searchExitIcComparisonV2(options = {}) {
     );
 
     updateDashboardWithBestExitIcV2();
+
+    saveDestinationTestComparisonResults(
+        "exit",
+        lastExitIcV2Results
+    );
+    logDestinationTestSummary();
 }
 
 function getRouteDurationMinutes(route) {
@@ -11501,6 +11892,11 @@ async function searchAutoExitIcComparison(
         multiIcCandidateSelection.selectedExits;
 
     logMultiIcCandidateSelection(
+        currentMultiIcMode,
+        multiIcCandidateSelection
+    );
+
+    saveDestinationTestCandidateSelection(
         currentMultiIcMode,
         multiIcCandidateSelection
     );

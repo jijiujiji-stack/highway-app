@@ -252,6 +252,20 @@ button {
     -webkit-line-clamp: 2;
 }
 
+.assumed-route-road {
+    display: inline-block;
+    margin: 0 2px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: rgba(120, 170, 220, 0.08);
+    color: #b9d8ff;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1.2;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
 .dashboard-toll-breakdown {
     display: block;
     margin-top: 3px;

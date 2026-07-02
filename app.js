@@ -401,7 +401,15 @@ function formatAssumedRouteIcName(ic) {
         .trim();
 }
 
-function buildAssumedRouteText(polylineAnalysis) {
+function createAssumedRouteRoadHtml(roadName) {
+    return (
+        "<span class=\"assumed-route-road\">" +
+        escapeHtml(roadName) +
+        "</span>"
+    );
+}
+
+function buildAssumedRouteHtml(polylineAnalysis) {
     if (!polylineAnalysis) {
         return "";
     }
@@ -430,20 +438,43 @@ function buildAssumedRouteText(polylineAnalysis) {
     const routeParts = [];
 
     if (shutoEntranceIc) {
+        const shutoEntranceIcName =
+            formatAssumedRouteIcName(shutoEntranceIc);
+
         routeParts.push(
-            "首都高 " +
-            formatAssumedRouteIcName(shutoEntranceIc)
+            {
+                value: "首都高 " + shutoEntranceIcName,
+                html:
+                    createAssumedRouteRoadHtml("首都高") +
+                    " " +
+                    escapeHtml(shutoEntranceIcName)
+            }
         );
     }
 
-    routeParts.push(formatAssumedRouteIcName(entranceIc));
-    routeParts.push(...routeRoads);
-    routeParts.push(formatAssumedRouteIcName(exitIc));
+    routeParts.push({
+        value: formatAssumedRouteIcName(entranceIc),
+        html: escapeHtml(formatAssumedRouteIcName(entranceIc))
+    });
+
+    routeParts.push(
+        ...routeRoads.map(roadName => ({
+            value: roadName,
+            html: createAssumedRouteRoadHtml(roadName)
+        }))
+    );
+
+    routeParts.push({
+        value: formatAssumedRouteIcName(exitIc),
+        html: escapeHtml(formatAssumedRouteIcName(exitIc))
+    });
 
     return routeParts
         .filter((part, index, parts) =>
-            part && part !== parts[index - 1]
+            part.value &&
+            part.value !== parts[index - 1]?.value
         )
+        .map(part => part.html)
         .join(" → ");
 }
 
@@ -3678,8 +3709,8 @@ async function displayRouteComparison(
     );
 
     if (!suppressDashboardSummary) {
-        const assumedRouteText =
-            buildAssumedRouteText(
+        const assumedRouteHtml =
+            buildAssumedRouteHtml(
                 lastHighwayRoutePolylineAnalysis
             );
 
@@ -3690,8 +3721,8 @@ async function displayRouteComparison(
 
         document
             .getElementById("dashboardAssumedRouteValue")
-            .textContent =
-            assumedRouteText || "ルート情報なし";
+            .innerHTML =
+            assumedRouteHtml || "ルート情報なし";
     }
 
     document

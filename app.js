@@ -12412,21 +12412,10 @@ function displayExitIcComparisonV2Results(results) {
         return;
     }
 
-    const sortedResults =
-        [...results].sort((a, b) =>
-            (
-                a.minutesToCandidate === null ||
-                a.minutesToCandidate === undefined
-                    ? Infinity
-                    : a.minutesToCandidate
-            ) -
-            (
-                b.minutesToCandidate === null ||
-                b.minutesToCandidate === undefined
-                    ? Infinity
-                    : b.minutesToCandidate
-            )
-        );
+    // 候補選定時のPolyline進行方向順を、そのままカード表示に使う。
+    // おすすめ判定は別処理のため、この表示順では並べ替えない。
+    const roadOrderResults =
+        results.slice();
 
     const normalExitIcName =
         getNormalHighwayExitIcName();
@@ -12443,7 +12432,7 @@ function displayExitIcComparisonV2Results(results) {
         normalExitHtml +
         buildBestExitIcV2Html(results) +
         "<div class=\"v2-exit-result-list\">" +
-        sortedResults
+        roadOrderResults
             .map(result =>
                 buildExitIcComparisonV2CardHtml(result)
             )

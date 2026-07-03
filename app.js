@@ -538,20 +538,20 @@ const SHUTO_IC_MASTER = [
         note: "既存IC_MASTERから正規化登録。現時点では未参照。"
     },
     {
-        id: "shuto-c2-kahira",
+        id: "shuto-6-kahira",
         displayName: "加平",
         googleName: "首都高速中央環状線 加平出入口",
         aliases: ["加平", "加平入口", "加平出口"],
         roadType: "首都高",
-        routeCode: "C2",
-        routeName: "首都高速中央環状線",
+        routeCode: "6",
+        routeName: "首都高速6号三郷線",
         lat: 35.777,
         lng: 139.820,
         entranceSelectable: true,
         exitSelectable: true,
         sourceAreaKeys: ["joban"],
         sourceGoogleNames: ["首都高速中央環状線 加平出入口"],
-        note: "routeNameとrouteCodeは既存googleNameから正規化。現時点では未参照。"
+        note: "公式路線区分に合わせて6号三郷線へ修正。googleNameは既存互換のため旧表記を暫定維持。"
     },
     {
         id: "shuto-6-yashio-minami",
@@ -634,20 +634,20 @@ const SHUTO_IC_MASTER = [
         note: "既存IC_MASTERから正規化登録。現時点では未参照。"
     },
     {
-        id: "shuto-c1-hitotsubashi",
+        id: "shuto-5-hitotsubashi",
         displayName: "一ツ橋",
         googleName: "首都高速都心環状線 一ツ橋出入口",
         aliases: ["一ツ橋", "一ツ橋入口", "一ツ橋出口"],
         roadType: "首都高",
-        routeCode: "C1",
-        routeName: "首都高速都心環状線",
+        routeCode: "5",
+        routeName: "首都高速5号池袋線",
         lat: 35.692,
         lng: 139.758,
         entranceSelectable: true,
         exitSelectable: true,
         sourceAreaKeys: ["chuo", "tomei"],
         sourceGoogleNames: ["首都高速都心環状線 一ツ橋出入口"],
-        note: "既存IC_MASTERから正規化登録。現時点では未参照。"
+        note: "公式路線区分に合わせて5号池袋線へ修正。googleNameは既存互換のため旧表記を暫定維持。"
     },
     {
         id: "shuto-3-yoga",
@@ -727,7 +727,7 @@ const SHUTO_IC_MASTER = [
         exitSelectable: true,
         sourceAreaKeys: ["aqualine", "keiyo", "tokan"],
         sourceGoogleNames: ["首都高速湾岸線 湾岸市川出入口"],
-        note: "tokan内のexperimental登録とroadType未設定登録を1件に正規化。現時点では未参照。"
+        note: "首都高速湾岸線と東関東道の境界・接続判定用として暫定保持。首都高公式の湾岸線出入口一覧には掲載なし。通常の首都高入口・出口候補として使用するかは別フェーズで再確認。"
     },
     {
         id: "shuto-b-shinkiba",
@@ -903,7 +903,7 @@ const SHUTO_IC_MASTER = [
         exitSelectable: false,
         sourceAreaKeys: ["shutoKanagawaK1"],
         sourceGoogleNames: ["首都高速神奈川1号横羽線 守屋町出口"],
-        note: "既存isSelectable:falseを引き継ぎ、入口・出口候補とも選択不可。現時点では未参照。"
+        note: "公式上は出口専用。現ロジックは入口・出口の選択可否を共通isSelectableへ統合するため、入口候補への混入防止として暫定的に選択不可。役割別フィルタ対応後にexitSelectable:trueへ変更予定。"
     },
     {
         id: "shuto-k1-koyasu",

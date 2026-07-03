@@ -522,6 +522,22 @@ function setDashboardNormalSearchMode(isActive) {
 // 今後、通常検索のPolyline解析や複数IC比較候補選定で利用する予定。
 const SHUTO_IC_MASTER = [
     {
+        id: "shuto-6-kiyosubashi",
+        displayName: "清洲橋",
+        googleName: "首都高速6号向島線 清洲橋出口",
+        aliases: ["清洲橋", "清洲橋出口"],
+        roadType: "首都高",
+        routeCode: "6",
+        routeName: "首都高速6号向島線",
+        lat: 35.683675,
+        lng: 139.789954,
+        entranceSelectable: false,
+        exitSelectable: false,
+        sourceAreaKeys: [],
+        sourceGoogleNames: ["首都高速6号向島線 清洲橋出口"],
+        note: "公式上は出口専用。現ロジックは入口・出口の選択可否を共通isSelectableへ統合するため、入口候補への混入防止として暫定的に選択不可。役割別フィルタ対応後にexitSelectable:trueへ変更予定。第1弾追加。Google表記と座標確認済み。"
+    },
+    {
         id: "shuto-6-tsutsumidori",
         displayName: "堤通",
         googleName: "首都高速6号向島線 堤通出入口",
@@ -568,6 +584,22 @@ const SHUTO_IC_MASTER = [
         sourceAreaKeys: ["joban"],
         sourceGoogleNames: ["首都高速6号三郷線 八潮南出入口"],
         note: "既存IC_MASTERから正規化登録。現時点では未参照。"
+    },
+    {
+        id: "shuto-6-yashio",
+        displayName: "八潮",
+        googleName: "首都高速6号三郷線 八潮出入口",
+        aliases: ["八潮", "八潮入口", "八潮出口"],
+        roadType: "首都高",
+        routeCode: "6",
+        routeName: "首都高速6号三郷線",
+        lat: 35.813690,
+        lng: 139.845540,
+        entranceSelectable: true,
+        exitSelectable: true,
+        sourceAreaKeys: [],
+        sourceGoogleNames: ["首都高速6号三郷線 八潮出入口"],
+        note: "上り入口・下り出口。第1弾追加。Google表記と座標確認済み。"
     },
     {
         id: "shuto-1-ueno",

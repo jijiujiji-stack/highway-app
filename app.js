@@ -842,6 +842,38 @@ const SHUTO_IC_MASTER = [
         note: "既存IC_MASTERから正規化登録。現時点では未参照。"
     },
     {
+        id: "shuto-b-chidoricho",
+        displayName: "千鳥町",
+        googleName: "首都高速湾岸線 千鳥町出入口",
+        aliases: ["千鳥町", "千鳥町入口", "千鳥町出口"],
+        roadType: "首都高",
+        routeCode: "B",
+        routeName: "首都高速湾岸線",
+        lat: 35.673286,
+        lng: 139.928790,
+        entranceSelectable: true,
+        exitSelectable: true,
+        sourceAreaKeys: [],
+        sourceGoogleNames: ["首都高速湾岸線 千鳥町出入口"],
+        note: "西行き入口・東行き出口。第4弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
+    },
+    {
+        id: "shuto-b-maihama",
+        displayName: "舞浜",
+        googleName: "首都高速湾岸線 舞浜入口",
+        aliases: ["舞浜", "舞浜入口"],
+        roadType: "首都高",
+        routeCode: "B",
+        routeName: "首都高速湾岸線",
+        lat: 35.635721,
+        lng: 139.886245,
+        entranceSelectable: true,
+        exitSelectable: false,
+        sourceAreaKeys: [],
+        sourceGoogleNames: ["首都高速湾岸線 舞浜入口"],
+        note: "西行き入口専用。第4弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
+    },
+    {
         id: "shuto-b-kasai",
         displayName: "葛西",
         googleName: "首都高速湾岸線 葛西出入口",

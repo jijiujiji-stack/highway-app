@@ -2660,16 +2660,24 @@ function normalizeShutoIcForRouteAnalysis(shutoIc) {
         return null;
     }
 
+    const entranceSelectable =
+        shutoIc.entranceSelectable !== false;
+
+    const exitSelectable =
+        shutoIc.exitSelectable !== false;
+
     const isSelectable =
         shutoIc.isSelectable === false
             ? false
             : Boolean(
-                shutoIc.entranceSelectable ||
-                shutoIc.exitSelectable
+                entranceSelectable ||
+                exitSelectable
             );
 
     return {
         ...shutoIc,
+        entranceSelectable,
+        exitSelectable,
         isSelectable,
         source: "SHUTO_IC_MASTER"
     };
@@ -5973,9 +5981,31 @@ function isShutoIcForRouteAnalysis(exit) {
     );
 }
 
+function isShutoIcSelectableForRole(exit, role) {
+
+    if (!isShutoIcForRouteAnalysis(exit)) {
+        return exit.isSelectable !== false;
+    }
+
+    if (role === "entrance") {
+        return typeof exit.entranceSelectable === "boolean"
+            ? exit.entranceSelectable
+            : exit.isSelectable !== false;
+    }
+
+    if (role === "exit") {
+        return typeof exit.exitSelectable === "boolean"
+            ? exit.exitSelectable
+            : exit.isSelectable !== false;
+    }
+
+    return exit.isSelectable !== false;
+}
+
 function findNearestShutoIcForRoutePoint(
     routePoint,
-    icDefinitions
+    icDefinitions,
+    selectableRole = null
 ) {
 
     let nearest = null;
@@ -5984,7 +6014,10 @@ function findNearestShutoIcForRoutePoint(
     for (const exit of icDefinitions) {
         if (
             !isShutoIcForRouteAnalysis(exit) ||
-            exit.isSelectable === false ||
+            !isShutoIcSelectableForRole(
+                exit,
+                selectableRole
+            ) ||
             exit.lat === undefined ||
             exit.lng === undefined
         ) {
@@ -6019,7 +6052,8 @@ function analyzeShutoIcCandidates(
     sampledPoints,
     preferLaterOccurrence = false,
     maxDistanceMeters = 5000,
-    icDefinitions
+    icDefinitions,
+    selectableRole = null
 ) {
 
     const candidatesByIdentity = new Map();
@@ -6043,7 +6077,8 @@ function analyzeShutoIcCandidates(
         const nearest =
             findNearestShutoIcForRoutePoint(
                 routePoint,
-                icDefinitions
+                icDefinitions,
+                selectableRole
             );
 
         if (
@@ -6142,7 +6177,8 @@ function selectShutoIcCandidateWindow(
     fromEnd = false,
     maxDistanceMeters = 3000,
     windowDistanceMeters = 5000,
-    icDefinitions
+    icDefinitions,
+    selectableRole = null
 ) {
 
     const orderedSamples = fromEnd
@@ -6154,7 +6190,8 @@ function selectShutoIcCandidateWindow(
             const nearest =
                 findNearestShutoIcForRoutePoint(
                     routePoint,
-                    icDefinitions
+                    icDefinitions,
+                    selectableRole
                 );
 
             return (
@@ -6823,7 +6860,8 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                     false,
                     3000,
                     5000,
-                    icDefinitions
+                    icDefinitions,
+                    "entrance"
                 )
                 : emptyShutoWindow;
 
@@ -6834,7 +6872,8 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                     true,
                     3000,
                     5000,
-                    icDefinitions
+                    icDefinitions,
+                    "exit"
                 )
                 : emptyShutoWindow;
 
@@ -6844,7 +6883,8 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                     shutoEntranceWindow.samples,
                     false,
                     3000,
-                    icDefinitions
+                    icDefinitions,
+                    "entrance"
                 )
                 : { candidates: [], selectedIc: null };
 
@@ -6854,7 +6894,8 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                     shutoExitWindow.samples,
                     true,
                     3000,
-                    icDefinitions
+                    icDefinitions,
+                    "exit"
                 )
                 : { candidates: [], selectedIc: null };
 

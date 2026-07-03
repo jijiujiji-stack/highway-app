@@ -399,7 +399,12 @@ function shortenHighwayRoadName(roadName) {
 }
 
 function formatAssumedRouteIcName(ic) {
-    return String(ic?.displayName || "")
+    return String(
+        ic?.displayName ||
+        ic?.googleName ||
+        ic?.name ||
+        ""
+    )
         .replace(/（首都高）$/, "")
         .trim();
 }
@@ -3828,15 +3833,19 @@ function logDestinationTestSummary() {
 function clearLastHighwayRoutePolylineAnalysis(reason) {
     clearDestinationTestSummary(reason);
 
-    if (
-        !lastHighwayRoutePolylineAnalysis &&
-        !lastHighwayRoutePolylineAnalysisKey
-    ) {
-        return;
-    }
+    const hadAnalysis = Boolean(
+        lastHighwayRoutePolylineAnalysis ||
+        lastHighwayRoutePolylineAnalysisKey
+    );
 
     lastHighwayRoutePolylineAnalysis = null;
     lastHighwayRoutePolylineAnalysisKey = "";
+
+    updateSearchConditionPolylineAnalysis();
+
+    if (!hadAnalysis) {
+        return;
+    }
 
     console.log(
         "[ROUTE POLYLINE ANALYSIS CLEARED]",
@@ -4735,6 +4744,11 @@ async function displayRouteComparison(
         polylineAnalysis
             ? buildRouteAnalysisKey(origin, destination)
             : "";
+
+    updateSearchConditionPolylineAnalysis(
+        origin,
+        destination
+    );
 
     const tollEstimate =
         await estimateMainHighwayToll(
@@ -11911,9 +11925,6 @@ async function prepareV2SimpleDiagnosticCandidates(
     const icAreaSelect =
         document.getElementById("icArea");
 
-    const icAreaReason =
-        document.getElementById("icAreaReason");
-
     let icArea =
         icAreaSelect?.value || "joban";
 
@@ -12113,12 +12124,10 @@ async function prepareV2SimpleDiagnosticCandidates(
             "比較対象ICが見つかりません。IC候補エリアを手動で変更してください";
     }
 
-    if (icAreaReason) {
-        icAreaReason.innerHTML =
-            buildPolylineComparisonSummaryHtml(
-                lastHighwayRoutePolylineAnalysis
-            );
-    }
+    updateSearchConditionPolylineAnalysis(
+        origin,
+        destination
+    );
 
     const candidateReason =
         document.getElementById("candidateReason");
@@ -14677,10 +14686,12 @@ function buildPolylineComparisonSummaryHtml(
 ) {
 
     if (!polylineAnalysis) {
-        return "解析方式：Polyline解析（解析結果なし）";
+        return "Polyline解析結果：未取得";
     }
 
-    const lines = [];
+    const lines = [
+        "Polyline解析結果：取得済み"
+    ];
 
     const roadNames = [
         ...new Set(
@@ -14689,68 +14700,134 @@ function buildPolylineComparisonSummaryHtml(
                 polylineAnalysis.roadSequence ||
                 []
             )
+                .map(shortenHighwayRoadName)
                 .filter(Boolean)
         )
     ];
 
-    if (roadNames.length > 0) {
-        lines.push(
-            "想定道路：" + roadNames.join(" → ")
-        );
-    }
+    lines.push(
+        "想定道路：" +
+        (roadNames.join(" → ") || "なし")
+    );
 
-    const entranceNames = [];
-    const entranceIdentities = new Set();
+    lines.push(
+        "首都高入口：" +
+        (
+            formatAssumedRouteIcName(
+                polylineAnalysis.shutoEntranceIc
+            ) || "なし"
+        )
+    );
 
-    [
-        polylineAnalysis.shutoEntranceIc,
-        polylineAnalysis.nexcoEntranceIc
-    ].forEach(exit => {
-        const identity =
-            exit?.googleName ||
-            (
-                exit
-                    ? exit.displayName + "|" +
-                        exit.lat + "|" + exit.lng
-                    : ""
-            );
+    lines.push(
+        "首都高出口：" +
+        (
+            formatAssumedRouteIcName(
+                polylineAnalysis.shutoExitIc
+            ) || "なし"
+        )
+    );
 
-        if (
-            !identity ||
-            entranceIdentities.has(identity)
-        ) {
-            return;
-        }
+    const normalEntrance =
+        polylineAnalysis.nexcoEntranceIc ||
+        polylineAnalysis.entranceIc;
 
-        entranceIdentities.add(identity);
-        entranceNames.push(exit.displayName);
-    });
-
-    if (entranceNames.length > 0) {
-        lines.push(
-            "通常入口：" + entranceNames.join(" → ")
-        );
-    }
+    lines.push(
+        "通常入口：" +
+        (formatAssumedRouteIcName(normalEntrance) || "なし")
+    );
 
     const normalExit =
         polylineAnalysis.nexcoExitIc ||
         polylineAnalysis.exitIc;
 
-    if (normalExit?.displayName) {
-        lines.push(
-            "通常出口：" + normalExit.displayName
-        );
-    }
+    lines.push(
+        "通常出口：" +
+        (formatAssumedRouteIcName(normalExit) || "なし")
+    );
 
-    if (lines.length === 0) {
-        lines.push("解析方式：Polyline解析");
-    }
+    const comparisonCandidatePreview =
+        buildPolylineBasedComparisonIcCandidates(
+            polylineAnalysis
+        );
+
+    const exitComparisonCandidateNames = [
+        ...new Set(
+            (
+                comparisonCandidatePreview
+                    ?.exitCandidateIcs || []
+            )
+                .map(candidate =>
+                    formatAssumedRouteIcName(
+                        candidate?.exit
+                    )
+                )
+                .filter(Boolean)
+        )
+    ];
+
+    lines.push(
+        "出口比較候補：" +
+        (
+            exitComparisonCandidateNames.join(" → ") ||
+            "なし"
+        )
+    );
 
     return lines
         .map(line =>
             "<div>" + escapeHtml(line) + "</div>"
         )
         .join("");
+}
+
+function updateSearchConditionPolylineAnalysis(
+    fallbackOrigin,
+    fallbackDestination
+) {
+
+    const icAreaReason =
+        document.getElementById("icAreaReason");
+
+    if (!icAreaReason) {
+        return;
+    }
+
+    const hasGpsOriginFallback =
+        fallbackOrigin !== undefined &&
+        String(fallbackOrigin).trim() === "";
+
+    const currentOrigin =
+        hasGpsOriginFallback
+            ? ""
+            : selectedOriginAddress ||
+                document.getElementById("origin")?.value ||
+                fallbackOrigin ||
+                "";
+
+    const currentDestination =
+        selectedDestinationAddress ||
+        document.getElementById("destination")?.value ||
+        fallbackDestination ||
+        "";
+
+    const currentRouteAnalysisKey =
+        buildRouteAnalysisKey(
+            currentOrigin,
+            currentDestination
+        );
+
+    const matchingAnalysis =
+        lastHighwayRoutePolylineAnalysis &&
+        lastHighwayRoutePolylineAnalysisKey ===
+            currentRouteAnalysisKey
+            ? lastHighwayRoutePolylineAnalysis
+            : null;
+
+    icAreaReason.innerHTML =
+        buildPolylineComparisonSummaryHtml(
+            matchingAnalysis
+        );
 }
 
 
@@ -15119,12 +15196,10 @@ async function searchAutoExitIcComparison(
             noExitCandidatesMessage;
     }
 
-    if (icAreaReason) {
-        icAreaReason.innerHTML =
-            buildPolylineComparisonSummaryHtml(
-                lastHighwayRoutePolylineAnalysis
-            );
-    }
+    updateSearchConditionPolylineAnalysis(
+        origin,
+        destination
+    );
 
     document
         .getElementById("candidateReason")

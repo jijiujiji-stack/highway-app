@@ -2557,6 +2557,129 @@ const IC_MASTER = {
 
 };
 
+function buildIcDefinitionIdentity(ic) {
+
+    const googleName = String(ic?.googleName || "").trim();
+
+    if (googleName) {
+        return "googleName:" + googleName;
+    }
+
+    const displayName = String(ic?.displayName || "").trim();
+
+    if (!displayName) {
+        return "";
+    }
+
+    return (
+        "location:" +
+        displayName + "|" +
+        String(ic?.lat ?? "") + "|" +
+        String(ic?.lng ?? "")
+    );
+}
+
+function dedupeIcDefinitionsByIdentity(icList) {
+
+    const definitionsByIdentity = new Map();
+    const definitionsWithoutIdentity = [];
+
+    (icList || []).forEach(ic => {
+        if (!ic) {
+            return;
+        }
+
+        const identity = buildIcDefinitionIdentity(ic);
+
+        if (!identity) {
+            definitionsWithoutIdentity.push(ic);
+            return;
+        }
+
+        const existing = definitionsByIdentity.get(identity);
+
+        if (
+            !existing ||
+            (
+                ic.source === "SHUTO_IC_MASTER" &&
+                existing.source !== "SHUTO_IC_MASTER"
+            )
+        ) {
+            definitionsByIdentity.set(identity, ic);
+        }
+    });
+
+    return [
+        ...definitionsByIdentity.values(),
+        ...definitionsWithoutIdentity
+    ];
+}
+
+function normalizeShutoIcForRouteAnalysis(shutoIc) {
+
+    if (!shutoIc) {
+        return null;
+    }
+
+    const isSelectable =
+        shutoIc.isSelectable === false
+            ? false
+            : Boolean(
+                shutoIc.entranceSelectable ||
+                shutoIc.exitSelectable
+            );
+
+    return {
+        ...shutoIc,
+        isSelectable,
+        source: "SHUTO_IC_MASTER"
+    };
+}
+
+function getAllShutoIcDefinitions() {
+
+    return SHUTO_IC_MASTER
+        .map(normalizeShutoIcForRouteAnalysis)
+        .filter(Boolean);
+}
+
+function getAllNexcoIcDefinitions() {
+
+    const definitions = [];
+    const listTypes = ["entrances", "exits"];
+
+    Object.entries(IC_MASTER).forEach(
+        ([areaKey, areaDefinition]) => {
+            listTypes.forEach(listType => {
+                const icList = areaDefinition?.[listType];
+
+                if (!Array.isArray(icList)) {
+                    return;
+                }
+
+                icList.forEach(ic => {
+                    definitions.push({
+                        ...ic,
+                        source: "IC_MASTER",
+                        sourceAreaKey: areaKey,
+                        sourceListType: listType
+                    });
+                });
+            });
+        }
+    );
+
+    return definitions;
+}
+
+function getAllRouteAnalysisIcDefinitions() {
+
+    return dedupeIcDefinitionsByIdentity([
+        ...getAllNexcoIcDefinitions(),
+        ...getAllShutoIcDefinitions()
+    ]);
+}
+
 console.log(
     "常磐道IC数",
     IC_MASTER.joban.exits.length

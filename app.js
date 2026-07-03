@@ -7769,33 +7769,123 @@ function filterEntranceCandidatesByRouteSection({
         );
     };
 
-    if (shutoEntranceIc) {
-        const shutoIdentity =
-            getIcIdentity(shutoEntranceIc);
+    const routeBaseDistanceMeters =
+        polylineAnalysis.sampledPoints?.[0]
+            ?.routeDistanceMeters ?? 0;
 
-        const alreadyIncluded =
-            workingCandidates.some(candidate =>
-                getIcIdentity(candidate.exit) === shutoIdentity
+    const shutoEntranceCandidates =
+        (polylineAnalysis.shutoDetail
+            ?.entranceCandidates || [])
+            .filter(candidate => {
+                const exit = candidate?.exit;
+
+                return (
+                    exit &&
+                    isShutoIcForRouteAnalysis(exit) &&
+                    isShutoIcSelectableForRole(
+                        exit,
+                        "entrance"
+                    ) &&
+                    exit.isSelectable !== false &&
+                    !(
+                        exit.connection === true &&
+                        /JCT|ジャンクション/i.test(
+                            exit.displayName ||
+                            exit.googleName ||
+                            ""
+                        )
+                    ) &&
+                    (
+                        !Number.isFinite(
+                            candidate.lastRouteDistanceMeters
+                        ) ||
+                        candidate.lastRouteDistanceMeters >=
+                            routeBaseDistanceMeters
+                    )
+                );
+            })
+            .slice()
+            .sort((a, b) =>
+                (
+                    a.lastRouteDistanceMeters ?? Infinity
+                ) -
+                (
+                    b.lastRouteDistanceMeters ?? Infinity
+                )
             );
 
-        if (!alreadyIncluded) {
-            const shutoArea =
-                candidateAreas.find(icArea =>
-                    Boolean(
-                        findExitInArea(
-                            icArea,
-                            shutoEntranceIc
-                        )
-                    )
-                ) || referenceArea;
+    const shutoCandidateByIdentity = new Map(
+        shutoEntranceCandidates.map(candidate => [
+            getIcIdentity(candidate.exit),
+            candidate
+        ])
+    );
 
-            workingCandidates.push({
-                icArea: shutoArea,
+    const orderedShutoEntrances = [
+        ...(shutoEntranceIc
+            ? [{
                 exit: shutoEntranceIc,
-                isShuto: true
-            });
+                isPrimary: true
+            }]
+            : []),
+        ...shutoEntranceCandidates.map(candidate => ({
+            exit: candidate.exit,
+            isPrimary: false
+        }))
+    ];
+
+    orderedShutoEntrances.forEach(item => {
+        const exit = item.exit;
+        const identity = getIcIdentity(exit);
+
+        if (
+            !identity ||
+            !isShutoIcSelectableForRole(exit, "entrance") ||
+            exit.isSelectable === false ||
+            (
+                exit.connection === true &&
+                /JCT|ジャンクション/i.test(
+                    exit.displayName ||
+                    exit.googleName ||
+                    ""
+                )
+            )
+        ) {
+            return;
         }
-    }
+
+        const routeCandidate =
+            shutoCandidateByIdentity.get(identity);
+
+        const alreadyIncluded =
+            workingCandidates.find(candidate =>
+                getIcIdentity(candidate.exit) === identity
+            );
+
+        if (alreadyIncluded) {
+            alreadyIncluded.isPrimaryShutoEntrance =
+                alreadyIncluded.isPrimaryShutoEntrance ||
+                item.isPrimary;
+            alreadyIncluded.routeDistanceMeters =
+                alreadyIncluded.routeDistanceMeters ??
+                routeCandidate?.lastRouteDistanceMeters;
+            return;
+        }
+
+        const shutoArea =
+            candidateAreas.find(icArea =>
+                Boolean(findExitInArea(icArea, exit))
+            ) || referenceArea;
+
+        workingCandidates.push({
+            icArea: shutoArea,
+            exit,
+            isShuto: true,
+            isPrimaryShutoEntrance: item.isPrimary,
+            routeDistanceMeters:
+                routeCandidate?.lastRouteDistanceMeters
+        });
+    });
 
     const beforeCandidates = [...workingCandidates];
 
@@ -7803,16 +7893,24 @@ function filterEntranceCandidatesByRouteSection({
         workingCandidates.filter(candidate => {
             const exit = candidate.exit;
 
+            if (exit?.entranceSelectable === false) {
+                excludedCandidates.push({
+                    candidate,
+                    reason: "入口として選択不可"
+                });
+                return false;
+            }
+
             if (
-                shutoEntranceIc &&
                 isShutoIcForRouteAnalysis(exit) &&
-                getIcIdentity(exit) !==
-                    getIcIdentity(shutoEntranceIc)
+                !isShutoIcSelectableForRole(
+                    exit,
+                    "entrance"
+                )
             ) {
                 excludedCandidates.push({
                     candidate,
-                    reason:
-                        "Polyline解析の首都高入口を優先"
+                    reason: "入口として選択不可"
                 });
                 return false;
             }
@@ -8398,6 +8496,7 @@ function selectLimitedComparisonIcCandidates(
         !Array.isArray(candidates) ||
         !referenceIc ||
         referenceIc.isSelectable === false ||
+        referenceIc.entranceSelectable === false ||
         maxCount <= 0
     ) {
         return [];
@@ -8417,7 +8516,8 @@ function selectLimitedComparisonIcCandidates(
     candidates.forEach(candidate => {
         if (
             !candidate?.exit ||
-            candidate.exit.isSelectable === false
+            candidate.exit.isSelectable === false ||
+            candidate.exit.entranceSelectable === false
         ) {
             return;
         }
@@ -8435,48 +8535,127 @@ function selectLimitedComparisonIcCandidates(
         uniqueCandidates.push(candidate);
     });
 
-    const referenceIdentity = getIcIdentity(referenceIc);
+    const shutoCandidates =
+        uniqueCandidates
+            .filter(candidate =>
+                isShutoIcForRouteAnalysis(candidate.exit)
+            )
+            .slice()
+            .sort((a, b) => {
+                if (
+                    Boolean(a.isPrimaryShutoEntrance) !==
+                    Boolean(b.isPrimaryShutoEntrance)
+                ) {
+                    return a.isPrimaryShutoEntrance ? -1 : 1;
+                }
 
-    let referenceIndex =
-        uniqueCandidates.findIndex(candidate =>
-            getIcIdentity(candidate.exit) === referenceIdentity
+                return (
+                    a.routeDistanceMeters ?? Infinity
+                ) -
+                (
+                    b.routeDistanceMeters ?? Infinity
+                );
+            });
+
+    const nonShutoCandidates =
+        uniqueCandidates.filter(candidate =>
+            !isShutoIcForRouteAnalysis(candidate.exit)
         );
 
-    if (referenceIndex < 0) {
-        uniqueCandidates.unshift({
-            icArea: null,
-            exit: referenceIc,
-            isShuto:
-                isShutoIcForRouteAnalysis(referenceIc)
-        });
-        referenceIndex = 0;
-    }
+    const selectAroundReference = count => {
+        if (count <= 0) {
+            return [];
+        }
 
-    const limitedCount =
-        Math.min(maxCount, uniqueCandidates.length);
+        const candidatesAroundReference =
+            nonShutoCandidates.slice();
 
-    const candidatesBeforeReference =
-        Math.floor(limitedCount / 2);
+        const referenceIdentity =
+            getIcIdentity(referenceIc);
 
-    let startIndex =
-        referenceIndex - candidatesBeforeReference;
+        let referenceIndex =
+            candidatesAroundReference.findIndex(candidate =>
+                getIcIdentity(candidate.exit) ===
+                    referenceIdentity
+            );
 
-    startIndex = Math.max(0, startIndex);
+        if (referenceIndex < 0) {
+            candidatesAroundReference.unshift({
+                icArea: null,
+                exit: referenceIc,
+                isShuto: false
+            });
+            referenceIndex = 0;
+        }
 
-    if (
-        startIndex + limitedCount >
-        uniqueCandidates.length
-    ) {
-        startIndex = Math.max(
-            0,
-            uniqueCandidates.length - limitedCount
+        const limitedCount =
+            Math.min(count, candidatesAroundReference.length);
+
+        let startIndex =
+            referenceIndex - Math.floor(limitedCount / 2);
+
+        startIndex = Math.max(0, startIndex);
+
+        if (
+            startIndex + limitedCount >
+            candidatesAroundReference.length
+        ) {
+            startIndex = Math.max(
+                0,
+                candidatesAroundReference.length - limitedCount
+            );
+        }
+
+        return candidatesAroundReference.slice(
+            startIndex,
+            startIndex + limitedCount
         );
-    }
+    };
 
-    return uniqueCandidates.slice(
-        startIndex,
-        startIndex + limitedCount
+    const reservedNonShutoCount =
+        maxCount >= 5 ? 2 : 1;
+
+    const shutoLimit = Math.max(
+        0,
+        maxCount - reservedNonShutoCount
     );
+
+    const selectedShutoCandidates =
+        shutoCandidates.slice(0, shutoLimit);
+
+    const selectedNonShutoCandidates =
+        selectAroundReference(
+            maxCount - selectedShutoCandidates.length
+        );
+
+    const selectedCandidates = [
+        ...selectedShutoCandidates,
+        ...selectedNonShutoCandidates
+    ];
+
+    if (selectedCandidates.length < maxCount) {
+        const selectedIdentities = new Set(
+            selectedCandidates.map(candidate =>
+                getIcIdentity(candidate.exit)
+            )
+        );
+
+        uniqueCandidates.forEach(candidate => {
+            const identity = getIcIdentity(candidate.exit);
+
+            if (
+                selectedCandidates.length >= maxCount ||
+                selectedIdentities.has(identity)
+            ) {
+                return;
+            }
+
+            selectedIdentities.add(identity);
+            selectedCandidates.push(candidate);
+        });
+    }
+
+    return selectedCandidates;
 }
 
 function selectPolylineBasedMultiIcCandidates({

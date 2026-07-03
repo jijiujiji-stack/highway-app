@@ -14728,22 +14728,20 @@ function buildPolylineComparisonSummaryHtml(
         )
     );
 
-    const normalEntrance =
-        polylineAnalysis.nexcoEntranceIc ||
-        polylineAnalysis.entranceIc;
+    const nexcoEntrance =
+        polylineAnalysis.nexcoEntranceIc;
 
     lines.push(
-        "通常入口：" +
-        (formatAssumedRouteIcName(normalEntrance) || "なし")
+        "NEXCO入口：" +
+        (formatAssumedRouteIcName(nexcoEntrance) || "なし")
     );
 
-    const normalExit =
-        polylineAnalysis.nexcoExitIc ||
-        polylineAnalysis.exitIc;
+    const nexcoExit =
+        polylineAnalysis.nexcoExitIc;
 
     lines.push(
-        "通常出口：" +
-        (formatAssumedRouteIcName(normalExit) || "なし")
+        "NEXCO出口：" +
+        (formatAssumedRouteIcName(nexcoExit) || "なし")
     );
 
     const comparisonCandidatePreview =

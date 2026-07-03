@@ -11,6 +11,9 @@ const DEV_API_SAVING_MODE = true;
 // Polyline解析とRoutesレスポンスの詳細ログを表示する。
 const DEBUG_ROUTE_VERBOSE = false;
 
+// 想定道路表示フィルタの判定内容を表示する。
+const DEBUG_DISPLAY_ROAD_SEQUENCE = false;
+
 // 開発中は候補IC数を少なめにする
 const DEV_IC_CANDIDATE_COUNT = 3;
 
@@ -427,7 +430,11 @@ function buildAssumedRouteHtml(polylineAnalysis) {
 
     const routeRoads = [
         ...new Set(
-            (polylineAnalysis.roadSequence || [])
+            (
+                polylineAnalysis.displayRoadSequence ||
+                polylineAnalysis.roadSequence ||
+                []
+            )
                 .map(shortenHighwayRoadName)
                 .filter(roadName =>
                     roadName && roadName !== "首都高"
@@ -6265,6 +6272,10 @@ function correctShortRoadSegments(
                         previous.distanceMeters +
                         current.distanceMeters +
                         next.distanceMeters,
+                    sampleCount:
+                        (previous.sampleCount || 0) +
+                        (current.sampleCount || 0) +
+                        (next.sampleCount || 0),
                     startTraceIndex:
                         previous.startTraceIndex,
                     endTraceIndex:
@@ -6307,6 +6318,114 @@ function summarizeRoadSegments(roadSegments) {
         roadSequence,
         roadDistances
     };
+}
+
+function buildDisplayRoadSequenceFromSegments(roadSegments) {
+
+    const minimumStableDistanceMeters = 5000;
+    const maximumShortSegmentSampleCount = 2;
+    const maximumSandwichedSegmentDistanceMeters = 8000;
+
+    const segments = (roadSegments || [])
+        .filter(segment => segment?.roadLabel);
+
+    if (segments.length === 0) {
+        return [];
+    }
+
+    const isShortMixedSegment = segment =>
+        segment.roadLabel !== "首都高" &&
+        Number.isFinite(segment.distanceMeters) &&
+        segment.distanceMeters < minimumStableDistanceMeters &&
+        Number.isFinite(segment.sampleCount) &&
+        segment.sampleCount <= maximumShortSegmentSampleCount;
+
+    const hasStableNonShutoSegment =
+        segments.some(segment =>
+            segment.roadLabel !== "首都高" &&
+            !isShortMixedSegment(segment)
+        );
+
+    const removalReasons = new Map();
+
+    segments.forEach((segment, index) => {
+        const previous = segments[index - 1];
+        const next = segments[index + 1];
+
+        const isSandwichedRoadSegment =
+            previous &&
+            next &&
+            previous.roadLabel === next.roadLabel &&
+            segment.roadLabel !== previous.roadLabel &&
+            segment.roadLabel !== "首都高" &&
+            Number.isFinite(segment.distanceMeters) &&
+            segment.distanceMeters <=
+                maximumSandwichedSegmentDistanceMeters &&
+            Number.isFinite(previous.distanceMeters) &&
+            Number.isFinite(next.distanceMeters) &&
+            previous.distanceMeters + next.distanceMeters >=
+                segment.distanceMeters * 3;
+
+        if (isSandwichedRoadSegment) {
+            removalReasons.set(
+                segment,
+                "sandwiched-road-segment"
+            );
+            return;
+        }
+
+        if (
+            hasStableNonShutoSegment &&
+            isShortMixedSegment(segment)
+        ) {
+            removalReasons.set(
+                segment,
+                "short-mixed-segment"
+            );
+        }
+    });
+
+    const displaySegments = segments
+        .filter(segment => !removalReasons.has(segment));
+
+    const displayRoadSequence = displaySegments
+        .map(segment => segment.roadLabel)
+        .filter((roadLabel, index, roadLabels) =>
+            roadLabel !== roadLabels[index - 1]
+        );
+
+    if (DEBUG_DISPLAY_ROAD_SEQUENCE) {
+        const formatSegment = segment => ({
+            roadLabel: segment.roadLabel,
+            distanceKm:
+                Math.round(
+                    (segment.distanceMeters || 0) / 100
+                ) / 10,
+            sampleCount: segment.sampleCount || 0,
+            startTraceIndex: segment.startTraceIndex,
+            endTraceIndex: segment.endTraceIndex
+        });
+
+        const removedSegments = segments
+            .filter(segment =>
+                !displaySegments.includes(segment)
+            )
+            .map(segment => ({
+                ...formatSegment(segment),
+                reason: removalReasons.get(segment)
+            }));
+
+        console.log(
+            "[DISPLAY ROAD SEQUENCE FILTER]",
+            {
+                segments: segments.map(formatSegment),
+                displayRoadSequence,
+                removedSegments
+            }
+        );
+    }
+
+    return displayRoadSequence;
 }
 
 function createRoadSwitchesFromSegments(
@@ -6542,12 +6661,14 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             ) {
                 currentRoadSegment.distanceMeters +=
                     estimatedDistanceMeters;
+                currentRoadSegment.sampleCount++;
                 currentRoadSegment.endTraceIndex = index;
             }
             else {
                 roadSegments.push({
                     roadLabel: item.roadLabel,
                     distanceMeters: estimatedDistanceMeters,
+                    sampleCount: 1,
                     startTraceIndex: index,
                     endTraceIndex: index
                 });
@@ -6572,6 +6693,11 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
 
         const correctedRoadSummary =
             summarizeRoadSegments(correctedRoadSegments);
+
+        const displayRoadSequence =
+            buildDisplayRoadSequenceFromSegments(
+                correctedRoadSegments
+            );
 
         const correctedRoadSwitches =
             createRoadSwitchesFromSegments(
@@ -6703,6 +6829,7 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
         return {
             roadSequence:
                 correctedRoadSummary.roadSequence,
+            displayRoadSequence,
             roadDistances:
                 correctedRoadSummary.roadDistances,
             entranceIc: entranceCandidate,
@@ -14036,7 +14163,11 @@ function buildPolylineComparisonSummaryHtml(
 
     const roadNames = [
         ...new Set(
-            (polylineAnalysis.roadSequence || [])
+            (
+                polylineAnalysis.displayRoadSequence ||
+                polylineAnalysis.roadSequence ||
+                []
+            )
                 .filter(Boolean)
         )
     ];

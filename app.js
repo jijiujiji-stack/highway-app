@@ -5869,35 +5869,49 @@ function sampleRoutePointsByDistanceRange(
     return sampledPoints;
 }
 
-function findNearestIcMasterEntryForRoutePoint(routePoint) {
+function getRouteAnalysisIcAreaKey(exit) {
+
+    if (exit?.source === "SHUTO_IC_MASTER") {
+        return "shuto";
+    }
+
+    return (
+        exit?.sourceAreaKey ||
+        exit?.sourceAreaKeys?.[0] ||
+        ""
+    );
+}
+
+function findNearestIcMasterEntryForRoutePoint(
+    routePoint,
+    icDefinitions
+) {
 
     let nearest = null;
     let nearestDistanceMeters = Infinity;
 
-    for (const icArea in IC_MASTER) {
-        for (const exit of IC_MASTER[icArea].exits) {
-            if (
-                exit.lat === undefined ||
-                exit.lng === undefined
-            ) {
-                continue;
-            }
+    for (const exit of icDefinitions) {
+        if (
+            exit.lat === undefined ||
+            exit.lng === undefined
+        ) {
+            continue;
+        }
 
-            const distanceMeters =
-                calculateDistance(
-                    routePoint.lat,
-                    routePoint.lng,
-                    exit.lat,
-                    exit.lng
-                );
+        const distanceMeters =
+            calculateDistance(
+                routePoint.lat,
+                routePoint.lng,
+                exit.lat,
+                exit.lng
+            );
 
-            if (distanceMeters < nearestDistanceMeters) {
-                nearest = {
-                    icArea,
-                    exit
-                };
-                nearestDistanceMeters = distanceMeters;
-            }
+        if (distanceMeters < nearestDistanceMeters) {
+            nearest = {
+                icArea: getRouteAnalysisIcAreaKey(exit),
+                exit
+            };
+            nearestDistanceMeters = distanceMeters;
         }
     }
 
@@ -5920,34 +5934,35 @@ function isShutoIcForRouteAnalysis(exit) {
     );
 }
 
-function findNearestShutoIcForRoutePoint(routePoint) {
+function findNearestShutoIcForRoutePoint(
+    routePoint,
+    icDefinitions
+) {
 
     let nearest = null;
     let nearestDistanceMeters = Infinity;
 
-    for (const icArea in IC_MASTER) {
-        for (const exit of IC_MASTER[icArea].exits) {
-            if (
-                !isShutoIcForRouteAnalysis(exit) ||
-                exit.isSelectable === false ||
-                exit.lat === undefined ||
-                exit.lng === undefined
-            ) {
-                continue;
-            }
+    for (const exit of icDefinitions) {
+        if (
+            !isShutoIcForRouteAnalysis(exit) ||
+            exit.isSelectable === false ||
+            exit.lat === undefined ||
+            exit.lng === undefined
+        ) {
+            continue;
+        }
 
-            const distanceMeters =
-                calculateDistance(
-                    routePoint.lat,
-                    routePoint.lng,
-                    exit.lat,
-                    exit.lng
-                );
+        const distanceMeters =
+            calculateDistance(
+                routePoint.lat,
+                routePoint.lng,
+                exit.lat,
+                exit.lng
+            );
 
-            if (distanceMeters < nearestDistanceMeters) {
-                nearest = exit;
-                nearestDistanceMeters = distanceMeters;
-            }
+        if (distanceMeters < nearestDistanceMeters) {
+            nearest = exit;
+            nearestDistanceMeters = distanceMeters;
         }
     }
 
@@ -5964,7 +5979,8 @@ function findNearestShutoIcForRoutePoint(routePoint) {
 function analyzeShutoIcCandidates(
     sampledPoints,
     preferLaterOccurrence = false,
-    maxDistanceMeters = 5000
+    maxDistanceMeters = 5000,
+    icDefinitions
 ) {
 
     const candidatesByIdentity = new Map();
@@ -5986,7 +6002,10 @@ function analyzeShutoIcCandidates(
 
     sampledPoints.forEach(routePoint => {
         const nearest =
-            findNearestShutoIcForRoutePoint(routePoint);
+            findNearestShutoIcForRoutePoint(
+                routePoint,
+                icDefinitions
+            );
 
         if (
             !nearest ||
@@ -6083,7 +6102,8 @@ function selectShutoIcCandidateWindow(
     sampledPoints,
     fromEnd = false,
     maxDistanceMeters = 3000,
-    windowDistanceMeters = 5000
+    windowDistanceMeters = 5000,
+    icDefinitions
 ) {
 
     const orderedSamples = fromEnd
@@ -6093,7 +6113,10 @@ function selectShutoIcCandidateWindow(
     const anchorSample =
         orderedSamples.find(routePoint => {
             const nearest =
-                findNearestShutoIcForRoutePoint(routePoint);
+                findNearestShutoIcForRoutePoint(
+                    routePoint,
+                    icDefinitions
+                );
 
             return (
                 nearest &&
@@ -6144,49 +6167,48 @@ function selectShutoIcCandidateWindow(
 function findNearbyIcMasterEntriesForRoutePoint(
     routePoint,
     maxDistanceMeters = 5000,
-    limit = 5
+    limit = 5,
+    icDefinitions
 ) {
 
     const nearbyByIdentity = new Map();
 
-    for (const icArea in IC_MASTER) {
-        for (const exit of IC_MASTER[icArea].exits) {
-            if (
-                exit.lat === undefined ||
-                exit.lng === undefined
-            ) {
-                continue;
-            }
+    for (const exit of icDefinitions) {
+        if (
+            exit.lat === undefined ||
+            exit.lng === undefined
+        ) {
+            continue;
+        }
 
-            const distanceMeters =
-                calculateDistance(
-                    routePoint.lat,
-                    routePoint.lng,
-                    exit.lat,
-                    exit.lng
-                );
+        const distanceMeters =
+            calculateDistance(
+                routePoint.lat,
+                routePoint.lng,
+                exit.lat,
+                exit.lng
+            );
 
-            if (distanceMeters > maxDistanceMeters) {
-                continue;
-            }
+        if (distanceMeters > maxDistanceMeters) {
+            continue;
+        }
 
-            const identity =
-                exit.googleName ||
-                exit.displayName + "|" + exit.lat + "|" + exit.lng;
+        const identity =
+            exit.googleName ||
+            exit.displayName + "|" + exit.lat + "|" + exit.lng;
 
-            const registered =
-                nearbyByIdentity.get(identity);
+        const registered =
+            nearbyByIdentity.get(identity);
 
-            if (
-                !registered ||
-                distanceMeters < registered.distanceMeters
-            ) {
-                nearbyByIdentity.set(identity, {
-                    icArea,
-                    exit,
-                    distanceMeters
-                });
-            }
+        if (
+            !registered ||
+            distanceMeters < registered.distanceMeters
+        ) {
+            nearbyByIdentity.set(identity, {
+                icArea: getRouteAnalysisIcAreaKey(exit),
+                exit,
+                distanceMeters
+            });
         }
     }
 
@@ -6289,7 +6311,8 @@ function summarizeRoadSegments(roadSegments) {
 
 function createRoadSwitchesFromSegments(
     roadSegments,
-    routeTrace
+    routeTrace,
+    icDefinitions
 ) {
 
     const roadSwitches = [];
@@ -6328,7 +6351,8 @@ function createRoadSwitchesFromSegments(
                 findNearbyIcMasterEntriesForRoutePoint(
                     switchPoint,
                     5000,
-                    5
+                    5,
+                    icDefinitions
                 )
         });
     }
@@ -6355,9 +6379,12 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
         const sampledPoints =
             sampleRoutePointsByDistance(routePoints, 2000);
 
+        const icDefinitions =
+            getAllRouteAnalysisIcDefinitions();
+
         const areaCounts =
             Object.fromEntries(
-                Object.keys(IC_MASTER).map(icArea =>
+                [...Object.keys(IC_MASTER), "shuto"].map(icArea =>
                     [icArea, 0]
                 )
             );
@@ -6368,19 +6395,23 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
 
         sampledPoints.forEach((routePoint, index) => {
             const nearest =
-                findNearestIcMasterEntryForRoutePoint(routePoint);
+                findNearestIcMasterEntryForRoutePoint(
+                    routePoint,
+                    icDefinitions
+                );
 
             if (!nearest) {
                 return;
             }
 
-            areaCounts[nearest.icArea]++;
+            areaCounts[nearest.icArea] =
+                (areaCounts[nearest.icArea] || 0) + 1;
 
             const displayName =
                 nearest.exit.displayName;
 
             const roadLabel =
-                nearest.exit.roadType === "首都高"
+                isShutoIcForRouteAnalysis(nearest.exit)
                     ? "首都高"
                     : IC_MASTER[nearest.icArea]?.label ||
                         nearest.icArea;
@@ -6453,7 +6484,8 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 findNearbyIcMasterEntriesForRoutePoint(
                     switchPoint,
                     5000,
-                    5
+                    5,
+                    icDefinitions
                 );
 
             roadSwitches.push({
@@ -6544,7 +6576,8 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
         const correctedRoadSwitches =
             createRoadSwitchesFromSegments(
                 correctedRoadSegments,
-                routeTrace
+                routeTrace,
+                icDefinitions
             );
 
         const selectablePassedIcs =
@@ -6628,7 +6661,11 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
         const shutoEntranceWindow =
             usesShuto
                 ? selectShutoIcCandidateWindow(
-                    shutoDetailStartSamples
+                    shutoDetailStartSamples,
+                    false,
+                    3000,
+                    5000,
+                    icDefinitions
                 )
                 : emptyShutoWindow;
 
@@ -6636,7 +6673,10 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             usesShuto
                 ? selectShutoIcCandidateWindow(
                     shutoDetailEndSamples,
-                    true
+                    true,
+                    3000,
+                    5000,
+                    icDefinitions
                 )
                 : emptyShutoWindow;
 
@@ -6645,7 +6685,8 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 ? analyzeShutoIcCandidates(
                     shutoEntranceWindow.samples,
                     false,
-                    3000
+                    3000,
+                    icDefinitions
                 )
                 : { candidates: [], selectedIc: null };
 
@@ -6654,7 +6695,8 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 ? analyzeShutoIcCandidates(
                     shutoExitWindow.samples,
                     true,
-                    3000
+                    3000,
+                    icDefinitions
                 )
                 : { candidates: [], selectedIc: null };
 

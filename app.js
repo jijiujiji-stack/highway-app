@@ -14774,6 +14774,9 @@ function buildPolylineComparisonSummaryHtml(
                 comparisonCandidatePreview
                     ?.exitCandidateIcs || []
             )
+                .filter(candidate =>
+                    candidate?.exit?.exitSelectable !== false
+                )
                 .map(candidate =>
                     formatAssumedRouteIcName(
                         candidate?.exit

@@ -417,21 +417,44 @@ function createAssumedRouteRoadHtml(roadName) {
     );
 }
 
+function createAssumedRouteIcPart(
+    ic,
+    role,
+    roadPrefix = ""
+) {
+    if (
+        !ic ||
+        ic[role + "Selectable"] === false
+    ) {
+        return null;
+    }
+
+    const icName =
+        formatAssumedRouteIcName(ic);
+
+    if (!icName) {
+        return null;
+    }
+
+    return {
+        identity:
+            "ic:" +
+            (ic.googleName || ic.id || icName),
+        html:
+            (
+                roadPrefix
+                    ? createAssumedRouteRoadHtml(roadPrefix) +
+                        " "
+                    : ""
+            ) +
+            escapeHtml(icName)
+    };
+}
+
 function buildAssumedRouteHtml(polylineAnalysis) {
     if (!polylineAnalysis) {
         return "";
     }
-
-    const shutoEntranceIc =
-        polylineAnalysis.shutoEntranceIc;
-
-    const entranceIc =
-        polylineAnalysis.nexcoEntranceIc ||
-        polylineAnalysis.entranceIc;
-
-    const exitIc =
-        polylineAnalysis.nexcoExitIc ||
-        polylineAnalysis.exitIc;
 
     const routeRoads = [
         ...new Set(
@@ -447,45 +470,41 @@ function buildAssumedRouteHtml(polylineAnalysis) {
         )
     ];
 
-    const routeParts = [];
-
-    if (shutoEntranceIc) {
-        const shutoEntranceIcName =
-            formatAssumedRouteIcName(shutoEntranceIc);
-
-        routeParts.push(
-            {
-                value: "首都高 " + shutoEntranceIcName,
-                html:
-                    createAssumedRouteRoadHtml("首都高") +
-                    " " +
-                    escapeHtml(shutoEntranceIcName)
-            }
-        );
-    }
-
-    routeParts.push({
-        value: formatAssumedRouteIcName(entranceIc),
-        html: escapeHtml(formatAssumedRouteIcName(entranceIc))
-    });
-
-    routeParts.push(
+    const routeParts = [
+        createAssumedRouteIcPart(
+            polylineAnalysis.shutoEntranceIc,
+            "entrance",
+            "首都高"
+        ),
+        createAssumedRouteIcPart(
+            polylineAnalysis.shutoExitIc,
+            "exit"
+        ),
+        createAssumedRouteIcPart(
+            polylineAnalysis.nexcoEntranceIc,
+            "entrance"
+        ),
         ...routeRoads.map(roadName => ({
-            value: roadName,
+            identity: "road:" + roadName,
             html: createAssumedRouteRoadHtml(roadName)
-        }))
-    );
+        })),
+        createAssumedRouteIcPart(
+            polylineAnalysis.nexcoExitIc,
+            "exit"
+        )
+    ].filter(Boolean);
 
-    routeParts.push({
-        value: formatAssumedRouteIcName(exitIc),
-        html: escapeHtml(formatAssumedRouteIcName(exitIc))
-    });
+    const displayedIdentities = new Set();
 
     return routeParts
-        .filter((part, index, parts) =>
-            part.value &&
-            part.value !== parts[index - 1]?.value
-        )
+        .filter(part => {
+            if (displayedIdentities.has(part.identity)) {
+                return false;
+            }
+
+            displayedIdentities.add(part.identity);
+            return true;
+        })
         .map(part => part.html)
         .join(" → ");
 }

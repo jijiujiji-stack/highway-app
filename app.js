@@ -532,10 +532,10 @@ const SHUTO_IC_MASTER = [
         lat: 35.683675,
         lng: 139.789954,
         entranceSelectable: false,
-        exitSelectable: false,
+        exitSelectable: true,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速6号向島線 清洲橋出口"],
-        note: "公式上は出口専用。現ロジックは入口・出口の選択可否を共通isSelectableへ統合するため、入口候補への混入防止として暫定的に選択不可。役割別フィルタ対応後にexitSelectable:trueへ変更予定。第1弾追加。Google表記と座標確認済み。"
+        note: "公式上は出口専用。入口出口別フィルタ対応済みのため、出口候補として有効化。第1弾追加。Google表記と座標確認済み。"
     },
     {
         id: "shuto-6-tsutsumidori",
@@ -932,10 +932,10 @@ const SHUTO_IC_MASTER = [
         lat: 35.481,
         lng: 139.660,
         entranceSelectable: false,
-        exitSelectable: false,
+        exitSelectable: true,
         sourceAreaKeys: ["shutoKanagawaK1"],
         sourceGoogleNames: ["首都高速神奈川1号横羽線 守屋町出口"],
-        note: "公式上は出口専用。現ロジックは入口・出口の選択可否を共通isSelectableへ統合するため、入口候補への混入防止として暫定的に選択不可。役割別フィルタ対応後にexitSelectable:trueへ変更予定。"
+        note: "公式上は出口専用。入口出口別フィルタ対応済みのため、出口候補として有効化。"
     },
     {
         id: "shuto-k1-koyasu",

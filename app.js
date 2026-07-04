@@ -8429,6 +8429,10 @@ function buildForwardExitComparisonIcCandidates(
                 exclusionReason =
                     "isSelectable:false（選択不可IC/JCT）";
             }
+            else if (exit.exitSelectable === false) {
+                exclusionReason =
+                    "exitSelectable:false（出口不可）";
+            }
             else if (isConnectionJunction) {
                 exclusionReason = "接続用JCT";
             }

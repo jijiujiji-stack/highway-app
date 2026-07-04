@@ -689,3 +689,10 @@ Claude Codeは実装担当として使います。
 - GitHub Pages反映確認
 
 以上。
+
+---
+
+## Claude Code導入状況
+
+2026-07-04時点で、Claude Code Pro連携・リポジトリ読解・CLAUDE.md / PROJECT_HANDOFF.md 読解確認済み。
+初回はPowerShell上で動作確認し、VS Code拡張も導入して連携確認を進めています。

@@ -696,3 +696,42 @@ Claude Codeは実装担当として使います。
 
 2026-07-04時点で、Claude Code Pro連携・リポジトリ読解・CLAUDE.md / PROJECT_HANDOFF.md 読解確認済み。
 初回はPowerShell上で動作確認し、VS Code拡張も導入して連携確認を進めています。
+
+---
+
+## Claude Code静的レビュー結果メモ
+
+実施日：2026-07-04。app.jsの静的読解のみによる調査で、API呼び出し・ファイル変更・自動ブラウザ実行は行っていません。
+
+### 1. API呼び出し数に影響する関数
+
+- `getActiveIcCandidateCount()`（app.js:310）：`isRealDriveTestMode` で通常3件／実車テスト5件を切り替える起点。
+- `computeRoutes` 呼び出しは7箇所（app.js:4570, 4649, 4731, 6082, 6183, 10466, 10552）。全てキャッシュ層（`createRoutesCacheRequest` / `getCachedRoutesResponse` / `cacheRoutesResponse`）と `incrementRouteRequestUsage("pro"|"ess")` をセットで持つ統一パターン。新規呼び出し追加時はこのパターンを踏襲する必要あり。
+- `searchEntranceIcComparisonV2` / `searchExitIcComparisonV2`（app.js:11268, 11508）の候補ループは、候補IC 1件あたり2〜3回のcomputeRoutes呼び出しになる（下道＋高速＋トール概算）。「候補IC 1件≒Routes API 1回」は概算であり、実際は2〜3回である点に注意。
+- `runCandidateIcTest()`（app.js:15635）：デバッグボタンから`TEST_DESTINATIONS`約28ルート分のAPIを叩く。手動実行のみに留めること。
+
+### 2. 入口比較・出口比較の候補数制限に関係する関数
+
+- `selectLimitedComparisonIcCandidates`（app.js:8489、入口用）、`selectForwardComparisonIcCandidates`（app.js:8468、出口用）が実際の`maxCount`ゲート。
+- `selectLimitedComparisonIcCandidates`内の`reservedNonShutoCount = maxCount >= 5 ? 2 : 1`（app.js:8615-8616）は、`PROD_IC_CANDIDATE_COUNT=5`に決め打ちした分岐。この定数を変更する場合はここも見直しが必要。
+- `selectPolylineBasedMultiIcCandidates`（app.js:8661）が入口/出口を`mode`で分岐して上記2関数を呼ぶ統括点。
+
+### 3. 旧ロジックと新ロジックが混在していて壊しやすい箇所
+
+- `searchAutoExitIcComparison`（app.js:15134）は、Polyline解析による新候補と、常に旧来の距離ベース`selectExitCandidatesForAutoExitComparison(...)`（app.js:15326-15336）の両方を計算し、`legacySelectedExits`としてフォールバックに使っている（Polyline解析失敗時のみ使用：app.js:8754-8757）。
+- `USE_DISTANCE_ONLY_IC_AREA`（app.js:3、方面=icArea判定用の現役標準ロジック）と、出口比較候補選定における「距離だけ方式」フォールバックは別の距離ベースロジックだが、名前が似ており混同しやすい。
+- `filterEntranceCandidatesByRouteSection`（app.js:7554）のJCT除外判定は`/JCT|ジャンクション/i`という表示名の正規表現一致に依存（app.js:7791-7797, 8422-8426）。明示フラグではないため、新規JCT追加時に名称に含めないと除外漏れが起きる。
+
+### 4. 安易に削除してはいけない関数・要素
+
+- `.highway-card` / `.local-card`（`old-feature-hidden`クラス付き）は、通常検索の中核関数`displayRouteComparison`から`document.querySelector`でnullチェックなしに直接参照・書き込みされている（app.js:4931-4953）。HTML側からこの要素を削除すると通常検索フローが例外で壊れるため、見た目だけの非表示ではなく実行時依存がある。
+- `selectExitCandidatesForAutoExitComparison`（app.js:10314）：旧ロジックに見えるが、`searchAutoExitIcComparison`のフォールバック元として現役で毎回呼ばれている（app.js:12374, 15327, 15864）。
+- `runCandidateIcTest` / `runCandidateIcTestCase`（app.js:15635, 15709）：デバッグ用テストボタンから参照。
+
+### 5. コメントを追加すると将来安全になりそうな箇所
+
+1. `reservedNonShutoCount = maxCount >= 5 ? 2 : 1`（app.js:8615-8616）— `PROD_IC_CANDIDATE_COUNT`との対応関係が読み取れないため、定数変更時に追従すべき旨のコメント。
+2. `displayRouteComparison`内の`.highway-card`/`.local-card`直接参照部分（app.js:4931-4953）— 削除すると通常検索が例外で落ちる実行時依存の明記。
+3. `legacySelectedExits`が常に計算・フォールバックとして使われている旨（app.js:15326-15344, 8754-8757）— 「未使用の旧関数」に見えて実は現役という誤解防止。
+4. `filterEntranceCandidatesByRouteSection`のJCT正規表現除外（app.js:7791-7797）— 新規JCT追加時は表示名にJCT/ジャンクションを含めること、という運用ルールの明記。
+5. `searchEntranceIcComparisonV2`/`searchExitIcComparisonV2`のループ内API呼び出し回数（app.js:11317-11380, 11568-11631）— 候補1件＝Routes API最大3回である旨のコメント。

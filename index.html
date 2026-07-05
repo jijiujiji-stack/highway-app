@@ -280,9 +280,12 @@
 
 
                 <label for="acceptableDelay">
-                    許容できる遅れ時間（分）
+                    出口比較の判断時間（分）
                 </label>
                 <input type="number" id="acceptableDelay" value="30" min="0">
+                <div class="ic-area-reason">
+                    途中で降りた場合に、何分までの遅れなら候補にするかを判断します。
+                </div>
 
 
                 <!--
@@ -345,7 +348,7 @@
                         value="entrance"
                         checked>
 
-                    下道走行中
+                    入口比較（下道走行中）
                 </label>
 
                 <label>
@@ -354,7 +357,7 @@
                         name="multiIcMode"
                         value="exit">
 
-                    高速走行中
+                    出口比較（高速走行中）
                 </label>
 
             </div>

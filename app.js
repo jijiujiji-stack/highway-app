@@ -509,6 +509,25 @@ function buildAssumedRouteHtml(polylineAnalysis) {
         .join(" → ");
 }
 
+// 複数IC比較中も、通常検索で得た高速利用ルート概要をトップパネルに参考表示する。
+// Routes APIは新たに呼ばず、既存のlastHighwayRoutePolylineAnalysisを流用する。
+function updateDashboardAssumedRouteForComparisonMode() {
+
+    const dashboardAssumedRouteValue =
+        document.getElementById("dashboardAssumedRouteValue");
+
+    if (!dashboardAssumedRouteValue) {
+        return;
+    }
+
+    const assumedRouteHtml =
+        buildAssumedRouteHtml(lastHighwayRoutePolylineAnalysis);
+
+    dashboardAssumedRouteValue.innerHTML =
+        "<span class=\"dashboard-assumed-route-label\">参考：高速利用ルート</span>" +
+        (assumedRouteHtml || "ルート情報なし");
+}
+
 function createMainTollEstimateHtml(tollEstimate) {
     const amount = Number(tollEstimate?.amount) || 0;
     const shutoToll = Number(tollEstimate?.shutoToll) || 0;
@@ -13452,6 +13471,7 @@ function updateDashboardWithBestEntranceIcV2() {
     );
     setDashboardV2EntranceMode(true);
     setDashboardV2ExitMode(false);
+    updateDashboardAssumedRouteForComparisonMode();
 
     const dashboardCard =
         document.querySelector(".dashboard-card");
@@ -13748,6 +13768,7 @@ function updateDashboardWithBestExitIcV2() {
     );
     setDashboardV2EntranceMode(false);
     setDashboardV2ExitMode(true);
+    updateDashboardAssumedRouteForComparisonMode();
 
     const dashboardCard =
         document.querySelector(".dashboard-card");

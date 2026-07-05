@@ -233,7 +233,9 @@ button {
     line-height: 1.35;
 }
 
-.normal-search-active .dashboard-assumed-route {
+.normal-search-active .dashboard-assumed-route,
+.v2-dashboard-entrance-active .dashboard-assumed-route,
+.v2-dashboard-exit-active .dashboard-assumed-route {
     display: flex;
 }
 
@@ -250,6 +252,12 @@ button {
     text-align: center;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+}
+
+.dashboard-assumed-route-label {
+    margin-right: 6px;
+    color: #9ab0c9;
+    font-weight: normal;
 }
 
 .assumed-route-road {

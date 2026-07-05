@@ -14242,19 +14242,9 @@ function buildEntranceIcComparisonV2CardHtml(result) {
         result.differenceFromAllLocal !== null &&
         result.differenceFromAllLocal <= 0;
 
-    const acceptableDelayMinutes =
-        getAcceptableDelayMinutes();
-
-    const isEntranceBelowThreshold =
-        !hasError &&
-        result.differenceFromAllLocal > 0 &&
-        result.differenceFromAllLocal <
-            acceptableDelayMinutes;
-
     const classNames = [
         "v2-ic-result-card",
         hasNoSaving ? "v2-ic-no-saving" : "",
-        isEntranceBelowThreshold ? "v2-ic-excluded" : "",
         isWeakCandidate ? "weak-comparison-candidate" : "",
         hasError ? "v2-ic-error" : ""
     ]
@@ -14289,17 +14279,6 @@ function buildEntranceIcComparisonV2CardHtml(result) {
             : result.yenPerSavedMinute.toLocaleString() +
             "円/分";
 
-    const excludedNote =
-        isEntranceBelowThreshold
-            ? "<div class=\"v2-ic-excluded-note\">" +
-            "短縮不足：許容" +
-            acceptableDelayMinutes +
-            "分に対して" +
-            result.differenceFromAllLocal +
-            "分短縮" +
-            "</div>"
-            : "";
-
     const weakCandidateNote =
         isWeakCandidate
             ? "<div class=\"weak-comparison-note\">" +
@@ -14327,7 +14306,6 @@ function buildEntranceIcComparisonV2CardHtml(result) {
         yenPerMinuteText +
         "<br>合計" +
         formatV2Duration(result.totalMinutes) +
-        excludedNote +
         weakCandidateNote +
         "</div>" +
         "</div>"

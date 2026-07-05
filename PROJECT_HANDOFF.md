@@ -456,7 +456,7 @@ Routes API候補数上限は変更していません。
 - `searchEntranceIcComparisonV2`
 - `searchExitIcComparisonV2`
 
-通常検索の `estimateMainHighwayToll` は今回未変更です。
+この時点では、通常検索の `estimateMainHighwayToll` は未変更でした（後述の9で統一済み）。
 
 首都高固定料金は `SHUTO_TOLL_ESTIMATE_YEN = 1000` を使用します。
 
@@ -479,6 +479,32 @@ Routes API候補数上限は変更していません。
 API呼び出し数：
 
 Routes API呼び出し数を増やさない方針です。首都高IC同士では、料金概算用の `getHighwayRouteForTollEstimate` を呼ばないため、むしろ呼び出し回数が減る場合があります。
+
+---
+
+### 9. 通常検索側の料金計算もV2候補料金ルールに統一
+
+通常検索の `estimateMainHighwayToll` も、8で共通化した `estimateComparisonCandidateToll(...)` 経由に変更し、V2候補料金と同じ首都高料金ルールに揃えました。
+
+変更点：
+
+- `estimateMainHighwayToll` 内の `startIc → endIc` 直接距離ベース計算（`getHighwayRouteForTollEstimate` 直接呼び出し）を、`estimateComparisonCandidateToll(...)` 呼び出しに変更
+- `highwayToll` は `amount - shutoToll` で逆算し、既存の料金内訳表示（トップパネルの「首都高◯ + 高速◯」）にそのまま反映
+- `startIc` / `endIc` の決定ロジック、`lastTollStartIcGoogleName` / `lastTollEndIcGoogleName` の保存ロジックは変更していない
+- `startIc.googleName === endIc.googleName` の早期returnブロックも変更していない
+
+これにより、通常検索・入口比較V2・出口比較V2の3箇所で首都高料金ルールが揃いました。
+
+- 首都高IC → 首都高IC：首都高固定1,000円のみ
+- 首都高IC → 非首都高IC：首都高固定1,000円 + NEXCO入口以降の距離ベース概算
+- 非首都高IC → 首都高IC：非首都高区間の距離ベース概算 + 首都高固定1,000円
+- 非首都高IC → 非首都高IC：従来どおり距離ベース概算
+
+影響：
+
+- 通常検索のETC概算、トップパネルの料金内訳、出口比較V2の「通常 約◯円」が同じルールで整合するようになった
+- 首都高経由ルートのETC概算や出口比較の節約額は、二重計上を避けた結果、以前より下がる場合がある
+- Routes API呼び出し数は増やしていない。首都高IC同士では料金概算用ルート取得を避けられる場合がある
 
 ---
 

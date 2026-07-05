@@ -5547,19 +5547,30 @@ async function estimateMainHighwayToll(
             canUseNexcoPolylineIcs ||
             canUseDefaultPolylineIcs;
 
+        // 首都高経由ルートは、ルート途中のNEXCO入口（nexcoEntranceIc）ではなく
+        // 実際の走行開始地点（entranceIc、首都高含む）を基準ICにする。
+        const shouldPreferDefaultPolylineIcs =
+            Boolean(polylineAnalysis?.shutoEntranceIc);
+
         const startIc =
-            canUseNexcoPolylineIcs
-                ? nexcoStartIc
-                : canUseDefaultPolylineIcs
-                    ? polylineStartIc
-                    : legacyStartIc;
+            shouldPreferDefaultPolylineIcs &&
+                canUseDefaultPolylineIcs
+                ? polylineStartIc
+                : canUseNexcoPolylineIcs
+                    ? nexcoStartIc
+                    : canUseDefaultPolylineIcs
+                        ? polylineStartIc
+                        : legacyStartIc;
 
         const endIc =
-            canUseNexcoPolylineIcs
-                ? nexcoEndIc
-                : canUseDefaultPolylineIcs
-                    ? polylineEndIc
-                    : legacyEndIc;
+            shouldPreferDefaultPolylineIcs &&
+                canUseDefaultPolylineIcs
+                ? polylineEndIc
+                : canUseNexcoPolylineIcs
+                    ? nexcoEndIc
+                    : canUseDefaultPolylineIcs
+                        ? polylineEndIc
+                        : legacyEndIc;
 
         if (
             !startIc ||

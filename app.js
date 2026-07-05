@@ -11006,7 +11006,10 @@ function evaluateEntranceCandidateEligibility(result) {
     };
 }
 
-function buildExitCandidateValueNote(result) {
+function buildExitCandidateValueNote(
+    result,
+    recommendationEligibility
+) {
     if (
         !result ||
         result.savedToll === null ||
@@ -11058,10 +11061,7 @@ function buildExitCandidateValueNote(result) {
                 "円）";
 
     const lowEfficiencyNote =
-        result.yenPerDelayedMinute !== null &&
-        result.yenPerDelayedMinute !== undefined &&
-        result.yenPerDelayedMinute <
-            MIN_EXIT_RECOMMEND_YEN_PER_DELAY_MINUTE
+        recommendationEligibility === "reference"
             ? "。おすすめ条件の" +
                 MIN_EXIT_RECOMMEND_YEN_PER_DELAY_MINUTE +
                 "円/分未満のため、参考出口として表示しています"
@@ -11087,91 +11087,68 @@ function getNormalHighwayExitIcName() {
 
 function evaluateExitCandidateEligibility(result) {
 
-    const valueNote =
-        buildExitCandidateValueNote(result);
+    let recommendationEligibility;
+    let weakReason;
 
     if (result.error) {
-        return {
-            recommendationEligibility: "error",
-            weakReason: "計算エラー",
-            valueNote
-        };
+        recommendationEligibility = "error";
+        weakReason = "計算エラー";
     }
-
-    if (
+    else if (
         result.savedToll === null ||
         result.savedToll === undefined ||
         result.differenceFromAllHighway === null ||
         result.differenceFromAllHighway === undefined
     ) {
-        return {
-            recommendationEligibility: "weak",
-            weakReason: "全高速との差分または節約額不明",
-            valueNote
-        };
+        recommendationEligibility = "weak";
+        weakReason = "全高速との差分または節約額不明";
     }
-
-    if (
+    else if (
         result.savedToll < 0 &&
         result.differenceFromAllHighway > 0
     ) {
-        return {
-            recommendationEligibility: "weak",
-            weakReason: "逆に高く、時間も遅い",
-            valueNote
-        };
+        recommendationEligibility = "weak";
+        weakReason = "逆に高く、時間も遅い";
     }
-
-    if (result.savedToll < 0) {
-        return {
-            recommendationEligibility: "weak",
-            weakReason: "逆に高い",
-            valueNote
-        };
+    else if (result.savedToll < 0) {
+        recommendationEligibility = "weak";
+        weakReason = "逆に高い";
     }
-
-    if (result.savedToll === 0) {
-        return {
-            recommendationEligibility: "weak",
-            weakReason: "節約なし",
-            valueNote
-        };
+    else if (result.savedToll === 0) {
+        recommendationEligibility = "weak";
+        weakReason = "節約なし";
     }
-
-    const acceptableDelayMinutes =
-        getAcceptableDelayMinutes();
-
-    if (
+    else if (
         result.differenceFromAllHighway >
-        acceptableDelayMinutes
+        getAcceptableDelayMinutes()
     ) {
-        return {
-            recommendationEligibility: "weak",
-            weakReason: "許容遅れ超過",
-            valueNote
-        };
+        recommendationEligibility = "weak";
+        weakReason = "許容遅れ超過";
     }
-
-    if (
+    else if (
         result.differenceFromAllHighway > 0 &&
         result.yenPerDelayedMinute !== null &&
         result.yenPerDelayedMinute <
             MIN_EXIT_RECOMMEND_YEN_PER_DELAY_MINUTE
     ) {
-        return {
-            recommendationEligibility: "reference",
-            weakReason:
-                "節約効果が小さい（" +
-                result.yenPerDelayedMinute +
-                "円/分）",
-            valueNote
-        };
+        recommendationEligibility = "reference";
+        weakReason =
+            "節約効果が小さい（" +
+            result.yenPerDelayedMinute +
+            "円/分）";
+    }
+    else {
+        recommendationEligibility = "eligible";
+        weakReason = "";
     }
 
     return {
-        recommendationEligibility: "eligible",
-        weakReason: "",
-        valueNote
+        recommendationEligibility,
+        weakReason,
+        valueNote: buildExitCandidateValueNote(
+            result,
+            recommendationEligibility
+        )
     };
 }
 
@@ -13951,7 +13928,10 @@ function updateDashboardWithBestExitIcV2() {
                     "円/分のため参考扱い<br>おすすめ条件：" +
                     MIN_EXIT_RECOMMEND_YEN_PER_DELAY_MINUTE +
                     "円/分以上"
-                : "※許容遅れ超過";
+                : "※おすすめ対象外: " +
+                    escapeHtml(
+                        reference?.weakReason || "条件外"
+                    );
 
         if (dashboardReason) {
             dashboardReason.innerHTML =

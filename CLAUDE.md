@@ -306,38 +306,33 @@ Claude Codeは、実装担当です。
 
 ---
 
-## 作業完了時の必須処理
+## 作業完了時の確認と完了音
 
-作業完了時は、リポジトリ直下で以下の1コマンドを実行してください。
+Claude Codeは、作業途中で以下のような確認コマンドを個別に実行しないこと。
 
-```powershell
-tools\finish-check.cmd
-```
+- git status
+- git diff
+- git diff --check
+- echo
+- cat
+- type
+- PowerShell コマンド
+- bashで複数コマンドを連結した一時コマンド
 
-このスクリプトは以下をまとめて行います。
+これらはユーザーの許可確認が毎回出る原因になるため、原則実行しない。
 
-- `git status` / `git diff --check` / 文字化けパターン確認 / `git diff --cached --name-only`
-- 前回の diff.txt を削除してから、今回の差分を diff.txt に出力
-- 作業完了通知の音（beep）
-
-diff.txt は、ユーザーがChatGPTへ貼って差分確認するための一時ファイルです。
-
-コミット対象には含めないでください。
-
-`tools/finish-check.ps1` の内容自体を変更する場合は、ユーザーの明示的な許可を得てください。
-
----
-
-## コマンド実行の注意
-
-Claude Codeは、作業完了確認として個別に `git diff` / `git diff --check` / `git status` / `echo` / `cat` / `type` などを組み合わせた一時コマンドを実行しないこと。
-
-作業完了時の確認は、原則として以下の1コマンドだけにまとめる。
+作業がすべて完了した最後に、完了通知と確認を兼ねて以下を1回だけ実行する。
 
 ```powershell
 tools\finish-check.cmd
 ```
 
-差分確認は、このコマンドが生成する diff.txt と標準出力を使うこと。
+このコマンドは、`git status` / `git diff --check` / 文字化けチェック / diff.txt生成 / 完了音（beep）をまとめて実行する。
 
-追加の個別コマンドを実行する必要がある場合は、実行前に理由を短く説明し、必要最小限にすること。
+diff.txt は、ユーザーがChatGPTへ貼って差分確認するための一時ファイルです。コミット対象には含めないでください。
+
+Claude Codeは、作業途中で個別の確認コマンドを実行せず、最後の `tools\finish-check.cmd` に集約すること。
+
+追加の確認コマンドがどうしても必要な場合は、実行前に「なぜ finish-check.cmd だけでは足りないのか」を短く説明し、ユーザーの明示的な許可を得ること。
+
+`tools/finish-check.ps1` / `tools/finish-check.cmd` の内容自体を変更する場合は、ユーザーの明示的な許可を得てください。

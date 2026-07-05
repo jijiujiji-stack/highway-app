@@ -23,6 +23,9 @@ const PROD_IC_CANDIDATE_COUNT = 5;
 // 入口比較でおすすめ対象にする最低短縮時間
 const MIN_ENTRANCE_RECOMMEND_SAVED_MINUTES = 5;
 
+// 出口比較でおすすめ対象にする最低節約効率（1分あたりの節約額）
+const MIN_EXIT_RECOMMEND_YEN_PER_DELAY_MINUTE = 10;
+
 // 実際に使用する候補IC数
 let isRealDriveTestMode = false;
 
@@ -11049,12 +11052,23 @@ function buildExitCandidateValueNote(result) {
                 result.yenPerDelayedMinute +
                 "円）";
 
+    const lowEfficiencyNote =
+        result.yenPerDelayedMinute !== null &&
+        result.yenPerDelayedMinute !== undefined &&
+        result.yenPerDelayedMinute <
+            MIN_EXIT_RECOMMEND_YEN_PER_DELAY_MINUTE
+            ? "。おすすめ条件の" +
+                MIN_EXIT_RECOMMEND_YEN_PER_DELAY_MINUTE +
+                "円/分未満のため、参考出口として表示しています"
+            : "";
+
     return (
         result.differenceFromAllHighway +
         "分の遅れで" +
         result.savedToll +
         "円節約" +
         efficiencyText +
+        lowEfficiencyNote +
         "。時間優先なら" +
         normalExitRecommendation
     );
@@ -11129,6 +11143,22 @@ function evaluateExitCandidateEligibility(result) {
         return {
             recommendationEligibility: "weak",
             weakReason: "許容遅れ超過",
+            valueNote
+        };
+    }
+
+    if (
+        result.differenceFromAllHighway > 0 &&
+        result.yenPerDelayedMinute !== null &&
+        result.yenPerDelayedMinute <
+            MIN_EXIT_RECOMMEND_YEN_PER_DELAY_MINUTE
+    ) {
+        return {
+            recommendationEligibility: "reference",
+            weakReason:
+                "節約効果が小さい（" +
+                result.yenPerDelayedMinute +
+                "円/分）",
             valueNote
         };
     }
@@ -12847,6 +12877,14 @@ function getBestIcV2ExclusionReason(
         if (result.yenPerDelayedMinute === null) {
             return "yenPerDelayedMinuteがnull";
         }
+        if (
+            !(
+                result.yenPerDelayedMinute >=
+                MIN_EXIT_RECOMMEND_YEN_PER_DELAY_MINUTE
+            )
+        ) {
+            return "節約効率が出口おすすめ最低効率未満";
+        }
     }
 
     if (result.recommendScore === null) {
@@ -13016,6 +13054,8 @@ function getBestExitIcV2(results) {
                 result.differenceFromAllHighway <=
                     acceptableDelayMinutes &&
                 result.yenPerDelayedMinute !== null &&
+                result.yenPerDelayedMinute >=
+                    MIN_EXIT_RECOMMEND_YEN_PER_DELAY_MINUTE &&
                 result.recommendScore !== null
             )
             .sort((a, b) => {
@@ -13065,6 +13105,30 @@ function getReferenceExitIcV2(results) {
 
     if (!Array.isArray(results)) {
         return null;
+    }
+
+    const lowEfficiencyCandidates =
+        results
+            .filter(result =>
+                result.recommendationEligibility === "reference"
+            )
+            .sort((a, b) => {
+
+                const scoreA = a.recommendScore ?? -Infinity;
+                const scoreB = b.recommendScore ?? -Infinity;
+
+                if (scoreA !== scoreB) {
+                    return scoreB - scoreA;
+                }
+
+                return (
+                    a.differenceFromAllHighway -
+                    b.differenceFromAllHighway
+                );
+            });
+
+    if (lowEfficiencyCandidates.length > 0) {
+        return lowEfficiencyCandidates[0];
     }
 
     const candidates =
@@ -13141,6 +13205,9 @@ function buildExitIcComparisonV2CardHtml(result) {
     const isWeakCandidate =
         result.recommendationEligibility === "weak";
 
+    const isReferenceCandidate =
+        result.recommendationEligibility === "reference";
+
     const hasNoSaving =
         !hasError &&
         result.savedToll !== null &&
@@ -13160,6 +13227,7 @@ function buildExitIcComparisonV2CardHtml(result) {
         hasNoSaving ? "v2-exit-no-saving" : "",
         isExitOverThreshold ? "v2-exit-excluded" : "",
         isWeakCandidate ? "weak-comparison-candidate" : "",
+        isReferenceCandidate ? "v2-exit-reference-candidate" : "",
         hasError ? "v2-exit-error" : ""
     ]
         .filter(Boolean)
@@ -13860,17 +13928,33 @@ function updateDashboardWithBestExitIcV2() {
         lastRecommendationText =
             "おすすめ出口なし";
 
+        const isLowEfficiencyReference =
+            reference?.recommendationEligibility ===
+            "reference";
+
+        const referenceName =
+            isLowEfficiencyReference
+                ? "参考出口 " +
+                    (reference.candidateIcName || "--")
+                : "参考出口 " +
+                    (reference?.candidateIcName || "--") +
+                    "（条件外）";
+
+        const referenceNoteHtml =
+            isLowEfficiencyReference
+                ? reference.yenPerDelayedMinute +
+                    "円/分のため参考扱い<br>おすすめ条件：" +
+                    MIN_EXIT_RECOMMEND_YEN_PER_DELAY_MINUTE +
+                    "円/分以上"
+                : "※許容遅れ超過";
+
         if (dashboardReason) {
             dashboardReason.innerHTML =
                 reference
                     ? "<div class=\"v2-best-exit-card reference-candidate\">" +
                     "<div class=\"v2-best-exit-label\">おすすめ出口なし</div>" +
                     "<div class=\"v2-best-exit-name\">" +
-                    escapeHtml(
-                        "参考出口 " +
-                        (reference.candidateIcName || "--") +
-                        "（条件外）"
-                    ) +
+                    escapeHtml(referenceName) +
                     "</div>" +
                     "<div class=\"v2-best-exit-detail\">" +
                     escapeHtml(
@@ -13885,7 +13969,7 @@ function updateDashboardWithBestExitIcV2() {
                         ).replace(/<br>/g, " ")
                     ) +
                     "<div class=\"v2-reference-note\">" +
-                    "※許容遅れ超過" +
+                    referenceNoteHtml +
                     "</div>" +
                     "</div>" +
                     "</div>"

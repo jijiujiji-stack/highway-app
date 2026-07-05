@@ -1487,6 +1487,10 @@ details#searchPanel .origin-row input {
     color: var(--color-warning);
 }
 
+.v2-exit-reference-candidate {
+    opacity: 0.85;
+}
+
 .v2-ic-error {
     opacity: 0.5;
     border-color: #e74c3c;

@@ -374,6 +374,102 @@ function getShutoTollEstimateForIcPair(startIc, endIc) {
     return 0;
 }
 
+// 入口比較V2・出口比較V2で共通利用する候補料金概算。
+// 首都高IC同士は固定料金のみとし、首都高⇔非首都高をまたぐ場合は、
+// polylineAnalysisのnexcoEntranceIc/nexcoExitIcを使って首都高区間の
+// 距離ベース概算の二重計上を避ける。取得できない場合は既存の
+// startIc→endIc距離ベース計算にフォールバックする。
+async function estimateComparisonCandidateToll({
+    startIc,
+    endIc,
+    startGoogleName,
+    endGoogleName,
+    fallbackDistanceMeters,
+    polylineAnalysis = null
+}) {
+
+    const shutoToll =
+        getShutoTollEstimateForIcPair(
+            startIc,
+            endIc
+        );
+
+    const startIsShuto = isShutoIc(startIc);
+    const endIsShuto = isShutoIc(endIc);
+
+    // ルールA：首都高IC同士は距離ベース概算を重ねず、固定料金のみ。
+    if (startIsShuto && endIsShuto) {
+        return shutoToll;
+    }
+
+    let tollFromGoogleName = startGoogleName;
+    let tollToGoogleName = endGoogleName;
+
+    if (startIsShuto && !endIsShuto) {
+
+        // ルールB：首都高入口の違いで料金が揺れないよう、
+        // NEXCO側入口〜endIcの区間だけを距離ベース概算の対象にする。
+        const nexcoEntranceGoogleName =
+            polylineAnalysis?.nexcoEntranceIc?.googleName;
+
+        if (nexcoEntranceGoogleName) {
+            tollFromGoogleName = nexcoEntranceGoogleName;
+        }
+    }
+    else if (!startIsShuto && endIsShuto) {
+
+        // ルールC：首都高に入る直前のNEXCO側ICまでの区間だけを
+        // 距離ベース概算の対象にする。
+        const nexcoExitGoogleName =
+            polylineAnalysis?.nexcoExitIc?.googleName;
+
+        if (nexcoExitGoogleName) {
+            tollToGoogleName = nexcoExitGoogleName;
+        }
+    }
+
+    let tollDistanceMeters = fallbackDistanceMeters;
+
+    if (
+        tollFromGoogleName &&
+        tollToGoogleName &&
+        tollFromGoogleName === tollToGoogleName
+    ) {
+
+        // 起点と終点が同一ICの場合は、距離ベース加算を発生させない。
+        tollDistanceMeters = 0;
+    }
+    else if (
+        tollFromGoogleName &&
+        tollToGoogleName
+    ) {
+
+        try {
+
+            const tollRoute =
+                await getHighwayRouteForTollEstimate(
+                    tollFromGoogleName,
+                    tollToGoogleName
+                );
+
+            tollDistanceMeters =
+                tollRoute.distanceMeters;
+
+        } catch (error) {
+
+            // ルールD：距離取得に失敗した場合は、既存のfallback距離を使う。
+            tollDistanceMeters = fallbackDistanceMeters;
+        }
+    }
+
+    return (
+        Math.round(
+            (tollDistanceMeters / 1000) * 24
+        ) +
+        shutoToll
+    );
+}
+
 function shortenHighwayRoadName(roadName) {
     const value = String(roadName || "").trim();
 
@@ -11432,44 +11528,17 @@ async function searchEntranceIcComparisonV2(options = {}) {
                     lastTollEndIcGoogleName
                 );
 
-            const shutoToll =
-                getShutoTollEstimateForIcPair(
-                    exit,
-                    endIc
-                );
-
-            // 首都高IC同士は首都高固定料金のみで扱うため、
-            // 距離ベース概算（getHighwayRouteForTollEstimate）を重ねない。
-            const bothShuto =
-                isShutoIc(exit) &&
-                isShutoIc(endIc);
-
-            let tollDistanceMeters =
-                highwayFromCandidateRoute.distanceMeters;
-
-            if (
-                !bothShuto &&
-                lastTollEndIcGoogleName &&
-                exit.googleName !== lastTollEndIcGoogleName
-            ) {
-
-                const tollRoute =
-                    await getHighwayRouteForTollEstimate(
-                        exit.googleName,
-                        lastTollEndIcGoogleName
-                    );
-
-                tollDistanceMeters =
-                    tollRoute.distanceMeters;
-            }
-
             const estimatedToll =
-                bothShuto
-                    ? shutoToll
-                    : Math.round(
-                        (tollDistanceMeters / 1000) * 24
-                    ) +
-                    shutoToll;
+                await estimateComparisonCandidateToll({
+                    startIc: exit,
+                    endIc: endIc,
+                    startGoogleName: exit.googleName,
+                    endGoogleName: lastTollEndIcGoogleName,
+                    fallbackDistanceMeters:
+                        highwayFromCandidateRoute.distanceMeters,
+                    polylineAnalysis:
+                        lastHighwayRoutePolylineAnalysis
+                });
 
             const differenceFromAllLocal =
                 allLocalMinutes === null
@@ -11694,44 +11763,17 @@ async function searchExitIcComparisonV2(options = {}) {
                     lastTollStartIcGoogleName
                 );
 
-            const shutoToll =
-                getShutoTollEstimateForIcPair(
-                    startIc,
-                    exit
-                );
-
-            // 首都高IC同士は首都高固定料金のみで扱うため、
-            // 距離ベース概算（getHighwayRouteForTollEstimate）を重ねない。
-            const bothShuto =
-                isShutoIc(startIc) &&
-                isShutoIc(exit);
-
-            let tollDistanceMeters =
-                highwayToCandidateRoute.distanceMeters;
-
-            if (
-                !bothShuto &&
-                lastTollStartIcGoogleName &&
-                exit.googleName !== lastTollStartIcGoogleName
-            ) {
-
-                const tollRoute =
-                    await getHighwayRouteForTollEstimate(
-                        lastTollStartIcGoogleName,
-                        exit.googleName
-                    );
-
-                tollDistanceMeters =
-                    tollRoute.distanceMeters;
-            }
-
             const exitTollEstimate =
-                bothShuto
-                    ? shutoToll
-                    : Math.round(
-                        (tollDistanceMeters / 1000) * 24
-                    ) +
-                    shutoToll;
+                await estimateComparisonCandidateToll({
+                    startIc: startIc,
+                    endIc: exit,
+                    startGoogleName: lastTollStartIcGoogleName,
+                    endGoogleName: exit.googleName,
+                    fallbackDistanceMeters:
+                        highwayToCandidateRoute.distanceMeters,
+                    polylineAnalysis:
+                        lastHighwayRoutePolylineAnalysis
+                });
 
             const savedToll =
                 allHighwayToll === null

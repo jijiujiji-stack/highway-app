@@ -10135,7 +10135,12 @@ function findIcDefinitionForMultiExitComparison(googleName) {
         }
     }
 
-    return null;
+    const foundShutoIc =
+        getAllShutoIcDefinitions().find(shutoIc =>
+            shutoIc.googleName === googleName
+        );
+
+    return foundShutoIc || null;
 }
 
 function buildRoutesLocationForIcOrAddress(value) {

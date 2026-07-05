@@ -11003,7 +11003,6 @@ function buildExitCandidateValueNote(result) {
         !result ||
         result.savedToll === null ||
         result.savedToll === undefined ||
-        result.savedToll <= 0 ||
         result.differenceFromAllHighway === null ||
         result.differenceFromAllHighway === undefined
     ) {
@@ -11011,7 +11010,35 @@ function buildExitCandidateValueNote(result) {
     }
 
     if (result.differenceFromAllHighway <= 0) {
-        return "遅れなしで節約あり";
+        return result.savedToll > 0 ? "遅れなしで節約あり" : "";
+    }
+
+    const normalExitIcName =
+        getNormalHighwayExitIcName();
+
+    const normalExitRecommendation =
+        normalExitIcName
+            ? "通常出口（" + normalExitIcName + "）がおすすめ"
+            : "通常出口がおすすめ";
+
+    if (result.savedToll < 0) {
+        return (
+            result.differenceFromAllHighway +
+            "分の遅れで" +
+            Math.abs(result.savedToll).toLocaleString() +
+            "円高い" +
+            "。時間優先なら" +
+            normalExitRecommendation
+        );
+    }
+
+    if (result.savedToll === 0) {
+        return (
+            result.differenceFromAllHighway +
+            "分の遅れで0円節約" +
+            "。時間優先なら" +
+            normalExitRecommendation
+        );
     }
 
     const efficiencyText =
@@ -11021,14 +11048,6 @@ function buildExitCandidateValueNote(result) {
             : "（1分あたり" +
                 result.yenPerDelayedMinute +
                 "円）";
-
-    const normalExitIcName =
-        getNormalHighwayExitIcName();
-
-    const normalExitRecommendation =
-        normalExitIcName
-            ? "通常出口（" + normalExitIcName + "）がおすすめ"
-            : "通常出口がおすすめ";
 
     return (
         result.differenceFromAllHighway +

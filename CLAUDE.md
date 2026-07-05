@@ -308,10 +308,10 @@ Claude Codeは、実装担当です。
 
 ## 作業完了時の必須処理
 
-作業完了時は、リポジトリ直下でPowerShellから以下の1コマンドを実行してください。
+作業完了時は、リポジトリ直下で以下の1コマンドを実行してください。
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\tools\finish-check.ps1
+tools\finish-check.cmd
 ```
 
 このスクリプトは以下をまとめて行います。

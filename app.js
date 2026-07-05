@@ -11691,10 +11691,17 @@ async function searchExitIcComparisonV2(options = {}) {
                     exit
                 );
 
+            // 首都高IC同士は首都高固定料金のみで扱うため、
+            // 距離ベース概算（getHighwayRouteForTollEstimate）を重ねない。
+            const bothShuto =
+                isShutoIc(startIc) &&
+                isShutoIc(exit);
+
             let tollDistanceMeters =
                 highwayToCandidateRoute.distanceMeters;
 
             if (
+                !bothShuto &&
                 lastTollStartIcGoogleName &&
                 exit.googleName !== lastTollStartIcGoogleName
             ) {
@@ -11710,10 +11717,12 @@ async function searchExitIcComparisonV2(options = {}) {
             }
 
             const exitTollEstimate =
-                Math.round(
-                    (tollDistanceMeters / 1000) * 24
-                ) +
-                shutoToll;
+                bothShuto
+                    ? shutoToll
+                    : Math.round(
+                        (tollDistanceMeters / 1000) * 24
+                    ) +
+                    shutoToll;
 
             const savedToll =
                 allHighwayToll === null

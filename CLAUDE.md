@@ -303,3 +303,33 @@ git push origin master
 
 Claude Codeは、実装担当です。
 仕様判断・大きな設計変更・削除判断は、ユーザー確認を挟んでください。
+
+---
+
+## 作業完了時の必須処理
+
+作業完了時は、PowerShellで以下を実行してください。
+
+```powershell
+git status
+git diff --check
+Select-String -Path app.js,index.html,style.css -Pattern "鬥|鬮|竊|繝"
+git diff --cached --name-only
+```
+
+前回の diff.txt があれば削除してから、今回の差分を diff.txt に出力してください。
+
+diff.txt は、ユーザーがChatGPTへ貼って差分確認するための一時ファイルです。
+
+コミット対象には含めないでください。
+
+```powershell
+Remove-Item diff.txt -ErrorAction SilentlyContinue
+git --no-pager diff -- app.js style.css index.html PROJECT_HANDOFF.md CLAUDE.md | Out-File -FilePath diff.txt -Encoding utf8
+```
+
+最後に、作業完了通知として以下のPowerShellコマンドで音を鳴らしてください。
+
+```powershell
+[console]::beep(800,300); [console]::beep(1000,300); [console]::beep(1200,500)
+```

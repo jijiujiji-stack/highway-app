@@ -5584,30 +5584,30 @@ async function estimateMainHighwayToll(
         }
 
         if (
-            legacyStartIc?.googleName &&
-            legacyEndIc?.googleName
+            startIc.googleName &&
+            endIc.googleName
         ) {
             lastTollStartIcName =
-                legacyStartIc.displayName;
+                startIc.displayName;
             lastTollStartIc =
-                legacyStartIc;
+                startIc;
 
             lastTollStartIcGoogleName =
-                legacyStartIc.googleName;
+                startIc.googleName;
 
             lastTollStartIcOrder =
-                legacyStartIc.order;
+                startIc.order ?? null;
 
             lastTollEndIcName =
-                legacyEndIc.displayName;
+                endIc.displayName;
             lastTollEndIc =
-                legacyEndIc;
+                endIc;
 
             lastTollEndIcGoogleName =
-                legacyEndIc.googleName;
+                endIc.googleName;
 
             lastTollEndIcOrder =
-                legacyEndIc.order;
+                endIc.order ?? null;
         }
 
         const shutoToll = shutoTollEstimate;

@@ -5760,23 +5760,25 @@ async function estimateMainHighwayToll(
             };
         }
 
-        const tollRoute =
-            await getHighwayRouteForTollEstimate(
-                startIc.googleName,
-                endIc.googleName
-            );
-
-        const tollKm =
-            tollRoute.distanceMeters / 1000;
+        const amount =
+            await estimateComparisonCandidateToll({
+                startIc,
+                endIc,
+                startGoogleName: startIc.googleName,
+                endGoogleName: endIc.googleName,
+                fallbackDistanceMeters:
+                    highwayRoute.distanceMeters,
+                polylineAnalysis
+            });
 
         const baseToll =
-            Math.round(
-                tollKm * 24
+            Math.max(
+                0,
+                amount - shutoToll
             );
 
         return {
-            amount:
-                baseToll + shutoToll,
+            amount,
             highwayToll: baseToll,
             shutoToll,
             label:

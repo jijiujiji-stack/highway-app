@@ -447,6 +447,41 @@ Routes API候補数上限は変更していません。
 
 ---
 
+### 8. V2候補料金計算の共通化と首都高固定料金の整理
+
+入口比較V2・出口比較V2の候補料金計算を、共通ヘルパー `estimateComparisonCandidateToll(...)` に統一しました。
+
+対象：
+
+- `searchEntranceIcComparisonV2`
+- `searchExitIcComparisonV2`
+
+通常検索の `estimateMainHighwayToll` は今回未変更です。
+
+首都高固定料金は `SHUTO_TOLL_ESTIMATE_YEN = 1000` を使用します。
+
+料金ルール：
+
+- 首都高IC → 首都高IC：距離ベース概算を重ねず、首都高固定1,000円のみ
+- 首都高IC → 非首都高IC：首都高固定1,000円 + NEXCO入口以降の距離ベース概算
+- 非首都高IC → 首都高IC：非首都高区間の距離ベース概算 + 首都高固定1,000円
+- 非首都高IC → 非首都高IC：従来どおり距離ベース概算
+
+`polylineAnalysis.nexcoEntranceIc` / `nexcoExitIc` を使って、首都高区間への距離ベース二重計上を避けています。
+
+必要なIC情報が取れない場合は、既存の距離（fallbackDistanceMeters）を使うフォールバックがあります。
+
+表示側：
+
+- 入口比較カード：「料金目安：首都高 約1,000円 + 他道路 約◯円」の内訳表示を追加済み
+- 出口比較カード：「通常 約◯円 / この出口 約◯円」の料金目安表示を追加済み
+
+API呼び出し数：
+
+Routes API呼び出し数を増やさない方針です。首都高IC同士では、料金概算用の `getHighwayRouteForTollEstimate` を呼ばないため、むしろ呼び出し回数が減る場合があります。
+
+---
+
 ## 最近の手動確認例
 
 ### 荒川区役所 → 東京ディズニーランド

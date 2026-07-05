@@ -11571,7 +11571,9 @@ async function searchExitIcComparisonV2(options = {}) {
             await estimateMainHighwayToll(
                 allHighwayRoute,
                 origin,
-                destination
+                destination,
+                null,
+                lastHighwayRoutePolylineAnalysis
             );
 
         allHighwayToll =
@@ -13260,10 +13262,10 @@ function formatExitV2SavingText(savedToll) {
     }
 
     if (savedToll < 0) {
-        return "節約なし";
+        return Math.abs(savedToll).toLocaleString() + "円高い";
     }
 
-    return "節約なし";
+    return "0円節約";
 }
 
 function displayEntranceIcComparisonV2Results(results) {

@@ -13263,6 +13263,12 @@ function buildExitIcComparisonV2CardHtml(result) {
     const savingText =
         formatExitV2SavingText(result.savedToll);
 
+    const tollBreakdownText =
+        formatExitV2TollBreakdownText(
+            result.allHighwayToll,
+            result.exitTollEstimate
+        );
+
     const yenPerDelayedMinuteText =
         result.yenPerDelayedMinute === null ||
             result.savedToll <= 0
@@ -13311,6 +13317,7 @@ function buildExitIcComparisonV2CardHtml(result) {
         delayText +
         "<br>" +
         savingText +
+        tollBreakdownText +
         yenPerDelayedMinuteText +
         "<br>合計" +
         formatV2Duration(result.totalMinutes) +
@@ -13358,6 +13365,26 @@ function formatExitV2SavingText(savedToll) {
     }
 
     return "0円節約";
+}
+
+function formatExitV2TollBreakdownText(allHighwayToll, exitTollEstimate) {
+
+    if (
+        allHighwayToll === null ||
+        allHighwayToll === undefined ||
+        exitTollEstimate === null ||
+        exitTollEstimate === undefined
+    ) {
+        return "";
+    }
+
+    return (
+        "<br>料金目安：通常 約" +
+        allHighwayToll.toLocaleString() +
+        "円 / この出口 約" +
+        exitTollEstimate.toLocaleString() +
+        "円"
+    );
 }
 
 function displayEntranceIcComparisonV2Results(results) {

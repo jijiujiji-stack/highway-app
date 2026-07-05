@@ -11540,6 +11540,20 @@ async function searchEntranceIcComparisonV2(options = {}) {
                         lastHighwayRoutePolylineAnalysis
                 });
 
+            // 料金目安の内訳表示用。距離計算をやり直さず、
+            // 既知のestimatedToll/shutoTollから他道路分を逆算する。
+            const shutoToll =
+                getShutoTollEstimateForIcPair(
+                    exit,
+                    endIc
+                );
+
+            const nonShutoToll =
+                Math.max(
+                    0,
+                    estimatedToll - shutoToll
+                );
+
             const differenceFromAllLocal =
                 allLocalMinutes === null
                     ? null
@@ -11563,6 +11577,8 @@ async function searchEntranceIcComparisonV2(options = {}) {
                 totalMinutes: totalMinutes,
                 totalDistanceKm: totalDistanceKm,
                 estimatedToll: estimatedToll,
+                shutoToll: shutoToll,
+                nonShutoToll: nonShutoToll,
                 tollLabel:
                     exit &&
                     lastTollEndIc
@@ -11600,6 +11616,8 @@ async function searchEntranceIcComparisonV2(options = {}) {
                 totalMinutes: null,
                 totalDistanceKm: null,
                 estimatedToll: null,
+                shutoToll: null,
+                nonShutoToll: null,
                 tollLabel:
                     exit &&
                     lastTollEndIc
@@ -14479,6 +14497,12 @@ function buildEntranceIcComparisonV2CardHtml(result) {
             : result.yenPerSavedMinute.toLocaleString() +
             "円/分";
 
+    const tollBreakdownText =
+        formatEntranceV2TollBreakdownText(
+            result.shutoToll,
+            result.nonShutoToll
+        );
+
     const weakCandidateNote =
         isWeakCandidate
             ? "<div class=\"weak-comparison-note\">" +
@@ -14502,6 +14526,7 @@ function buildEntranceIcComparisonV2CardHtml(result) {
         "<br>ETC 約" +
         result.estimatedToll.toLocaleString() +
         "円" +
+        tollBreakdownText +
         "<br>" +
         yenPerMinuteText +
         "<br>合計" +
@@ -14559,6 +14584,46 @@ function formatV2SavingText(differenceFromAllLocal) {
     }
 
     return "短縮なし<br>全下道と同じ";
+}
+
+function formatEntranceV2TollBreakdownText(shutoToll, nonShutoToll) {
+
+    if (
+        shutoToll === null ||
+        shutoToll === undefined ||
+        nonShutoToll === null ||
+        nonShutoToll === undefined
+    ) {
+        return "";
+    }
+
+    if (shutoToll > 0 && nonShutoToll > 0) {
+        return (
+            "<br>料金目安：首都高 約" +
+            shutoToll.toLocaleString() +
+            "円 + 他道路 約" +
+            nonShutoToll.toLocaleString() +
+            "円"
+        );
+    }
+
+    if (shutoToll > 0) {
+        return (
+            "<br>料金目安：首都高 約" +
+            shutoToll.toLocaleString() +
+            "円"
+        );
+    }
+
+    if (nonShutoToll > 0) {
+        return (
+            "<br>料金目安：他道路 約" +
+            nonShutoToll.toLocaleString() +
+            "円"
+        );
+    }
+
+    return "";
 }
 
 function escapeHtml(value) {

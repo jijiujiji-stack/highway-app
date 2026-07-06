@@ -13759,10 +13759,8 @@ function updateDashboardWithBestEntranceIcV2() {
                     ) +
                     "</div>" +
                     "<div class=\"v2-best-detail\">" +
-                    escapeHtml(
-                        formatV2SavingText(
-                            reference.differenceFromAllLocal
-                        )
+                    formatV2SavingText(
+                        reference.differenceFromAllLocal
                     ) +
                     " / " +
                     escapeHtml(

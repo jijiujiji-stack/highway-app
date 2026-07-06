@@ -8421,7 +8421,9 @@ function buildPolylineBasedComparisonIcCandidates(
     }
     else if (candidateAreas.length === 0) {
         reason =
-            "Polyline道路エリアを特定できないため候補なし";
+            entranceCandidateIcs.length > 0
+                ? "NEXCO道路エリアなし（首都高候補のみで抽出）"
+                : "Polyline道路エリアを特定できないため候補なし";
     }
     else if (entranceCandidateIcs.length === 0) {
         reason =
@@ -8643,12 +8645,29 @@ function selectLimitedComparisonIcCandidates(
     maxCount
 ) {
 
+    if (!Array.isArray(candidates) || maxCount <= 0) {
+        return [];
+    }
+
+    // NEXCO側の基準IC（referenceIc）が無いルート（首都高のみで完結する
+    // ルート等）でも、首都高候補が1件でもあればそれだけで処理を続行する。
+    const hasShutoCandidateWithoutReference =
+        !referenceIc &&
+        candidates.some(candidate =>
+            candidate?.exit &&
+            isShutoIcForRouteAnalysis(candidate.exit)
+        );
+
+    if (!referenceIc && !hasShutoCandidateWithoutReference) {
+        return [];
+    }
+
     if (
-        !Array.isArray(candidates) ||
-        !referenceIc ||
-        referenceIc.isSelectable === false ||
-        referenceIc.entranceSelectable === false ||
-        maxCount <= 0
+        referenceIc &&
+        (
+            referenceIc.isSelectable === false ||
+            referenceIc.entranceSelectable === false
+        )
     ) {
         return [];
     }
@@ -8714,7 +8733,7 @@ function selectLimitedComparisonIcCandidates(
         );
 
     const selectAroundReference = count => {
-        if (count <= 0) {
+        if (count <= 0 || !referenceIc) {
             return [];
         }
 
@@ -8763,8 +8782,12 @@ function selectLimitedComparisonIcCandidates(
         );
     };
 
+    // referenceIc（NEXCO側の基準IC）が無い場合は非首都高候補を
+    // 探しようがないため、首都高候補だけでmaxCountまで埋める。
     const reservedNonShutoCount =
-        maxCount >= 5 ? 2 : 1;
+        !referenceIc
+            ? 0
+            : maxCount >= 5 ? 2 : 1;
 
     const shutoLimit = Math.max(
         0,

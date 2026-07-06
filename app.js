@@ -26,6 +26,10 @@ const MIN_ENTRANCE_RECOMMEND_SAVED_MINUTES = 5;
 // 出口比較でおすすめ対象にする最低節約効率（1分あたりの節約額）
 const MIN_EXIT_RECOMMEND_YEN_PER_DELAY_MINUTE = 10;
 
+// 出口比較の総合スコアで使う時間価値の換算レート（1分あたり円）。
+// 仮置きの値。実車テストで違和感が出たら調整する。
+const EXIT_TIME_VALUE_YEN_PER_MINUTE = 20;
+
 // 実際に使用する候補IC数
 let isRealDriveTestMode = false;
 
@@ -11852,6 +11856,9 @@ async function searchExitIcComparisonV2(options = {}) {
             result.recommendScore =
                 calculateExitRecommendScoreV2(result);
 
+            result.totalValueScore =
+                calculateExitTotalValueScoreV2(result);
+
             lastExitIcV2Results.push(result);
 
         } catch (error) {
@@ -11874,7 +11881,8 @@ async function searchExitIcComparisonV2(options = {}) {
                 baselineError: baselineError,
                 error: error.message || String(error),
                 recommendScore: null,
-                recommendScoreDetail: null
+                recommendScoreDetail: null,
+                totalValueScore: null
             });
         }
     }
@@ -12005,6 +12013,30 @@ function calculateExitRecommendScoreDetailV2(result) {
         efficiencyScore:
             Math.min(result.yenPerDelayedMinute, 60)
     };
+}
+
+// 「遅いけど安い」候補と「速くて安い」候補を同じ基準で比較するための総合スコア。
+// differenceFromAllHighwayは遅れならプラス、速くなるならマイナス。
+function calculateExitTotalValueScoreV2(result) {
+
+    if (
+        !result ||
+        result.error ||
+        result.savedToll === null ||
+        result.savedToll === undefined ||
+        result.differenceFromAllHighway === null ||
+        result.differenceFromAllHighway === undefined
+    ) {
+        return null;
+    }
+
+    return (
+        result.savedToll -
+        (
+            result.differenceFromAllHighway *
+            EXIT_TIME_VALUE_YEN_PER_MINUTE
+        )
+    );
 }
 
 function dumpV2TestSummary() {
@@ -12945,31 +12977,18 @@ function getBestIcV2ExclusionReason(
         }
     }
     else {
-        if (!(result.savedToll > 0)) {
-            return "savedTollが0以下";
+        if (result.recommendationEligibility !== "eligible") {
+            return (
+                "recommendationEligibilityがeligibleでない（" +
+                (result.weakReason || "理由不明") +
+                "）"
+            );
         }
-        if (!(result.differenceFromAllHighway > 0)) {
-            return "differenceFromAllHighwayが0以下";
+        if (result.totalValueScore === null) {
+            return "totalValueScoreがnull";
         }
-        if (
-            !(
-                result.differenceFromAllHighway <=
-                acceptableDelayMinutes
-            )
-        ) {
-            return "遅延時間が許容時間条件超過";
-        }
-        if (result.yenPerDelayedMinute === null) {
-            return "yenPerDelayedMinuteがnull";
-        }
-        if (
-            !(
-                result.yenPerDelayedMinute >=
-                MIN_EXIT_RECOMMEND_YEN_PER_DELAY_MINUTE
-            )
-        ) {
-            return "節約効率が出口おすすめ最低効率未満";
-        }
+
+        return "なし";
     }
 
     if (result.recommendScore === null) {
@@ -13133,25 +13152,19 @@ function getBestExitIcV2(results) {
     const candidates =
         recommendationPool
             .filter(result =>
-                !result.error &&
-                result.savedToll > 0 &&
-                result.differenceFromAllHighway > 0 &&
-                result.differenceFromAllHighway <=
-                    acceptableDelayMinutes &&
-                result.yenPerDelayedMinute !== null &&
-                result.yenPerDelayedMinute >=
-                    MIN_EXIT_RECOMMEND_YEN_PER_DELAY_MINUTE &&
-                result.recommendScore !== null
+                result.recommendationEligibility ===
+                    "eligible" &&
+                result.totalValueScore !== null
             )
             .sort((a, b) => {
 
                 if (
-                    a.recommendScore !==
-                    b.recommendScore
+                    a.totalValueScore !==
+                    b.totalValueScore
                 ) {
                     return (
-                        b.recommendScore -
-                        a.recommendScore
+                        b.totalValueScore -
+                        a.totalValueScore
                     );
                 }
 

@@ -13532,6 +13532,8 @@ function getBestEntranceIcV2(results) {
         recommendationPool
             .filter(result =>
                 !result.error &&
+                result.recommendationEligibility ===
+                    "eligible" &&
                 result.differenceFromAllLocal > 0 &&
                 result.differenceFromAllLocal >=
                     MIN_ENTRANCE_RECOMMEND_SAVED_MINUTES &&

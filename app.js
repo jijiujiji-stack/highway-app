@@ -11114,6 +11114,21 @@ function evaluateEntranceCandidateEligibility(result) {
     }
 
     if (
+        result.differenceFromAllLocal <
+        MIN_ENTRANCE_RECOMMEND_SAVED_MINUTES
+    ) {
+        return {
+            recommendationEligibility: "weak",
+            weakReason:
+                "短縮時間が" +
+                result.differenceFromAllLocal +
+                "分と短い（" +
+                MIN_ENTRANCE_RECOMMEND_SAVED_MINUTES +
+                "分未満）"
+        };
+    }
+
+    if (
         result.yenPerSavedMinute !== null &&
         result.yenPerSavedMinute !== undefined &&
         result.yenPerSavedMinute > 100
@@ -13785,7 +13800,8 @@ function updateDashboardWithBestEntranceIcV2() {
                             : "円/分なし"
                     ) +
                     "<div class=\"v2-reference-note\">" +
-                    "※許容条件外" +
+                    "※おすすめ対象外: " +
+                    escapeHtml(reference.weakReason || "条件外") +
                     "</div>" +
                     "</div>" +
                     "</div>"

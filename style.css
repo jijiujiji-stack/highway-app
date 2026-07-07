@@ -257,7 +257,8 @@ button {
 
 .dashboard-assumed-route-label {
     margin-right: 6px;
-    color: #9ab0c9;
+    color: var(--color-text-main);
+    font-size: 12px;
     font-weight: normal;
 }
 

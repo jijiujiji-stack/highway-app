@@ -14242,7 +14242,7 @@ function updateDashboardWithBestExitIcV2() {
     if (dashboardReason) {
         dashboardReason.innerHTML =
             "<div class=\"v2-best-exit-card\">" +
-            "<div class=\"v2-best-exit-name\">" +
+            "<div class=\"v2-best-exit-name v2-best-exit-name-confirmed\">" +
             escapeHtml(best.candidateIcName) +
             "</div>" +
             "<div class=\"v2-best-exit-detail\">" +

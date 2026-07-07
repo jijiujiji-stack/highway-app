@@ -403,6 +403,10 @@ button {
     margin-bottom: 8px;
 }
 
+#dashboardReason .v2-best-exit-name-confirmed {
+    color: var(--color-good);
+}
+
 #dashboardReason .v2-best-exit-detail {
     font-size: 14px;
     color: #ddd;

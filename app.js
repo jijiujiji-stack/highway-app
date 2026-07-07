@@ -13803,7 +13803,7 @@ function updateDashboardWithBestEntranceIcV2() {
             dashboardReason.innerHTML =
                 reference
                     ? "<div class=\"v2-best-entrance-card reference-candidate\">" +
-                    "<div class=\"v2-best-label\">おすすめ入口なし</div>" +
+                    "<div class=\"v2-best-label\">参考入口</div>" +
                     "<div class=\"v2-best-name\">" +
                     escapeHtml(
                         "参考入口 " +
@@ -14119,7 +14119,7 @@ function updateDashboardWithBestExitIcV2() {
             dashboardReason.innerHTML =
                 reference
                     ? "<div class=\"v2-best-exit-card reference-candidate\">" +
-                    "<div class=\"v2-best-exit-label\">おすすめ出口なし</div>" +
+                    "<div class=\"v2-best-exit-label\">参考出口</div>" +
                     "<div class=\"v2-best-exit-name\">" +
                     escapeHtml(referenceName) +
                     "</div>" +

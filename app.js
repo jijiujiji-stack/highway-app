@@ -13740,6 +13740,17 @@ function updateDashboardWithBestEntranceIcV2() {
         dashboardCard.classList.add(
             best ? "recommend-highway" : "recommend-local"
         );
+
+        dashboardCard.classList.remove(
+            "v2-dashboard-recommendation-good",
+            "v2-dashboard-recommendation-none"
+        );
+
+        dashboardCard.classList.add(
+            best
+                ? "v2-dashboard-recommendation-good"
+                : "v2-dashboard-recommendation-none"
+        );
     }
 
     const dashboardStars =
@@ -14035,6 +14046,17 @@ function updateDashboardWithBestExitIcV2() {
 
         dashboardCard.classList.add(
             best ? "recommend-neutral" : "recommend-highway"
+        );
+
+        dashboardCard.classList.remove(
+            "v2-dashboard-recommendation-good",
+            "v2-dashboard-recommendation-none"
+        );
+
+        dashboardCard.classList.add(
+            best
+                ? "v2-dashboard-recommendation-good"
+                : "v2-dashboard-recommendation-none"
         );
     }
 

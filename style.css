@@ -482,6 +482,14 @@ button {
     color: var(--color-bad);
 }
 
+.v2-dashboard-recommendation-good #dashboardRecommendation {
+    color: var(--color-good);
+}
+
+.v2-dashboard-recommendation-none #dashboardRecommendation {
+    color: #ccc;
+}
+
 .time-box {
 
     background: #222;

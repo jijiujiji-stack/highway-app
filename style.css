@@ -423,6 +423,10 @@ button {
     color: #ccc;
 }
 
+.v2-reference-note-lowefficiency {
+    color: var(--color-warning);
+}
+
 .v2-best-unit {
     margin-top: 4px;
     font-size: 14px;

@@ -14115,6 +14115,11 @@ function updateDashboardWithBestExitIcV2() {
                         reference?.weakReason || "条件外"
                     );
 
+        const referenceNoteClassName =
+            isLowEfficiencyReference
+                ? "v2-reference-note v2-reference-note-lowefficiency"
+                : "v2-reference-note";
+
         if (dashboardReason) {
             dashboardReason.innerHTML =
                 reference
@@ -14135,7 +14140,7 @@ function updateDashboardWithBestExitIcV2() {
                             reference.differenceFromAllHighway
                         ).replace(/<br>/g, " ")
                     ) +
-                    "<div class=\"v2-reference-note\">" +
+                    "<div class=\"" + referenceNoteClassName + "\">" +
                     referenceNoteHtml +
                     "</div>" +
                     "</div>" +

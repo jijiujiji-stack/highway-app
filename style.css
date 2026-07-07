@@ -4,6 +4,7 @@
     --color-equal: #81d4fa;
     --color-warning: #f1c40f;
     --color-text-main: #ffffff;
+    --color-info: #b39ddb;
 }
 
 body {
@@ -266,7 +267,7 @@ button {
     padding: 0 4px;
     border-radius: 999px;
     background: rgba(120, 170, 220, 0.08);
-    color: #b9d8ff;
+    color: var(--color-info);
     font-size: 12px;
     font-weight: bold;
     line-height: 1.2;
@@ -644,6 +645,10 @@ button {
 
 .value-good {
     color: #7bed9f;
+}
+
+.v2-dashboard-value-info {
+    color: var(--color-info);
 }
 
 .value-normal {

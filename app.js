@@ -13845,6 +13845,9 @@ function updateDashboardWithBestEntranceIcV2() {
         if (dashboardValueJudge) {
             dashboardValueJudge.className = "";
             dashboardValueJudge.classList.add("value-good");
+            dashboardValueJudge.classList.add(
+                "v2-dashboard-value-info"
+            );
             dashboardValueJudge.textContent =
                 "🚗 有料回避推奨";
         }
@@ -14173,6 +14176,9 @@ function updateDashboardWithBestExitIcV2() {
         if (dashboardValueJudge) {
             dashboardValueJudge.className = "";
             dashboardValueJudge.classList.add("value-good");
+            dashboardValueJudge.classList.add(
+                "v2-dashboard-value-info"
+            );
             dashboardValueJudge.textContent =
                 "🚙 高速継続推奨";
         }

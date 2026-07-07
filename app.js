@@ -13803,8 +13803,8 @@ function updateDashboardWithBestEntranceIcV2() {
             dashboardReason.innerHTML =
                 reference
                     ? "<div class=\"v2-best-entrance-card reference-candidate\">" +
-                    "<div class=\"v2-best-label\">参考入口</div>" +
-                    "<div class=\"v2-best-name\">" +
+                    "<div class=\"v2-best-label v2-reference-label\">参考入口</div>" +
+                    "<div class=\"v2-best-name v2-reference-name\">" +
                     escapeHtml(
                         "参考入口 " +
                         (reference.candidateIcName || "--") +

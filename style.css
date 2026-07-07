@@ -355,6 +355,10 @@ button {
     margin-bottom: 8px;
 }
 
+#dashboardReason .v2-reference-name {
+    color: var(--color-warning);
+}
+
 #dashboardReason .v2-best-time-badge {
     display: inline-flex;
     align-items: center;
@@ -1635,6 +1639,10 @@ details#searchPanel .origin-row input {
     color: #7bed9f;
     font-weight: bold;
     margin-bottom: 6px;
+}
+
+.v2-reference-label {
+    color: var(--color-warning);
 }
 
 .v2-best-name {

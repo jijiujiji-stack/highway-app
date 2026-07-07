@@ -1484,7 +1484,7 @@ details#searchPanel .origin-row input {
 .v2-exit-excluded-note {
     margin-top: 6px;
     font-size: 12px;
-    color: var(--color-warning);
+    color: #ccc;
 }
 
 .v2-exit-reference-candidate {
@@ -1576,7 +1576,7 @@ details#searchPanel .origin-row input {
 .weak-comparison-note {
     margin-top: 6px;
     font-size: 12px;
-    color: var(--color-warning);
+    color: #ccc;
 }
 
 .v2-best-exit-card {

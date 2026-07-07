@@ -13799,7 +13799,7 @@ function updateDashboardWithBestEntranceIcV2() {
         );
 
         if (dashboardStars) {
-            dashboardStars.textContent = "🚗";
+            dashboardStars.textContent = "";
         }
 
         if (dashboardRecommendation) {
@@ -13846,7 +13846,7 @@ function updateDashboardWithBestEntranceIcV2() {
             dashboardValueJudge.className = "";
             dashboardValueJudge.classList.add("value-good");
             dashboardValueJudge.textContent =
-                "有料回避推奨";
+                "🚗 有料回避推奨";
         }
 
         if (dashboardHighway) {
@@ -13926,7 +13926,7 @@ function updateDashboardWithBestEntranceIcV2() {
     }
 
     if (dashboardStars) {
-        dashboardStars.textContent = "🚙";
+        dashboardStars.textContent = "";
     }
 
     setDashboardRouteDimmed(false, false);
@@ -14103,7 +14103,7 @@ function updateDashboardWithBestExitIcV2() {
         );
 
         if (dashboardStars) {
-            dashboardStars.textContent = "🚙";
+            dashboardStars.textContent = "";
         }
 
         if (dashboardRecommendation) {
@@ -14174,7 +14174,7 @@ function updateDashboardWithBestExitIcV2() {
             dashboardValueJudge.className = "";
             dashboardValueJudge.classList.add("value-good");
             dashboardValueJudge.textContent =
-                "高速継続推奨";
+                "🚙 高速継続推奨";
         }
 
         if (dashboardHighway) {
@@ -14253,7 +14253,7 @@ function updateDashboardWithBestExitIcV2() {
     }
 
     if (dashboardStars) {
-        dashboardStars.textContent = "🚗";
+        dashboardStars.textContent = "";
     }
 
     setDashboardRouteDimmed(false, false);

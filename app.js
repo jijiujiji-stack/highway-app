@@ -13378,7 +13378,7 @@ function buildExitIcComparisonV2CardHtml(result) {
             "<div class=\"v2-exit-name\">" +
             icName +
             "</div>" +
-            "<div class=\"v2-exit-main\">取得失敗</div>" +
+            "<div class=\"v2-exit-main v2-exit-main-error\">取得失敗</div>" +
             "<div class=\"v2-exit-detail\">" +
             escapeHtml(result.error) +
             "</div>" +
@@ -14532,7 +14532,7 @@ function buildEntranceIcComparisonV2CardHtml(result) {
             "<div class=\"v2-ic-name\">" +
             icName +
             "</div>" +
-            "<div class=\"v2-ic-main\">取得失敗</div>" +
+            "<div class=\"v2-ic-main v2-ic-main-error\">取得失敗</div>" +
             "<div class=\"v2-ic-detail\">" +
             escapeHtml(result.error) +
             "</div>" +

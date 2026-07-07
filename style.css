@@ -1496,6 +1496,10 @@ details#searchPanel .origin-row input {
     border-color: #e74c3c;
 }
 
+.v2-ic-main-error {
+    color: var(--color-bad);
+}
+
 .v2-exit-result-list {
     display: flex;
     flex-direction: column;
@@ -1549,6 +1553,10 @@ details#searchPanel .origin-row input {
 .v2-exit-error {
     opacity: 0.5;
     border-color: #e74c3c;
+}
+
+.v2-exit-main-error {
+    color: var(--color-bad);
 }
 
 .weak-comparison-candidate {

@@ -553,6 +553,10 @@ button {
     font-weight: inherit;
 }
 
+.main-route-time .route-time-unit {
+    font-size: 0.6em;
+}
+
 .probably-no-toll-note {
     margin: 6px 0 8px;
     font-size: 0.40em;

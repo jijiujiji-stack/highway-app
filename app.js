@@ -5213,7 +5213,7 @@ async function displayRouteComparison(
         highwayArrivalTime +
         "</div>" +
         "<div class=\"main-route-time\">" +
-        formatMinutes(
+        formatMinutesHtml(
             highwayMinutes
         ) +
         "</div>";
@@ -5226,7 +5226,7 @@ async function displayRouteComparison(
         localArrivalTime +
         "</div>" +
         "<div class=\"main-route-time\">" +
-        formatMinutes(
+        formatMinutesHtml(
             localMinutes
         ) +
         "</div>";
@@ -10002,6 +10002,31 @@ function formatMinutes(minutes) {
     );
 }
 
+function formatMinutesHtml(minutes) {
+
+    const hours =
+        Math.floor(minutes / 60);
+
+    const mins =
+        minutes % 60;
+
+    if (hours === 0) {
+
+        return (
+            mins +
+            "<span class=\"route-time-unit\">分</span>"
+        );
+
+    }
+
+    return (
+        hours +
+        "<span class=\"route-time-unit\">時間</span>" +
+        mins +
+        "<span class=\"route-time-unit\">分</span>"
+    );
+}
+
 function formatArrivalTime(minutesFromNow) {
 
     const arrival =
@@ -10039,7 +10064,7 @@ function createRouteTimeHtml(
         formatArrivalTime(minutes) +
         "</div>" +
         "<div class=\"main-route-time\">" +
-        formatMinutes(minutes) +
+        formatMinutesHtml(minutes) +
         "</div>"
     );
 }

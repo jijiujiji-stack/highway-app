@@ -1056,7 +1056,15 @@ details#searchPanel .auto-compare-toggle input {
 }
 
 .main-status-grid {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.main-status-grid div {
+    font-size: 10px;
+}
+
+.main-status-grid span {
+    font-size: 11px;
 }
 
 .auto-update-toggle {
@@ -1066,7 +1074,7 @@ details#searchPanel .auto-compare-toggle input {
     border-radius: 8px;
     background: #2ecc71;
     color: #111;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: bold;
     line-height: 1.2;
 }
@@ -1101,12 +1109,6 @@ details#searchPanel .auto-compare-toggle input {
 .data-update-paused {
     color: var(--color-warning) !important;
     font-weight: bold;
-}
-
-@media (max-width: 420px) {
-    .main-status-grid {
-        grid-template-columns: 1fr 1fr;
-    }
 }
 
 .route-mode-highway {

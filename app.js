@@ -10101,7 +10101,9 @@ function createEtcEstimateHtml(amount, label = "") {
         "円" +
         (
             tollLabel
-                ? "<br>" + escapeHtml(tollLabel)
+                ? "<small class=\"dashboard-toll-breakdown\">" +
+                    escapeHtml(tollLabel) +
+                    "</small>"
                 : ""
         )
     );

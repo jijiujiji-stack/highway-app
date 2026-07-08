@@ -185,6 +185,7 @@ button {
     margin-top: 4px;
 }
 
+#dashboardDestination,
 #dashboardEfficiency,
 #dashboardCost {
     font-size: 14px;

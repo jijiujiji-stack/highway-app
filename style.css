@@ -185,6 +185,11 @@ button {
     margin-top: 4px;
 }
 
+#dashboardEfficiency,
+#dashboardCost {
+    font-size: 14px;
+}
+
 .dashboard-info-label {
     display: inline !important;
     color: #aaa !important;
@@ -240,7 +245,9 @@ button {
     display: flex;
 }
 
-.normal-search-active #dashboardStars {
+.normal-search-active #dashboardStars,
+.v2-dashboard-entrance-active #dashboardStars,
+.v2-dashboard-exit-active #dashboardStars {
     display: none;
 }
 

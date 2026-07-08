@@ -200,10 +200,10 @@ button {
 
 .dashboard-efficiency-rate {
     margin-top: 10px;
-    padding: 10px;
+    padding: 6px;
     background: #222;
     border-radius: 8px;
-    font-size: 18px;
+    font-size: 14px;
     font-weight: bold;
     text-align: center;
 }
@@ -543,7 +543,7 @@ button {
     font-size: 18px;
     color: inherit;
     font-weight: 700;
-    margin-bottom: 14px;
+    margin-bottom: 4px;
 }
 
 .main-route-time {

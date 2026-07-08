@@ -13817,7 +13817,6 @@ function updateDashboardWithBestEntranceIcV2() {
                     "<div class=\"v2-best-label v2-reference-label\">参考入口</div>" +
                     "<div class=\"v2-best-name v2-reference-name\">" +
                     escapeHtml(
-                        "参考入口 " +
                         (reference.candidateIcName || "--") +
                         "（条件外）"
                     ) +
@@ -14123,10 +14122,8 @@ function updateDashboardWithBestExitIcV2() {
 
         const referenceName =
             isLowEfficiencyReference
-                ? "参考出口 " +
-                    (reference.candidateIcName || "--")
-                : "参考出口 " +
-                    (reference?.candidateIcName || "--") +
+                ? (reference.candidateIcName || "--")
+                : (reference?.candidateIcName || "--") +
                     "（条件外）";
 
         const referenceNoteHtml =

@@ -7045,9 +7045,28 @@ function findNearestShutoIcForRoutePoint(
             !isShutoIcSelectableForRole(
                 exit,
                 selectableRole
-            ) ||
-            exit.lat === undefined ||
-            exit.lng === undefined
+            )
+        ) {
+            continue;
+        }
+
+        const roleLat =
+            selectableRole === "entrance"
+                ? exit.entranceLat ?? exit.lat
+                : selectableRole === "exit"
+                    ? exit.exitLat ?? exit.lat
+                    : exit.lat;
+
+        const roleLng =
+            selectableRole === "entrance"
+                ? exit.entranceLng ?? exit.lng
+                : selectableRole === "exit"
+                    ? exit.exitLng ?? exit.lng
+                    : exit.lng;
+
+        if (
+            roleLat === undefined ||
+            roleLng === undefined
         ) {
             continue;
         }
@@ -7056,8 +7075,8 @@ function findNearestShutoIcForRoutePoint(
             calculateDistance(
                 routePoint.lat,
                 routePoint.lng,
-                exit.lat,
-                exit.lng
+                roleLat,
+                roleLng
             );
 
         if (distanceMeters < nearestDistanceMeters) {
@@ -8802,10 +8821,13 @@ function buildForwardExitComparisonIcCandidates(
         const exit = routePoint.exit;
         const identity = getIcIdentity(exit);
 
+        const exitLat = exit?.exitLat ?? exit?.lat;
+        const exitLng = exit?.exitLng ?? exit?.lng;
+
         if (
             !identity ||
-            exit?.lat === undefined ||
-            exit?.lng === undefined ||
+            exitLat === undefined ||
+            exitLng === undefined ||
             !Number.isFinite(routePoint.routeDistanceMeters)
         ) {
             return;
@@ -8815,8 +8837,8 @@ function buildForwardExitComparisonIcCandidates(
             calculateDistance(
                 routePoint.lat,
                 routePoint.lng,
-                exit.lat,
-                exit.lng
+                exitLat,
+                exitLng
             );
 
         const existing =

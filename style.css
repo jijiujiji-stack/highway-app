@@ -163,6 +163,7 @@ button {
 
 .dashboard-info div {
     background: #222;
+    border: 1px solid #555;
     border-radius: 10px;
     padding: 8px 4px;
     font-size: 12px;
@@ -504,6 +505,8 @@ button {
 
     background: #222;
 
+    border: 1px solid #555;
+
     border-radius: 12px;
 
     padding: 12px;
@@ -631,6 +634,7 @@ button {
 
 .dashboard-mini-grid div {
     background: #202020;
+    border: 1px solid #555;
     border-radius: 8px;
     padding: 6px 4px;
     font-size: 11px;

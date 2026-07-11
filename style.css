@@ -204,6 +204,7 @@ button {
     margin-top: 10px;
     padding: 6px;
     background: #222;
+    border: 1px solid #555;
     border-radius: 8px;
     font-size: 14px;
     font-weight: bold;
@@ -236,6 +237,7 @@ button {
     margin-top: 8px;
     padding: 9px 10px;
     background: #222;
+    border: 1px solid #555;
     border-radius: 8px;
     font-size: 13px;
     line-height: 1.35;
@@ -491,6 +493,14 @@ button {
 
 .recommend-local #dashboardRecommendation {
     color: var(--color-bad);
+}
+
+.v2-dashboard-recommendation-good {
+    border-color: var(--color-good);
+}
+
+.v2-dashboard-recommendation-none {
+    border-color: #ccc;
 }
 
 .v2-dashboard-recommendation-good #dashboardRecommendation {

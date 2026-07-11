@@ -2061,11 +2061,11 @@ const SHUTO_IC_MASTER = [
         entranceLng: 139.600,
         exitLat: 35.519,
         exitLng: 139.600,
-        entranceSelectable: false,
-        exitSelectable: false,
+        entranceSelectable: true,
+        exitSelectable: true,
         sourceAreaKeys: ["shutoKanagawaK7"],
         sourceGoogleNames: ["首都高速神奈川7号横浜北線 横浜港北出入口"],
-        note: "北西線側とは路線別に分離。既存isSelectable:falseを引き継ぎ選択不可。現時点では未参照。"
+        note: "首都高公式サイトで入口・出口とも上り下り利用可能を確認し、trueに修正。以前のisSelectable:false引き継ぎは誤りと判断。"
     },
     {
         id: "shuto-k7-hokusei-yokohama-kohoku",
@@ -2081,11 +2081,11 @@ const SHUTO_IC_MASTER = [
         entranceLng: 139.600,
         exitLat: 35.519,
         exitLng: 139.600,
-        entranceSelectable: false,
-        exitSelectable: false,
+        entranceSelectable: true,
+        exitSelectable: true,
         sourceAreaKeys: ["shutoKanagawaK7Hokusei"],
         sourceGoogleNames: ["首都高速神奈川7号横浜北西線 横浜港北出入口"],
-        note: "横浜北線側とは路線別に分離。既存isSelectable:falseを引き継ぎ選択不可。現時点では未参照。"
+        note: "首都高公式サイトで入口・出口とも上り下り利用可能を確認し、trueに修正。以前のisSelectable:false引き継ぎは誤りと判断。"
     },
     {
         id: "shuto-k7-hokusei-yokohama-aoba",

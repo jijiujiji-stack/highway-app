@@ -3143,7 +3143,8 @@ const IC_MASTER = {
                 lat: 35.731,
                 lng: 139.817,
                 experimental: true,
-                roadType: "首都高"
+                roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.731, entranceLng: 139.817, exitLat: 35.731, exitLng: 139.817
             },
             {
                 order: -2,
@@ -3152,7 +3153,8 @@ const IC_MASTER = {
                 lat: 35.777,
                 lng: 139.820,
                 experimental: true,
-                roadType: "首都高"
+                roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.777, entranceLng: 139.820, exitLat: 35.777, exitLng: 139.820
             },
             {
                 order: -1,
@@ -3161,7 +3163,8 @@ const IC_MASTER = {
                 lat: 35.805,
                 lng: 139.842,
                 experimental: true,
-                roadType: "首都高"
+                roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.805, entranceLng: 139.842, exitLat: 35.805, exitLng: 139.842
             },
 
             {
@@ -3169,84 +3172,96 @@ const IC_MASTER = {
                 displayName: "三郷IC",
                 googleName: "常磐自動車道 三郷インターチェンジ",
                 lat: 35.842,
-                lng: 139.872
+                lng: 139.872,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.842, entranceLng: 139.872, exitLat: 35.842, exitLng: 139.872
             },
             {
                 order: 1.5,
                 displayName: "三郷料金所SIC",
                 googleName: "常磐自動車道 三郷料金所スマートインターチェンジ",
                 lat: 35.865,
-                lng: 139.883
+                lng: 139.883,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.865, entranceLng: 139.883, exitLat: 35.865, exitLng: 139.883
             },
             {
                 order: 2,
                 displayName: "流山IC",
                 googleName: "常磐自動車道 流山インターチェンジ",
                 lat: 35.889,
-                lng: 139.911
+                lng: 139.911,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.889, entranceLng: 139.911, exitLat: 35.889, exitLng: 139.911
             },
             {
                 order: 3,
                 displayName: "柏IC",
                 googleName: "常磐自動車道 柏インターチェンジ",
                 lat: 35.899,
-                lng: 139.953
+                lng: 139.953,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.899, entranceLng: 139.953, exitLat: 35.899, exitLng: 139.953
             },
             {
                 order: 4,
                 displayName: "谷和原IC",
                 googleName: "常磐自動車道 谷和原インターチェンジ",
                 lat: 35.984,
-                lng: 140.000
+                lng: 140.000,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.984, entranceLng: 140.000, exitLat: 35.984, exitLng: 140.000
             },
             {
                 order: 5,
                 displayName: "守谷SA",
                 googleName: "常磐自動車道 守谷サービスエリア",
                 lat: 35.941,
-                lng: 139.993
+                lng: 139.993,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.941, entranceLng: 139.993, exitLat: 35.941, exitLng: 139.993
             },
             {
                 order: 6,
                 displayName: "谷田部IC",
                 googleName: "常磐自動車道 谷田部インターチェンジ",
                 lat: 36.003,
-                lng: 140.076
+                lng: 140.076,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.003, entranceLng: 140.076, exitLat: 36.003, exitLng: 140.076
             },
             {
                 order: 7,
                 displayName: "桜土浦IC",
                 googleName: "常磐自動車道 桜土浦インターチェンジ",
                 lat: 36.047,
-                lng: 140.141
+                lng: 140.141,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.047, entranceLng: 140.141, exitLat: 36.047, exitLng: 140.141
             },
             {
                 order: 8,
                 displayName: "土浦北IC",
                 googleName: "常磐自動車道 土浦北インターチェンジ",
                 lat: 36.107,
-                lng: 140.197
+                lng: 140.197,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.107, entranceLng: 140.197, exitLat: 36.107, exitLng: 140.197
             },
             {
                 order: 9,
                 displayName: "千代田石岡IC",
                 googleName: "常磐自動車道 千代田石岡インターチェンジ",
                 lat: 36.171,
-                lng: 140.259
+                lng: 140.259,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.171, entranceLng: 140.259, exitLat: 36.171, exitLng: 140.259
             },
             {
                 order: 9.5,
                 displayName: "石岡小美玉SIC",
                 googleName: "常磐自動車道 石岡小美玉スマートインターチェンジ",
                 lat: 36.221,
-                lng: 140.281
+                lng: 140.281,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.221, entranceLng: 140.281, exitLat: 36.221, exitLng: 140.281
             },
             {
                 order: 10,
                 displayName: "岩間IC",
                 googleName: "常磐自動車道 岩間インターチェンジ",
                 lat: 36.300,
-                lng: 140.306
+                lng: 140.306,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.300, entranceLng: 140.306, exitLat: 36.300, exitLng: 140.306
             },
 
             {
@@ -3254,7 +3269,8 @@ const IC_MASTER = {
                 displayName: "友部SA SIC",
                 googleName: "常磐自動車道 友部SAスマートインターチェンジ",
                 lat: 36.309,
-                lng: 140.341
+                lng: 140.341,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.309, entranceLng: 140.341, exitLat: 36.309, exitLng: 140.341
             },
 
             {
@@ -3262,7 +3278,8 @@ const IC_MASTER = {
                 displayName: "友部SA",
                 googleName: "常磐自動車道 友部サービスエリア",
                 lat: 36.317,
-                lng: 140.346
+                lng: 140.346,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.317, entranceLng: 140.346, exitLat: 36.317, exitLng: 140.346
             },
 
             {
@@ -3270,77 +3287,88 @@ const IC_MASTER = {
                 displayName: "水戸IC",
                 googleName: "常磐自動車道 水戸インターチェンジ",
                 lat: 36.381,
-                lng: 140.366
+                lng: 140.366,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.381, entranceLng: 140.366, exitLat: 36.381, exitLng: 140.366
             },
             {
                 order: 12.5,
                 displayName: "水戸北SIC",
                 googleName: "常磐自動車道 水戸北スマートインターチェンジ",
                 lat: 36.417,
-                lng: 140.425
+                lng: 140.425,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.417, entranceLng: 140.425, exitLat: 36.417, exitLng: 140.425
             },
             {
                 order: 13,
                 displayName: "那珂IC",
                 googleName: "常磐自動車道 那珂インターチェンジ",
                 lat: 36.486,
-                lng: 140.472
+                lng: 140.472,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.486, entranceLng: 140.472, exitLat: 36.486, exitLng: 140.472
             },
             {
                 order: 13.5,
                 displayName: "東海SIC",
                 googleName: "常磐自動車道 東海スマートインターチェンジ",
                 lat: 36.485,
-                lng: 140.551
+                lng: 140.551,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.485, entranceLng: 140.551, exitLat: 36.485, exitLng: 140.551
             },
             {
                 order: 14,
                 displayName: "日立南太田IC",
                 googleName: "常磐自動車道 日立南太田インターチェンジ",
                 lat: 36.565,
-                lng: 140.543
+                lng: 140.543,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.565, entranceLng: 140.543, exitLat: 36.565, exitLng: 140.543
             },
             {
                 order: 15,
                 displayName: "日立中央IC",
                 googleName: "常磐自動車道 日立中央インターチェンジ",
                 lat: 36.607,
-                lng: 140.640
+                lng: 140.640,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.607, entranceLng: 140.640, exitLat: 36.607, exitLng: 140.640
             },
             {
                 order: 16,
                 displayName: "高萩IC",
                 googleName: "常磐自動車道 高萩インターチェンジ",
                 lat: 36.713,
-                lng: 140.709
+                lng: 140.709,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.713, entranceLng: 140.709, exitLat: 36.713, exitLng: 140.709
             },
             {
                 order: 17,
                 displayName: "北茨城IC",
                 googleName: "常磐自動車道 北茨城インターチェンジ",
                 lat: 36.819,
-                lng: 140.744
+                lng: 140.744,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.819, entranceLng: 140.744, exitLat: 36.819, exitLng: 140.744
             },
             {
                 order: 18,
                 displayName: "いわき勿来IC",
                 googleName: "常磐自動車道 いわき勿来インターチェンジ",
                 lat: 36.906,
-                lng: 140.786
+                lng: 140.786,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.906, entranceLng: 140.786, exitLat: 36.906, exitLng: 140.786
             },
             {
                 order: 19,
                 displayName: "いわき湯本IC",
                 googleName: "常磐自動車道 いわき湯本インターチェンジ",
                 lat: 37.008,
-                lng: 140.828
+                lng: 140.828,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 37.008, entranceLng: 140.828, exitLat: 37.008, exitLng: 140.828
             },
             {
                 order: 20,
                 displayName: "いわき中央IC",
                 googleName: "常磐自動車道 いわき中央インターチェンジ",
                 lat: 37.067,
-                lng: 140.849
+                lng: 140.849,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 37.067, entranceLng: 140.849, exitLat: 37.067, exitLng: 140.849
             }
 
 
@@ -3350,61 +3378,149 @@ const IC_MASTER = {
     tohoku: {
         label: "東北道方面",
         exits: [
-            { order: 1, displayName: "浦和IC", googleName: "東北自動車道 浦和インターチェンジ" },
-            { order: 2, displayName: "岩槻IC", googleName: "東北自動車道 岩槻インターチェンジ" },
-            { order: 3, displayName: "蓮田SIC", googleName: "東北自動車道 蓮田スマートインターチェンジ" },
-            { order: 4, displayName: "久喜IC", googleName: "東北自動車道 久喜インターチェンジ" },
-            { order: 5, displayName: "加須IC", googleName: "東北自動車道 加須インターチェンジ" },
-            { order: 6, displayName: "羽生IC", googleName: "東北自動車道 羽生インターチェンジ" },
-            { order: 7, displayName: "館林IC", googleName: "東北自動車道 館林インターチェンジ" },
-            { order: 8, displayName: "佐野藤岡IC", googleName: "東北自動車道 佐野藤岡インターチェンジ" },
-            { order: 9, displayName: "栃木IC", googleName: "東北自動車道 栃木インターチェンジ" },
-            { order: 10, displayName: "鹿沼IC", googleName: "東北自動車道 鹿沼インターチェンジ" },
-            { order: 11, displayName: "宇都宮IC", googleName: "東北自動車道 宇都宮インターチェンジ" }
+            { order: 1, displayName: "浦和IC", googleName: "東北自動車道 浦和インターチェンジ",
+                entranceSelectable: true, exitSelectable: true
+            },
+            { order: 2, displayName: "岩槻IC", googleName: "東北自動車道 岩槻インターチェンジ",
+                entranceSelectable: true, exitSelectable: true
+            },
+            { order: 3, displayName: "蓮田SIC", googleName: "東北自動車道 蓮田スマートインターチェンジ",
+                entranceSelectable: true, exitSelectable: true
+            },
+            { order: 4, displayName: "久喜IC", googleName: "東北自動車道 久喜インターチェンジ",
+                entranceSelectable: true, exitSelectable: true
+            },
+            { order: 5, displayName: "加須IC", googleName: "東北自動車道 加須インターチェンジ",
+                entranceSelectable: true, exitSelectable: true
+            },
+            { order: 6, displayName: "羽生IC", googleName: "東北自動車道 羽生インターチェンジ",
+                entranceSelectable: true, exitSelectable: true
+            },
+            { order: 7, displayName: "館林IC", googleName: "東北自動車道 館林インターチェンジ",
+                entranceSelectable: true, exitSelectable: true
+            },
+            { order: 8, displayName: "佐野藤岡IC", googleName: "東北自動車道 佐野藤岡インターチェンジ",
+                entranceSelectable: true, exitSelectable: true
+            },
+            { order: 9, displayName: "栃木IC", googleName: "東北自動車道 栃木インターチェンジ",
+                entranceSelectable: true, exitSelectable: true
+            },
+            { order: 10, displayName: "鹿沼IC", googleName: "東北自動車道 鹿沼インターチェンジ",
+                entranceSelectable: true, exitSelectable: true
+            },
+            { order: 11, displayName: "宇都宮IC", googleName: "東北自動車道 宇都宮インターチェンジ",
+                entranceSelectable: true, exitSelectable: true
+            }
         ]
     },
     kanetsu: {
         label: "関越道方面",
         exits: [
-            { order: 1, displayName: "練馬IC", googleName: "関越自動車道 練馬インターチェンジ", lat: 35.753, lng: 139.605 },
-            { order: 2, displayName: "大泉IC", googleName: "関越自動車道 大泉インターチェンジ", lat: 35.771, lng: 139.587 },
-            { order: 3, displayName: "所沢IC", googleName: "関越自動車道 所沢インターチェンジ", lat: 35.801, lng: 139.498 },
-            { order: 4, displayName: "三芳SIC", googleName: "関越自動車道 三芳スマートインターチェンジ", lat: 35.843, lng: 139.518 },
-            { order: 5, displayName: "川越IC", googleName: "関越自動車道 川越インターチェンジ", lat: 35.907, lng: 139.483 },
-            { order: 6, displayName: "鶴ヶ島IC", googleName: "関越自動車道 鶴ヶ島インターチェンジ", lat: 35.944, lng: 139.394 },
-            { order: 7, displayName: "坂戸西SIC", googleName: "関越自動車道 坂戸西スマートインターチェンジ", lat: 35.971, lng: 139.356 },
-            { order: 8, displayName: "東松山IC", googleName: "関越自動車道 東松山インターチェンジ", lat: 36.036, lng: 139.377 },
-            { order: 9, displayName: "嵐山小川IC", googleName: "関越自動車道 嵐山小川インターチェンジ", lat: 36.060, lng: 139.300 },
-            { order: 10, displayName: "花園IC", googleName: "関越自動車道 花園インターチェンジ", lat: 36.115, lng: 139.214 },
-            { order: 10.5, displayName: "寄居SIC", googleName: "関越自動車道 寄居スマートインターチェンジ", lat: 36.173, lng: 139.194 },
-            { order: 11, displayName: "本庄児玉IC", googleName: "関越自動車道 本庄児玉インターチェンジ", lat: 36.223, lng: 139.152 },
-            { order: 11.5, displayName: "上里SIC", googleName: "関越自動車道 上里スマートインターチェンジ", lat: 36.256, lng: 139.119 },
-            { order: 12, displayName: "高崎玉村SIC", googleName: "関越自動車道 高崎玉村スマートインターチェンジ", lat: 36.284, lng: 139.101 },
-            { order: 13, displayName: "高崎IC", googleName: "関越自動車道 高崎インターチェンジ", lat: 36.308, lng: 139.063, connection: true, connectedRoads: ["kanetsu", "joshinetsu"] },
-            { order: 14, displayName: "前橋IC", googleName: "関越自動車道 前橋インターチェンジ", lat: 36.384, lng: 139.055 },
-            { order: 15, displayName: "駒寄SIC", googleName: "関越自動車道 駒寄スマートインターチェンジ", lat: 36.441, lng: 139.010 },
-            { order: 16, displayName: "渋川伊香保IC", googleName: "関越自動車道 渋川伊香保インターチェンジ", lat: 36.493, lng: 139.007 },
-            { order: 17, displayName: "赤城IC", googleName: "関越自動車道 赤城インターチェンジ", lat: 36.558, lng: 139.069 },
-            { order: 18, displayName: "昭和IC", googleName: "関越自動車道 昭和インターチェンジ", lat: 36.634, lng: 139.101 },
-            { order: 19, displayName: "沼田IC", googleName: "関越自動車道 沼田インターチェンジ", lat: 36.663, lng: 139.036 },
-            { order: 20, displayName: "月夜野IC", googleName: "関越自動車道 月夜野インターチェンジ", lat: 36.748, lng: 138.988 },
-            { order: 21, displayName: "水上IC", googleName: "関越自動車道 水上インターチェンジ", lat: 36.801, lng: 138.964 },
-            { order: 22, displayName: "藤岡IC", googleName: "上信越自動車道 藤岡インターチェンジ", lat: 36.269, lng: 139.074, connection: true, connectedRoads: ["kanetsu", "joshinetsu"] }
+            { order: 1, displayName: "練馬IC", googleName: "関越自動車道 練馬インターチェンジ", lat: 35.753, lng: 139.605,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.753, entranceLng: 139.605, exitLat: 35.753, exitLng: 139.605
+            },
+            { order: 2, displayName: "大泉IC", googleName: "関越自動車道 大泉インターチェンジ", lat: 35.771, lng: 139.587,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.771, entranceLng: 139.587, exitLat: 35.771, exitLng: 139.587
+            },
+            { order: 3, displayName: "所沢IC", googleName: "関越自動車道 所沢インターチェンジ", lat: 35.801, lng: 139.498,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.801, entranceLng: 139.498, exitLat: 35.801, exitLng: 139.498
+            },
+            { order: 4, displayName: "三芳SIC", googleName: "関越自動車道 三芳スマートインターチェンジ", lat: 35.843, lng: 139.518,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.843, entranceLng: 139.518, exitLat: 35.843, exitLng: 139.518
+            },
+            { order: 5, displayName: "川越IC", googleName: "関越自動車道 川越インターチェンジ", lat: 35.907, lng: 139.483,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.907, entranceLng: 139.483, exitLat: 35.907, exitLng: 139.483
+            },
+            { order: 6, displayName: "鶴ヶ島IC", googleName: "関越自動車道 鶴ヶ島インターチェンジ", lat: 35.944, lng: 139.394,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.944, entranceLng: 139.394, exitLat: 35.944, exitLng: 139.394
+            },
+            { order: 7, displayName: "坂戸西SIC", googleName: "関越自動車道 坂戸西スマートインターチェンジ", lat: 35.971, lng: 139.356,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.971, entranceLng: 139.356, exitLat: 35.971, exitLng: 139.356
+            },
+            { order: 8, displayName: "東松山IC", googleName: "関越自動車道 東松山インターチェンジ", lat: 36.036, lng: 139.377,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.036, entranceLng: 139.377, exitLat: 36.036, exitLng: 139.377
+            },
+            { order: 9, displayName: "嵐山小川IC", googleName: "関越自動車道 嵐山小川インターチェンジ", lat: 36.060, lng: 139.300,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.060, entranceLng: 139.300, exitLat: 36.060, exitLng: 139.300
+            },
+            { order: 10, displayName: "花園IC", googleName: "関越自動車道 花園インターチェンジ", lat: 36.115, lng: 139.214,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.115, entranceLng: 139.214, exitLat: 36.115, exitLng: 139.214
+            },
+            { order: 10.5, displayName: "寄居SIC", googleName: "関越自動車道 寄居スマートインターチェンジ", lat: 36.173, lng: 139.194,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.173, entranceLng: 139.194, exitLat: 36.173, exitLng: 139.194
+            },
+            { order: 11, displayName: "本庄児玉IC", googleName: "関越自動車道 本庄児玉インターチェンジ", lat: 36.223, lng: 139.152,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.223, entranceLng: 139.152, exitLat: 36.223, exitLng: 139.152
+            },
+            { order: 11.5, displayName: "上里SIC", googleName: "関越自動車道 上里スマートインターチェンジ", lat: 36.256, lng: 139.119,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.256, entranceLng: 139.119, exitLat: 36.256, exitLng: 139.119
+            },
+            { order: 12, displayName: "高崎玉村SIC", googleName: "関越自動車道 高崎玉村スマートインターチェンジ", lat: 36.284, lng: 139.101,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.284, entranceLng: 139.101, exitLat: 36.284, exitLng: 139.101
+            },
+            { order: 13, displayName: "高崎IC", googleName: "関越自動車道 高崎インターチェンジ", lat: 36.308, lng: 139.063, connection: true, connectedRoads: ["kanetsu", "joshinetsu"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.308, entranceLng: 139.063, exitLat: 36.308, exitLng: 139.063
+            },
+            { order: 14, displayName: "前橋IC", googleName: "関越自動車道 前橋インターチェンジ", lat: 36.384, lng: 139.055,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.384, entranceLng: 139.055, exitLat: 36.384, exitLng: 139.055
+            },
+            { order: 15, displayName: "駒寄SIC", googleName: "関越自動車道 駒寄スマートインターチェンジ", lat: 36.441, lng: 139.010,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.441, entranceLng: 139.010, exitLat: 36.441, exitLng: 139.010
+            },
+            { order: 16, displayName: "渋川伊香保IC", googleName: "関越自動車道 渋川伊香保インターチェンジ", lat: 36.493, lng: 139.007,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.493, entranceLng: 139.007, exitLat: 36.493, exitLng: 139.007
+            },
+            { order: 17, displayName: "赤城IC", googleName: "関越自動車道 赤城インターチェンジ", lat: 36.558, lng: 139.069,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.558, entranceLng: 139.069, exitLat: 36.558, exitLng: 139.069
+            },
+            { order: 18, displayName: "昭和IC", googleName: "関越自動車道 昭和インターチェンジ", lat: 36.634, lng: 139.101,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.634, entranceLng: 139.101, exitLat: 36.634, exitLng: 139.101
+            },
+            { order: 19, displayName: "沼田IC", googleName: "関越自動車道 沼田インターチェンジ", lat: 36.663, lng: 139.036,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.663, entranceLng: 139.036, exitLat: 36.663, exitLng: 139.036
+            },
+            { order: 20, displayName: "月夜野IC", googleName: "関越自動車道 月夜野インターチェンジ", lat: 36.748, lng: 138.988,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.748, entranceLng: 138.988, exitLat: 36.748, exitLng: 138.988
+            },
+            { order: 21, displayName: "水上IC", googleName: "関越自動車道 水上インターチェンジ", lat: 36.801, lng: 138.964,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.801, entranceLng: 138.964, exitLat: 36.801, exitLng: 138.964
+            },
+            { order: 22, displayName: "藤岡IC", googleName: "上信越自動車道 藤岡インターチェンジ", lat: 36.269, lng: 139.074, connection: true, connectedRoads: ["kanetsu", "joshinetsu"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.269, entranceLng: 139.074, exitLat: 36.269, exitLng: 139.074
+            }
         ]
     },
 
     joshinetsu: {
         label: "上信越道方面",
         exits: [
-            { order: 0, displayName: "高崎IC", googleName: "関越自動車道 高崎インターチェンジ", lat: 36.308, lng: 139.063, connection: true, connectedRoads: ["kanetsu", "joshinetsu"] },
-            { order: 1, displayName: "藤岡IC", googleName: "上信越自動車道 藤岡インターチェンジ", lat: 36.269, lng: 139.074, connection: true, connectedRoads: ["kanetsu", "joshinetsu"] },
-            { order: 2, displayName: "吉井IC", googleName: "上信越自動車道 吉井インターチェンジ", lat: 36.250, lng: 138.986 },
-            { order: 2.5, displayName: "甘楽SIC", googleName: "上信越自動車道 甘楽スマートインターチェンジ", lat: 36.242, lng: 138.946 },
-            { order: 3, displayName: "富岡IC", googleName: "上信越自動車道 富岡インターチェンジ", lat: 36.250, lng: 138.891 },
-            { order: 4, displayName: "下仁田IC", googleName: "上信越自動車道 下仁田インターチェンジ", lat: 36.210, lng: 138.774 },
-            { order: 5, displayName: "松井田妙義IC", googleName: "上信越自動車道 松井田妙義インターチェンジ", lat: 36.309, lng: 138.733 },
-            { order: 6, displayName: "碓氷軽井沢IC", googleName: "上信越自動車道 碓氷軽井沢インターチェンジ", lat: 36.338, lng: 138.640 },
-            { order: 7, displayName: "佐久IC", googleName: "上信越自動車道 佐久インターチェンジ", lat: 36.269, lng: 138.476 }
+            { order: 0, displayName: "高崎IC", googleName: "関越自動車道 高崎インターチェンジ", lat: 36.308, lng: 139.063, connection: true, connectedRoads: ["kanetsu", "joshinetsu"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.308, entranceLng: 139.063, exitLat: 36.308, exitLng: 139.063
+            },
+            { order: 1, displayName: "藤岡IC", googleName: "上信越自動車道 藤岡インターチェンジ", lat: 36.269, lng: 139.074, connection: true, connectedRoads: ["kanetsu", "joshinetsu"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.269, entranceLng: 139.074, exitLat: 36.269, exitLng: 139.074
+            },
+            { order: 2, displayName: "吉井IC", googleName: "上信越自動車道 吉井インターチェンジ", lat: 36.250, lng: 138.986,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.250, entranceLng: 138.986, exitLat: 36.250, exitLng: 138.986
+            },
+            { order: 2.5, displayName: "甘楽SIC", googleName: "上信越自動車道 甘楽スマートインターチェンジ", lat: 36.242, lng: 138.946,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.242, entranceLng: 138.946, exitLat: 36.242, exitLng: 138.946
+            },
+            { order: 3, displayName: "富岡IC", googleName: "上信越自動車道 富岡インターチェンジ", lat: 36.250, lng: 138.891,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.250, entranceLng: 138.891, exitLat: 36.250, exitLng: 138.891
+            },
+            { order: 4, displayName: "下仁田IC", googleName: "上信越自動車道 下仁田インターチェンジ", lat: 36.210, lng: 138.774,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.210, entranceLng: 138.774, exitLat: 36.210, exitLng: 138.774
+            },
+            { order: 5, displayName: "松井田妙義IC", googleName: "上信越自動車道 松井田妙義インターチェンジ", lat: 36.309, lng: 138.733,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.309, entranceLng: 138.733, exitLat: 36.309, exitLng: 138.733
+            },
+            { order: 6, displayName: "碓氷軽井沢IC", googleName: "上信越自動車道 碓氷軽井沢インターチェンジ", lat: 36.338, lng: 138.640,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.338, entranceLng: 138.640, exitLat: 36.338, exitLng: 138.640
+            },
+            { order: 7, displayName: "佐久IC", googleName: "上信越自動車道 佐久インターチェンジ", lat: 36.269, lng: 138.476,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.269, entranceLng: 138.476, exitLat: 36.269, exitLng: 138.476
+            }
         ]
     },
 
@@ -3421,7 +3537,8 @@ const IC_MASTER = {
                 connection: true,
                 connectedRoads: ["keno", "tomei"],
                 routeBranch: "west",
-                branchOrder: 1
+                branchOrder: 1,
+                entranceSelectable: false, exitSelectable: false, entranceLat: 35.422, entranceLng: 139.375, exitLat: 35.422, exitLng: 139.375
             },
             {
                 order: 2,
@@ -3430,7 +3547,8 @@ const IC_MASTER = {
                 lat: 35.480,
                 lng: 139.372,
                 routeBranch: "west",
-                branchOrder: 2
+                branchOrder: 2,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.480, entranceLng: 139.372, exitLat: 35.480, exitLng: 139.372
             },
             {
                 order: 3,
@@ -3439,7 +3557,8 @@ const IC_MASTER = {
                 lat: 35.490,
                 lng: 139.369,
                 routeBranch: "west",
-                branchOrder: 3
+                branchOrder: 3,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.490, entranceLng: 139.369, exitLat: 35.490, exitLng: 139.369
             },
             {
                 order: 4,
@@ -3448,7 +3567,8 @@ const IC_MASTER = {
                 lat: 35.527,
                 lng: 139.359,
                 routeBranch: "west",
-                branchOrder: 4
+                branchOrder: 4,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.527, entranceLng: 139.359, exitLat: 35.527, exitLng: 139.359
             },
             {
                 order: 5,
@@ -3457,7 +3577,8 @@ const IC_MASTER = {
                 lat: 35.582,
                 lng: 139.293,
                 routeBranch: "west",
-                branchOrder: 5
+                branchOrder: 5,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.582, entranceLng: 139.293, exitLat: 35.582, exitLng: 139.293
             },
             {
                 order: 6,
@@ -3466,7 +3587,8 @@ const IC_MASTER = {
                 lat: 35.623,
                 lng: 139.263,
                 routeBranch: "west",
-                branchOrder: 6
+                branchOrder: 6,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.623, entranceLng: 139.263, exitLat: 35.623, exitLng: 139.263
             },
             {
                 order: 7,
@@ -3478,7 +3600,8 @@ const IC_MASTER = {
                 connection: true,
                 connectedRoads: ["keno", "chuo"],
                 routeBranch: "west",
-                branchOrder: 7
+                branchOrder: 7,
+                entranceSelectable: false, exitSelectable: false, entranceLat: 35.640, entranceLng: 139.254, exitLat: 35.640, exitLng: 139.254
             },
             {
                 order: 8,
@@ -3487,7 +3610,8 @@ const IC_MASTER = {
                 lat: 35.718,
                 lng: 139.284,
                 routeBranch: "northwest",
-                branchOrder: 8
+                branchOrder: 8,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.718, entranceLng: 139.284, exitLat: 35.718, exitLng: 139.284
             },
             {
                 order: 9,
@@ -3496,7 +3620,8 @@ const IC_MASTER = {
                 lat: 35.736,
                 lng: 139.282,
                 routeBranch: "northwest",
-                branchOrder: 9
+                branchOrder: 9,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.736, entranceLng: 139.282, exitLat: 35.736, exitLng: 139.282
             },
             {
                 order: 10,
@@ -3505,7 +3630,8 @@ const IC_MASTER = {
                 lat: 35.797,
                 lng: 139.323,
                 routeBranch: "northwest",
-                branchOrder: 10
+                branchOrder: 10,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.797, entranceLng: 139.323, exitLat: 35.797, exitLng: 139.323
             },
             {
                 order: 11,
@@ -3514,7 +3640,8 @@ const IC_MASTER = {
                 lat: 35.818,
                 lng: 139.369,
                 routeBranch: "northwest",
-                branchOrder: 11
+                branchOrder: 11,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.818, entranceLng: 139.369, exitLat: 35.818, exitLng: 139.369
             },
             {
                 order: 12,
@@ -3523,7 +3650,8 @@ const IC_MASTER = {
                 lat: 35.865,
                 lng: 139.378,
                 routeBranch: "northwest",
-                branchOrder: 12
+                branchOrder: 12,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.865, entranceLng: 139.378, exitLat: 35.865, exitLng: 139.378
             },
             {
                 order: 13,
@@ -3532,7 +3660,8 @@ const IC_MASTER = {
                 lat: 35.920,
                 lng: 139.389,
                 routeBranch: "northwest",
-                branchOrder: 13
+                branchOrder: 13,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.920, entranceLng: 139.389, exitLat: 35.920, exitLng: 139.389
             },
             {
                 order: 14,
@@ -3541,7 +3670,8 @@ const IC_MASTER = {
                 lat: 35.967,
                 lng: 139.444,
                 routeBranch: "northwest",
-                branchOrder: 14
+                branchOrder: 14,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.967, entranceLng: 139.444, exitLat: 35.967, exitLng: 139.444
             },
             {
                 order: 15,
@@ -3550,7 +3680,8 @@ const IC_MASTER = {
                 lat: 35.981,
                 lng: 139.466,
                 routeBranch: "northwest",
-                branchOrder: 15
+                branchOrder: 15,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.981, entranceLng: 139.466, exitLat: 35.981, exitLng: 139.466
             },
             {
                 order: 16,
@@ -3559,7 +3690,8 @@ const IC_MASTER = {
                 lat: 36.002,
                 lng: 139.520,
                 routeBranch: "northwest",
-                branchOrder: 16
+                branchOrder: 16,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.002, entranceLng: 139.520, exitLat: 36.002, exitLng: 139.520
             },
             {
                 order: 17,
@@ -3568,7 +3700,8 @@ const IC_MASTER = {
                 lat: 36.022,
                 lng: 139.565,
                 routeBranch: "northwest",
-                branchOrder: 17
+                branchOrder: 17,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.022, entranceLng: 139.565, exitLat: 36.022, exitLng: 139.565
             },
             {
                 order: 18,
@@ -3577,7 +3710,8 @@ const IC_MASTER = {
                 lat: 36.047,
                 lng: 139.623,
                 routeBranch: "northwest",
-                branchOrder: 18
+                branchOrder: 18,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.047, entranceLng: 139.623, exitLat: 36.047, exitLng: 139.623
             },
             {
                 order: 19,
@@ -3589,7 +3723,8 @@ const IC_MASTER = {
                 connection: true,
                 connectedRoads: ["keno", "tohoku"],
                 routeBranch: "northwest",
-                branchOrder: 19
+                branchOrder: 19,
+                entranceSelectable: false, exitSelectable: false, entranceLat: 36.049, entranceLng: 139.658, exitLat: 36.049, exitLng: 139.658
             },
             {
                 order: 20,
@@ -3598,7 +3733,8 @@ const IC_MASTER = {
                 lat: 36.075,
                 lng: 139.753,
                 routeBranch: "northeast",
-                branchOrder: 20
+                branchOrder: 20,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.075, entranceLng: 139.753, exitLat: 36.075, exitLng: 139.753
             },
             {
                 order: 21,
@@ -3607,7 +3743,8 @@ const IC_MASTER = {
                 lat: 36.101,
                 lng: 139.774,
                 routeBranch: "northeast",
-                branchOrder: 21
+                branchOrder: 21,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.101, entranceLng: 139.774, exitLat: 36.101, exitLng: 139.774
             },
             {
                 order: 22,
@@ -3616,7 +3753,8 @@ const IC_MASTER = {
                 lat: 36.113,
                 lng: 139.833,
                 routeBranch: "northeast",
-                branchOrder: 22
+                branchOrder: 22,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.113, entranceLng: 139.833, exitLat: 36.113, exitLng: 139.833
             },
             {
                 order: 23,
@@ -3625,7 +3763,8 @@ const IC_MASTER = {
                 lat: 36.063,
                 lng: 139.914,
                 routeBranch: "northeast",
-                branchOrder: 23
+                branchOrder: 23,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.063, entranceLng: 139.914, exitLat: 36.063, exitLng: 139.914
             },
             {
                 order: 24,
@@ -3634,7 +3773,8 @@ const IC_MASTER = {
                 lat: 36.044,
                 lng: 140.012,
                 routeBranch: "northeast",
-                branchOrder: 24
+                branchOrder: 24,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.044, entranceLng: 140.012, exitLat: 36.044, exitLng: 140.012
             },
             {
                 order: 25,
@@ -3643,7 +3783,8 @@ const IC_MASTER = {
                 lat: 36.079,
                 lng: 140.073,
                 routeBranch: "northeast",
-                branchOrder: 25
+                branchOrder: 25,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.079, entranceLng: 140.073, exitLat: 36.079, exitLng: 140.073
             },
             {
                 order: 26,
@@ -3655,7 +3796,8 @@ const IC_MASTER = {
                 connection: true,
                 connectedRoads: ["keno", "joban"],
                 routeBranch: "northeast",
-                branchOrder: 26
+                branchOrder: 26,
+                entranceSelectable: false, exitSelectable: false, entranceLat: 36.091, entranceLng: 140.111, exitLat: 36.091, exitLng: 140.111
             },
             {
                 order: 27,
@@ -3664,7 +3806,8 @@ const IC_MASTER = {
                 lat: 36.037,
                 lng: 140.119,
                 routeBranch: "northeast",
-                branchOrder: 27
+                branchOrder: 27,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.037, entranceLng: 140.119, exitLat: 36.037, exitLng: 140.119
             },
             {
                 order: 28,
@@ -3673,7 +3816,8 @@ const IC_MASTER = {
                 lat: 35.982,
                 lng: 140.170,
                 routeBranch: "northeast",
-                branchOrder: 28
+                branchOrder: 28,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.982, entranceLng: 140.170, exitLat: 35.982, exitLng: 140.170
             },
             {
                 order: 29,
@@ -3682,7 +3826,8 @@ const IC_MASTER = {
                 lat: 35.969,
                 lng: 140.234,
                 routeBranch: "northeast",
-                branchOrder: 29
+                branchOrder: 29,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.969, entranceLng: 140.234, exitLat: 35.969, exitLng: 140.234
             },
             {
                 order: 30,
@@ -3691,7 +3836,8 @@ const IC_MASTER = {
                 lat: 35.947,
                 lng: 140.323,
                 routeBranch: "northeast",
-                branchOrder: 30
+                branchOrder: 30,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.947, entranceLng: 140.323, exitLat: 35.947, exitLng: 140.323
             },
             {
                 order: 31,
@@ -3700,7 +3846,8 @@ const IC_MASTER = {
                 lat: 35.919,
                 lng: 140.383,
                 routeBranch: "northeast",
-                branchOrder: 31
+                branchOrder: 31,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.919, entranceLng: 140.383, exitLat: 35.919, exitLng: 140.383
             },
             {
                 order: 32,
@@ -3709,7 +3856,8 @@ const IC_MASTER = {
                 lat: 35.894,
                 lng: 140.408,
                 routeBranch: "northeast",
-                branchOrder: 32
+                branchOrder: 32,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.894, entranceLng: 140.408, exitLat: 35.894, exitLng: 140.408
             },
             {
                 order: 33,
@@ -3718,7 +3866,8 @@ const IC_MASTER = {
                 lat: 35.873,
                 lng: 140.432,
                 routeBranch: "northeast",
-                branchOrder: 33
+                branchOrder: 33,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.873, entranceLng: 140.432, exitLat: 35.873, exitLng: 140.432
             },
             {
                 order: 34,
@@ -3730,7 +3879,8 @@ const IC_MASTER = {
                 connection: true,
                 connectedRoads: ["keno", "tokan"],
                 routeBranch: "northeast",
-                branchOrder: 34
+                branchOrder: 34,
+                entranceSelectable: false, exitSelectable: false, entranceLat: 35.851, entranceLng: 140.468, exitLat: 35.851, exitLng: 140.468
             },
             {
                 order: 35,
@@ -3739,7 +3889,8 @@ const IC_MASTER = {
                 lat: 35.663,
                 lng: 140.438,
                 routeBranch: "southeast",
-                branchOrder: 35
+                branchOrder: 35,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.663, entranceLng: 140.438, exitLat: 35.663, exitLng: 140.438
             },
             {
                 order: 36,
@@ -3748,7 +3899,8 @@ const IC_MASTER = {
                 lat: 35.618,
                 lng: 140.383,
                 routeBranch: "southeast",
-                branchOrder: 36
+                branchOrder: 36,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.618, entranceLng: 140.383, exitLat: 35.618, exitLng: 140.383
             },
             {
                 order: 37,
@@ -3760,7 +3912,8 @@ const IC_MASTER = {
                 connection: true,
                 connectedRoads: ["keno"],
                 routeBranch: "southeast",
-                branchOrder: 37
+                branchOrder: 37,
+                entranceSelectable: false, exitSelectable: false, entranceLat: 35.574, entranceLng: 140.316, exitLat: 35.574, exitLng: 140.316
             },
             {
                 order: 38,
@@ -3769,7 +3922,8 @@ const IC_MASTER = {
                 lat: 35.571,
                 lng: 140.316,
                 routeBranch: "southeast",
-                branchOrder: 38
+                branchOrder: 38,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.571, entranceLng: 140.316, exitLat: 35.571, exitLng: 140.316
             },
             {
                 order: 39,
@@ -3778,7 +3932,8 @@ const IC_MASTER = {
                 lat: 35.514,
                 lng: 140.295,
                 routeBranch: "southeast",
-                branchOrder: 39
+                branchOrder: 39,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.514, entranceLng: 140.295, exitLat: 35.514, exitLng: 140.295
             },
             {
                 order: 40,
@@ -3787,7 +3942,8 @@ const IC_MASTER = {
                 lat: 35.487,
                 lng: 140.271,
                 routeBranch: "southeast",
-                branchOrder: 40
+                branchOrder: 40,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.487, entranceLng: 140.271, exitLat: 35.487, exitLng: 140.271
             },
             {
                 order: 41,
@@ -3796,7 +3952,8 @@ const IC_MASTER = {
                 lat: 35.448,
                 lng: 140.248,
                 routeBranch: "southeast",
-                branchOrder: 41
+                branchOrder: 41,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.448, entranceLng: 140.248, exitLat: 35.448, exitLng: 140.248
             },
             {
                 order: 42,
@@ -3805,7 +3962,8 @@ const IC_MASTER = {
                 lat: 35.402,
                 lng: 140.245,
                 routeBranch: "southeast",
-                branchOrder: 42
+                branchOrder: 42,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.402, entranceLng: 140.245, exitLat: 35.402, exitLng: 140.245
             },
             {
                 order: 43,
@@ -3814,7 +3972,8 @@ const IC_MASTER = {
                 lat: 35.363,
                 lng: 140.185,
                 routeBranch: "southeast",
-                branchOrder: 43
+                branchOrder: 43,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.363, entranceLng: 140.185, exitLat: 35.363, exitLng: 140.185
             },
             {
                 order: 44,
@@ -3823,7 +3982,8 @@ const IC_MASTER = {
                 lat: 35.361,
                 lng: 140.052,
                 routeBranch: "southeast",
-                branchOrder: 44
+                branchOrder: 44,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.361, entranceLng: 140.052, exitLat: 35.361, exitLng: 140.052
             },
             {
                 order: 45,
@@ -3835,7 +3995,8 @@ const IC_MASTER = {
                 connection: true,
                 connectedRoads: ["keno", "tateyama", "aqualine"],
                 routeBranch: "southeast",
-                branchOrder: 45
+                branchOrder: 45,
+                entranceSelectable: false, exitSelectable: false, entranceLat: 35.372, entranceLng: 139.974, exitLat: 35.372, exitLng: 139.974
             }
         ]
     },
@@ -3844,39 +4005,105 @@ const IC_MASTER = {
     chuo: {
         label: "中央道方面",
         exits: [
-            { order: -6, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.731, lng: 139.817, experimental: true, roadType: "首都高" },
-            { order: -5, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.712, lng: 139.779, experimental: true, roadType: "首都高" },
-            { order: -4, displayName: "高井戸（首都高）", googleName: "首都高速4号新宿線 高井戸出入口", lat: 35.684, lng: 139.615, experimental: true, roadType: "首都高" },
-            { order: -3, displayName: "外苑（首都高）", googleName: "首都高速4号新宿線 外苑出入口", lat: 35.677, lng: 139.718, experimental: true, roadType: "首都高" },
-            { order: -2, displayName: "代官町（首都高）", googleName: "首都高速都心環状線 代官町出入口", lat: 35.688, lng: 139.754, experimental: true, roadType: "首都高" },
-            { order: -1, displayName: "一ツ橋（首都高）", googleName: "首都高速都心環状線 一ツ橋出入口", lat: 35.692, lng: 139.758, experimental: true, roadType: "首都高" },
-            { order: 1, displayName: "高井戸IC", googleName: "中央自動車道 高井戸インターチェンジ", lat: 35.684, lng: 139.611 },
-            { order: 2, displayName: "調布IC", googleName: "中央自動車道 調布インターチェンジ", lat: 35.650, lng: 139.536 },
-            { order: 3, displayName: "稲城IC", googleName: "中央自動車道 稲城インターチェンジ", lat: 35.638, lng: 139.510 },
-            { order: 3.5, displayName: "府中SIC", googleName: "中央自動車道 府中スマートインターチェンジ", lat: 35.660, lng: 139.496 },
-            { order: 4, displayName: "国立府中IC", googleName: "中央自動車道 国立府中インターチェンジ", lat: 35.668, lng: 139.457 },
-            { order: 5, displayName: "八王子IC", googleName: "中央自動車道 八王子インターチェンジ", lat: 35.657, lng: 139.335 },
-            { order: 6, displayName: "相模湖IC", googleName: "中央自動車道 相模湖インターチェンジ", lat: 35.616, lng: 139.190 },
-            { order: 7, displayName: "上野原IC", googleName: "中央自動車道 上野原インターチェンジ", lat: 35.631, lng: 139.109 },
-            { order: 7.5, displayName: "談合坂SIC", googleName: "中央自動車道 談合坂スマートインターチェンジ", lat: 35.629, lng: 139.045 },
-            { order: 8, displayName: "大月IC", googleName: "中央自動車道 大月インターチェンジ", lat: 35.616, lng: 138.949 },
-            { order: 9, displayName: "勝沼IC", googleName: "中央自動車道 勝沼インターチェンジ", lat: 35.686, lng: 138.739 },
-            { order: 10, displayName: "一宮御坂IC", googleName: "中央自動車道 一宮御坂インターチェンジ", lat: 35.657, lng: 138.688 },
-            { order: 10.5, displayName: "笛吹八代SIC", googleName: "中央自動車道 笛吹八代スマートインターチェンジ", lat: 35.623, lng: 138.636 },
-            { order: 11, displayName: "甲府昭和IC", googleName: "中央自動車道 甲府昭和インターチェンジ", lat: 35.627, lng: 138.553 },
-            { order: 12, displayName: "双葉SIC", googleName: "中央自動車道 双葉スマートインターチェンジ", lat: 35.705, lng: 138.503 },
-            { order: 13, displayName: "韮崎IC", googleName: "中央自動車道 韮崎インターチェンジ", lat: 35.718, lng: 138.445 },
-            { order: 14, displayName: "須玉IC", googleName: "中央自動車道 須玉インターチェンジ", lat: 35.795, lng: 138.406 },
-            { order: 15, displayName: "長坂IC", googleName: "中央自動車道 長坂インターチェンジ", lat: 35.841, lng: 138.366 },
-            { order: 16, displayName: "小淵沢IC", googleName: "中央自動車道 小淵沢インターチェンジ", lat: 35.888, lng: 138.316 },
-            { order: 17, displayName: "諏訪南IC", googleName: "中央自動車道 諏訪南インターチェンジ", lat: 35.973, lng: 138.232 },
-            { order: 18, displayName: "諏訪IC", googleName: "中央自動車道 諏訪インターチェンジ", lat: 36.031, lng: 138.114 },
-            { order: 18.5, displayName: "諏訪湖SIC", googleName: "中央自動車道 諏訪湖スマートインターチェンジ", lat: 36.026, lng: 138.079 },
-            { order: 19, displayName: "岡谷IC", googleName: "長野自動車道 岡谷インターチェンジ", lat: 36.056, lng: 138.050 },
-            { order: 20, displayName: "塩尻IC", googleName: "長野自動車道 塩尻インターチェンジ", lat: 36.093, lng: 137.963 },
-            { order: 21, displayName: "松本IC", googleName: "長野自動車道 松本インターチェンジ", lat: 36.219, lng: 137.940 },
-            { order: 21.5, displayName: "梓川SIC", googleName: "長野自動車道 梓川スマートインターチェンジ", lat: 36.266, lng: 137.933 },
-            { order: 22, displayName: "安曇野IC", googleName: "長野自動車道 安曇野インターチェンジ", lat: 36.300, lng: 137.898 }
+            { order: -6, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.731, lng: 139.817, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.731, entranceLng: 139.817, exitLat: 35.731, exitLng: 139.817
+            },
+            { order: -5, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.712, lng: 139.779, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.712, entranceLng: 139.779, exitLat: 35.712, exitLng: 139.779
+            },
+            { order: -4, displayName: "高井戸（首都高）", googleName: "首都高速4号新宿線 高井戸出入口", lat: 35.684, lng: 139.615, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.684, entranceLng: 139.615, exitLat: 35.684, exitLng: 139.615
+            },
+            { order: -3, displayName: "外苑（首都高）", googleName: "首都高速4号新宿線 外苑出入口", lat: 35.677, lng: 139.718, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.677, entranceLng: 139.718, exitLat: 35.677, exitLng: 139.718
+            },
+            { order: -2, displayName: "代官町（首都高）", googleName: "首都高速都心環状線 代官町出入口", lat: 35.688, lng: 139.754, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.688, entranceLng: 139.754, exitLat: 35.688, exitLng: 139.754
+            },
+            { order: -1, displayName: "一ツ橋（首都高）", googleName: "首都高速都心環状線 一ツ橋出入口", lat: 35.692, lng: 139.758, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.692, entranceLng: 139.758, exitLat: 35.692, exitLng: 139.758
+            },
+            { order: 1, displayName: "高井戸IC", googleName: "中央自動車道 高井戸インターチェンジ", lat: 35.684, lng: 139.611,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.684, entranceLng: 139.611, exitLat: 35.684, exitLng: 139.611
+            },
+            { order: 2, displayName: "調布IC", googleName: "中央自動車道 調布インターチェンジ", lat: 35.650, lng: 139.536,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.650, entranceLng: 139.536, exitLat: 35.650, exitLng: 139.536
+            },
+            { order: 3, displayName: "稲城IC", googleName: "中央自動車道 稲城インターチェンジ", lat: 35.638, lng: 139.510,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.638, entranceLng: 139.510, exitLat: 35.638, exitLng: 139.510
+            },
+            { order: 3.5, displayName: "府中SIC", googleName: "中央自動車道 府中スマートインターチェンジ", lat: 35.660, lng: 139.496,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.660, entranceLng: 139.496, exitLat: 35.660, exitLng: 139.496
+            },
+            { order: 4, displayName: "国立府中IC", googleName: "中央自動車道 国立府中インターチェンジ", lat: 35.668, lng: 139.457,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.668, entranceLng: 139.457, exitLat: 35.668, exitLng: 139.457
+            },
+            { order: 5, displayName: "八王子IC", googleName: "中央自動車道 八王子インターチェンジ", lat: 35.657, lng: 139.335,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.657, entranceLng: 139.335, exitLat: 35.657, exitLng: 139.335
+            },
+            { order: 6, displayName: "相模湖IC", googleName: "中央自動車道 相模湖インターチェンジ", lat: 35.616, lng: 139.190,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.616, entranceLng: 139.190, exitLat: 35.616, exitLng: 139.190
+            },
+            { order: 7, displayName: "上野原IC", googleName: "中央自動車道 上野原インターチェンジ", lat: 35.631, lng: 139.109,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.631, entranceLng: 139.109, exitLat: 35.631, exitLng: 139.109
+            },
+            { order: 7.5, displayName: "談合坂SIC", googleName: "中央自動車道 談合坂スマートインターチェンジ", lat: 35.629, lng: 139.045,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.629, entranceLng: 139.045, exitLat: 35.629, exitLng: 139.045
+            },
+            { order: 8, displayName: "大月IC", googleName: "中央自動車道 大月インターチェンジ", lat: 35.616, lng: 138.949,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.616, entranceLng: 138.949, exitLat: 35.616, exitLng: 138.949
+            },
+            { order: 9, displayName: "勝沼IC", googleName: "中央自動車道 勝沼インターチェンジ", lat: 35.686, lng: 138.739,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.686, entranceLng: 138.739, exitLat: 35.686, exitLng: 138.739
+            },
+            { order: 10, displayName: "一宮御坂IC", googleName: "中央自動車道 一宮御坂インターチェンジ", lat: 35.657, lng: 138.688,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.657, entranceLng: 138.688, exitLat: 35.657, exitLng: 138.688
+            },
+            { order: 10.5, displayName: "笛吹八代SIC", googleName: "中央自動車道 笛吹八代スマートインターチェンジ", lat: 35.623, lng: 138.636,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.623, entranceLng: 138.636, exitLat: 35.623, exitLng: 138.636
+            },
+            { order: 11, displayName: "甲府昭和IC", googleName: "中央自動車道 甲府昭和インターチェンジ", lat: 35.627, lng: 138.553,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.627, entranceLng: 138.553, exitLat: 35.627, exitLng: 138.553
+            },
+            { order: 12, displayName: "双葉SIC", googleName: "中央自動車道 双葉スマートインターチェンジ", lat: 35.705, lng: 138.503,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.705, entranceLng: 138.503, exitLat: 35.705, exitLng: 138.503
+            },
+            { order: 13, displayName: "韮崎IC", googleName: "中央自動車道 韮崎インターチェンジ", lat: 35.718, lng: 138.445,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.718, entranceLng: 138.445, exitLat: 35.718, exitLng: 138.445
+            },
+            { order: 14, displayName: "須玉IC", googleName: "中央自動車道 須玉インターチェンジ", lat: 35.795, lng: 138.406,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.795, entranceLng: 138.406, exitLat: 35.795, exitLng: 138.406
+            },
+            { order: 15, displayName: "長坂IC", googleName: "中央自動車道 長坂インターチェンジ", lat: 35.841, lng: 138.366,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.841, entranceLng: 138.366, exitLat: 35.841, exitLng: 138.366
+            },
+            { order: 16, displayName: "小淵沢IC", googleName: "中央自動車道 小淵沢インターチェンジ", lat: 35.888, lng: 138.316,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.888, entranceLng: 138.316, exitLat: 35.888, exitLng: 138.316
+            },
+            { order: 17, displayName: "諏訪南IC", googleName: "中央自動車道 諏訪南インターチェンジ", lat: 35.973, lng: 138.232,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.973, entranceLng: 138.232, exitLat: 35.973, exitLng: 138.232
+            },
+            { order: 18, displayName: "諏訪IC", googleName: "中央自動車道 諏訪インターチェンジ", lat: 36.031, lng: 138.114,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.031, entranceLng: 138.114, exitLat: 36.031, exitLng: 138.114
+            },
+            { order: 18.5, displayName: "諏訪湖SIC", googleName: "中央自動車道 諏訪湖スマートインターチェンジ", lat: 36.026, lng: 138.079,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.026, entranceLng: 138.079, exitLat: 36.026, exitLng: 138.079
+            },
+            { order: 19, displayName: "岡谷IC", googleName: "長野自動車道 岡谷インターチェンジ", lat: 36.056, lng: 138.050,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.056, entranceLng: 138.050, exitLat: 36.056, exitLng: 138.050
+            },
+            { order: 20, displayName: "塩尻IC", googleName: "長野自動車道 塩尻インターチェンジ", lat: 36.093, lng: 137.963,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.093, entranceLng: 137.963, exitLat: 36.093, exitLng: 137.963
+            },
+            { order: 21, displayName: "松本IC", googleName: "長野自動車道 松本インターチェンジ", lat: 36.219, lng: 137.940,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.219, entranceLng: 137.940, exitLat: 36.219, exitLng: 137.940
+            },
+            { order: 21.5, displayName: "梓川SIC", googleName: "長野自動車道 梓川スマートインターチェンジ", lat: 36.266, lng: 137.933,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.266, entranceLng: 137.933, exitLat: 36.266, exitLng: 137.933
+            },
+            { order: 22, displayName: "安曇野IC", googleName: "長野自動車道 安曇野インターチェンジ", lat: 36.300, lng: 137.898,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.300, entranceLng: 137.898, exitLat: 36.300, exitLng: 137.898
+            }
         ]
     },
 
@@ -3884,43 +4111,117 @@ const IC_MASTER = {
     tomei: {
         label: "東名道方面",
         exits: [
-            { order: -8, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.731, lng: 139.817, experimental: true, roadType: "首都高" },
-            { order: -7, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.712, lng: 139.779, experimental: true, roadType: "首都高" },
-            { order: -6, displayName: "用賀（首都高）", googleName: "首都高速3号渋谷線 用賀出入口", lat: 35.626, lng: 139.633, experimental: true, roadType: "首都高" },
-            { order: -5, displayName: "霞が関（首都高）", googleName: "首都高速都心環状線 霞が関出入口", lat: 35.671, lng: 139.751, experimental: true, roadType: "首都高" },
-            { order: -4, displayName: "外苑（首都高）", googleName: "首都高速4号新宿線 外苑出入口", lat: 35.677, lng: 139.718, experimental: true, roadType: "首都高" },
-            { order: -3, displayName: "代官町（首都高）", googleName: "首都高速都心環状線 代官町出入口", lat: 35.688, lng: 139.754, experimental: true, roadType: "首都高" },
-            { order: -2, displayName: "一ツ橋（首都高）", googleName: "首都高速都心環状線 一ツ橋出入口", lat: 35.692, lng: 139.758, experimental: true, roadType: "首都高" },
-            { order: -1, displayName: "戸越（首都高）", googleName: "首都高速2号目黒線 戸越出入口", lat: 35.615, lng: 139.716, experimental: true, roadType: "首都高" },
-            { order: 1, displayName: "東京IC", googleName: "東名高速道路 東京インターチェンジ", lat: 35.625, lng: 139.632 },
-            { order: 2, displayName: "東名川崎IC", googleName: "東名高速道路 東名川崎インターチェンジ", lat: 35.589, lng: 139.587 },
-            { order: 3, displayName: "横浜青葉IC", googleName: "東名高速道路 横浜青葉インターチェンジ", lat: 35.542, lng: 139.537, connection: true, connectedRoads: ["tomei", "shutoKanagawaK7Hokusei"] },
-            { order: 4, displayName: "横浜町田IC", googleName: "東名高速道路 横浜町田インターチェンジ", lat: 35.513, lng: 139.474, connection: true, connectedRoads: ["tomei", "hodogayaBypass"] },
-            { order: 5, displayName: "綾瀬SIC", googleName: "東名高速道路 綾瀬スマートインターチェンジ", lat: 35.436, lng: 139.429 },
-            { order: 6, displayName: "厚木IC", googleName: "東名高速道路 厚木インターチェンジ", lat: 35.417, lng: 139.364, connection: true, connectedRoads: ["tomei", "odawaraAtsugi"] },
-            { order: 7, displayName: "秦野中井IC", googleName: "東名高速道路 秦野中井インターチェンジ", lat: 35.374, lng: 139.214 },
-            { order: 8, displayName: "大井松田IC", googleName: "東名高速道路 大井松田インターチェンジ", lat: 35.344, lng: 139.152 },
-            { order: 8.5, displayName: "足柄SIC", googleName: "東名高速道路 足柄スマートインターチェンジ", lat: 35.314, lng: 138.966 },
-            { order: 9, displayName: "御殿場IC", googleName: "東名高速道路 御殿場インターチェンジ", lat: 35.300, lng: 138.934 },
-            { order: 9.5, displayName: "駒門SIC", googleName: "東名高速道路 駒門スマートインターチェンジ", lat: 35.239, lng: 138.908 },
-            { order: 10, displayName: "裾野IC", googleName: "東名高速道路 裾野インターチェンジ", lat: 35.190, lng: 138.909 },
-            { order: 11, displayName: "沼津IC", googleName: "東名高速道路 沼津インターチェンジ", lat: 35.156, lng: 138.860 },
-            { order: 11.5, displayName: "愛鷹SIC", googleName: "東名高速道路 愛鷹スマートインターチェンジ", lat: 35.143, lng: 138.837 },
-            { order: 12, displayName: "富士IC", googleName: "東名高速道路 富士インターチェンジ", lat: 35.180, lng: 138.671 },
-            { order: 12.5, displayName: "富士川SIC", googleName: "東名高速道路 富士川スマートインターチェンジ", lat: 35.159, lng: 138.619 },
-            { order: 13, displayName: "清水IC", googleName: "東名高速道路 清水インターチェンジ", lat: 35.037, lng: 138.477 },
-            { order: 13.5, displayName: "日本平久能山SIC", googleName: "東名高速道路 日本平久能山スマートインターチェンジ", lat: 34.962, lng: 138.422 },
-            { order: 14, displayName: "静岡IC", googleName: "東名高速道路 静岡インターチェンジ", lat: 34.944, lng: 138.395 },
-            { order: 15, displayName: "焼津IC", googleName: "東名高速道路 焼津インターチェンジ", lat: 34.861, lng: 138.302 },
-            { order: 15.5, displayName: "大井川焼津藤枝SIC", googleName: "東名高速道路 大井川焼津藤枝スマートインターチェンジ", lat: 34.821, lng: 138.269 },
-            { order: 16, displayName: "吉田IC", googleName: "東名高速道路 吉田インターチェンジ", lat: 34.781, lng: 138.252 },
-            { order: 17, displayName: "相良牧之原IC", googleName: "東名高速道路 相良牧之原インターチェンジ", lat: 34.735, lng: 138.179 },
-            { order: 18, displayName: "菊川IC", googleName: "東名高速道路 菊川インターチェンジ", lat: 34.748, lng: 138.086 },
-            { order: 19, displayName: "掛川IC", googleName: "東名高速道路 掛川インターチェンジ", lat: 34.754, lng: 137.999 },
-            { order: 20, displayName: "袋井IC", googleName: "東名高速道路 袋井インターチェンジ", lat: 34.749, lng: 137.908 },
-            { order: 21, displayName: "磐田IC", googleName: "東名高速道路 磐田インターチェンジ", lat: 34.783, lng: 137.823 },
-            { order: 21.5, displayName: "遠州豊田SIC", googleName: "東名高速道路 遠州豊田スマートインターチェンジ", lat: 34.748, lng: 137.840 },
-            { order: 22, displayName: "浜松IC", googleName: "東名高速道路 浜松インターチェンジ", lat: 34.758, lng: 137.773 }
+            { order: -8, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.731, lng: 139.817, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.731, entranceLng: 139.817, exitLat: 35.731, exitLng: 139.817
+            },
+            { order: -7, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.712, lng: 139.779, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.712, entranceLng: 139.779, exitLat: 35.712, exitLng: 139.779
+            },
+            { order: -6, displayName: "用賀（首都高）", googleName: "首都高速3号渋谷線 用賀出入口", lat: 35.626, lng: 139.633, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.626, entranceLng: 139.633, exitLat: 35.626, exitLng: 139.633
+            },
+            { order: -5, displayName: "霞が関（首都高）", googleName: "首都高速都心環状線 霞が関出入口", lat: 35.671, lng: 139.751, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.671, entranceLng: 139.751, exitLat: 35.671, exitLng: 139.751
+            },
+            { order: -4, displayName: "外苑（首都高）", googleName: "首都高速4号新宿線 外苑出入口", lat: 35.677, lng: 139.718, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.677, entranceLng: 139.718, exitLat: 35.677, exitLng: 139.718
+            },
+            { order: -3, displayName: "代官町（首都高）", googleName: "首都高速都心環状線 代官町出入口", lat: 35.688, lng: 139.754, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.688, entranceLng: 139.754, exitLat: 35.688, exitLng: 139.754
+            },
+            { order: -2, displayName: "一ツ橋（首都高）", googleName: "首都高速都心環状線 一ツ橋出入口", lat: 35.692, lng: 139.758, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.692, entranceLng: 139.758, exitLat: 35.692, exitLng: 139.758
+            },
+            { order: -1, displayName: "戸越（首都高）", googleName: "首都高速2号目黒線 戸越出入口", lat: 35.615, lng: 139.716, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.615, entranceLng: 139.716, exitLat: 35.615, exitLng: 139.716
+            },
+            { order: 1, displayName: "東京IC", googleName: "東名高速道路 東京インターチェンジ", lat: 35.625, lng: 139.632,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.625, entranceLng: 139.632, exitLat: 35.625, exitLng: 139.632
+            },
+            { order: 2, displayName: "東名川崎IC", googleName: "東名高速道路 東名川崎インターチェンジ", lat: 35.589, lng: 139.587,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.589, entranceLng: 139.587, exitLat: 35.589, exitLng: 139.587
+            },
+            { order: 3, displayName: "横浜青葉IC", googleName: "東名高速道路 横浜青葉インターチェンジ", lat: 35.542, lng: 139.537, connection: true, connectedRoads: ["tomei", "shutoKanagawaK7Hokusei"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.542, entranceLng: 139.537, exitLat: 35.542, exitLng: 139.537
+            },
+            { order: 4, displayName: "横浜町田IC", googleName: "東名高速道路 横浜町田インターチェンジ", lat: 35.513, lng: 139.474, connection: true, connectedRoads: ["tomei", "hodogayaBypass"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.513, entranceLng: 139.474, exitLat: 35.513, exitLng: 139.474
+            },
+            { order: 5, displayName: "綾瀬SIC", googleName: "東名高速道路 綾瀬スマートインターチェンジ", lat: 35.436, lng: 139.429,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.436, entranceLng: 139.429, exitLat: 35.436, exitLng: 139.429
+            },
+            { order: 6, displayName: "厚木IC", googleName: "東名高速道路 厚木インターチェンジ", lat: 35.417, lng: 139.364, connection: true, connectedRoads: ["tomei", "odawaraAtsugi"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.417, entranceLng: 139.364, exitLat: 35.417, exitLng: 139.364
+            },
+            { order: 7, displayName: "秦野中井IC", googleName: "東名高速道路 秦野中井インターチェンジ", lat: 35.374, lng: 139.214,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.374, entranceLng: 139.214, exitLat: 35.374, exitLng: 139.214
+            },
+            { order: 8, displayName: "大井松田IC", googleName: "東名高速道路 大井松田インターチェンジ", lat: 35.344, lng: 139.152,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.344, entranceLng: 139.152, exitLat: 35.344, exitLng: 139.152
+            },
+            { order: 8.5, displayName: "足柄SIC", googleName: "東名高速道路 足柄スマートインターチェンジ", lat: 35.314, lng: 138.966,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.314, entranceLng: 138.966, exitLat: 35.314, exitLng: 138.966
+            },
+            { order: 9, displayName: "御殿場IC", googleName: "東名高速道路 御殿場インターチェンジ", lat: 35.300, lng: 138.934,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.300, entranceLng: 138.934, exitLat: 35.300, exitLng: 138.934
+            },
+            { order: 9.5, displayName: "駒門SIC", googleName: "東名高速道路 駒門スマートインターチェンジ", lat: 35.239, lng: 138.908,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.239, entranceLng: 138.908, exitLat: 35.239, exitLng: 138.908
+            },
+            { order: 10, displayName: "裾野IC", googleName: "東名高速道路 裾野インターチェンジ", lat: 35.190, lng: 138.909,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.190, entranceLng: 138.909, exitLat: 35.190, exitLng: 138.909
+            },
+            { order: 11, displayName: "沼津IC", googleName: "東名高速道路 沼津インターチェンジ", lat: 35.156, lng: 138.860,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.156, entranceLng: 138.860, exitLat: 35.156, exitLng: 138.860
+            },
+            { order: 11.5, displayName: "愛鷹SIC", googleName: "東名高速道路 愛鷹スマートインターチェンジ", lat: 35.143, lng: 138.837,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.143, entranceLng: 138.837, exitLat: 35.143, exitLng: 138.837
+            },
+            { order: 12, displayName: "富士IC", googleName: "東名高速道路 富士インターチェンジ", lat: 35.180, lng: 138.671,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.180, entranceLng: 138.671, exitLat: 35.180, exitLng: 138.671
+            },
+            { order: 12.5, displayName: "富士川SIC", googleName: "東名高速道路 富士川スマートインターチェンジ", lat: 35.159, lng: 138.619,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.159, entranceLng: 138.619, exitLat: 35.159, exitLng: 138.619
+            },
+            { order: 13, displayName: "清水IC", googleName: "東名高速道路 清水インターチェンジ", lat: 35.037, lng: 138.477,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.037, entranceLng: 138.477, exitLat: 35.037, exitLng: 138.477
+            },
+            { order: 13.5, displayName: "日本平久能山SIC", googleName: "東名高速道路 日本平久能山スマートインターチェンジ", lat: 34.962, lng: 138.422,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 34.962, entranceLng: 138.422, exitLat: 34.962, exitLng: 138.422
+            },
+            { order: 14, displayName: "静岡IC", googleName: "東名高速道路 静岡インターチェンジ", lat: 34.944, lng: 138.395,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 34.944, entranceLng: 138.395, exitLat: 34.944, exitLng: 138.395
+            },
+            { order: 15, displayName: "焼津IC", googleName: "東名高速道路 焼津インターチェンジ", lat: 34.861, lng: 138.302,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 34.861, entranceLng: 138.302, exitLat: 34.861, exitLng: 138.302
+            },
+            { order: 15.5, displayName: "大井川焼津藤枝SIC", googleName: "東名高速道路 大井川焼津藤枝スマートインターチェンジ", lat: 34.821, lng: 138.269,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 34.821, entranceLng: 138.269, exitLat: 34.821, exitLng: 138.269
+            },
+            { order: 16, displayName: "吉田IC", googleName: "東名高速道路 吉田インターチェンジ", lat: 34.781, lng: 138.252,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 34.781, entranceLng: 138.252, exitLat: 34.781, exitLng: 138.252
+            },
+            { order: 17, displayName: "相良牧之原IC", googleName: "東名高速道路 相良牧之原インターチェンジ", lat: 34.735, lng: 138.179,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 34.735, entranceLng: 138.179, exitLat: 34.735, exitLng: 138.179
+            },
+            { order: 18, displayName: "菊川IC", googleName: "東名高速道路 菊川インターチェンジ", lat: 34.748, lng: 138.086,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 34.748, entranceLng: 138.086, exitLat: 34.748, exitLng: 138.086
+            },
+            { order: 19, displayName: "掛川IC", googleName: "東名高速道路 掛川インターチェンジ", lat: 34.754, lng: 137.999,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 34.754, entranceLng: 137.999, exitLat: 34.754, exitLng: 137.999
+            },
+            { order: 20, displayName: "袋井IC", googleName: "東名高速道路 袋井インターチェンジ", lat: 34.749, lng: 137.908,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 34.749, entranceLng: 137.908, exitLat: 34.749, exitLng: 137.908
+            },
+            { order: 21, displayName: "磐田IC", googleName: "東名高速道路 磐田インターチェンジ", lat: 34.783, lng: 137.823,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 34.783, entranceLng: 137.823, exitLat: 34.783, exitLng: 137.823
+            },
+            { order: 21.5, displayName: "遠州豊田SIC", googleName: "東名高速道路 遠州豊田スマートインターチェンジ", lat: 34.748, lng: 137.840,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 34.748, entranceLng: 137.840, exitLat: 34.748, exitLng: 137.840
+            },
+            { order: 22, displayName: "浜松IC", googleName: "東名高速道路 浜松インターチェンジ", lat: 34.758, lng: 137.773,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 34.758, entranceLng: 137.773, exitLat: 34.758, exitLng: 137.773
+            }
         ]
     },
 
@@ -3928,12 +4229,24 @@ const IC_MASTER = {
     daisanKeihin: {
         label: "第三京浜方面",
         exits: [
-            { order: 1, displayName: "玉川IC", googleName: "第三京浜道路 玉川インターチェンジ", lat: 35.604, lng: 139.645, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 1 },
-            { order: 2, displayName: "京浜川崎IC", googleName: "第三京浜道路 京浜川崎インターチェンジ", lat: 35.578, lng: 139.627, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 2 },
-            { order: 3, displayName: "都筑IC", googleName: "第三京浜道路 都筑インターチェンジ", lat: 35.544, lng: 139.592, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 3 },
-            { order: 4, displayName: "港北IC", googleName: "第三京浜道路 港北インターチェンジ", lat: 35.519, lng: 139.600, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 4, connection: true, connectedRoads: ["daisanKeihin", "shutoKanagawaK7", "shutoKanagawaK7Hokusei"] },
-            { order: 5, displayName: "羽沢IC", googleName: "第三京浜道路 羽沢インターチェンジ", lat: 35.492, lng: 139.592, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 5 },
-            { order: 6, displayName: "保土ヶ谷IC", googleName: "第三京浜道路 保土ヶ谷インターチェンジ", lat: 35.474, lng: 139.586, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 6, connection: true, connectedRoads: ["daisanKeihin", "yokohamaShindo"] }
+            { order: 1, displayName: "玉川IC", googleName: "第三京浜道路 玉川インターチェンジ", lat: 35.604, lng: 139.645, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 1,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.604, entranceLng: 139.645, exitLat: 35.604, exitLng: 139.645
+            },
+            { order: 2, displayName: "京浜川崎IC", googleName: "第三京浜道路 京浜川崎インターチェンジ", lat: 35.578, lng: 139.627, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 2,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.578, entranceLng: 139.627, exitLat: 35.578, exitLng: 139.627
+            },
+            { order: 3, displayName: "都筑IC", googleName: "第三京浜道路 都筑インターチェンジ", lat: 35.544, lng: 139.592, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 3,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.544, entranceLng: 139.592, exitLat: 35.544, exitLng: 139.592
+            },
+            { order: 4, displayName: "港北IC", googleName: "第三京浜道路 港北インターチェンジ", lat: 35.519, lng: 139.600, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 4, connection: true, connectedRoads: ["daisanKeihin", "shutoKanagawaK7", "shutoKanagawaK7Hokusei"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.519, entranceLng: 139.600, exitLat: 35.519, exitLng: 139.600
+            },
+            { order: 5, displayName: "羽沢IC", googleName: "第三京浜道路 羽沢インターチェンジ", lat: 35.492, lng: 139.592, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 5,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.492, entranceLng: 139.592, exitLat: 35.492, exitLng: 139.592
+            },
+            { order: 6, displayName: "保土ヶ谷IC", googleName: "第三京浜道路 保土ヶ谷インターチェンジ", lat: 35.474, lng: 139.586, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 6, connection: true, connectedRoads: ["daisanKeihin", "yokohamaShindo"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.474, entranceLng: 139.586, exitLat: 35.474, exitLng: 139.586
+            }
         ]
     },
 
@@ -3941,16 +4254,36 @@ const IC_MASTER = {
     yokohamaShindo: {
         label: "横浜新道方面",
         exits: [
-            { order: 1, displayName: "保土ヶ谷IC", googleName: "横浜新道 保土ヶ谷インターチェンジ", lat: 35.474, lng: 139.586, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 1, connection: true, connectedRoads: ["yokohamaShindo", "daisanKeihin"] },
-            { order: 2, displayName: "常盤台出口", googleName: "横浜新道 常盤台出口", lat: 35.473, lng: 139.590, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 2 },
-            { order: 3, displayName: "峰岡出口", googleName: "横浜新道 峰岡出口", lat: 35.463, lng: 139.590, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 3 },
-            { order: 4, displayName: "星川入口", googleName: "横浜新道 星川入口", lat: 35.459, lng: 139.588, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 4 },
-            { order: 5, displayName: "藤塚IC", googleName: "横浜新道 藤塚インターチェンジ", lat: 35.458, lng: 139.567, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 5 },
-            { order: 6, displayName: "新保土ヶ谷IC", googleName: "横浜新道 新保土ヶ谷インターチェンジ", lat: 35.455, lng: 139.557, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 6, connection: true, connectedRoads: ["yokohamaShindo", "hodogayaBypass"] },
-            { order: 7, displayName: "今井IC", googleName: "横浜新道 今井インターチェンジ", lat: 35.441, lng: 139.551, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 7 },
-            { order: 8, displayName: "川上IC", googleName: "横浜新道 川上インターチェンジ", lat: 35.429, lng: 139.542, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 8 },
-            { order: 9, displayName: "上矢部IC", googleName: "横浜新道 上矢部インターチェンジ", lat: 35.409, lng: 139.529, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 9 },
-            { order: 10, displayName: "戸塚終点", googleName: "横浜新道 戸塚終点", lat: 35.397, lng: 139.530, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 10 }
+            { order: 1, displayName: "保土ヶ谷IC", googleName: "横浜新道 保土ヶ谷インターチェンジ", lat: 35.474, lng: 139.586, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 1, connection: true, connectedRoads: ["yokohamaShindo", "daisanKeihin"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.474, entranceLng: 139.586, exitLat: 35.474, exitLng: 139.586
+            },
+            { order: 2, displayName: "常盤台出口", googleName: "横浜新道 常盤台出口", lat: 35.473, lng: 139.590, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 2,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.473, entranceLng: 139.590, exitLat: 35.473, exitLng: 139.590
+            },
+            { order: 3, displayName: "峰岡出口", googleName: "横浜新道 峰岡出口", lat: 35.463, lng: 139.590, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 3,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.463, entranceLng: 139.590, exitLat: 35.463, exitLng: 139.590
+            },
+            { order: 4, displayName: "星川入口", googleName: "横浜新道 星川入口", lat: 35.459, lng: 139.588, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 4,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.459, entranceLng: 139.588, exitLat: 35.459, exitLng: 139.588
+            },
+            { order: 5, displayName: "藤塚IC", googleName: "横浜新道 藤塚インターチェンジ", lat: 35.458, lng: 139.567, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 5,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.458, entranceLng: 139.567, exitLat: 35.458, exitLng: 139.567
+            },
+            { order: 6, displayName: "新保土ヶ谷IC", googleName: "横浜新道 新保土ヶ谷インターチェンジ", lat: 35.455, lng: 139.557, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 6, connection: true, connectedRoads: ["yokohamaShindo", "hodogayaBypass"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.455, entranceLng: 139.557, exitLat: 35.455, exitLng: 139.557
+            },
+            { order: 7, displayName: "今井IC", googleName: "横浜新道 今井インターチェンジ", lat: 35.441, lng: 139.551, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 7,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.441, entranceLng: 139.551, exitLat: 35.441, exitLng: 139.551
+            },
+            { order: 8, displayName: "川上IC", googleName: "横浜新道 川上インターチェンジ", lat: 35.429, lng: 139.542, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 8,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.429, entranceLng: 139.542, exitLat: 35.429, exitLng: 139.542
+            },
+            { order: 9, displayName: "上矢部IC", googleName: "横浜新道 上矢部インターチェンジ", lat: 35.409, lng: 139.529, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 9,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.409, entranceLng: 139.529, exitLat: 35.409, exitLng: 139.529
+            },
+            { order: 10, displayName: "戸塚終点", googleName: "横浜新道 戸塚終点", lat: 35.397, lng: 139.530, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 10,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.397, entranceLng: 139.530, exitLat: 35.397, exitLng: 139.530
+            }
         ]
     },
 
@@ -3958,13 +4291,27 @@ const IC_MASTER = {
     hodogayaBypass: {
         label: "保土ヶ谷バイパス方面",
         exits: [
-            { order: 1, displayName: "新保土ヶ谷IC", googleName: "保土ヶ谷バイパス 新保土ヶ谷インターチェンジ", lat: 35.455, lng: 139.557, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 1, connection: true, connectedRoads: ["hodogayaBypass", "yokohamaShindo"] },
-            { order: 2, displayName: "新桜ヶ丘IC", googleName: "保土ヶ谷バイパス 新桜ヶ丘インターチェンジ", lat: 35.451, lng: 139.542, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 2 },
-            { order: 3, displayName: "南本宿IC", googleName: "保土ヶ谷バイパス 南本宿インターチェンジ", lat: 35.457, lng: 139.526, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 3 },
-            { order: 4, displayName: "本村IC", googleName: "保土ヶ谷バイパス 本村インターチェンジ", lat: 35.466, lng: 139.514, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 4 },
-            { order: 5, displayName: "下川井IC", googleName: "保土ヶ谷バイパス 下川井インターチェンジ", lat: 35.486, lng: 139.506, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 5 },
-            { order: 6, displayName: "上川井IC", googleName: "保土ヶ谷バイパス 上川井インターチェンジ", lat: 35.497, lng: 139.494, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 6 },
-            { order: 7, displayName: "横浜町田IC", googleName: "保土ヶ谷バイパス 横浜町田インターチェンジ", lat: 35.513, lng: 139.474, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 7, connection: true, connectedRoads: ["hodogayaBypass", "tomei"] }
+            { order: 1, displayName: "新保土ヶ谷IC", googleName: "保土ヶ谷バイパス 新保土ヶ谷インターチェンジ", lat: 35.455, lng: 139.557, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 1, connection: true, connectedRoads: ["hodogayaBypass", "yokohamaShindo"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.455, entranceLng: 139.557, exitLat: 35.455, exitLng: 139.557
+            },
+            { order: 2, displayName: "新桜ヶ丘IC", googleName: "保土ヶ谷バイパス 新桜ヶ丘インターチェンジ", lat: 35.451, lng: 139.542, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 2,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.451, entranceLng: 139.542, exitLat: 35.451, exitLng: 139.542
+            },
+            { order: 3, displayName: "南本宿IC", googleName: "保土ヶ谷バイパス 南本宿インターチェンジ", lat: 35.457, lng: 139.526, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 3,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.457, entranceLng: 139.526, exitLat: 35.457, exitLng: 139.526
+            },
+            { order: 4, displayName: "本村IC", googleName: "保土ヶ谷バイパス 本村インターチェンジ", lat: 35.466, lng: 139.514, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 4,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.466, entranceLng: 139.514, exitLat: 35.466, exitLng: 139.514
+            },
+            { order: 5, displayName: "下川井IC", googleName: "保土ヶ谷バイパス 下川井インターチェンジ", lat: 35.486, lng: 139.506, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 5,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.486, entranceLng: 139.506, exitLat: 35.486, exitLng: 139.506
+            },
+            { order: 6, displayName: "上川井IC", googleName: "保土ヶ谷バイパス 上川井インターチェンジ", lat: 35.497, lng: 139.494, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 6,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.497, entranceLng: 139.494, exitLat: 35.497, exitLng: 139.494
+            },
+            { order: 7, displayName: "横浜町田IC", googleName: "保土ヶ谷バイパス 横浜町田インターチェンジ", lat: 35.513, lng: 139.474, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 7, connection: true, connectedRoads: ["hodogayaBypass", "tomei"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.513, entranceLng: 139.474, exitLat: 35.513, exitLng: 139.474
+            }
         ]
     },
 
@@ -3972,17 +4319,39 @@ const IC_MASTER = {
     shutoKanagawaK1: {
         label: "首都高神奈川横羽線方面",
         exits: [
-            { order: 1, displayName: "大師", googleName: "首都高速神奈川1号横羽線 大師出入口", lat: 35.535, lng: 139.726, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 1 },
-            { order: 2, displayName: "浅田", googleName: "首都高速神奈川1号横羽線 浅田出入口", lat: 35.520, lng: 139.706, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 2 },
-            { order: 3, displayName: "浜川崎", googleName: "首都高速神奈川1号横羽線 浜川崎出入口", lat: 35.522, lng: 139.718, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 3 },
-            { order: 4, displayName: "生麦", googleName: "首都高速神奈川1号横羽線 生麦出入口", lat: 35.495, lng: 139.668, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 4, connection: true, connectedRoads: ["shutoKanagawaK1", "shutoKanagawaK7"] },
-            { order: 5, displayName: "汐入", googleName: "首都高速神奈川1号横羽線 汐入出入口", lat: 35.501, lng: 139.682, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 5 },
-            { order: 6, displayName: "守屋町", googleName: "首都高速神奈川1号横羽線 守屋町出口", lat: 35.481, lng: 139.660, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 6, isSelectable: false },
-            { order: 7, displayName: "子安", googleName: "首都高速神奈川1号横羽線 子安出入口", lat: 35.483, lng: 139.646, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 7 },
-            { order: 8, displayName: "東神奈川", googleName: "首都高速神奈川1号横羽線 東神奈川出入口", lat: 35.476, lng: 139.636, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 8 },
-            { order: 9, displayName: "横浜駅東口", googleName: "首都高速神奈川1号横羽線 横浜駅東口出入口", lat: 35.466, lng: 139.626, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 9 },
-            { order: 10, displayName: "みなとみらい", googleName: "首都高速神奈川1号横羽線 みなとみらい出入口", lat: 35.457, lng: 139.632, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 10 },
-            { order: 11, displayName: "横浜公園", googleName: "首都高速神奈川1号横羽線 横浜公園出入口", lat: 35.444, lng: 139.642, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 11 }
+            { order: 1, displayName: "大師", googleName: "首都高速神奈川1号横羽線 大師出入口", lat: 35.535, lng: 139.726, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 1,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.535, entranceLng: 139.726, exitLat: 35.535, exitLng: 139.726
+            },
+            { order: 2, displayName: "浅田", googleName: "首都高速神奈川1号横羽線 浅田出入口", lat: 35.520, lng: 139.706, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 2,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.520, entranceLng: 139.706, exitLat: 35.520, exitLng: 139.706
+            },
+            { order: 3, displayName: "浜川崎", googleName: "首都高速神奈川1号横羽線 浜川崎出入口", lat: 35.522, lng: 139.718, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 3,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.522, entranceLng: 139.718, exitLat: 35.522, exitLng: 139.718
+            },
+            { order: 4, displayName: "生麦", googleName: "首都高速神奈川1号横羽線 生麦出入口", lat: 35.495, lng: 139.668, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 4, connection: true, connectedRoads: ["shutoKanagawaK1", "shutoKanagawaK7"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.495, entranceLng: 139.668, exitLat: 35.495, exitLng: 139.668
+            },
+            { order: 5, displayName: "汐入", googleName: "首都高速神奈川1号横羽線 汐入出入口", lat: 35.501, lng: 139.682, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 5,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.501, entranceLng: 139.682, exitLat: 35.501, exitLng: 139.682
+            },
+            { order: 6, displayName: "守屋町", googleName: "首都高速神奈川1号横羽線 守屋町出口", lat: 35.481, lng: 139.660, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 6, isSelectable: false,
+                entranceSelectable: false, exitSelectable: false, entranceLat: 35.481, entranceLng: 139.660, exitLat: 35.481, exitLng: 139.660
+            },
+            { order: 7, displayName: "子安", googleName: "首都高速神奈川1号横羽線 子安出入口", lat: 35.483, lng: 139.646, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 7,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.483, entranceLng: 139.646, exitLat: 35.483, exitLng: 139.646
+            },
+            { order: 8, displayName: "東神奈川", googleName: "首都高速神奈川1号横羽線 東神奈川出入口", lat: 35.476, lng: 139.636, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 8,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.476, entranceLng: 139.636, exitLat: 35.476, exitLng: 139.636
+            },
+            { order: 9, displayName: "横浜駅東口", googleName: "首都高速神奈川1号横羽線 横浜駅東口出入口", lat: 35.466, lng: 139.626, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 9,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.466, entranceLng: 139.626, exitLat: 35.466, exitLng: 139.626
+            },
+            { order: 10, displayName: "みなとみらい", googleName: "首都高速神奈川1号横羽線 みなとみらい出入口", lat: 35.457, lng: 139.632, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 10,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.457, entranceLng: 139.632, exitLat: 35.457, exitLng: 139.632
+            },
+            { order: 11, displayName: "横浜公園", googleName: "首都高速神奈川1号横羽線 横浜公園出入口", lat: 35.444, lng: 139.642, roadType: "首都高", routeBranch: "shutoKanagawaK1", branchOrder: 11,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.444, entranceLng: 139.642, exitLat: 35.444, exitLng: 139.642
+            }
         ]
     },
 
@@ -3990,10 +4359,18 @@ const IC_MASTER = {
     shutoKanagawaK7: {
         label: "首都高横浜北線方面",
         exits: [
-            { order: 1, displayName: "岸谷生麦", googleName: "首都高速神奈川7号横浜北線 岸谷生麦出入口", lat: 35.495, lng: 139.667, roadType: "首都高", routeBranch: "shutoKanagawaK7", branchOrder: 1, connection: true, connectedRoads: ["shutoKanagawaK7", "shutoKanagawaK1"] },
-            { order: 2, displayName: "馬場", googleName: "首都高速神奈川7号横浜北線 馬場出入口", lat: 35.504, lng: 139.646, roadType: "首都高", routeBranch: "shutoKanagawaK7", branchOrder: 2 },
-            { order: 3, displayName: "新横浜", googleName: "首都高速神奈川7号横浜北線 新横浜出入口", lat: 35.513, lng: 139.618, roadType: "首都高", routeBranch: "shutoKanagawaK7", branchOrder: 3 },
-            { order: 4, displayName: "横浜港北", googleName: "首都高速神奈川7号横浜北線 横浜港北出入口", lat: 35.519, lng: 139.600, roadType: "首都高", routeBranch: "shutoKanagawaK7", branchOrder: 4, isSelectable: false, connection: true, connectedRoads: ["shutoKanagawaK7", "shutoKanagawaK7Hokusei", "daisanKeihin"] }
+            { order: 1, displayName: "岸谷生麦", googleName: "首都高速神奈川7号横浜北線 岸谷生麦出入口", lat: 35.495, lng: 139.667, roadType: "首都高", routeBranch: "shutoKanagawaK7", branchOrder: 1, connection: true, connectedRoads: ["shutoKanagawaK7", "shutoKanagawaK1"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.495, entranceLng: 139.667, exitLat: 35.495, exitLng: 139.667
+            },
+            { order: 2, displayName: "馬場", googleName: "首都高速神奈川7号横浜北線 馬場出入口", lat: 35.504, lng: 139.646, roadType: "首都高", routeBranch: "shutoKanagawaK7", branchOrder: 2,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.504, entranceLng: 139.646, exitLat: 35.504, exitLng: 139.646
+            },
+            { order: 3, displayName: "新横浜", googleName: "首都高速神奈川7号横浜北線 新横浜出入口", lat: 35.513, lng: 139.618, roadType: "首都高", routeBranch: "shutoKanagawaK7", branchOrder: 3,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.513, entranceLng: 139.618, exitLat: 35.513, exitLng: 139.618
+            },
+            { order: 4, displayName: "横浜港北", googleName: "首都高速神奈川7号横浜北線 横浜港北出入口", lat: 35.519, lng: 139.600, roadType: "首都高", routeBranch: "shutoKanagawaK7", branchOrder: 4, isSelectable: false, connection: true, connectedRoads: ["shutoKanagawaK7", "shutoKanagawaK7Hokusei", "daisanKeihin"],
+                entranceSelectable: false, exitSelectable: false, entranceLat: 35.519, entranceLng: 139.600, exitLat: 35.519, exitLng: 139.600
+            }
         ]
     },
 
@@ -4001,8 +4378,12 @@ const IC_MASTER = {
     shutoKanagawaK7Hokusei: {
         label: "首都高横浜北西線方面",
         exits: [
-            { order: 1, displayName: "横浜港北", googleName: "首都高速神奈川7号横浜北西線 横浜港北出入口", lat: 35.519, lng: 139.600, roadType: "首都高", routeBranch: "shutoKanagawaK7Hokusei", branchOrder: 1, isSelectable: false, connection: true, connectedRoads: ["shutoKanagawaK7Hokusei", "shutoKanagawaK7", "daisanKeihin"] },
-            { order: 2, displayName: "横浜青葉", googleName: "首都高速神奈川7号横浜北西線 横浜青葉出入口", lat: 35.542, lng: 139.537, roadType: "首都高", routeBranch: "shutoKanagawaK7Hokusei", branchOrder: 2, connection: true, connectedRoads: ["shutoKanagawaK7Hokusei", "tomei"] }
+            { order: 1, displayName: "横浜港北", googleName: "首都高速神奈川7号横浜北西線 横浜港北出入口", lat: 35.519, lng: 139.600, roadType: "首都高", routeBranch: "shutoKanagawaK7Hokusei", branchOrder: 1, isSelectable: false, connection: true, connectedRoads: ["shutoKanagawaK7Hokusei", "shutoKanagawaK7", "daisanKeihin"],
+                entranceSelectable: false, exitSelectable: false, entranceLat: 35.519, entranceLng: 139.600, exitLat: 35.519, exitLng: 139.600
+            },
+            { order: 2, displayName: "横浜青葉", googleName: "首都高速神奈川7号横浜北西線 横浜青葉出入口", lat: 35.542, lng: 139.537, roadType: "首都高", routeBranch: "shutoKanagawaK7Hokusei", branchOrder: 2, connection: true, connectedRoads: ["shutoKanagawaK7Hokusei", "tomei"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.542, entranceLng: 139.537, exitLat: 35.542, exitLng: 139.537
+            }
         ]
     },
 
@@ -4020,7 +4401,8 @@ const IC_MASTER = {
                 routeBranch: "odawaraAtsugi",
                 branchOrder: 1,
                 connection: true,
-                connectedRoads: ["tomei", "odawaraAtsugi"]
+                connectedRoads: ["tomei", "odawaraAtsugi"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.417, entranceLng: 139.364, exitLat: 35.417, exitLng: 139.364
             },
             {
                 order: 2,
@@ -4030,7 +4412,8 @@ const IC_MASTER = {
                 lng: 139.3509,
                 roadType: "小田原厚木道路",
                 routeBranch: "odawaraAtsugi",
-                branchOrder: 2
+                branchOrder: 2,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.41657, entranceLng: 139.3509, exitLat: 35.41657, exitLng: 139.3509
             },
             {
                 order: 3,
@@ -4040,7 +4423,8 @@ const IC_MASTER = {
                 lng: 139.3314,
                 roadType: "小田原厚木道路",
                 routeBranch: "odawaraAtsugi",
-                branchOrder: 3
+                branchOrder: 3,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.38629, entranceLng: 139.3314, exitLat: 35.38629, exitLng: 139.3314
             },
             {
                 order: 4,
@@ -4050,7 +4434,8 @@ const IC_MASTER = {
                 lng: 139.3028,
                 roadType: "小田原厚木道路",
                 routeBranch: "odawaraAtsugi",
-                branchOrder: 4
+                branchOrder: 4,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.35883, entranceLng: 139.3028, exitLat: 35.35883, exitLng: 139.3028
             },
             {
                 order: 5,
@@ -4060,7 +4445,8 @@ const IC_MASTER = {
                 lng: 139.2719,
                 roadType: "小田原厚木道路",
                 routeBranch: "odawaraAtsugi",
-                branchOrder: 5
+                branchOrder: 5,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.31957, entranceLng: 139.2719, exitLat: 35.31957, exitLng: 139.2719
             },
             {
                 order: 6,
@@ -4070,7 +4456,8 @@ const IC_MASTER = {
                 lng: 139.2378,
                 roadType: "小田原厚木道路",
                 routeBranch: "odawaraAtsugi",
-                branchOrder: 6
+                branchOrder: 6,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.30803, entranceLng: 139.2378, exitLat: 35.30803, exitLng: 139.2378
             },
             {
                 order: 7,
@@ -4080,7 +4467,8 @@ const IC_MASTER = {
                 lng: 139.1697,
                 roadType: "小田原厚木道路",
                 routeBranch: "odawaraAtsugi",
-                branchOrder: 7
+                branchOrder: 7,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.28621, entranceLng: 139.1697, exitLat: 35.28621, exitLng: 139.1697
             },
             {
                 order: 8,
@@ -4090,7 +4478,8 @@ const IC_MASTER = {
                 lng: 139.13601,
                 roadType: "小田原厚木道路",
                 routeBranch: "odawaraAtsugi",
-                branchOrder: 8
+                branchOrder: 8,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.25742, entranceLng: 139.13601, exitLat: 35.25742, exitLng: 139.13601
             },
             {
                 order: 9,
@@ -4100,7 +4489,8 @@ const IC_MASTER = {
                 lng: 139.1352,
                 roadType: "小田原厚木道路",
                 routeBranch: "odawaraAtsugi",
-                branchOrder: 9
+                branchOrder: 9,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.2446, entranceLng: 139.1352, exitLat: 35.2446, exitLng: 139.1352
             }
         ]
     },
@@ -4110,14 +4500,30 @@ const IC_MASTER = {
     aqualine: {
         label: "アクアライン方面",
         exits: [
-            { order: -8, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.731, lng: 139.817, experimental: true, roadType: "首都高" },
-            { order: -7, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.712, lng: 139.779, experimental: true, roadType: "首都高" },
-            { order: -6, displayName: "葛西（首都高）", googleName: "首都高速湾岸線 葛西出入口", lat: 35.652, lng: 139.870, experimental: true, roadType: "首都高" },
-            { order: -5, displayName: "湾岸市川（首都高）", googleName: "首都高速湾岸線 湾岸市川出入口", lat: 35.672, lng: 139.938, experimental: true, roadType: "首都高" },
-            { order: -4, displayName: "新木場（首都高）", googleName: "首都高速湾岸線 新木場出入口", lat: 35.645, lng: 139.827, experimental: true, roadType: "首都高" },
-            { order: -3, displayName: "有明（首都高）", googleName: "首都高速湾岸線 有明出入口", lat: 35.634, lng: 139.795, experimental: true, roadType: "首都高" },
-            { order: -2, displayName: "大井南（首都高）", googleName: "首都高速湾岸線 大井南出入口", lat: 35.589, lng: 139.756, experimental: true, roadType: "首都高" },
-            { order: -1, displayName: "空港中央（首都高）", googleName: "首都高速湾岸線 空港中央出入口", lat: 35.553, lng: 139.787, experimental: true, roadType: "首都高" },
+            { order: -8, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.731, lng: 139.817, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.731, entranceLng: 139.817, exitLat: 35.731, exitLng: 139.817
+            },
+            { order: -7, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.712, lng: 139.779, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.712, entranceLng: 139.779, exitLat: 35.712, exitLng: 139.779
+            },
+            { order: -6, displayName: "葛西（首都高）", googleName: "首都高速湾岸線 葛西出入口", lat: 35.652, lng: 139.870, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.652, entranceLng: 139.870, exitLat: 35.652, exitLng: 139.870
+            },
+            { order: -5, displayName: "湾岸市川（首都高）", googleName: "首都高速湾岸線 湾岸市川出入口", lat: 35.672, lng: 139.938, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.672, entranceLng: 139.938, exitLat: 35.672, exitLng: 139.938
+            },
+            { order: -4, displayName: "新木場（首都高）", googleName: "首都高速湾岸線 新木場出入口", lat: 35.645, lng: 139.827, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.645, entranceLng: 139.827, exitLat: 35.645, exitLng: 139.827
+            },
+            { order: -3, displayName: "有明（首都高）", googleName: "首都高速湾岸線 有明出入口", lat: 35.634, lng: 139.795, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.634, entranceLng: 139.795, exitLat: 35.634, exitLng: 139.795
+            },
+            { order: -2, displayName: "大井南（首都高）", googleName: "首都高速湾岸線 大井南出入口", lat: 35.589, lng: 139.756, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.589, entranceLng: 139.756, exitLat: 35.589, exitLng: 139.756
+            },
+            { order: -1, displayName: "空港中央（首都高）", googleName: "首都高速湾岸線 空港中央出入口", lat: 35.553, lng: 139.787, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.553, entranceLng: 139.787, exitLat: 35.553, exitLng: 139.787
+            },
             {
                 order: 1,
                 displayName: "浮島IC",
@@ -4125,7 +4531,8 @@ const IC_MASTER = {
                 lat: 35.521,
                 lng: 139.788,
                 routeBranch: "aqualine",
-                branchOrder: 1
+                branchOrder: 1,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.521, entranceLng: 139.788, exitLat: 35.521, exitLng: 139.788
             },
             {
                 order: 2,
@@ -4135,7 +4542,8 @@ const IC_MASTER = {
                 lng: 139.875,
                 isSelectable: false,
                 routeBranch: "aqualine",
-                branchOrder: 1.5
+                branchOrder: 1.5,
+                entranceSelectable: false, exitSelectable: false, entranceLat: 35.463, entranceLng: 139.875, exitLat: 35.463, exitLng: 139.875
             },
             {
                 order: 3,
@@ -4146,7 +4554,8 @@ const IC_MASTER = {
                 connection: true,
                 connectedRoads: ["aqualine", "tateyama"],
                 routeBranch: "aqualine",
-                branchOrder: 2
+                branchOrder: 2,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.435, entranceLng: 139.921, exitLat: 35.435, exitLng: 139.921
             },
             {
                 order: 4,
@@ -4157,7 +4566,8 @@ const IC_MASTER = {
                 connection: true,
                 connectedRoads: ["aqualine", "tateyama"],
                 routeBranch: "aqualine",
-                branchOrder: 3
+                branchOrder: 3,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.418, entranceLng: 139.980, exitLat: 35.418, exitLng: 139.980
             }
         ]
     },
@@ -4175,7 +4585,8 @@ const IC_MASTER = {
                 lat: 35.521,
                 lng: 139.788,
                 routeBranch: "aqualine",
-                branchOrder: 1
+                branchOrder: 1,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.521, entranceLng: 139.788, exitLat: 35.521, exitLng: 139.788
             },
             {
                 order: -2,
@@ -4186,7 +4597,8 @@ const IC_MASTER = {
                 connection: true,
                 connectedRoads: ["aqualine", "tateyama"],
                 routeBranch: "aqualine",
-                branchOrder: 2
+                branchOrder: 2,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.435, entranceLng: 139.921, exitLat: 35.435, exitLng: 139.921
             },
             {
                 order: -1,
@@ -4197,7 +4609,8 @@ const IC_MASTER = {
                 connection: true,
                 connectedRoads: ["aqualine", "tateyama"],
                 routeBranch: "aqualine",
-                branchOrder: 3
+                branchOrder: 3,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.418, entranceLng: 139.980, exitLat: 35.418, exitLng: 139.980
             },
             {
                 order: 0,
@@ -4208,7 +4621,8 @@ const IC_MASTER = {
                 connection: true,
                 connectedRoads: ["keiyo", "tateyama", "tokan"],
                 routeBranch: "keiyo",
-                branchOrder: 10
+                branchOrder: 10,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.568, entranceLng: 140.158, exitLat: 35.568, exitLng: 140.158
             },
             {
                 order: 1,
@@ -4219,7 +4633,8 @@ const IC_MASTER = {
                 connection: true,
                 connectedRoads: ["keiyo", "tateyama"],
                 routeBranch: "keiyo",
-                branchOrder: 11
+                branchOrder: 11,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.498, entranceLng: 140.104, exitLat: 35.498, exitLng: 140.104
             },
             {
                 order: 2,
@@ -4228,7 +4643,8 @@ const IC_MASTER = {
                 lat: 35.432,
                 lng: 140.043,
                 routeBranch: "keiyo",
-                branchOrder: 12
+                branchOrder: 12,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.432, entranceLng: 140.043, exitLat: 35.432, exitLng: 140.043
             },
             {
                 order: 3,
@@ -4237,7 +4653,8 @@ const IC_MASTER = {
                 lat: 35.394,
                 lng: 139.967,
                 routeBranch: "aqualine",
-                branchOrder: 4
+                branchOrder: 4,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.394, entranceLng: 139.967, exitLat: 35.394, exitLng: 139.967
             },
             {
                 order: 4,
@@ -4246,7 +4663,8 @@ const IC_MASTER = {
                 lat: 35.365,
                 lng: 139.935,
                 routeBranch: "aqualine",
-                branchOrder: 5
+                branchOrder: 5,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.365, entranceLng: 139.935, exitLat: 35.365, exitLng: 139.935
             },
             {
                 order: 5,
@@ -4255,7 +4673,8 @@ const IC_MASTER = {
                 lat: 35.333,
                 lng: 139.902,
                 routeBranch: "aqualine",
-                branchOrder: 6
+                branchOrder: 6,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.333, entranceLng: 139.902, exitLat: 35.333, exitLng: 139.902
             },
             {
                 order: 5.5,
@@ -4264,7 +4683,8 @@ const IC_MASTER = {
                 lat: 35.283,
                 lng: 139.927,
                 routeBranch: "aqualine",
-                branchOrder: 6.5
+                branchOrder: 6.5,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.283, entranceLng: 139.927, exitLat: 35.283, exitLng: 139.927
             },
             {
                 order: 6,
@@ -4273,7 +4693,8 @@ const IC_MASTER = {
                 lat: 35.273,
                 lng: 139.855,
                 routeBranch: "aqualine",
-                branchOrder: 7
+                branchOrder: 7,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.273, entranceLng: 139.855, exitLat: 35.273, exitLng: 139.855
             },
             {
                 order: 7,
@@ -4282,7 +4703,8 @@ const IC_MASTER = {
                 lat: 35.204,
                 lng: 139.825,
                 routeBranch: "aqualine",
-                branchOrder: 8
+                branchOrder: 8,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.204, entranceLng: 139.825, exitLat: 35.204, exitLng: 139.825
             },
             {
                 order: 8,
@@ -4291,7 +4713,8 @@ const IC_MASTER = {
                 lat: 35.140,
                 lng: 139.827,
                 routeBranch: "aqualine",
-                branchOrder: 9
+                branchOrder: 9,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.140, entranceLng: 139.827, exitLat: 35.140, exitLng: 139.827
             },
             {
                 order: 9,
@@ -4300,7 +4723,8 @@ const IC_MASTER = {
                 lat: 35.034,
                 lng: 139.832,
                 routeBranch: "aqualine",
-                branchOrder: 10
+                branchOrder: 10,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.034, entranceLng: 139.832, exitLat: 35.034, exitLng: 139.832
             }
         ]
     },
@@ -4312,14 +4736,30 @@ const IC_MASTER = {
     keiyo: {
         label: "京葉道路方面",
         exits: [
-            { order: -8, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.731, lng: 139.817, experimental: true, roadType: "首都高" },
-            { order: -7, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.712, lng: 139.779, experimental: true, roadType: "首都高" },
-            { order: -6, displayName: "葛西（首都高）", googleName: "首都高速湾岸線 葛西出入口", lat: 35.652, lng: 139.870, experimental: true, roadType: "首都高" },
-            { order: -5, displayName: "湾岸市川（首都高）", googleName: "首都高速湾岸線 湾岸市川出入口", lat: 35.672, lng: 139.938, experimental: true, roadType: "首都高" },
-            { order: -4, displayName: "新木場（首都高）", googleName: "首都高速湾岸線 新木場出入口", lat: 35.645, lng: 139.827, experimental: true, roadType: "首都高" },
-            { order: -3, displayName: "有明（首都高）", googleName: "首都高速湾岸線 有明出入口", lat: 35.634, lng: 139.795, experimental: true, roadType: "首都高" },
-            { order: -2, displayName: "大井南（首都高）", googleName: "首都高速湾岸線 大井南出入口", lat: 35.589, lng: 139.756, experimental: true, roadType: "首都高" },
-            { order: -1, displayName: "空港中央（首都高）", googleName: "首都高速湾岸線 空港中央出入口", lat: 35.553, lng: 139.787, experimental: true, roadType: "首都高" },
+            { order: -8, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.731, lng: 139.817, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.731, entranceLng: 139.817, exitLat: 35.731, exitLng: 139.817
+            },
+            { order: -7, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.712, lng: 139.779, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.712, entranceLng: 139.779, exitLat: 35.712, exitLng: 139.779
+            },
+            { order: -6, displayName: "葛西（首都高）", googleName: "首都高速湾岸線 葛西出入口", lat: 35.652, lng: 139.870, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.652, entranceLng: 139.870, exitLat: 35.652, exitLng: 139.870
+            },
+            { order: -5, displayName: "湾岸市川（首都高）", googleName: "首都高速湾岸線 湾岸市川出入口", lat: 35.672, lng: 139.938, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.672, entranceLng: 139.938, exitLat: 35.672, exitLng: 139.938
+            },
+            { order: -4, displayName: "新木場（首都高）", googleName: "首都高速湾岸線 新木場出入口", lat: 35.645, lng: 139.827, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.645, entranceLng: 139.827, exitLat: 35.645, exitLng: 139.827
+            },
+            { order: -3, displayName: "有明（首都高）", googleName: "首都高速湾岸線 有明出入口", lat: 35.634, lng: 139.795, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.634, entranceLng: 139.795, exitLat: 35.634, exitLng: 139.795
+            },
+            { order: -2, displayName: "大井南（首都高）", googleName: "首都高速湾岸線 大井南出入口", lat: 35.589, lng: 139.756, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.589, entranceLng: 139.756, exitLat: 35.589, exitLng: 139.756
+            },
+            { order: -1, displayName: "空港中央（首都高）", googleName: "首都高速湾岸線 空港中央出入口", lat: 35.553, lng: 139.787, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.553, entranceLng: 139.787, exitLat: 35.553, exitLng: 139.787
+            },
             {
                 order: 1,
                 displayName: "篠崎IC",
@@ -4327,7 +4767,8 @@ const IC_MASTER = {
                 lat: 35.707,
                 lng: 139.898,
                 routeBranch: "keiyo",
-                branchOrder: 1
+                branchOrder: 1,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.707, entranceLng: 139.898, exitLat: 35.707, exitLng: 139.898
             },
             {
                 order: 2,
@@ -4336,7 +4777,8 @@ const IC_MASTER = {
                 lat: 35.715,
                 lng: 139.931,
                 routeBranch: "keiyo",
-                branchOrder: 2
+                branchOrder: 2,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.715, entranceLng: 139.931, exitLat: 35.715, exitLng: 139.931
             },
             {
                 order: 3,
@@ -4345,7 +4787,8 @@ const IC_MASTER = {
                 lat: 35.704,
                 lng: 139.959,
                 routeBranch: "keiyo",
-                branchOrder: 3
+                branchOrder: 3,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.704, entranceLng: 139.959, exitLat: 35.704, exitLng: 139.959
             },
             {
                 order: 4,
@@ -4354,7 +4797,8 @@ const IC_MASTER = {
                 lat: 35.693,
                 lng: 139.990,
                 routeBranch: "keiyo",
-                branchOrder: 4
+                branchOrder: 4,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.693, entranceLng: 139.990, exitLat: 35.693, exitLng: 139.990
             },
             {
                 order: 5,
@@ -4363,7 +4807,8 @@ const IC_MASTER = {
                 lat: 35.689,
                 lng: 140.015,
                 routeBranch: "keiyo",
-                branchOrder: 5
+                branchOrder: 5,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.689, entranceLng: 140.015, exitLat: 35.689, exitLng: 140.015
             },
             {
                 order: 6,
@@ -4372,7 +4817,8 @@ const IC_MASTER = {
                 lat: 35.675,
                 lng: 140.061,
                 routeBranch: "keiyo",
-                branchOrder: 6
+                branchOrder: 6,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.675, entranceLng: 140.061, exitLat: 35.675, exitLng: 140.061
             },
             {
                 order: 7,
@@ -4381,7 +4827,8 @@ const IC_MASTER = {
                 lat: 35.644,
                 lng: 140.119,
                 routeBranch: "keiyo",
-                branchOrder: 7
+                branchOrder: 7,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.644, entranceLng: 140.119, exitLat: 35.644, exitLng: 140.119
             },
             {
                 order: 8,
@@ -4390,7 +4837,8 @@ const IC_MASTER = {
                 lat: 35.625,
                 lng: 140.150,
                 routeBranch: "keiyo",
-                branchOrder: 8
+                branchOrder: 8,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.625, entranceLng: 140.150, exitLat: 35.625, exitLng: 140.150
             },
             {
                 order: 9,
@@ -4399,7 +4847,8 @@ const IC_MASTER = {
                 lat: 35.583,
                 lng: 140.158,
                 routeBranch: "keiyo",
-                branchOrder: 9
+                branchOrder: 9,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.583, entranceLng: 140.158, exitLat: 35.583, exitLng: 140.158
             },
             {
                 order: 10,
@@ -4410,7 +4859,8 @@ const IC_MASTER = {
                 connection: true,
                 connectedRoads: ["keiyo", "tateyama", "tokan"],
                 routeBranch: "keiyo",
-                branchOrder: 10
+                branchOrder: 10,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.568, entranceLng: 140.158, exitLat: 35.568, exitLng: 140.158
             },
             {
                 order: 11,
@@ -4421,7 +4871,8 @@ const IC_MASTER = {
                 connection: true,
                 connectedRoads: ["keiyo", "tateyama"],
                 routeBranch: "keiyo",
-                branchOrder: 11
+                branchOrder: 11,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.498, entranceLng: 140.104, exitLat: 35.498, exitLng: 140.104
             },
             {
                 order: 12,
@@ -4430,7 +4881,8 @@ const IC_MASTER = {
                 lat: 35.432,
                 lng: 140.043,
                 routeBranch: "keiyo",
-                branchOrder: 12
+                branchOrder: 12,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.432, entranceLng: 140.043, exitLat: 35.432, exitLng: 140.043
             },
             {
                 order: 13,
@@ -4439,7 +4891,8 @@ const IC_MASTER = {
                 lat: 35.394,
                 lng: 139.967,
                 routeBranch: "keiyo",
-                branchOrder: 13
+                branchOrder: 13,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.394, entranceLng: 139.967, exitLat: 35.394, exitLng: 139.967
             },
             {
                 order: 14,
@@ -4448,7 +4901,8 @@ const IC_MASTER = {
                 lat: 35.365,
                 lng: 139.935,
                 routeBranch: "keiyo",
-                branchOrder: 14
+                branchOrder: 14,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.365, entranceLng: 139.935, exitLat: 35.365, exitLng: 139.935
             },
             {
                 order: 15,
@@ -4457,7 +4911,8 @@ const IC_MASTER = {
                 lat: 35.333,
                 lng: 139.902,
                 routeBranch: "keiyo",
-                branchOrder: 15
+                branchOrder: 15,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.333, entranceLng: 139.902, exitLat: 35.333, exitLng: 139.902
             }
         ]
     },
@@ -4467,14 +4922,30 @@ const IC_MASTER = {
     tokan: {
         label: "東関東道方面",
         exits: [
-            { order: -8, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.731, lng: 139.817, experimental: true, roadType: "首都高" },
-            { order: -7, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.712, lng: 139.779, experimental: true, roadType: "首都高" },
-            { order: -6, displayName: "葛西（首都高）", googleName: "首都高速湾岸線 葛西出入口", lat: 35.652, lng: 139.870, experimental: true, roadType: "首都高" },
-            { order: -5, displayName: "湾岸市川（首都高）", googleName: "首都高速湾岸線 湾岸市川出入口", lat: 35.672, lng: 139.938, experimental: true, roadType: "首都高" },
-            { order: -4, displayName: "新木場（首都高）", googleName: "首都高速湾岸線 新木場出入口", lat: 35.645, lng: 139.827, experimental: true, roadType: "首都高" },
-            { order: -3, displayName: "有明（首都高）", googleName: "首都高速湾岸線 有明出入口", lat: 35.634, lng: 139.795, experimental: true, roadType: "首都高" },
-            { order: -2, displayName: "大井南（首都高）", googleName: "首都高速湾岸線 大井南出入口", lat: 35.589, lng: 139.756, experimental: true, roadType: "首都高" },
-            { order: -1, displayName: "空港中央（首都高）", googleName: "首都高速湾岸線 空港中央出入口", lat: 35.553, lng: 139.787, experimental: true, roadType: "首都高" },
+            { order: -8, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.731, lng: 139.817, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.731, entranceLng: 139.817, exitLat: 35.731, exitLng: 139.817
+            },
+            { order: -7, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.712, lng: 139.779, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.712, entranceLng: 139.779, exitLat: 35.712, exitLng: 139.779
+            },
+            { order: -6, displayName: "葛西（首都高）", googleName: "首都高速湾岸線 葛西出入口", lat: 35.652, lng: 139.870, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.652, entranceLng: 139.870, exitLat: 35.652, exitLng: 139.870
+            },
+            { order: -5, displayName: "湾岸市川（首都高）", googleName: "首都高速湾岸線 湾岸市川出入口", lat: 35.672, lng: 139.938, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.672, entranceLng: 139.938, exitLat: 35.672, exitLng: 139.938
+            },
+            { order: -4, displayName: "新木場（首都高）", googleName: "首都高速湾岸線 新木場出入口", lat: 35.645, lng: 139.827, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.645, entranceLng: 139.827, exitLat: 35.645, exitLng: 139.827
+            },
+            { order: -3, displayName: "有明（首都高）", googleName: "首都高速湾岸線 有明出入口", lat: 35.634, lng: 139.795, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.634, entranceLng: 139.795, exitLat: 35.634, exitLng: 139.795
+            },
+            { order: -2, displayName: "大井南（首都高）", googleName: "首都高速湾岸線 大井南出入口", lat: 35.589, lng: 139.756, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.589, entranceLng: 139.756, exitLat: 35.589, exitLng: 139.756
+            },
+            { order: -1, displayName: "空港中央（首都高）", googleName: "首都高速湾岸線 空港中央出入口", lat: 35.553, lng: 139.787, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.553, entranceLng: 139.787, exitLat: 35.553, exitLng: 139.787
+            },
             {
                 order: 0.1,
                 displayName: "葛西IC",
@@ -4482,7 +4953,8 @@ const IC_MASTER = {
                 lat: 35.652,
                 lng: 139.870,
                 routeBranch: "tokan",
-                branchOrder: 1
+                branchOrder: 1,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.652, entranceLng: 139.870, exitLat: 35.652, exitLng: 139.870
             },
             {
                 order: 0.2,
@@ -4491,7 +4963,8 @@ const IC_MASTER = {
                 lat: 35.672,
                 lng: 139.938,
                 routeBranch: "tokan",
-                branchOrder: 2
+                branchOrder: 2,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.672, entranceLng: 139.938, exitLat: 35.672, exitLng: 139.938
             },
             {
                 order: 0,
@@ -4502,7 +4975,8 @@ const IC_MASTER = {
                 connection: true,
                 connectedRoads: ["keiyo", "tokan", "tateyama"],
                 routeBranch: "keiyo",
-                branchOrder: 10
+                branchOrder: 10,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.568, entranceLng: 140.158, exitLat: 35.568, exitLng: 140.158
             },
             {
                 order: 1,
@@ -4511,7 +4985,8 @@ const IC_MASTER = {
                 lat: 35.665,
                 lng: 140.016,
                 routeBranch: "tokan",
-                branchOrder: 3
+                branchOrder: 3,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.665, entranceLng: 140.016, exitLat: 35.665, exitLng: 140.016
             },
             {
                 order: 2,
@@ -4520,7 +4995,8 @@ const IC_MASTER = {
                 lat: 35.638,
                 lng: 140.060,
                 routeBranch: "tokan",
-                branchOrder: 4
+                branchOrder: 4,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.638, entranceLng: 140.060, exitLat: 35.638, exitLng: 140.060
             },
             {
                 order: 3,
@@ -4529,7 +5005,8 @@ const IC_MASTER = {
                 lat: 35.676,
                 lng: 140.131,
                 routeBranch: "tokan",
-                branchOrder: 5
+                branchOrder: 5,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.676, entranceLng: 140.131, exitLat: 35.676, exitLng: 140.131
             },
             {
                 order: 4,
@@ -4538,7 +5015,8 @@ const IC_MASTER = {
                 lat: 35.664,
                 lng: 140.187,
                 routeBranch: "tokan",
-                branchOrder: 6
+                branchOrder: 6,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.664, entranceLng: 140.187, exitLat: 35.664, exitLng: 140.187
             },
             {
                 order: 5,
@@ -4547,7 +5025,8 @@ const IC_MASTER = {
                 lat: 35.694,
                 lng: 140.248,
                 routeBranch: "tokan",
-                branchOrder: 7
+                branchOrder: 7,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.694, entranceLng: 140.248, exitLat: 35.694, exitLng: 140.248
             },
             {
                 order: 6,
@@ -4556,7 +5035,8 @@ const IC_MASTER = {
                 lat: 35.718,
                 lng: 140.300,
                 routeBranch: "tokan",
-                branchOrder: 8
+                branchOrder: 8,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.718, entranceLng: 140.300, exitLat: 35.718, exitLng: 140.300
             },
             {
                 order: 7,
@@ -4565,7 +5045,8 @@ const IC_MASTER = {
                 lat: 35.729,
                 lng: 140.343,
                 routeBranch: "tokan",
-                branchOrder: 9
+                branchOrder: 9,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.729, entranceLng: 140.343, exitLat: 35.729, exitLng: 140.343
             },
             {
                 order: 8,
@@ -4574,7 +5055,8 @@ const IC_MASTER = {
                 lat: 35.779,
                 lng: 140.365,
                 routeBranch: "tokan",
-                branchOrder: 10
+                branchOrder: 10,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.779, entranceLng: 140.365, exitLat: 35.779, exitLng: 140.365
             },
             {
                 order: 9,
@@ -4583,7 +5065,8 @@ const IC_MASTER = {
                 lat: 35.842,
                 lng: 140.470,
                 routeBranch: "tokan",
-                branchOrder: 11
+                branchOrder: 11,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.842, entranceLng: 140.470, exitLat: 35.842, exitLng: 140.470
             },
             {
                 order: 10,
@@ -4592,7 +5075,8 @@ const IC_MASTER = {
                 lat: 35.884,
                 lng: 140.548,
                 routeBranch: "tokan",
-                branchOrder: 12
+                branchOrder: 12,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.884, entranceLng: 140.548, exitLat: 35.884, exitLng: 140.548
             },
             {
                 order: 11,
@@ -4601,7 +5085,8 @@ const IC_MASTER = {
                 lat: 35.952,
                 lng: 140.574,
                 routeBranch: "tokan",
-                branchOrder: 13
+                branchOrder: 13,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.952, entranceLng: 140.574, exitLat: 35.952, exitLng: 140.574
             }
         ]
     }

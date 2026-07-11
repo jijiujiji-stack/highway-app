@@ -10628,7 +10628,7 @@ function findIcDefinitionForMultiExitComparison(googleName) {
     return foundShutoIc || null;
 }
 
-function buildRoutesLocationForIcOrAddress(value) {
+function buildRoutesLocationForIcOrAddress(value, role) {
 
     if (
         value &&
@@ -10649,16 +10649,30 @@ function buildRoutesLocationForIcOrAddress(value) {
     const ic =
         findIcDefinitionForMultiExitComparison(value);
 
+    const icLat =
+        role === "entrance"
+            ? ic?.entranceLat ?? ic?.lat
+            : role === "exit"
+                ? ic?.exitLat ?? ic?.lat
+                : ic?.lat;
+
+    const icLng =
+        role === "entrance"
+            ? ic?.entranceLng ?? ic?.lng
+            : role === "exit"
+                ? ic?.exitLng ?? ic?.lng
+                : ic?.lng;
+
     if (
         ic &&
-        ic.lat !== undefined &&
-        ic.lng !== undefined
+        icLat !== undefined &&
+        icLng !== undefined
     ) {
         return {
             location: {
                 latLng: {
-                    latitude: ic.lat,
-                    longitude: ic.lng
+                    latitude: icLat,
+                    longitude: icLng
                 }
             }
         };
@@ -10953,7 +10967,8 @@ function selectExitCandidatesForAutoExitComparison(
 
 async function getHighwayRouteForMultiExitComparison(
     origin,
-    destination
+    destination,
+    role
 ) {
 
     const cacheRequest = createRoutesCacheRequest(
@@ -10995,10 +11010,16 @@ async function getHighwayRouteForMultiExitComparison(
             body: JSON.stringify({
 
                 origin:
-                    buildRoutesLocationForIcOrAddress(origin),
+                    buildRoutesLocationForIcOrAddress(
+                        origin,
+                        role
+                    ),
 
                 destination:
-                    buildRoutesLocationForIcOrAddress(destination),
+                    buildRoutesLocationForIcOrAddress(
+                        destination,
+                        role
+                    ),
 
                 travelMode: "DRIVE",
 
@@ -11039,7 +11060,8 @@ async function getHighwayRouteForMultiExitComparison(
 
 async function getLocalRouteForMultiExitComparison(
     origin,
-    destination
+    destination,
+    role
 ) {
 
     const cacheRequest = createRoutesCacheRequest(
@@ -11082,10 +11104,16 @@ async function getLocalRouteForMultiExitComparison(
             body: JSON.stringify({
 
                 origin:
-                    buildRoutesLocationForIcOrAddress(origin),
+                    buildRoutesLocationForIcOrAddress(
+                        origin,
+                        role
+                    ),
 
                 destination:
-                    buildRoutesLocationForIcOrAddress(destination),
+                    buildRoutesLocationForIcOrAddress(
+                        destination,
+                        role
+                    ),
 
                 travelMode: "DRIVE",
 
@@ -11875,13 +11903,15 @@ async function searchEntranceIcComparisonV2(options = {}) {
             const localToCandidateRoute =
                 await getLocalRouteForMultiExitComparison(
                     routeOrigin,
-                    exit.googleName
+                    exit.googleName,
+                    "entrance"
                 );
 
             const highwayFromCandidateRoute =
                 await getHighwayRouteForMultiExitComparison(
                     exit.googleName,
-                    destination
+                    destination,
+                    "entrance"
                 );
 
             const localToCandidateMinutes =
@@ -12128,13 +12158,15 @@ async function searchExitIcComparisonV2(options = {}) {
             const highwayToCandidateRoute =
                 await getHighwayRouteForMultiExitComparison(
                     routeOrigin,
-                    exit.googleName
+                    exit.googleName,
+                    "exit"
                 );
 
             const localFromCandidateRoute =
                 await getLocalRouteForMultiExitComparison(
                     exit.googleName,
-                    destination
+                    destination,
+                    "exit"
                 );
 
             const highwayToCandidateMinutes =

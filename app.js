@@ -5241,6 +5241,159 @@ const IC_MASTER = {
                 note: "ハーフIC。外回り方向は出口のみ、内回り方向は入口のみ。トラベルWatch記事で確認。座標はMapFan「市川南IC(東京外環自動車道)【出口(外回り)】」で確認(35.695239,139.9391511)。内回り方向(入口)はentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
             }
         ]
+    },
+
+    // gaikanUchimawari: 東京外環自動車道の内回り方向（高谷JCT→大泉JCT方向）。
+    // gaikan（外回り）と同一の物理IC群を、内回り側のランプ座標・入口出口可否で鏡合わせ登録。
+    // orderはgaikan側の公式IC番号を負数化した値（高谷側ほど絶対値が大きい）。
+    gaikanUchimawari: {
+        label: "外環方面（内回り）",
+        exits: [
+            {
+                order: -91,
+                displayName: "市川南IC",
+                googleName: "東京外環自動車道 市川南インターチェンジ",
+                lat: 35.6944644,
+                lng: 139.9393046,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.6944644, entranceLng: 139.9393046, exitLat: 35.6944644, exitLng: 139.9393046,
+                note: "ハーフIC。内回り方向は入口のみ（gaikan側の外回り出口と対の方向）。トラベルWatch記事で方向を確認。座標はMapFan「市川南IC(東京外環自動車道)【入口(内回り)】」で確認(35.6944644,139.9393046)。外回り方向(出口)はexitSelectable:falseとし、exitLat/Lngは入口座標にフォールバック。"
+            },
+            {
+                order: -86,
+                displayName: "市川中央IC",
+                googleName: "東京外環自動車道 市川中央インターチェンジ",
+                lat: 35.7227736,
+                lng: 139.9160115,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.7227736, entranceLng: 139.9160115, exitLat: 35.7227736, exitLng: 139.9160115,
+                note: "ハーフIC。内回り方向は出口のみ。トラベルWatch記事で方向を確認。座標はMapFan「市川中央IC(東京外環自動車道)【出口(内回り)】」で確認(35.7227736,139.9160115)。外回り方向(入口)はentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -85,
+                displayName: "市川北IC",
+                googleName: "東京外環自動車道 市川北インターチェンジ",
+                lat: 35.7447738,
+                lng: 139.9195973,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.7447738, entranceLng: 139.9195973, exitLat: 35.7447738, exitLng: 139.9195973,
+                note: "ハーフIC。内回り方向は入口のみ。トラベルWatch記事で方向を確認。座標はMapFan「市川北IC(東京外環自動車道)【入口(内回り)】」で確認(35.7447738,139.9195973)。外回り方向(出口)はexitSelectable:falseとし、exitLat/Lngは入口座標にフォールバック。"
+            },
+            {
+                order: -83,
+                displayName: "松戸IC",
+                googleName: "東京外環自動車道 松戸インターチェンジ",
+                lat: 35.76278,
+                lng: 139.9001168,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.76278, entranceLng: 139.9001168, exitLat: 35.76278, exitLng: 139.9001168,
+                note: "ハーフIC。内回り方向は出口のみ。トラベルWatch記事で方向を確認。座標はMapFan「松戸IC(東京外環自動車道)【出口(内回り)】」で確認(35.76278,139.9001168)。外回り方向(入口)はentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -82,
+                displayName: "三郷南IC",
+                googleName: "東京外環自動車道 三郷南インターチェンジ",
+                lat: 35.8004852,
+                lng: 139.8778389,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.8004852, entranceLng: 139.8778389, exitLat: 35.8004852, exitLng: 139.8778389,
+                note: "ハーフIC。内回り方向は入口のみ。トラベルWatch記事およびNEXCO公式プレスリリース（2024/8/9、三郷南IC内回り入口がETC専用化）で確認。座標はMapFan「三郷南IC(東京外環自動車道)【入口(内回り)】」で確認(35.8004852,139.8778389)。外回り方向(出口)はexitSelectable:falseとし、exitLat/Lngは入口座標にフォールバック。"
+            },
+            {
+                order: -81,
+                displayName: "三郷中央IC",
+                googleName: "東京外環自動車道 三郷中央インターチェンジ",
+                lat: 35.827177,
+                lng: 139.8692322,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.827177, entranceLng: 139.8692322, exitLat: 35.827177, exitLng: 139.8692322,
+                note: "ハーフIC。内回り方向は出口のみ。座標はMapFan「三郷中央IC(東京外環自動車道)【出口(内回り)】」で確認(35.827177,139.8692322)。外回り方向(入口)はentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -74,
+                displayName: "外環三郷西IC",
+                googleName: "東京外環自動車道 外環三郷西インターチェンジ",
+                lat: 35.836572,
+                lng: 139.8583611,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.836572, entranceLng: 139.8583611, exitLat: 35.836572, exitLng: 139.8583611,
+                note: "ハーフIC。内回り方向は入口のみ。NEXCO公式プレスリリース（外環三郷西IC(外)出口閉鎖の迂回路案内、外回り側が出口である旨）と整合する形で内回り側を入口と確認。座標はMapFan「外環三郷西IC(東京外環自動車道)【入口(内回り)】」で確認(35.836572,139.8583611)。外回り方向(出口)はexitSelectable:falseとし、exitLat/Lngは入口座標にフォールバック。"
+            },
+            {
+                order: -72,
+                displayName: "草加IC",
+                googleName: "東京外環自動車道 草加インターチェンジ",
+                lat: 35.8481156,
+                lng: 139.78598605,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.847932, entranceLng: 139.7827628, exitLat: 35.8482992, exitLng: 139.7892093,
+                note: "フルIC。MapFan「草加IC(東京外環自動車道)【入口(内回り)】」(35.847932,139.7827628)・【出口(内回り)】(35.8482992,139.7892093)で確認。lat/lngは入口・出口の中間点。"
+            },
+            {
+                order: -71,
+                displayName: "川口東IC",
+                googleName: "東京外環自動車道 川口東インターチェンジ",
+                lat: 35.8528871,
+                lng: 139.7437258,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.8528871, entranceLng: 139.7437258, exitLat: 35.8528871, exitLng: 139.7437258,
+                note: "ハーフIC。内回り方向は出口のみ。座標はMapFan「川口東IC(東京外環自動車道)【出口(内回り)】」で確認(35.8528871,139.7437258)。外回り方向(入口)はentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -64,
+                displayName: "川口中央IC",
+                googleName: "東京外環自動車道 川口中央インターチェンジ",
+                lat: 35.8504997,
+                lng: 139.7204253,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.8504997, entranceLng: 139.7204253, exitLat: 35.8504997, exitLng: 139.7204253,
+                note: "ハーフIC。内回り方向は出口のみ。座標はMapFan「川口中央IC(東京外環自動車道)【出口(内回り)】」で確認(35.8504997,139.7204253)。外回り方向(入口)はentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -63,
+                displayName: "川口西IC",
+                googleName: "東京外環自動車道 川口西インターチェンジ",
+                lat: 35.8464306,
+                lng: 139.6996475,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.8464306, entranceLng: 139.6996475, exitLat: 35.8464306, exitLng: 139.6996475,
+                note: "ハーフIC。内回り方向は入口のみ。NEXCO公式プレスリリース（2021年、内回り側入口ランプ夜間閉鎖のお知らせ）で確認済み。座標はMapFan「川口西IC(東京外環自動車道)【入口(内回り)】」で確認(35.8464306,139.6996475)。外回り方向(出口)はexitSelectable:falseとし、exitLat/Lngは入口座標にフォールバック。"
+            },
+            {
+                order: -62,
+                displayName: "外環浦和IC",
+                googleName: "東京外環自動車道 外環浦和インターチェンジ",
+                lat: 35.836972,
+                lng: 139.6754025,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.836972, entranceLng: 139.6754025, exitLat: 35.836972, exitLng: 139.6754025,
+                note: "ハーフIC。内回り方向は出口のみ。座標はMapFan「外環浦和IC(東京外環自動車道)【出口(内回り)】」で確認(35.836972,139.6754025)。外回り方向(入口)はentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -61,
+                displayName: "戸田東IC",
+                googleName: "東京外環自動車道 戸田東インターチェンジ",
+                lat: 35.8271131,
+                lng: 139.6508347,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.8271131, entranceLng: 139.6508347, exitLat: 35.8271131, exitLng: 139.6508347,
+                note: "ハーフIC。内回り方向は出口のみ。座標はMapFan「戸田東IC(東京外環自動車道)【出口(内回り)】」で確認(35.8271131,139.6508347)。外回り方向(入口)はentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -53,
+                displayName: "戸田西IC",
+                googleName: "東京外環自動車道 戸田西インターチェンジ",
+                lat: 35.8184564,
+                lng: 139.6363316,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.8184564, entranceLng: 139.6363316, exitLat: 35.8184564, exitLng: 139.6363316,
+                note: "ハーフIC。内回り方向は入口のみ。座標はMapFan「戸田西IC(東京外環自動車道)【入口(内回り)】」で確認(35.8184564,139.6363316)。外回り方向(出口)はexitSelectable:falseとし、exitLat/Lngは入口座標にフォールバック。"
+            },
+            {
+                order: -52,
+                displayName: "和光北IC",
+                googleName: "東京外環自動車道 和光北インターチェンジ",
+                lat: 35.80285705,
+                lng: 139.6213011,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.8018947, entranceLng: 139.620561, exitLat: 35.8038194, exitLng: 139.6220412,
+                note: "フルIC。MapFan「和光北IC(東京外環自動車道)【入口(内回り)】」(35.8018947,139.620561)・【出口(内回り)】(35.8038194,139.6220412)で確認。lat/lngは入口・出口の中間点。"
+            },
+            {
+                order: -51,
+                displayName: "和光IC",
+                googleName: "東京外環自動車道 和光インターチェンジ",
+                lat: 35.78469445,
+                lng: 139.6130821,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.7821421, entranceLng: 139.6108254, exitLat: 35.7872468, exitLng: 139.6153388,
+                note: "フルIC。MapFan「和光IC(東京外環自動車道)【入口(内回り)】」(35.7821421,139.6108254)・【出口(内回り)】(35.7872468,139.6153388)で確認。lat/lngは入口・出口の中間点。"
+            }
+        ]
     }
 
 
@@ -12537,12 +12690,62 @@ async function findDestinationNearestIcForAutoExitComparison(
     };
 }
 
+function resolveGaikanDirectionalIcArea(
+    icArea,
+    origin,
+    destination
+) {
+
+    if (icArea !== "gaikan") {
+        return icArea;
+    }
+
+    const routeAnalysisKey =
+        buildRouteAnalysisKey(origin, destination);
+
+    const passedIcEntries =
+        lastHighwayRoutePolylineAnalysisKey === routeAnalysisKey
+            ? lastHighwayRoutePolylineAnalysis?.passedIcEntries
+            : null;
+
+    const gaikanPassedIcEntry =
+        (passedIcEntries || []).find(item =>
+            item.icArea === "gaikan"
+        );
+
+    if (!gaikanPassedIcEntry) {
+        return null;
+    }
+
+    const travelDirection =
+        inferTravelDirectionForIcArea(
+            "gaikan",
+            gaikanPassedIcEntry.exit,
+            passedIcEntries,
+            buildIcDefinitionIdentity
+        );
+
+    if (travelDirection === 1) {
+        return "gaikan";
+    }
+
+    if (travelDirection === -1) {
+        return "gaikanUchimawari";
+    }
+
+    return null;
+}
+
 function findNearestIcByMasterCoordinatesForAutoExitComparison(
     icArea,
     baseLat,
     baseLng,
     role
 ) {
+
+    if (!IC_MASTER[icArea]) {
+        return null;
+    }
 
     const getRoleLat = exit =>
         role === "entrance"
@@ -12644,6 +12847,7 @@ function selectExitCandidatesForAutoExitComparison(
 ) {
 
     if (
+        !IC_MASTER[icArea] ||
         !highwayStart ||
         !baseLatLng ||
         baseLatLng.lat === undefined ||
@@ -14692,6 +14896,19 @@ async function prepareV2SimpleDiagnosticCandidates(
     }
 
     setResolvedIcArea(icArea);
+
+    icArea =
+        resolveGaikanDirectionalIcArea(
+            icArea,
+            origin,
+            destination
+        );
+
+    if (!icArea) {
+        throw new Error(
+            "外環の走行方向を判定できなかったため、候補ICを算出できませんでした"
+        );
+    }
 
     const highwayStartInfo =
         findNearestIcByMasterCoordinatesForAutoExitComparison(
@@ -17808,6 +18025,18 @@ async function searchAutoExitIcComparison(
             }
         }
 
+    }
+
+    icArea =
+        resolveGaikanDirectionalIcArea(
+            icArea,
+            origin,
+            destination
+        );
+
+    if (!icArea) {
+        alert("\u5916\u74b0\u306e\u8d70\u884c\u65b9\u5411\u3092\u5224\u5b9a\u3067\u304d\u306a\u304b\u3063\u305f\u305f\u3081\u3001\u5019\u88dcIC\u3092\u8868\u793a\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f");
+        return;
     }
 
     const highwayStartInfo =

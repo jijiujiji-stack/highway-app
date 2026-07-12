@@ -9255,6 +9255,108 @@ function correctShortRoadSegments(
     return correctedSegments;
 }
 
+// correctShortRoadSegments（roadSegments単位のノイズ補正）と同じ
+// しきい値・サンドイッチ判定を、routeTrace（サンプル点単位）に直接適用し、
+// 孤立した別路線ICの混入（例：外環走行中の首都高「新井宿」）を検出する。
+// 現時点では検出のみで、routeTrace自体の書き換えや候補選定への接続は行わない。
+// correctShortRoadSegmentsと異なり反復マージは行わない単純パス版のため、
+// 連続する複数の孤立区間までは検出できない場合がある。
+function detectIsolatedRoadTraceNoise(
+    routeTrace,
+    thresholdMeters = 5000
+) {
+
+    const protectedRoadLabels = new Set(
+        [
+            "アクアライン方面",
+            IC_MASTER.aqualine?.label
+        ].filter(Boolean)
+    );
+
+    const segments = [];
+
+    routeTrace.forEach((item, index) => {
+
+        const previousDistanceMeters =
+            index > 0
+                ? item.routeDistanceMeters -
+                    routeTrace[index - 1].routeDistanceMeters
+                : 0;
+
+        const nextDistanceMeters =
+            index < routeTrace.length - 1
+                ? routeTrace[index + 1].routeDistanceMeters -
+                    item.routeDistanceMeters
+                : 0;
+
+        const estimatedDistanceMeters =
+            (
+                previousDistanceMeters +
+                nextDistanceMeters
+            ) / 2;
+
+        const currentSegment =
+            segments[segments.length - 1];
+
+        if (currentSegment?.roadLabel === item.roadLabel) {
+            currentSegment.distanceMeters +=
+                estimatedDistanceMeters;
+            currentSegment.endTraceIndex = index;
+        }
+        else {
+            segments.push({
+                roadLabel: item.roadLabel,
+                distanceMeters: estimatedDistanceMeters,
+                startTraceIndex: index,
+                endTraceIndex: index
+            });
+        }
+    });
+
+    const isolatedSegments = [];
+
+    for (
+        let index = 1;
+        index < segments.length - 1;
+        index++
+    ) {
+        const previous = segments[index - 1];
+        const current = segments[index];
+        const next = segments[index + 1];
+
+        if (
+            current.distanceMeters >= thresholdMeters ||
+            previous.roadLabel !== next.roadLabel ||
+            protectedRoadLabels.has(current.roadLabel)
+        ) {
+            continue;
+        }
+
+        const icNames = [
+            ...new Set(
+                routeTrace
+                    .slice(
+                        current.startTraceIndex,
+                        current.endTraceIndex + 1
+                    )
+                    .map(item => item.exit?.displayName)
+                    .filter(Boolean)
+            )
+        ];
+
+        isolatedSegments.push({
+            roadLabel: current.roadLabel,
+            surroundingRoadLabel: previous.roadLabel,
+            startTraceIndex: current.startTraceIndex,
+            endTraceIndex: current.endTraceIndex,
+            distanceMeters: current.distanceMeters,
+            icNames
+        });
+    }
+
+    return isolatedSegments;
+}
+
 function summarizeRoadSegments(roadSegments) {
 
     const roadSequence =
@@ -11310,6 +11412,7 @@ function logHighwayRoutePolylineAnalysis(
         sampledPoints,
         areaCounts,
         routePointLogs,
+        routeTrace,
         passedIcEntries
     } = result;
 
@@ -11543,6 +11646,24 @@ function logHighwayRoutePolylineAnalysis(
                     : gaikanTravelDirection === -1
                         ? "内回り"
                         : "判定不能"
+            );
+        }
+
+        const isolatedRoadTraceNoise =
+            detectIsolatedRoadTraceNoise(routeTrace);
+
+        if (isolatedRoadTraceNoise.length > 0) {
+            console.log(
+                "道路連続性ノイズ検出：" +
+                isolatedRoadTraceNoise.length +
+                "件（" +
+                isolatedRoadTraceNoise
+                    .map(segment =>
+                        segment.icNames.join("/") ||
+                        segment.roadLabel
+                    )
+                    .join("、") +
+                "）"
             );
         }
 

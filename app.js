@@ -9575,8 +9575,7 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             );
 
         const routePointLogs = [];
-        const routeTrace = [];
-        const passedIcEntries = [];
+        const rawRouteTrace = [];
 
         sampledPoints.forEach((routePoint, index) => {
             const nearest =
@@ -9601,21 +9600,6 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                     : IC_MASTER[nearest.icArea]?.label ||
                         nearest.icArea;
 
-            const icIdentity =
-                nearest.exit.googleName ||
-                nearest.icArea + "|" + displayName;
-
-            if (
-                passedIcEntries[passedIcEntries.length - 1]
-                    ?.identity !== icIdentity
-            ) {
-                passedIcEntries.push({
-                    identity: icIdentity,
-                    icArea: nearest.icArea,
-                    exit: nearest.exit
-                });
-            }
-
             const distanceKm =
                 Math.round(nearest.distanceMeters / 100) / 10;
 
@@ -9633,7 +9617,7 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 distanceKm
             });
 
-            routeTrace.push({
+            rawRouteTrace.push({
                 routeDistanceMeters:
                     routePoint.routeDistanceMeters,
                 lat: routePoint.lat,
@@ -9642,6 +9626,53 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 icArea: nearest.icArea,
                 exit: nearest.exit
             });
+        });
+
+        // 座標最近傍探索のみでは、地理的に近いだけの別路線ICが
+        // 孤立点として紛れ込むことがあるため（例：外環走行中の首都高
+        // 「新井宿」）、correctShortRoadSegmentsと同じ考え方で
+        // routeTrace自体から孤立ノイズを除外してから、以降の
+        // usesShuto判定・NEXCO入口出口・出口比較候補等に使う。
+        const isolatedRoadTraceNoise =
+            detectIsolatedRoadTraceNoise(rawRouteTrace);
+
+        const isolatedRoadTraceIndexSet = new Set();
+
+        isolatedRoadTraceNoise.forEach(segment => {
+            for (
+                let index = segment.startTraceIndex;
+                index <= segment.endTraceIndex;
+                index++
+            ) {
+                isolatedRoadTraceIndexSet.add(index);
+            }
+        });
+
+        const routeTrace =
+            rawRouteTrace.filter((item, index) =>
+                !isolatedRoadTraceIndexSet.has(index)
+            );
+
+        // passedIcEntries（重複除去した通過IC列）は、routeTrace補正後の
+        // 並びから作り直す。補正前のrouteTraceループ内で作っていたものを
+        // ここに移動しただけで、重複除去のロジック自体は変えていない。
+        const passedIcEntries = [];
+
+        routeTrace.forEach(item => {
+            const icIdentity =
+                item.exit.googleName ||
+                item.icArea + "|" + item.exit.displayName;
+
+            if (
+                passedIcEntries[passedIcEntries.length - 1]
+                    ?.identity !== icIdentity
+            ) {
+                passedIcEntries.push({
+                    identity: icIdentity,
+                    icArea: item.icArea,
+                    exit: item.exit
+                });
+            }
         });
 
         const roadSwitches = [];
@@ -9939,7 +9970,9 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             sampledPoints,
             areaCounts,
             routePointLogs,
+            rawRouteTrace,
             routeTrace,
+            isolatedRoadTraceNoise,
             passedIcEntries,
             roadSwitches: correctedRoadSwitches
         };
@@ -11413,6 +11446,7 @@ function logHighwayRoutePolylineAnalysis(
         areaCounts,
         routePointLogs,
         routeTrace,
+        isolatedRoadTraceNoise = [],
         passedIcEntries
     } = result;
 
@@ -11649,12 +11683,9 @@ function logHighwayRoutePolylineAnalysis(
             );
         }
 
-        const isolatedRoadTraceNoise =
-            detectIsolatedRoadTraceNoise(routeTrace);
-
         if (isolatedRoadTraceNoise.length > 0) {
             console.log(
-                "道路連続性ノイズ検出：" +
+                "道路連続性ノイズ検出・除外：" +
                 isolatedRoadTraceNoise.length +
                 "件（" +
                 isolatedRoadTraceNoise

@@ -8464,16 +8464,54 @@ function getRouteAnalysisIcAreaKey(exit) {
 
 function findNearestIcMasterEntryForRoutePoint(
     routePoint,
-    icDefinitions
+    icDefinitions,
+    role
 ) {
 
     let nearest = null;
     let nearestDistanceMeters = Infinity;
 
     for (const exit of icDefinitions) {
+
+        const roleLat =
+            role === "entrance"
+                ? exit.entranceLat ?? exit.lat
+                : role === "exit"
+                    ? exit.exitLat ?? exit.lat
+                    : exit.lat;
+
+        const roleLng =
+            role === "entrance"
+                ? exit.entranceLng ?? exit.lng
+                : role === "exit"
+                    ? exit.exitLng ?? exit.lng
+                    : exit.lng;
+
         if (
-            exit.lat === undefined ||
-            exit.lng === undefined
+            roleLat === undefined ||
+            roleLng === undefined
+        ) {
+            continue;
+        }
+
+        if (
+            role === "entrance" &&
+            (
+                typeof exit.entranceSelectable === "boolean"
+                    ? !exit.entranceSelectable
+                    : exit.isSelectable === false
+            )
+        ) {
+            continue;
+        }
+
+        if (
+            role === "exit" &&
+            (
+                typeof exit.exitSelectable === "boolean"
+                    ? !exit.exitSelectable
+                    : exit.isSelectable === false
+            )
         ) {
             continue;
         }
@@ -8482,8 +8520,8 @@ function findNearestIcMasterEntryForRoutePoint(
             calculateDistance(
                 routePoint.lat,
                 routePoint.lng,
-                exit.lat,
-                exit.lng
+                roleLat,
+                roleLng
             );
 
         if (distanceMeters < nearestDistanceMeters) {
@@ -12241,7 +12279,8 @@ async function findNearestHighwayStartForAutoExitComparison(
     return findNearestIcByMasterCoordinatesForAutoExitComparison(
         icArea,
         baseLat,
-        baseLng
+        baseLng,
+        "entrance"
     );
 }
 
@@ -12261,7 +12300,8 @@ async function findDestinationNearestIcForAutoExitComparison(
         findNearestIcByMasterCoordinatesForAutoExitComparison(
             icArea,
             destinationLatLng.lat,
-            destinationLatLng.lng
+            destinationLatLng.lng,
+            "exit"
         );
 
     if (!nearestInfo) {
@@ -12280,15 +12320,44 @@ async function findDestinationNearestIcForAutoExitComparison(
 function findNearestIcByMasterCoordinatesForAutoExitComparison(
     icArea,
     baseLat,
-    baseLng
+    baseLng,
+    role
 ) {
+
+    const getRoleLat = exit =>
+        role === "entrance"
+            ? exit.entranceLat ?? exit.lat
+            : role === "exit"
+                ? exit.exitLat ?? exit.lat
+                : exit.lat;
+
+    const getRoleLng = exit =>
+        role === "entrance"
+            ? exit.entranceLng ?? exit.lng
+            : role === "exit"
+                ? exit.exitLng ?? exit.lng
+                : exit.lng;
+
+    const isRoleSelectable = exit => {
+        if (role === "entrance") {
+            return typeof exit.entranceSelectable === "boolean"
+                ? exit.entranceSelectable
+                : exit.isSelectable !== false;
+        }
+        if (role === "exit") {
+            return typeof exit.exitSelectable === "boolean"
+                ? exit.exitSelectable
+                : exit.isSelectable !== false;
+        }
+        return exit.isSelectable !== false;
+    };
 
     const exits =
         IC_MASTER[icArea].exits
             .filter(exit =>
-                exit.lat !== undefined &&
-                exit.lng !== undefined &&
-                exit.isSelectable !== false
+                getRoleLat(exit) !== undefined &&
+                getRoleLng(exit) !== undefined &&
+                isRoleSelectable(exit)
             )
             .slice()
             .sort((a, b) =>
@@ -12304,8 +12373,8 @@ function findNearestIcByMasterCoordinatesForAutoExitComparison(
             calculateDistance(
                 baseLat,
                 baseLng,
-                exit.lat,
-                exit.lng
+                getRoleLat(exit),
+                getRoleLng(exit)
             );
 
         if (distance < nearestDistance) {
@@ -12363,26 +12432,34 @@ function selectExitCandidatesForAutoExitComparison(
         return [];
     }
 
+    const getExitRoleLat = exit => exit.exitLat ?? exit.lat;
+    const getExitRoleLng = exit => exit.exitLng ?? exit.lng;
+
+    const isExitRoleSelectable = exit =>
+        typeof exit.exitSelectable === "boolean"
+            ? exit.exitSelectable
+            : exit.isSelectable !== false;
+
     const selectableExits =
         IC_MASTER[icArea].exits
             .filter(exit =>
-                exit.isSelectable !== false &&
-                exit.lat !== undefined &&
-                exit.lng !== undefined
+                isExitRoleSelectable(exit) &&
+                getExitRoleLat(exit) !== undefined &&
+                getExitRoleLng(exit) !== undefined
             );
 
     const sortByDistanceFromBase = (a, b) =>
         calculateDistance(
             baseLatLng.lat,
             baseLatLng.lng,
-            a.lat,
-            a.lng
+            getExitRoleLat(a),
+            getExitRoleLng(a)
         ) -
         calculateDistance(
             baseLatLng.lat,
             baseLatLng.lng,
-            b.lat,
-            b.lng
+            getExitRoleLat(b),
+            getExitRoleLng(b)
         );
 
     const shutoCandidate =
@@ -14400,7 +14477,8 @@ async function prepareV2SimpleDiagnosticCandidates(
         findNearestIcByMasterCoordinatesForAutoExitComparison(
             icArea,
             originLatLng.lat,
-            originLatLng.lng
+            originLatLng.lng,
+            "entrance"
         );
 
     /*
@@ -14439,7 +14517,8 @@ async function prepareV2SimpleDiagnosticCandidates(
             ? findNearestIcByMasterCoordinatesForAutoExitComparison(
                 icArea,
                 destinationLatLng.lat,
-                destinationLatLng.lng
+                destinationLatLng.lng,
+                "exit"
             )
             : null;
 

@@ -1141,11 +1141,11 @@ const SHUTO_IC_MASTER = [
         entranceLng: 139.691505,
         exitLat: 35.687420,
         exitLng: 139.691323,
-        entranceSelectable: true,
+        entranceSelectable: false,
         exitSelectable: true,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速4号新宿線 新宿出入口"],
-        note: "上りのみ入口・上り下りとも出口（入口は中央道方面へは行けない）。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-4/shinjuku)で方向を確認。座標はMapFanの「新宿ランプ（４号新宿線）【入口（上り）】/【出口】」個別ページで確認（入口・出口とも1箇所に集約されたランプ）、座標差はごく僅か。"
+        note: "上りのみ入口・上り下りとも出口（入口は中央道方面へは行けない）。本アプリは候補選定時に走行方向（上り/下り）を区別する仕組みを持たないため、方向限定の入口は安全側でentranceSelectable:falseとした（誤って中央道方面希望のルートに本ICを入口候補として出さないため）。出口は方向を問わず利用可能なためexitSelectable:trueを維持。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-4/shinjuku)で方向を確認。座標はMapFanの「新宿ランプ（４号新宿線）【入口（上り）】/【出口】」個別ページで確認（入口・出口とも1箇所に集約されたランプ）、座標差はごく僅か。"
     },
     {
         id: "shuto-4-hatsudai",
@@ -2122,10 +2122,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.750686,
         exitLng: 139.825256,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速中央環状線 小菅出入口"],
-        note: "外回り入口・内回り出口。入口はETC専用。小菅JCTではなく出入口ランプ座標。第5弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
+        note: "外回り入口・内回り出口。C2は環状路線のため、外環(gaikan)と同様に1レコードでは外回り・内回り両方向を正確に表現できない制約がある。noteが外回りを先に記載していること、および本アプリの外環(gaikan)エリアで外回りを代表方向として扱っている既存の割り切りと合わせ、外回りを代表値として採用し、内回り出口はexitSelectable:falseとした。入口（外回り）はETC専用。小菅JCTではなく出入口ランプ座標。第5弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
     },
     {
         id: "shuto-c2-yotsugi",

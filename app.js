@@ -1961,11 +1961,11 @@ const SHUTO_IC_MASTER = [
         entranceLng: 139.695041,
         exitLat: 35.725356,
         exitLng: 139.695041,
-        entranceSelectable: true,
+        entranceSelectable: false,
         exitSelectable: true,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速中央環状線 西池袋出入口"],
-        note: "内回り入口・内回りおよび外回り出口。入口はETC専用。各ランプは1km以内。第6弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
+        note: "内回り入口・内回りおよび外回り出口。本アプリは候補選定時に走行方向を区別できないため、方向限定の入口（内回りのみ）は安全側でentranceSelectable:falseとした（誤って外回り希望のルートに本ICを入口候補として出さないため）。出口は方向を問わず利用可能なためexitSelectable:trueを維持。入口はETC専用。各ランプは1km以内。第6弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
     },
     {
         id: "shuto-c2-takamatsu",
@@ -3002,10 +3002,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.776176,
         exitLng: 139.749689,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速川口線 鹿浜橋出入口"],
-        note: "上り・下りとも入口、出口は下りのみ（江北JCT方面への出口は設置なし）。ETC専用。新規追加。首都高公式サイト(shutoko.jp route-s1/shikahamabashi)で方向を確認。座標はMapFanの「鹿浜橋ランプ（川口線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.10kmの中間点。下り入口ランプの座標は未採用。"
+        note: "上り・下りとも入口、出口は下りのみ（江北JCT方面への出口は設置なし）。本アプリは候補選定時に走行方向を区別できないため、方向限定の出口（下りのみ、上り側は設置なしと明記）は安全側でexitSelectable:falseとした（誤って上り方向のルートに本ICを出口候補として出さないため）。入口は方向を問わず利用可能なためentranceSelectable:trueを維持。ETC専用。新規追加。首都高公式サイト(shutoko.jp route-s1/shikahamabashi)で方向を確認。座標はMapFanの「鹿浜橋ランプ（川口線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.10kmの中間点。下り入口ランプの座標は未採用。"
     },
     {
         id: "shuto-s1-higashiryoke",

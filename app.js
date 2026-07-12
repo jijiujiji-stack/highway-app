@@ -762,10 +762,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.707552,
         exitLng: 139.798075,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速6号向島線 駒形出入口"],
-        note: "上り入口・下り出口。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-6mu/komagata)で方向を確認。座標はMapFanの「駒形ランプ（６号向島線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.13kmの中間点。"
+        note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-6mu/komagata)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。入口はETC専用。新規追加。座標はMapFanの「駒形ランプ（６号向島線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.13kmの中間点。"
     },
     {
         id: "shuto-6-mukoujima",
@@ -862,10 +862,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.835239,
         exitLng: 139.857745,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速6号三郷線 三郷出入口"],
-        note: "上り入口・下り出口。新規追加。首都高公式サイト(shutoko.jp route-6mi/misato)で方向を確認。座標はMapFanの「三郷ランプ（６号三郷線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.17kmの中間点。"
+        note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-6mi/misato)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。新規追加。座標はMapFanの「三郷ランプ（６号三郷線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.17kmの中間点。"
     },
     {
         id: "shuto-7-kinshicho",
@@ -1062,10 +1062,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.719763,
         exitLng: 139.783689,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速1号上野線 入谷出入口"],
-        note: "上り入口・下り出口。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-1u/iriya)で方向を確認。座標はMapFanの「入谷ランプ（１号上野線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.01kmの中間点。"
+        note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-1u/iriya)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。入口はETC専用。新規追加。座標はMapFanの「入谷ランプ（１号上野線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.01kmの中間点。"
     },
     {
         id: "shuto-4-takaido",
@@ -1162,10 +1162,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.680202,
         exitLng: 139.684429,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速4号新宿線 初台出入口"],
-        note: "下り入口・上り出口。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-4/hatsudai)で方向を確認。座標はMapFanの「初台ランプ（４号新宿線）【入口（下り）】/【出口（上り）】」個別ページでランプごとに確認、入口・出口座標間約0.02kmの中間点。"
+        note: "下り入口・上り出口。首都高公式サイト(shutoko.jp route-4/hatsudai)の出入口ページの表で「入口:下り／出口:上り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（下り）を代表方向として採用し、上り出口はexitSelectable:falseとした。入口はETC専用。新規追加。座標はMapFanの「初台ランプ（４号新宿線）【入口（下り）】/【出口（上り）】」個別ページでランプごとに確認、入口・出口座標間約0.02kmの中間点。"
     },
     {
         id: "shuto-4-hatagaya",
@@ -1182,10 +1182,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.676663,
         exitLng: 139.675273,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速4号新宿線 幡ヶ谷出入口"],
-        note: "上り入口・下り出口。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-4/hatagaya)で方向を確認。座標はMapFanの「幡ヶ谷ランプ（４号新宿線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.02kmの中間点。"
+        note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-4/hatagaya)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。入口はETC専用。新規追加。座標はMapFanの「幡ヶ谷ランプ（４号新宿線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.02kmの中間点。"
     },
     {
         id: "shuto-4-eifuku",
@@ -1302,10 +1302,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.697927,
         exitLng: 139.752251,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速5号池袋線 西神田出入口"],
-        note: "上り入口・下り出口。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-5/nishikanda)で方向を確認。座標はMapFanの「西神田ランプ（５号池袋線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.04kmの中間点。"
+        note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-5/nishikanda)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。入口はETC専用。新規追加。座標はMapFanの「西神田ランプ（５号池袋線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.04kmの中間点。"
     },
     {
         id: "shuto-5-iidabashi",
@@ -1322,10 +1322,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.703774,
         exitLng: 139.744831,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速5号池袋線 飯田橋出入口"],
-        note: "下り入口・上り出口。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-5/iidabashi)で方向を確認。座標は出口（上り）ランプのみMapFan個別ページ「飯田橋ランプ（５号池袋線）【出口（上り）】」で確認済み（千代田区・文京区のMapFan一覧を確認したが入口（下り）の個別ページは見つからず）。入口（下り）ランプ座標は未確認のため、lat/lngと同じ値を暫定使用。"
+        note: "下り入口・上り出口。首都高公式サイト(shutoko.jp route-5/iidabashi)の出入口ページの表で「入口:下り／出口:上り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（下り）を代表方向として採用し、上り出口はexitSelectable:falseとした。入口はETC専用。新規追加。座標は出口（上り）ランプのみMapFan個別ページ「飯田橋ランプ（５号池袋線）【出口（上り）】」で確認済み（千代田区・文京区のMapFan一覧を確認したが入口（下り）の個別ページは見つからず）。入口（下り）ランプ座標は未確認のため、lat/lngと同じ値を暫定使用。"
     },
     {
         id: "shuto-5-waseda",
@@ -1362,10 +1362,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.719170,
         exitLng: 139.725720,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速5号池袋線 護国寺出入口"],
-        note: "上り入口・下り出口。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-5/gokokuji)で方向を確認。座標はMapFanの「護国寺ランプ（５号池袋線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.02kmの中間点。"
+        note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-5/gokokuji)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。入口はETC専用。新規追加。座標はMapFanの「護国寺ランプ（５号池袋線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.02kmの中間点。"
     },
     {
         id: "shuto-5-higashiikebukuro",
@@ -1402,10 +1402,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.740540,
         exitLng: 139.707525,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速5号池袋線 北池袋出入口"],
-        note: "上り入口・下り出口。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-5/kitaikebukuro)で方向を確認。座標はMapFanの「北池袋ランプ（５号池袋線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.03kmの中間点。"
+        note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-5/kitaikebukuro)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。入口はETC専用。新規追加。座標はMapFanの「北池袋ランプ（５号池袋線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.03kmの中間点。"
     },
     {
         id: "shuto-5-itabashihoncho",
@@ -1442,10 +1442,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.775913,
         exitLng: 139.678934,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速5号池袋線 中台出入口"],
-        note: "上り入口・下り出口。新規追加。首都高公式サイト(shutoko.jp route-5/nakadai)で方向を確認。座標はMapFanの「中台ランプ（５号池袋線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.02kmの中間点。"
+        note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-5/nakadai)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。新規追加。座標はMapFanの「中台ランプ（５号池袋線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.02kmの中間点。"
     },
     {
         id: "shuto-5-takashimadaira",
@@ -1462,10 +1462,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.785819,
         exitLng: 139.646359,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速5号池袋線 高島平出入口"],
-        note: "上り入口・下り出口。新規追加。首都高公式サイト(shutoko.jp route-5/takashimadaira)で方向を確認。座標はMapFanの「高島平ランプ（５号池袋線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.16kmの中間点。"
+        note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-5/takashimadaira)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。新規追加。座標はMapFanの「高島平ランプ（５号池袋線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.16kmの中間点。"
     },
     {
         id: "shuto-5-todaminami",
@@ -1482,10 +1482,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.805776,
         exitLng: 139.649120,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速5号池袋線 戸田南出入口"],
-        note: "上り入口・下り出口。新規追加。首都高公式サイト(shutoko.jp route-5/todaminami)で方向を確認。座標はMapFanの「戸田南ランプ（５号池袋線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.12kmの中間点。"
+        note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-5/todaminami)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。新規追加。座標はMapFanの「戸田南ランプ（５号池袋線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.12kmの中間点。"
     },
     {
         id: "shuto-5-toda",
@@ -1502,10 +1502,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.820069,
         exitLng: 139.644340,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速5号池袋線 戸田出入口"],
-        note: "下り入口・上り出口。新規追加。首都高公式サイト(shutoko.jp route-5/toda)で方向を確認。座標はMapFanの「戸田ランプ（５号池袋線）【入口（下り）】/【出口（上り）】」個別ページでランプごとに確認、入口・出口座標間約0.20kmの中間点。"
+        note: "下り入口・上り出口。首都高公式サイト(shutoko.jp route-5/toda)の出入口ページの表で「入口:下り／出口:上り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（下り）を代表方向として採用し、上り出口はexitSelectable:falseとした。新規追加。座標はMapFanの「戸田ランプ（５号池袋線）【入口（下り）】/【出口（上り）】」個別ページでランプごとに確認、入口・出口座標間約0.20kmの中間点。"
     },
     {
         id: "shuto-3-yoga",
@@ -1542,10 +1542,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.659301,
         exitLng: 139.719804,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: ["tomei"],
         sourceGoogleNames: ["首都高速3号渋谷線 高樹町出入口"],
-        note: "上り入口・下り出口。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-3/takagicho)で方向を確認。座標はMapFanの「高樹町ランプ（３号渋谷線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.03kmの中間点。"
+        note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-3/takagicho)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。入口はETC専用。新規追加。座標はMapFanの「高樹町ランプ（３号渋谷線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.03kmの中間点。"
     },
     {
         id: "shuto-3-shibuya",
@@ -1582,10 +1582,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.649044,
         exitLng: 139.681494,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: ["tomei"],
         sourceGoogleNames: ["首都高速3号渋谷線 池尻出入口"],
-        note: "下り入口・上り出口。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-3/ikejiri)で方向を確認。座標はMapFanの「池尻ランプ（３号渋谷線）【入口（下り）】/【出口（上り）】」個別ページでランプごとに確認、入口・出口座標間約0.46km（既存データ中の芝公園0.75kmの範囲内）。"
+        note: "下り入口・上り出口。首都高公式サイト(shutoko.jp route-3/ikejiri)の出入口ページの表で「下り:入口／上り:出口」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（下り）を代表方向として採用し、上り出口はexitSelectable:falseとした。入口はETC専用。新規追加。座標はMapFanの「池尻ランプ（３号渋谷線）【入口（下り）】/【出口（上り）】」個別ページでランプごとに確認、入口・出口座標間約0.46km（既存データ中の芝公園0.75kmの範囲内）。"
     },
     {
         id: "shuto-3-sangenjaya",
@@ -1602,10 +1602,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.644056,
         exitLng: 139.672592,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: ["tomei"],
         sourceGoogleNames: ["首都高速3号渋谷線 三軒茶屋出入口"],
-        note: "上り入口・下り出口。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-3/sangendyaya)で方向を確認。座標はMapFanの「三軒茶屋ランプ（３号渋谷線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.24kmの中間点。"
+        note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-3/sangendyaya)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。入口はETC専用。新規追加。座標はMapFanの「三軒茶屋ランプ（３号渋谷線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.24kmの中間点。"
     },
     {
         id: "shuto-c1-kasumigaseki",
@@ -1802,10 +1802,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.646625,
         exitLng: 139.725832,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: ["tomei"],
         sourceGoogleNames: ["首都高速2号目黒線 天現寺出入口"],
-        note: "上り入口・下り出口。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-2/tengenji)で方向を確認。座標はMapFanの「天現寺ランプ（２号目黒線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.02kmの中間点。"
+        note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-2/tengenji)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。入口はETC専用。新規追加。座標はMapFanの「天現寺ランプ（２号目黒線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.02kmの中間点。"
     },
     {
         id: "shuto-2-meguro",
@@ -1822,10 +1822,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.636063,
         exitLng: 139.718403,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: ["tomei"],
         sourceGoogleNames: ["首都高速2号目黒線 目黒出入口"],
-        note: "上り入口・下り出口。新規追加。首都高公式サイト(shutoko.jp route-2/meguro)で方向を確認。座標は出口（下り）ランプのみMapFan個別ページ「目黒ランプ（２号目黒線）【出口（下り）】」で確認済み。入口（上り）ランプ座標は個別ページを直接確認できず未確認のため、lat/lngと同じ値を暫定使用。"
+        note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-2/meguro)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。新規追加。座標は出口（下り）ランプのみMapFan個別ページ「目黒ランプ（２号目黒線）【出口（下り）】」で確認済み。入口（上り）ランプ座標は個別ページを直接確認できず未確認のため、lat/lngと同じ値を暫定使用。"
     },
     {
         id: "shuto-2-ebara",
@@ -1842,10 +1842,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.618687,
         exitLng: 139.715724,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: ["tomei"],
         sourceGoogleNames: ["首都高速2号目黒線 荏原出入口"],
-        note: "上り入口・下り出口。新規追加。首都高公式サイト(shutoko.jp route-2/ebara)で方向を確認。座標はMapFanの「荏原ランプ（２号目黒線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.02kmの中間点。"
+        note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-2/ebara)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。新規追加。座標はMapFanの「荏原ランプ（２号目黒線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.02kmの中間点。"
     },
     {
         id: "shuto-c2-chukan-oi-minami",
@@ -3042,10 +3042,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.794786,
         exitLng: 139.759737,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速川口線 加賀出入口"],
-        note: "上り入口・下り出口。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-s1/kaga)で方向を確認。座標はMapFanの「加賀ランプ（川口線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.05kmの中間点。"
+        note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-s1/kaga)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。入口はETC専用。新規追加。座標はMapFanの「加賀ランプ（川口線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.05kmの中間点。"
     },
     {
         id: "shuto-s1-adachi-iriya",
@@ -3062,10 +3062,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.804822,
         exitLng: 139.759663,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速川口線 足立入谷出入口"],
-        note: "下り入口・上り出口。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-s1/adachiiriya)で方向を確認。座標はMapFanの「足立入谷ランプ（川口線）【入口（下り）】/【出口（上り）】」個別ページでランプごとに確認、入口・出口座標間約0.02kmの中間点。"
+        note: "下り入口・上り出口。首都高公式サイト(shutoko.jp route-s1/adachiiriya)の出入口ページの表で「入口:下り／出口:上り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（下り）を代表方向として採用し、上り出口はexitSelectable:falseとした。入口はETC専用。新規追加。座標はMapFanの「足立入谷ランプ（川口線）【入口（下り）】/【出口（上り）】」個別ページでランプごとに確認、入口・出口座標間約0.02kmの中間点。"
     },
     {
         id: "shuto-s1-shingou",
@@ -3102,10 +3102,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.835560,
         exitLng: 139.755615,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速川口線 安行出入口"],
-        note: "上り入口・下り出口。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-s1/angyou)で方向を確認。座標はMapFanの「安行ランプ（川口線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.02kmの中間点。"
+        note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-s1/angyou)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。入口はETC専用。新規追加。座標はMapFanの「安行ランプ（川口線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.02kmの中間点。"
     },
     {
         id: "shuto-s1-araijuku",
@@ -3122,10 +3122,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.847266,
         exitLng: 139.737857,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速川口線 新井宿出入口"],
-        note: "上り入口・下り出口。新規追加。首都高公式サイト(shutoko.jp route-s1/araijuku)で方向を確認。座標はMapFanの「新井宿ランプ（川口線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.04kmの中間点。"
+        note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-s1/araijuku)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。新規追加。座標はMapFanの「新井宿ランプ（川口線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.04kmの中間点。"
     }
 ];
 

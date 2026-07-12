@@ -9700,6 +9700,126 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
 
 const entranceSectionFilterLoggedAnalyses = new WeakSet();
 
+function inferTravelDirectionForIcArea(
+    icArea,
+    referenceIc,
+    passedIcEntries,
+    getIcIdentity
+) {
+
+    const findExitInArea = targetIc => {
+        const targetIdentity = getIcIdentity(targetIc);
+
+        if (!targetIdentity || !IC_MASTER[icArea]) {
+            return null;
+        }
+
+        return IC_MASTER[icArea].exits.find(exit =>
+            getIcIdentity(exit) === targetIdentity
+        ) || null;
+    };
+
+    const getComparablePosition = (exit, reference) => {
+        if (!exit || !reference) {
+            return null;
+        }
+
+        if (
+            exit.routeBranch &&
+            reference.routeBranch &&
+            exit.routeBranch !== reference.routeBranch
+        ) {
+            return null;
+        }
+
+        if (
+            Number.isFinite(exit.branchOrder) &&
+            Number.isFinite(reference.branchOrder)
+        ) {
+            return exit.branchOrder;
+        }
+
+        return Number.isFinite(exit.order)
+            ? exit.order
+            : null;
+    };
+
+    const referenceInArea =
+        findExitInArea(referenceIc);
+
+    const referencePosition =
+        getComparablePosition(
+            referenceInArea,
+            referenceInArea
+        );
+
+    if (referencePosition === null) {
+        return null;
+    }
+
+    const passedIcs = passedIcEntries || [];
+
+    const referencePassedIndex =
+        passedIcs.findIndex(item =>
+            getIcIdentity(item.exit) ===
+                getIcIdentity(referenceIc)
+        );
+
+    if (referencePassedIndex < 0) {
+        return null;
+    }
+
+    for (
+        let index = referencePassedIndex + 1;
+        index < passedIcs.length;
+        index++
+    ) {
+        const nextExit =
+            findExitInArea(passedIcs[index].exit);
+
+        const nextPosition =
+            getComparablePosition(
+                nextExit,
+                referenceInArea
+            );
+
+        if (
+            nextPosition !== null &&
+            nextPosition !== referencePosition
+        ) {
+            return Math.sign(
+                nextPosition - referencePosition
+            );
+        }
+    }
+
+    for (
+        let index = referencePassedIndex - 1;
+        index >= 0;
+        index--
+    ) {
+        const previousExit =
+            findExitInArea(passedIcs[index].exit);
+
+        const previousPosition =
+            getComparablePosition(
+                previousExit,
+                referenceInArea
+            );
+
+        if (
+            previousPosition !== null &&
+            previousPosition !== referencePosition
+        ) {
+            return Math.sign(
+                referencePosition - previousPosition
+            );
+        }
+    }
+
+    return null;
+}
+
 function filterEntranceCandidatesByRouteSection({
     polylineAnalysis,
     candidates,
@@ -9762,89 +9882,13 @@ function filterEntranceCandidatesByRouteSection({
             : null;
     };
 
-    const inferTravelDirection = icArea => {
-        const referenceInArea =
-            findExitInArea(icArea, referenceIc);
-
-        const referencePosition =
-            getComparablePosition(
-                referenceInArea,
-                referenceInArea
-            );
-
-        if (referencePosition === null) {
-            return null;
-        }
-
-        const passedIcs =
-            polylineAnalysis.passedIcEntries || [];
-
-        const referencePassedIndex =
-            passedIcs.findIndex(item =>
-                getIcIdentity(item.exit) ===
-                    getIcIdentity(referenceIc)
-            );
-
-        if (referencePassedIndex < 0) {
-            return null;
-        }
-
-        for (
-            let index = referencePassedIndex + 1;
-            index < passedIcs.length;
-            index++
-        ) {
-            const nextExit =
-                findExitInArea(
-                    icArea,
-                    passedIcs[index].exit
-                );
-
-            const nextPosition =
-                getComparablePosition(
-                    nextExit,
-                    referenceInArea
-                );
-
-            if (
-                nextPosition !== null &&
-                nextPosition !== referencePosition
-            ) {
-                return Math.sign(
-                    nextPosition - referencePosition
-                );
-            }
-        }
-
-        for (
-            let index = referencePassedIndex - 1;
-            index >= 0;
-            index--
-        ) {
-            const previousExit =
-                findExitInArea(
-                    icArea,
-                    passedIcs[index].exit
-                );
-
-            const previousPosition =
-                getComparablePosition(
-                    previousExit,
-                    referenceInArea
-                );
-
-            if (
-                previousPosition !== null &&
-                previousPosition !== referencePosition
-            ) {
-                return Math.sign(
-                    referencePosition - previousPosition
-                );
-            }
-        }
-
-        return null;
-    };
+    const inferTravelDirection = icArea =>
+        inferTravelDirectionForIcArea(
+            icArea,
+            referenceIc,
+            polylineAnalysis.passedIcEntries,
+            getIcIdentity
+        );
 
     const getForwardStepCount = (
         icArea,
@@ -11324,6 +11368,30 @@ function logHighwayRoutePolylineAnalysis(
             "現在のexitIc:",
             exitCandidate?.displayName || "なし"
         );
+
+        const gaikanPassedIcEntry =
+            passedIcEntries.find(item =>
+                item.icArea === "gaikan"
+            );
+
+        if (gaikanPassedIcEntry) {
+            const gaikanTravelDirection =
+                inferTravelDirectionForIcArea(
+                    "gaikan",
+                    gaikanPassedIcEntry.exit,
+                    passedIcEntries,
+                    buildIcDefinitionIdentity
+                );
+
+            console.log(
+                "外環方向判定：",
+                gaikanTravelDirection === 1
+                    ? "外回り"
+                    : gaikanTravelDirection === -1
+                        ? "内回り"
+                        : "判定不能"
+            );
+        }
 
         console.groupEnd();
 

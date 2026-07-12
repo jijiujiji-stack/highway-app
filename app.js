@@ -9813,13 +9813,38 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 !isShutoIcForRouteAnalysis(item.exit)
             );
 
-        const nexcoEntranceCandidate =
-            selectablePassedNexcoIcs[0]?.exit || null;
+        const isEntranceRoleSelectable = exit =>
+            typeof exit.entranceSelectable === "boolean"
+                ? exit.entranceSelectable
+                : exit.isSelectable !== false;
 
-        const nexcoExitCandidate =
-            selectablePassedNexcoIcs[
-                selectablePassedNexcoIcs.length - 1
-            ]?.exit || null;
+        const isExitRoleSelectable = exit =>
+            typeof exit.exitSelectable === "boolean"
+                ? exit.exitSelectable
+                : exit.isSelectable !== false;
+
+        const nexcoEntranceCandidate =
+            selectablePassedNexcoIcs.find(item =>
+                isEntranceRoleSelectable(item.exit)
+            )?.exit || null;
+
+        let nexcoExitCandidate = null;
+
+        for (
+            let index = selectablePassedNexcoIcs.length - 1;
+            index >= 0;
+            index--
+        ) {
+            if (
+                isExitRoleSelectable(
+                    selectablePassedNexcoIcs[index].exit
+                )
+            ) {
+                nexcoExitCandidate =
+                    selectablePassedNexcoIcs[index].exit;
+                break;
+            }
+        }
 
         const shutoExitSwitch =
             roadSwitches.find(roadSwitch =>

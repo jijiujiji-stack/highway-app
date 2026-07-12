@@ -5582,12 +5582,14 @@ function isCurrentLocationRouteOrigin(value) {
 function createRoutesCacheKey(
     origin,
     destination,
-    routeOptions
+    routeOptions,
+    role
 ) {
     return JSON.stringify({
         origin: origin,
         destination: destination,
-        routeOptions: routeOptions
+        routeOptions: routeOptions,
+        role: role
     });
 }
 
@@ -5595,13 +5597,15 @@ function createRoutesCacheRequest(
     functionName,
     origin,
     destination,
-    routeOptions
+    routeOptions,
+    role
 ) {
     return {
         key: createRoutesCacheKey(
             origin,
             destination,
-            routeOptions
+            routeOptions,
+            role
         ),
         functionName: functionName,
         origin: origin,
@@ -13165,7 +13169,8 @@ async function getHighwayRouteForMultiExitComparison(
             travelMode: "DRIVE",
             routingPreference: "TRAFFIC_AWARE",
             avoidTolls: false
-        }
+        },
+        role
     );
 
     const cachedResponse = getCachedRoutesResponse(cacheRequest);
@@ -13258,7 +13263,8 @@ async function getLocalRouteForMultiExitComparison(
             travelMode: "DRIVE",
             routingPreference: "TRAFFIC_AWARE",
             avoidTolls: true
-        }
+        },
+        role
     );
 
     const cachedResponse = getCachedRoutesResponse(cacheRequest);

@@ -902,10 +902,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.699240,
         exitLng: 139.865884,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速7号小松川線 小松川出入口"],
-        note: "上り入口・下り出口。小松川JCTではなく出入口ランプ座標。第2弾追加。Google表記と座標確認済み。"
+        note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-7/komatsugawa)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。小松川JCTではなく出入口ランプ座標。第2弾追加。Google表記と座標確認済み。"
     },
     {
         id: "shuto-7-ichinoe",
@@ -922,10 +922,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.697449,
         exitLng: 139.880863,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速7号小松川線 一之江出入口"],
-        note: "上り入口・下り出口。第2弾追加。Google表記と座標確認済み。"
+        note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-7/ichinoe)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。第2弾追加。Google表記と座標確認済み。"
     },
     {
         id: "shuto-9-fukuzumi",
@@ -1642,10 +1642,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.678902,
         exitLng: 139.775407,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速都心環状線 宝町出入口"],
-        note: "内回り入口・外回り出口。入口はETC専用。入口・出口座標間約0.08kmの中間点。第7弾追加。公式の出入口方向と地図上のランプ座標を照合済み。"
+        note: "内回り入口・外回り出口。首都高公式サイト(shutoko.jp route-c1/takaracho)の出入口ページの表で「入口:内回り／出口:外回り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（内回り）を代表方向として採用し、外回り出口はexitSelectable:falseとした。入口はETC専用。入口・出口座標間約0.08kmの中間点。第7弾追加。公式の出入口方向と地図上のランプ座標を照合済み。"
     },
     {
         id: "shuto-c1-kyobashi",
@@ -1662,10 +1662,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.673166,
         exitLng: 139.772414,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速都心環状線 京橋出入口"],
-        note: "外回り入口・内回り出口。入口・出口座標間約0.14kmの中間点。第7弾追加。公式の出入口方向と地図上のランプ座標を照合済み。"
+        note: "外回り入口・内回り出口。首都高公式サイト(shutoko.jp route-c1/kyoubashi)の出入口ページの表で「入口:外回り／出口:内回り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（外回り）を代表方向として採用し、内回り出口はexitSelectable:falseとした。入口・出口座標間約0.14kmの中間点。第7弾追加。公式の出入口方向と地図上のランプ座標を照合済み。"
     },
     {
         id: "shuto-c1-shintomicho",
@@ -1722,10 +1722,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.660376,
         exitLng: 139.760324,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速都心環状線 汐留出入口"],
-        note: "外回り入口・内回り出口。入口はETC専用。入口・出口座標間約0.02kmの中間点。第7弾追加。公式の出入口方向と地図上のランプ座標を照合済み。"
+        note: "外回り入口・内回り出口。首都高公式サイト(shutoko.jp route-c1/shiodome)の出入口ページの表で「入口:外回り／出口:内回り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（外回り）を代表方向として採用し、内回り出口はexitSelectable:falseとした。入口はETC専用。入口・出口座標間約0.02kmの中間点。第7弾追加。公式の出入口方向と地図上のランプ座標を照合済み。"
     },
     {
         id: "shuto-c1-shibakoen",
@@ -1762,10 +1762,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.660574,
         exitLng: 139.737371,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速都心環状線 飯倉出入口"],
-        note: "内回り入口・外回り出口。入口はETC専用。入口・出口座標間約0.57kmの中間点。第7弾追加。公式の出入口方向と地図上のランプ座標を照合済み。"
+        note: "内回り入口・外回り出口。首都高公式サイト(shutoko.jp route-c1/iikura)の出入口ページの表で「入口:内回り／出口:外回り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（内回り）を代表方向として採用し、外回り出口はexitSelectable:falseとした。入口はETC専用。入口・出口座標間約0.57kmの中間点。第7弾追加。公式の出入口方向と地図上のランプ座標を照合済み。"
     },
     {
         id: "shuto-2-togoshi",
@@ -1862,10 +1862,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.599007,
         exitLng: 139.754924,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速中央環状線 中環大井南出入口"],
-        note: "外回り入口・内回り出口。入口はETC専用。湾岸線の大井南出入口・大井JCTではなくC2出入口ランプ座標。第6弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
+        note: "外回り入口・内回り出口。首都高公式サイト(shutoko.jp route-c2/chukanooiminami)の出入口ページの表で「入口:外回り／出口:内回り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（外回り）を代表方向として採用し、内回り出口はexitSelectable:falseとした。入口はETC専用。湾岸線の大井南出入口・大井JCTではなくC2出入口ランプ座標。第6弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
     },
     {
         id: "shuto-c2-gotanda",
@@ -1882,10 +1882,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.625619,
         exitLng: 139.717378,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速中央環状線 五反田出入口"],
-        note: "外回り入口・内回り出口。入口はETC専用。第6弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
+        note: "外回り入口・内回り出口。首都高公式サイト(shutoko.jp route-c2/gotanda)の出入口ページの表で「入口:外回り／出口:内回り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（外回り）を代表方向として採用し、内回り出口はexitSelectable:falseとした。入口はETC専用。第6弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
     },
     {
         id: "shuto-c2-tomigaya",
@@ -1902,10 +1902,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.662953,
         exitLng: 139.687707,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速中央環状線 富ヶ谷出入口"],
-        note: "外回り入口・内回り出口。入口はETC専用。第6弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
+        note: "外回り入口・内回り出口。首都高公式サイト(shutoko.jp route-c2/tomigaya)の出入口ページの表で「入口:外回り／出口:内回り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（外回り）を代表方向として採用し、内回り出口はexitSelectable:falseとした。入口はETC専用。第6弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
     },
     {
         id: "shuto-c2-hatsudai-minami",
@@ -1922,10 +1922,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.675152,
         exitLng: 139.687813,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速中央環状線 初台南出入口"],
-        note: "内回り入口・外回り出口。入口はETC専用。第6弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
+        note: "内回り入口・外回り出口。首都高公式サイト(shutoko.jp route-c2/hatsudaiminami)の出入口ページの表で「入口:内回り／出口:外回り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（内回り）を代表方向として採用し、外回り出口はexitSelectable:falseとした。入口はETC専用。第6弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
     },
     {
         id: "shuto-c2-nakano-chojabashi",
@@ -1942,10 +1942,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.692264,
         exitLng: 139.681958,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速中央環状線 中野長者橋出入口"],
-        note: "外回り入口・内回り出口。入口はETC専用。第6弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
+        note: "外回り入口・内回り出口。首都高公式サイト(shutoko.jp route-c2/nakanochoujabashi)の出入口ページの表で「入口:外回り／出口:内回り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（外回り）を代表方向として採用し、内回り出口はexitSelectable:falseとした。入口はETC専用。第6弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
     },
     {
         id: "shuto-c2-nishi-ikebukuro",
@@ -2042,10 +2042,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.755105,
         exitLng: 139.742349,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速中央環状線 王子南出入口"],
-        note: "内回り入口・外回り出口。入口はETC専用。第6弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
+        note: "内回り入口・外回り出口。首都高公式サイト(shutoko.jp route-c2/oujiminami)の出入口ページの表で「入口:内回り／出口:外回り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（内回り）を代表方向として採用し、外回り出口はexitSelectable:falseとした。入口はETC専用。第6弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
     },
     {
         id: "shuto-c2-oji-kita",
@@ -2162,10 +2162,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.714809,
         exitLng: 139.850480,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速中央環状線 平井大橋出入口"],
-        note: "内回り入口・外回り出口。第5弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
+        note: "内回り入口・外回り出口。首都高公式サイト(shutoko.jp route-c2/hiraioohashi)の出入口ページの表で「入口:内回り／出口:外回り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（内回り）を代表方向として採用し、外回り出口はexitSelectable:falseとした。第5弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
     },
     {
         id: "shuto-c2-chukan-komatsugawa",
@@ -2202,10 +2202,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.688332,
         exitLng: 139.857953,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速中央環状線 船堀橋出入口"],
-        note: "外回り入口・内回り出口。入口はETC専用。第5弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
+        note: "外回り入口・内回り出口。首都高公式サイト(shutoko.jp route-c2/funaboribashi)の出入口ページの表で「入口:外回り／出口:内回り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（外回り）を代表方向として採用し、内回り出口はexitSelectable:falseとした。入口はETC専用。第5弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
     },
     {
         id: "shuto-c2-seishincho",
@@ -2222,10 +2222,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.665223,
         exitLng: 139.853007,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速中央環状線 清新町出入口"],
-        note: "内回り入口・外回り出口。入口はETC専用。第5弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
+        note: "内回り入口・外回り出口。首都高公式サイト(shutoko.jp route-c2/seishincho)の出入口ページの表で「入口:内回り／出口:外回り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（内回り）を代表方向として採用し、外回り出口はexitSelectable:falseとした。入口はETC専用。第5弾追加。公式の出入口方向とGoogle Map座標を照合済み。"
     },
     {
         id: "shuto-b-chidoricho",
@@ -2442,10 +2442,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.625993,
         exitLng: 139.773874,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速湾岸線 臨海副都心出入口"],
-        note: "西行き入口・東行き出口。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-b/rinkaihukutoshin)で方向を確認。座標はMapFanの「臨海副都心ランプ（湾岸線）【入口（西行き）】/【出口（東行き）】」個別ページでランプごとに確認、入口・出口座標間約0.10kmの中間点。"
+        note: "西行き入口・東行き出口。首都高公式サイト(shutoko.jp route-b/rinkaihukutoshin)の出入口ページの表で「入口:西行き／出口:東行き」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（西行き）を代表方向として採用し、東行き出口はexitSelectable:falseとした。入口はETC専用。新規追加。座標はMapFanの「臨海副都心ランプ（湾岸線）【入口（西行き）】/【出口（東行き）】」個別ページでランプごとに確認、入口・出口座標間約0.10kmの中間点。"
     },
     {
         id: "shuto-b-ooi",
@@ -2462,10 +2462,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.611819,
         exitLng: 139.756607,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速湾岸線 大井出入口"],
-        note: "東行き入口・西行き出口。入口はETC専用。既存登録済みの「大井南」とは別出入口。新規追加。首都高公式サイト(shutoko.jp route-b/ooi)で方向を確認。座標はMapFanの「大井ランプ（湾岸線）【入口（東行き）】/【出口（西行き）】」個別ページでランプごとに確認、入口・出口座標間約0.30kmの中間点。"
+        note: "東行き入口・西行き出口。首都高公式サイト(shutoko.jp route-b/ooi)の出入口ページの表で「入口:東行き／出口:西行き」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（東行き）を代表方向として採用し、西行き出口はexitSelectable:falseとした。入口はETC専用。既存登録済みの「大井南」とは別出入口。新規追加。座標はMapFanの「大井ランプ（湾岸線）【入口（東行き）】/【出口（西行き）】」個別ページでランプごとに確認、入口・出口座標間約0.30kmの中間点。"
     },
     {
         id: "shuto-b-wangan-kanpachi",
@@ -2482,10 +2482,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.540368,
         exitLng: 139.792927,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速湾岸線 湾岸環八出入口"],
-        note: "西行き入口・東行き出口。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-b/wangankanpachi)で方向を確認。座標はMapFanの「湾岸環八ランプ（湾岸線）【入口（西行き）】/【出口（東行き）】」個別ページでランプごとに確認、入口・出口座標間約0.07kmの中間点。"
+        note: "西行き入口・東行き出口。首都高公式サイト(shutoko.jp route-b/wangankanpachi)の出入口ページの表で「入口:西行き／出口:東行き」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（西行き）を代表方向として採用し、東行き出口はexitSelectable:falseとした。入口はETC専用。新規追加。座標はMapFanの「湾岸環八ランプ（湾岸線）【入口（西行き）】/【出口（東行き）】」個別ページでランプごとに確認、入口・出口座標間約0.07kmの中間点。"
     },
     {
         id: "shuto-b-higashiogishima",
@@ -2582,10 +2582,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.412549,
         exitLng: 139.661584,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速湾岸線 三溪園出入口"],
-        note: "西行き入口・東行き出口。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-b/sankeien)で方向を確認。座標はMapFanの「三溪園ランプ（湾岸線）【入口（西行き）】/【出口（東行き）】」個別ページでランプごとに確認、入口・出口座標間約0.36km（既存データ中の芝公園0.75kmの範囲内）。"
+        note: "西行き入口・東行き出口。首都高公式サイト(shutoko.jp route-b/sankeien)の出入口ページの表で「入口:西行き／出口:東行き」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（西行き）を代表方向として採用し、東行き出口はexitSelectable:falseとした。入口はETC専用。新規追加。座標はMapFanの「三溪園ランプ（湾岸線）【入口（西行き）】/【出口（東行き）】」個別ページでランプごとに確認、入口・出口座標間約0.36km（既存データ中の芝公園0.75kmの範囲内）。"
     },
     {
         id: "shuto-b-isogo",
@@ -2602,10 +2602,10 @@ const SHUTO_IC_MASTER = [
         exitLat: 35.397064,
         exitLng: 139.617192,
         entranceSelectable: true,
-        exitSelectable: true,
+        exitSelectable: false,
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速湾岸線 磯子出入口"],
-        note: "東行き入口・西行き出口。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-b/isogo)で方向を確認。座標はMapFanの「磯子ランプ（湾岸線）【入口（東行き）】/【出口（西行き）】」個別ページでランプごとに確認、入口・出口座標間約0.04kmの中間点。"
+        note: "東行き入口・西行き出口。首都高公式サイト(shutoko.jp route-b/isogo)の出入口ページの表で「入口:東行き／出口:西行き」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（東行き）を代表方向として採用し、西行き出口はexitSelectable:falseとした。入口はETC専用。新規追加。座標はMapFanの「磯子ランプ（湾岸線）【入口（東行き）】/【出口（西行き）】」個別ページでランプごとに確認、入口・出口座標間約0.04kmの中間点。"
     },
     {
         id: "shuto-b-sugita",

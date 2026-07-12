@@ -5520,9 +5520,154 @@ const IC_MASTER = {
                 note: "フルIC。MapFan「和光IC(東京外環自動車道)【入口(内回り)】」(35.7821421,139.6108254)・【出口(内回り)】(35.7872468,139.6153388)で確認。lat/lngは入口・出口の中間点。"
             }
         ]
+    },
+
+    // shutoC1Uchimawari: SHUTO_IC_MASTER内の首都高速都心環状線(C1)のうち、
+    // 方向によって入口・出口の役割が入れ替わる4件（宝町・京橋・汐留・飯倉）について、
+    // SHUTO_IC_MASTER本体側（代表方向）とは逆方向の役割をミラー登録したもの。
+    // orderはSHUTO_IC_MASTER側の同ICのorder値を負数化（gaikan/gaikanUchimawariと同じ規則）。
+    // googleNameはSHUTO_IC_MASTER側の対応ICと同一にし、identity一致による方向判定を可能にする。
+    shutoC1Uchimawari: {
+        label: "都心環状線方面（逆方向）",
+        exits: [
+            {
+                order: -1,
+                displayName: "宝町",
+                googleName: "首都高速都心環状線 宝町出入口",
+                lat: 35.67788556,
+                lng: 139.77513532,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.67788556, entranceLng: 139.77513532, exitLat: 35.67788556, exitLng: 139.77513532,
+                note: "SHUTO_IC_MASTERの「宝町」（内回り入口を代表方向として採用）に対する外回り方向のミラーレコード。首都高公式サイト(shutoko.jp route-c1/takaracho)で外回り出口の存在を確認済み。座標はMapFan個別ページ(S3Y,J,NU4)が404で確認できなかったため、マピオン電話帳「宝町ランプ出口」で確認(35.67788556,139.77513532)。内回り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -2,
+                displayName: "京橋",
+                googleName: "首都高速都心環状線 京橋出入口",
+                lat: 35.6750043,
+                lng: 139.7726618,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.6750043, entranceLng: 139.7726618, exitLat: 35.6750043, exitLng: 139.7726618,
+                note: "SHUTO_IC_MASTERの「京橋」（外回り入口を代表方向として採用）に対する内回り方向のミラーレコード。首都高公式サイト(shutoko.jp route-c1/kyoubashi)で内回り出口の存在を確認済み。座標はMapFan「京橋ランプ（都心環状線）【出口（内回り）】」で確認(35.6750043,139.7726618)。外回り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -5,
+                displayName: "汐留",
+                googleName: "首都高速都心環状線 汐留出入口",
+                lat: 35.6633142,
+                lng: 139.7625511,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.6633142, entranceLng: 139.7625511, exitLat: 35.6633142, exitLng: 139.7625511,
+                note: "SHUTO_IC_MASTERの「汐留」（外回り入口を代表方向として採用）に対する内回り方向のミラーレコード。首都高公式サイト(shutoko.jp route-c1/shiodome)で内回り出口の存在を確認済み。座標はMapFan「汐留ランプ（都心環状線）【出口（内回り）】」で確認(35.6633142,139.7625511)。外回り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -7,
+                displayName: "飯倉",
+                googleName: "首都高速都心環状線 飯倉出入口",
+                lat: 35.6600066,
+                lng: 139.7368456,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.6600066, entranceLng: 139.7368456, exitLat: 35.6600066, exitLng: 139.7368456,
+                note: "SHUTO_IC_MASTERの「飯倉」（内回り入口を代表方向として採用）に対する外回り方向のミラーレコード。首都高公式サイト(shutoko.jp route-c1/iikura)で外回り出口の存在を確認済み。座標はMapFan「飯倉ランプ（都心環状線）【出口（外回り）】」で確認(35.6600066,139.7368456)。内回り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            }
+        ]
+    },
+
+    // shutoC2Uchimawari: SHUTO_IC_MASTER内の首都高速中央環状線(C2)のうち、
+    // 方向によって入口・出口の役割が入れ替わる10件について、
+    // SHUTO_IC_MASTER本体側（代表方向）とは逆方向の役割をミラー登録したもの。
+    // orderはSHUTO_IC_MASTER側の同ICのorder値を負数化（gaikan/gaikanUchimawariと同じ規則）。
+    shutoC2Uchimawari: {
+        label: "中央環状線方面（逆方向）",
+        exits: [
+            {
+                order: -1,
+                displayName: "中環大井南",
+                googleName: "首都高速中央環状線 中環大井南出入口",
+                lat: 35.6013968,
+                lng: 139.7557747,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.6013968, entranceLng: 139.7557747, exitLat: 35.6013968, exitLng: 139.7557747,
+                note: "SHUTO_IC_MASTERの「中環大井南」（外回り入口を代表方向として採用）に対する内回り方向のミラーレコード。首都高公式サイト(shutoko.jp route-c2/chukanooiminami)で内回り出口の存在を確認済み。座標はMapFan「中環大井南ランプ（中央環状線（山手トンネル））【出口（内回り）】」で確認(35.6013968,139.7557747)。外回り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -2,
+                displayName: "五反田",
+                googleName: "首都高速中央環状線 五反田出入口",
+                lat: 35.6279557,
+                lng: 139.7131047,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.6279557, entranceLng: 139.7131047, exitLat: 35.6279557, exitLng: 139.7131047,
+                note: "SHUTO_IC_MASTERの「五反田」（外回り入口を代表方向として採用）に対する内回り方向のミラーレコード。首都高公式サイト(shutoko.jp route-c2/gotanda)で内回り出口の存在を確認済み。座標はMapFan「五反田ランプ（中央環状線（山手トンネル））【出口（内回り）】」で確認(35.6279557,139.7131047)。外回り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -3,
+                displayName: "富ヶ谷",
+                googleName: "首都高速中央環状線 富ヶ谷出入口",
+                lat: 35.6639768,
+                lng: 139.6878959,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.6639768, entranceLng: 139.6878959, exitLat: 35.6639768, exitLng: 139.6878959,
+                note: "SHUTO_IC_MASTERの「富ヶ谷」（外回り入口を代表方向として採用）に対する内回り方向のミラーレコード。首都高公式サイト(shutoko.jp route-c2/tomigaya)で内回り出口の存在を確認済み。座標はMapFan「富ヶ谷ランプ（中央環状線（山手トンネル））【出口（内回り）】」で確認(35.6639768,139.6878959)。外回り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -4,
+                displayName: "初台南",
+                googleName: "首都高速中央環状線 初台南出入口",
+                lat: 35.6755305,
+                lng: 139.6877129,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.6755305, entranceLng: 139.6877129, exitLat: 35.6755305, exitLng: 139.6877129,
+                note: "SHUTO_IC_MASTERの「初台南」（内回り入口を代表方向として採用）に対する外回り方向のミラーレコード。首都高公式サイト(shutoko.jp route-c2/hatsudaiminami)で外回り出口の存在を確認済み。座標はMapFan「初台南ランプ（中央環状線（山手トンネル））【出口（外回り）】」で確認(35.6755305,139.6877129)。内回り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -5,
+                displayName: "中野長者橋",
+                googleName: "首都高速中央環状線 中野長者橋出入口",
+                lat: 35.6936813,
+                lng: 139.682356,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.6936813, entranceLng: 139.682356, exitLat: 35.6936813, exitLng: 139.682356,
+                note: "SHUTO_IC_MASTERの「中野長者橋」（外回り入口を代表方向として採用）に対する内回り方向のミラーレコード。首都高公式サイト(shutoko.jp route-c2/nakanochoujabashi)で内回り出口の存在を確認済み。座標はMapFan「中野長者橋ランプ（中央環状線（山手トンネル））【出口（内回り）】」で確認(35.6936813,139.682356)。外回り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -10,
+                displayName: "王子南",
+                googleName: "首都高速中央環状線 王子南出入口",
+                lat: 35.7552346,
+                lng: 139.7423909,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.7552346, entranceLng: 139.7423909, exitLat: 35.7552346, exitLng: 139.7423909,
+                note: "SHUTO_IC_MASTERの「王子南」（内回り入口を代表方向として採用）に対する外回り方向のミラーレコード。首都高公式サイト(shutoko.jp route-c2/oujiminami)で外回り出口の存在を確認済み。座標はMapFan「王子南ランプ（中央環状線）【出口（外回り）】」で確認(35.7552346,139.7423909)。内回り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -14,
+                displayName: "小菅",
+                googleName: "首都高速中央環状線 小菅出入口",
+                lat: 35.7511342,
+                lng: 139.8210043,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.7511342, entranceLng: 139.8210043, exitLat: 35.7511342, exitLng: 139.8210043,
+                note: "SHUTO_IC_MASTERの「小菅」（外回り入口を代表方向として採用）に対する内回り方向のミラーレコード。SHUTO_IC_MASTER側noteで内回り出口の存在を確認済み（個別のshutoko.jp出入口ページURLは未特定）。座標はMapFan「小菅ランプ（中央環状線）【出口（内回り）】」で確認(35.7511342,139.8210043)。外回り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -16,
+                displayName: "平井大橋",
+                googleName: "首都高速中央環状線 平井大橋出入口",
+                lat: 35.7147245,
+                lng: 139.8505446,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.7147245, entranceLng: 139.8505446, exitLat: 35.7147245, exitLng: 139.8505446,
+                note: "SHUTO_IC_MASTERの「平井大橋」（内回り入口を代表方向として採用）に対する外回り方向のミラーレコード。首都高公式サイト(shutoko.jp route-c2/hiraioohashi)で外回り出口の存在を確認済み。座標はMapFan「平井大橋ランプ（中央環状線）【出口（外回り）】」で確認(35.7147245,139.8505446)。内回り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -18,
+                displayName: "船堀橋",
+                googleName: "首都高速中央環状線 船堀橋出入口",
+                lat: 35.688526,
+                lng: 139.8577375,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.688526, entranceLng: 139.8577375, exitLat: 35.688526, exitLng: 139.8577375,
+                note: "SHUTO_IC_MASTERの「船堀橋」（外回り入口を代表方向として採用）に対する内回り方向のミラーレコード。首都高公式サイト(shutoko.jp route-c2/funaboribashi)で内回り出口の存在を確認済み。座標はMapFan「船堀橋ランプ（中央環状線）【出口（内回り）】」で確認(35.688526,139.8577375)。外回り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -19,
+                displayName: "清新町",
+                googleName: "首都高速中央環状線 清新町出入口",
+                lat: 35.6651955,
+                lng: 139.8530795,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.6651955, entranceLng: 139.8530795, exitLat: 35.6651955, exitLng: 139.8530795,
+                note: "SHUTO_IC_MASTERの「清新町」（内回り入口を代表方向として採用）に対する外回り方向のミラーレコード。首都高公式サイト(shutoko.jp route-c2/seishincho)で外回り出口の存在を確認済み。座標はMapFan「清新町ランプ（中央環状線）【出口（外回り）】」で確認(35.6651955,139.8530795)。内回り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            }
+        ]
     }
-
-
 
 };
 
@@ -10153,12 +10298,23 @@ function inferTravelDirectionForIcArea(
     const findExitInArea = targetIc => {
         const targetIdentity = getIcIdentity(targetIc);
 
-        if (!targetIdentity || !IC_MASTER[icArea]) {
+        if (!targetIdentity) {
             return null;
         }
 
-        return IC_MASTER[icArea].exits.find(exit =>
-            getIcIdentity(exit) === targetIdentity
+        if (IC_MASTER[icArea]) {
+            return IC_MASTER[icArea].exits.find(exit =>
+                getIcIdentity(exit) === targetIdentity
+            ) || null;
+        }
+
+        // gaikan等のIC_MASTERエリアではなく、SHUTO_IC_MASTER側routeCode
+        // （"C1"/"C2"等）で管理されている環状路線向けのフォールバック。
+        // IC_MASTER[icArea]が存在しない場合のみ参照するため、
+        // 既存のgaikan/gaikanUchimawari等の挙動には影響しない。
+        return SHUTO_IC_MASTER.find(ic =>
+            ic.routeCode === icArea &&
+            getIcIdentity(ic) === targetIdentity
         ) || null;
     };
 
@@ -11838,6 +11994,41 @@ function logHighwayRoutePolylineAnalysis(
             );
         }
 
+        // gaikanと同様の試験ログをC1/C2にも追加。
+        // shutoC1Uchimawari/shutoC2Uchimawariのorderが
+        // SHUTO_IC_MASTER本体側orderの負数であるため、
+        // 「並び順どおり」＝SHUTO_IC_MASTER側order昇順方向、
+        // 「並び順の逆」＝ミラー（shutoC1Uchimawari/shutoC2Uchimawari）側を意味する。
+        // 実際の内回り/外回りとの対応は路線ごとに未確認のため、ここでは断定しない。
+        ["C1", "C2"].forEach(routeCode => {
+            const shutoLoopPassedIcEntry =
+                passedIcEntries.find(item =>
+                    item.icArea === "shuto" &&
+                    item.exit?.routeCode === routeCode
+                );
+
+            if (!shutoLoopPassedIcEntry) {
+                return;
+            }
+
+            const shutoLoopTravelDirection =
+                inferTravelDirectionForIcArea(
+                    routeCode,
+                    shutoLoopPassedIcEntry.exit,
+                    passedIcEntries,
+                    buildIcDefinitionIdentity
+                );
+
+            console.log(
+                routeCode + "方向判定：",
+                shutoLoopTravelDirection === 1
+                    ? "並び順どおり"
+                    : shutoLoopTravelDirection === -1
+                        ? "並び順の逆（ミラー側）"
+                        : "判定不能"
+            );
+        });
+
         if (isolatedRoadTraceNoise.length > 0) {
             console.log(
                 "道路連続性ノイズ検出・除外：" +
@@ -13038,6 +13229,53 @@ function resolveGaikanDirectionalIcArea(
 
     if (travelDirection === -1) {
         return "gaikanUchimawari";
+    }
+
+    return null;
+}
+
+// resolveGaikanDirectionalIcArea（gaikan専用・上記関数）とは別関数として追加。
+// C1/C2はSHUTO_IC_MASTER側でicArea:"shuto"固定のため、
+// gaikan側のitem.icArea一致方式ではなくroute Codeで該当passedIcEntryを探す点のみ異なる。
+// resolveGaikanDirectionalIcArea自体は未変更のため、gaikan/gaikanUchimawariの挙動に影響しない。
+function resolveShutoRouteDirectionalIcArea(
+    routeCode,
+    origin,
+    destination
+) {
+
+    const routeAnalysisKey =
+        buildRouteAnalysisKey(origin, destination);
+
+    const passedIcEntries =
+        lastHighwayRoutePolylineAnalysisKey === routeAnalysisKey
+            ? lastHighwayRoutePolylineAnalysis?.passedIcEntries
+            : null;
+
+    const routePassedIcEntry =
+        (passedIcEntries || []).find(item =>
+            item.icArea === "shuto" &&
+            item.exit?.routeCode === routeCode
+        );
+
+    if (!routePassedIcEntry) {
+        return null;
+    }
+
+    const travelDirection =
+        inferTravelDirectionForIcArea(
+            routeCode,
+            routePassedIcEntry.exit,
+            passedIcEntries,
+            buildIcDefinitionIdentity
+        );
+
+    if (travelDirection === 1) {
+        return routeCode;
+    }
+
+    if (travelDirection === -1) {
+        return "shuto" + routeCode + "Uchimawari";
     }
 
     return null;

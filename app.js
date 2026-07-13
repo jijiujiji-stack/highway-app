@@ -8134,6 +8134,21 @@ function updateIcAreaSelect(icArea) {
         return;
     }
 
+    // <select id="icArea">には"gaikan"等、HTML側に<option>が
+    // 存在しない値のoptionがある。存在しない値を.valueに代入すると、
+    // ブラウザの仕様でselectedIndexが-1になり.valueが空文字列に
+    // リセットされてしまう（以降このselectを読むすべての処理に
+    // 空文字列が伝播し、思わぬ場所でエラーの原因になる）。
+    // 該当する<option>がある場合のみ書き換える。
+    const hasMatchingOption =
+        Array.from(icAreaSelect.options).some(option =>
+            option.value === icArea
+        );
+
+    if (!hasMatchingOption) {
+        return;
+    }
+
     icAreaSelect.value = icArea;
 }
 

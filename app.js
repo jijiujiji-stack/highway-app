@@ -4355,23 +4355,29 @@ const IC_MASTER = {
     daisanKeihin: {
         label: "第三京浜方面",
         exits: [
-            { order: 1, displayName: "玉川IC", googleName: "第三京浜道路 玉川インターチェンジ", lat: 35.604, lng: 139.645, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 1,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.604, entranceLng: 139.645, exitLat: 35.604, exitLng: 139.645
+            { order: 1, displayName: "玉川IC", googleName: "第三京浜道路 玉川インターチェンジ", lat: 35.6050817, lng: 139.6387438, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 1,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.6050817, entranceLng: 139.6387438, exitLat: 35.6050817, exitLng: 139.6387438,
+                note: "第三京浜道路の起点（東京都世田谷区、下り線起点・上り線終点）。MapFanで「玉川ＩＣ（第三京浜道路）【入口（下り）】」「【出口（上り）】」の個別ページを確認したが、「【入口（上り）】」「【出口（下り）】」に相当するページは見つからず、下り線入口・上り線出口のみと判断。本アプリは走行方向を区別できないため、入口方向（下り）を代表方向として採用し、上り出口はexitSelectable:falseとした。座標はMapFan「玉川ＩＣ（第三京浜道路）【入口（下り）】」個別ページで確認(35.6050817,139.6387438)。従来座標(35.604,139.645)から約580m修正。"
             },
-            { order: 2, displayName: "京浜川崎IC", googleName: "第三京浜道路 京浜川崎インターチェンジ", lat: 35.578, lng: 139.627, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 2,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.578, entranceLng: 139.627, exitLat: 35.578, exitLng: 139.627
+            { order: 2, displayName: "京浜川崎IC", googleName: "第三京浜道路 京浜川崎インターチェンジ", lat: 35.5922815, lng: 139.6251989, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 2,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.5922160, entranceLng: 139.6251414, exitLat: 35.5923469, exitLng: 139.6252564,
+                note: "MapFanで「京浜川崎ＩＣ（第三京浜道路）」の【入口（上り）】【入口（下り）】【出口（上り）】【出口（下り）】4件全ての個別ページを確認し、上下線とも入口・出口が利用可能なフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標は入口2点（上り35.5925245,139.6251661／下り35.5919075,139.6251167）の中間点をentranceLat/Lngに、出口2点（下り35.5924073,139.625556／上り35.5922865,139.6249568）の中間点をexitLat/Lngに設定。従来座標(35.578,139.627)から約1.6km修正。"
             },
-            { order: 3, displayName: "都筑IC", googleName: "第三京浜道路 都筑インターチェンジ", lat: 35.544, lng: 139.592, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 3,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.544, entranceLng: 139.592, exitLat: 35.544, exitLng: 139.592
+            { order: 3, displayName: "都筑IC", googleName: "第三京浜道路 都筑インターチェンジ", lat: 35.5439460, lng: 139.6038134, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 3,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.5439689, entranceLng: 139.6037393, exitLat: 35.543923, exitLng: 139.6038874,
+                note: "MapFanで「都筑ＩＣ（第三京浜道路）【入口】」「【出口】」を確認（上り/下りの区別なく1箇所に集約されたランプ）。NEXCO東日本のプレスリリース「第三京浜道路 上下線 都筑IC 入口ランプ 一部夜間閉鎖」(e-nexco.co.jp/en/pressroom/kanto/2023/0130/00012233.html)でも上下線とも利用可能である旨を確認。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はMapFanの入口・出口個別ページで確認しentranceLat/Lng・exitLat/Lngを更新。従来座標(35.544,139.592)から約950m修正。"
             },
-            { order: 4, displayName: "港北IC", googleName: "第三京浜道路 港北インターチェンジ", lat: 35.519, lng: 139.600, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 4, connection: true, connectedRoads: ["daisanKeihin", "shutoKanagawaK7", "shutoKanagawaK7Hokusei"],
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.519, entranceLng: 139.600, exitLat: 35.519, exitLng: 139.600
+            { order: 4, displayName: "港北IC", googleName: "第三京浜道路 港北インターチェンジ", lat: 35.5167255, lng: 139.5900747, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 4, connection: true, connectedRoads: ["daisanKeihin", "shutoKanagawaK7", "shutoKanagawaK7Hokusei"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.5168611, entranceLng: 139.5903193, exitLat: 35.5165898, exitLng: 139.58983,
+                note: "MapFanで「港北ＩＣ（第三京浜道路）【入口】」「【出口】」を確認（上り/下りの区別なく1箇所に集約されたランプ）。NEXCO東日本のプレスリリース「港北IC出口位置変更のお知らせ」「上り線 港北IC 入口ランプ 夜間閉鎖」等でも入口・出口双方の存在を確認済み。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はMapFanの入口・出口個別ページで確認しentranceLat/Lng・exitLat/Lngを更新。従来座標(35.519,139.600)から約900m修正。connectedRoadsのshutoKanagawaK7/shutoKanagawaK7Hokuseiは今回変更していない（別タスク扱い）。"
             },
-            { order: 5, displayName: "羽沢IC", googleName: "第三京浜道路 羽沢インターチェンジ", lat: 35.492, lng: 139.592, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 5,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.492, entranceLng: 139.592, exitLat: 35.492, exitLng: 139.592
+            { order: 5, displayName: "羽沢IC", googleName: "第三京浜道路 羽沢インターチェンジ", lat: 35.4852055, lng: 139.5898595, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 5,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.4852055, entranceLng: 139.5898595, exitLat: 35.4852055, exitLng: 139.5898595,
+                note: "上り線入口（1988年供用開始）・下り線出口（2011年供用開始）で方向別に段階供用されたハーフIC（Wikipedia「第三京浜道路」記事に記載。MapFanでも「【入口（上り）】」「【出口（下り）】」の個別ページのみ確認でき「【入口（下り）】」「【出口（上り）】」は見つからない）。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。座標はMapFan「羽沢ＩＣ（第三京浜道路）【入口（上り）】」個別ページで確認(35.4852055,139.5898595)。従来座標(35.492,139.592)から約780m修正。"
             },
-            { order: 6, displayName: "保土ヶ谷IC", googleName: "第三京浜道路 保土ヶ谷インターチェンジ", lat: 35.474, lng: 139.586, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 6, connection: true, connectedRoads: ["daisanKeihin", "yokohamaShindo"],
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.474, entranceLng: 139.586, exitLat: 35.474, exitLng: 139.586
+            { order: 6, displayName: "保土ヶ谷IC", googleName: "第三京浜道路 保土ヶ谷インターチェンジ", lat: 35.4739368, lng: 139.5992145, roadType: "第三京浜", routeBranch: "daisanKeihin", branchOrder: 6, connection: true, connectedRoads: ["daisanKeihin", "yokohamaShindo"],
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.4739368, entranceLng: 139.5992145, exitLat: 35.4739368, exitLng: 139.5992145,
+                note: "第三京浜道路の終点（横浜市保土ケ谷区、横浜新道・保土ヶ谷JCTと隣接する複合IC）。MapFanで「保土ヶ谷ＩＣ（第三京浜道路）【入口（上り）】」「【出口（下り）】」の個別ページを確認したが、「【入口（下り）】」「【出口（上り）】」に相当するページは見つからず、上り線入口・下り線出口のみと判断（起点の玉川ICと対称の構造）。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。座標はMapFan「保土ヶ谷ＩＣ（第三京浜道路）【入口（上り）】」個別ページで確認(35.4739368,139.5992145)。従来座標(35.474,139.586)から約1.2km修正。connectedRoadsは今回変更していない。"
             }
         ]
     },

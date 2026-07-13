@@ -19050,6 +19050,9 @@ async function searchAutoExitIcComparison(
             .getElementById("icArea")
             .value;
 
+    // resolveGaikanDirectionalIcAreaが判定不能(null)を返した場合の
+    // フォールバック用に、自動推定で上書きされる前の値を保持しておく。
+    const manualIcArea = icArea;
 
     const autoIcAreaEnabled =
         document.getElementById("autoIcAreaEnabled")?.checked;
@@ -19120,14 +19123,29 @@ async function searchAutoExitIcComparison(
 
     }
 
-    icArea =
+    const gaikanResolvedIcArea =
         resolveGaikanDirectionalIcArea(
             icArea,
             origin,
             destination
         );
 
-    if (!icArea) {
+    if (gaikanResolvedIcArea) {
+        icArea = gaikanResolvedIcArea;
+    }
+    else {
+        // \u8ddd\u96e2\u306e\u307f\u306b\u3088\u308b\u30a8\u30ea\u30a2\u63a8\u5b9a(suggestIcAreaByDistanceOnlyForTest)\u304c
+        // "gaikan"\u3092\u63d0\u6848\u3057\u3066\u3082\u3001\u5b9f\u969b\u306e\u30dd\u30ea\u30e9\u30a4\u30f3\u89e3\u6790\u3067\u5916\u74b0\u3092\u901a\u904e\u3057\u305f
+        // \u3053\u3068\u304c\u78ba\u8a8d\u3067\u304d\u306a\u3044\u5834\u5408\u306fresolveGaikanDirectionalIcArea\u304c
+        // null\u3092\u8fd4\u3059\uff08\u4f8b\uff1a5\u53f7\u6c60\u888b\u7dda\u306e\u307f\u3067\u5b8c\u7d50\u3059\u308b\u30eb\u30fc\u30c8\uff09\u3002
+        // \u3053\u306e\u5834\u5408\u306f\u63a8\u5b9a\u81ea\u4f53\u3092\u7834\u68c4\u3057\u3001\u81ea\u52d5\u63a8\u5b9a\u524d\u306e\u624b\u52d5\u9078\u629eicArea\u306b
+        // \u623b\u3057\u3066\u7d9a\u884c\u3059\u308b\u3002\u3053\u3053\u3067\u306eicArea\u306f\u4ee5\u964d\u306e\u51e1\u4f8b(legacySelectedExits)
+        // \u751f\u6210\u306b\u306e\u307f\u4f7f\u308f\u308c\u3001\u5b9f\u969b\u306e\u5019\u88dc\u306fPolyline\u30d9\u30fc\u30b9\u306e\u89e3\u6790\u7d50\u679c\u304c
+        // \u512a\u5148\u3055\u308c\u308b\u305f\u3081\u3001\u591a\u5c11\u4e0d\u6b63\u78ba\u3067\u3082\u5b9f\u5bb3\u306f\u306a\u3044\u3002
+        icArea = manualIcArea;
+    }
+
+    if (!icArea || !IC_MASTER[icArea]) {
         alert("\u5916\u74b0\u306e\u8d70\u884c\u65b9\u5411\u3092\u5224\u5b9a\u3067\u304d\u306a\u304b\u3063\u305f\u305f\u3081\u3001\u5019\u88dcIC\u3092\u8868\u793a\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f");
         return;
     }

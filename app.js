@@ -2386,11 +2386,11 @@ const SHUTO_IC_MASTER = [
         entranceLng: 139.938,
         exitLat: 35.672,
         exitLng: 139.938,
-        entranceSelectable: true,
-        exitSelectable: true,
+        entranceSelectable: false,
+        exitSelectable: false,
         sourceAreaKeys: ["aqualine", "keiyo", "tokan"],
         sourceGoogleNames: ["首都高速湾岸線 湾岸市川出入口"],
-        note: "首都高速湾岸線と東関東道の境界・接続判定用として暫定保持。首都高公式の湾岸線出入口一覧には掲載なし。通常の首都高入口・出口候補として使用するかは別フェーズで再確認。"
+        note: "首都高速湾岸線と東関東道の境界・接続判定用として暫定保持。首都高公式の湾岸線出入口一覧には掲載なし。通常の首都高入口・出口候補として使用するかは別フェーズで再確認。【2026-07-13追記】複数の道路マニアのブログ・地図サイトを確認した結果、「湾岸市川」という名称の単独出入口は実在しない可能性が高く、一部地図サービスの表記揺れ・誤りが混入したものとみられる。首都高湾岸線は実際には高谷JCTで東関東自動車道に接続しており、その手前に単独の「湾岸市川」出入口が存在するという情報源は確認できなかった。実在性が未確定のため、誤って候補選定・料金計算に使われることを避ける目的で、entranceSelectable/exitSelectableを暫定的にfalseに変更し候補から除外した（エントリ自体は削除せず保留。orderも引き続き未設定のまま）。実在確認が取れ次第、trueに戻すか再検討する。"
     },
     {
         id: "shuto-b-shinkiba",

@@ -5777,6 +5777,7 @@ const IC_MASTER = {
                 order: -2,
                 displayName: "西神田",
                 googleName: "首都高速5号池袋線 西神田出入口",
+                roadType: "首都高",
                 lat: 35.697927,
                 lng: 139.752251,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.697927, entranceLng: 139.752251, exitLat: 35.697927, exitLng: 139.752251,
@@ -5786,6 +5787,7 @@ const IC_MASTER = {
                 order: -3,
                 displayName: "飯田橋",
                 googleName: "首都高速5号池袋線 飯田橋出入口",
+                roadType: "首都高",
                 lat: 35.7037737,
                 lng: 139.7448305,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.7037737, entranceLng: 139.7448305, exitLat: 35.7037737, exitLng: 139.7448305,
@@ -5795,6 +5797,7 @@ const IC_MASTER = {
                 order: -5,
                 displayName: "護国寺",
                 googleName: "首都高速5号池袋線 護国寺出入口",
+                roadType: "首都高",
                 lat: 35.719170,
                 lng: 139.725720,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.719170, entranceLng: 139.725720, exitLat: 35.719170, exitLng: 139.725720,
@@ -5804,6 +5807,7 @@ const IC_MASTER = {
                 order: -7,
                 displayName: "北池袋",
                 googleName: "首都高速5号池袋線 北池袋出入口",
+                roadType: "首都高",
                 lat: 35.740540,
                 lng: 139.707525,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.740540, entranceLng: 139.707525, exitLat: 35.740540, exitLng: 139.707525,
@@ -5813,6 +5817,7 @@ const IC_MASTER = {
                 order: -9,
                 displayName: "中台",
                 googleName: "首都高速5号池袋線 中台出入口",
+                roadType: "首都高",
                 lat: 35.775913,
                 lng: 139.678934,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.775913, entranceLng: 139.678934, exitLat: 35.775913, exitLng: 139.678934,
@@ -5822,6 +5827,7 @@ const IC_MASTER = {
                 order: -10,
                 displayName: "高島平",
                 googleName: "首都高速5号池袋線 高島平出入口",
+                roadType: "首都高",
                 lat: 35.785819,
                 lng: 139.646359,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.785819, entranceLng: 139.646359, exitLat: 35.785819, exitLng: 139.646359,
@@ -5831,6 +5837,7 @@ const IC_MASTER = {
                 order: -11,
                 displayName: "戸田南",
                 googleName: "首都高速5号池袋線 戸田南出入口",
+                roadType: "首都高",
                 lat: 35.805776,
                 lng: 139.649120,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.805776, entranceLng: 139.649120, exitLat: 35.805776, exitLng: 139.649120,
@@ -5840,6 +5847,7 @@ const IC_MASTER = {
                 order: -12,
                 displayName: "戸田",
                 googleName: "首都高速5号池袋線 戸田出入口",
+                roadType: "首都高",
                 lat: 35.820069,
                 lng: 139.644340,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.820069, entranceLng: 139.644340, exitLat: 35.820069, exitLng: 139.644340,
@@ -10764,6 +10772,134 @@ function inferTravelDirectionForIcArea(
     return null;
 }
 
+let shutoMirrorGoogleNameSetCache = null;
+
+// gaikanUchimawari・shutoC1Uchimawari/shutoC2Uchimawari・線形10路線分の
+// ミラーエリア（計13エリア）に登録されている全ICのgoogleNameを
+// 1つのSetにまとめる。初回呼び出し時にのみ構築し、以降は使い回す。
+// このSetの有無そのものが「方向依存ICかどうか」の判定材料になるため、
+// 方向依存でないIC（ミラーが存在しない大多数の候補）には影響しない。
+function getShutoMirrorGoogleNameSet() {
+
+    if (shutoMirrorGoogleNameSetCache) {
+        return shutoMirrorGoogleNameSetCache;
+    }
+
+    const mirrorAreaKeys = [
+        "gaikanUchimawari",
+        "shutoC1Uchimawari",
+        "shutoC2Uchimawari",
+        "shuto6MukoUchimawari",
+        "shuto6MisatoUchimawari",
+        "shuto7KomatsugawaUchimawari",
+        "shuto1UenoUchimawari",
+        "shuto4ShinjukuUchimawari",
+        "shuto5IkebukuroUchimawari",
+        "shuto3ShibuyaUchimawari",
+        "shuto2MeguroUchimawari",
+        "shutoBWanganUchimawari",
+        "shutoS1KawaguchiUchimawari"
+    ];
+
+    const googleNames = new Set();
+
+    mirrorAreaKeys.forEach(areaKey => {
+        (IC_MASTER[areaKey]?.exits || []).forEach(mirrorExit => {
+            if (mirrorExit.googleName) {
+                googleNames.add(mirrorExit.googleName);
+            }
+        });
+    });
+
+    shutoMirrorGoogleNameSetCache = googleNames;
+
+    return shutoMirrorGoogleNameSetCache;
+}
+
+// SHUTO_IC_MASTER側routeName → 対応するミラーエリアのキー。
+// 段階的接続のため、resolveEffectiveShutoExit内では今回
+// "首都高速5号池袋線"のみを実際に使用対象とし、他は今回まだ
+// 接続しない（将来の拡張時にこのマップをそのまま使う想定）。
+const SHUTO_MIRROR_AREA_KEY_BY_ROUTE_NAME = {
+    "首都高速都心環状線": "shutoC1Uchimawari",
+    "首都高速中央環状線": "shutoC2Uchimawari",
+    "首都高速6号向島線": "shuto6MukoUchimawari",
+    "首都高速6号三郷線": "shuto6MisatoUchimawari",
+    "首都高速7号小松川線": "shuto7KomatsugawaUchimawari",
+    "首都高速1号上野線": "shuto1UenoUchimawari",
+    "首都高速4号新宿線": "shuto4ShinjukuUchimawari",
+    "首都高速5号池袋線": "shuto5IkebukuroUchimawari",
+    "首都高速3号渋谷線": "shuto3ShibuyaUchimawari",
+    "首都高速2号目黒線": "shuto2MeguroUchimawari",
+    "首都高速湾岸線": "shutoBWanganUchimawari",
+    "首都高速川口線": "shutoS1KawaguchiUchimawari"
+};
+
+// 方向判定の結果に応じて、候補ICをSHUTO_IC_MASTER本体側のオブジェクトのまま
+// 使うか、ミラーエリア側のオブジェクトに差し替えるかを決定する。
+// 差し替えは候補収集の入口で行うため、entranceSelectable/exitSelectableを
+// 直接参照している既存の判定箇所（isShutoIcSelectableForRole等）は
+// 一切変更せずに、正しい値を読むようになる。
+//
+// 段階的接続の第一弾として、今回は"首都高速5号池袋線"のみを対象とする。
+// それ以外の路線（gaikan・C1・C2・他の線形路線含む）は、
+// この関数の冒頭で早期returnし、無変更のexitをそのまま返す。
+function resolveEffectiveShutoExit(
+    exit,
+    polylineAnalysis,
+    getIcIdentity
+) {
+
+    if (!exit || exit.routeName !== "首都高速5号池袋線") {
+        return exit;
+    }
+
+    const identity = getIcIdentity(exit);
+
+    if (!identity || !getShutoMirrorGoogleNameSet().has(identity)) {
+        return exit;
+    }
+
+    const mirrorAreaKey =
+        SHUTO_MIRROR_AREA_KEY_BY_ROUTE_NAME[exit.routeName];
+
+    const mirrorExit =
+        mirrorAreaKey && IC_MASTER[mirrorAreaKey]
+            ? IC_MASTER[mirrorAreaKey].exits.find(candidate =>
+                getIcIdentity(candidate) === identity
+            )
+            : null;
+
+    if (!mirrorExit) {
+        return exit;
+    }
+
+    const travelDirection =
+        inferTravelDirectionForIcArea(
+            exit.routeName,
+            exit,
+            polylineAnalysis?.passedIcEntries,
+            getIcIdentity
+        );
+
+    // 判定不能（null）の場合は安全側として本体のexitをそのまま使う。
+    // travelDirection === -1（並び順の逆＝ミラー側）の場合のみ差し替える。
+    // この±1とミラー側採用の対応は実車確認前提の暫定判断のため、
+    // 実車確認で逆と分かった場合はこの符号判定のみを反転すればよい。
+    if (travelDirection === -1) {
+        console.log(
+            "[方向判定→候補差し替え] " +
+            exit.displayName +
+            "（" + exit.routeName + "）は" +
+            "方向判定によりミラー側（" + mirrorAreaKey + "）に差し替えました。"
+        );
+
+        return mirrorExit;
+    }
+
+    return exit;
+}
+
 function filterEntranceCandidatesByRouteSection({
     polylineAnalysis,
     candidates,
@@ -10913,6 +11049,15 @@ function filterEntranceCandidatesByRouteSection({
     const shutoEntranceCandidates =
         (polylineAnalysis.shutoDetail
             ?.entranceCandidates || [])
+            .map(candidate => ({
+                ...candidate,
+                exit:
+                    resolveEffectiveShutoExit(
+                        candidate?.exit,
+                        polylineAnalysis,
+                        getIcIdentity
+                    )
+            }))
             .filter(candidate => {
                 const exit = candidate?.exit;
 
@@ -10961,7 +11106,12 @@ function filterEntranceCandidatesByRouteSection({
     const orderedShutoEntrances = [
         ...(shutoEntranceIc
             ? [{
-                exit: shutoEntranceIc,
+                exit:
+                    resolveEffectiveShutoExit(
+                        shutoEntranceIc,
+                        polylineAnalysis,
+                        getIcIdentity
+                    ),
                 isPrimary: true
             }]
             : []),
@@ -11501,7 +11651,12 @@ function buildForwardExitComparisonIcCandidates(
     );
 
     routeTrace.forEach(routePoint => {
-        const exit = routePoint.exit;
+        const exit =
+            resolveEffectiveShutoExit(
+                routePoint.exit,
+                polylineAnalysis,
+                getIcIdentity
+            );
         const identity = getIcIdentity(exit);
 
         const exitLat = exit?.exitLat ?? exit?.lat;

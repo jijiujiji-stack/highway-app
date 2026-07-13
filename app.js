@@ -19833,6 +19833,18 @@ function suggestIcAreaByDistanceOnlyForTest(
 
     for (const icArea in IC_MASTER) {
 
+        // gaikanUchimawari・shutoC1Uchimawari/shutoC2Uchimawari・線形10路線分の
+        // ミラーエリア（"Uchimawari"で終わるキー）は、方向判定
+        // （inferTravelDirectionForIcArea等）から明示的なキー指定でのみ
+        // 参照される想定の内部データであり、この関数のような
+        // 「距離が最も近いエリアを探す」用途の候補には含めない。
+        // 含めてしまうと、entranceSelectable/exitSelectableが
+        // 片方向のみtrueのミラーICが最近傍として選ばれ、
+        // 後続の役割別（入口/出口）検索が0件になる場合がある。
+        if (icArea.endsWith("Uchimawari")) {
+            continue;
+        }
+
         const originNearest =
             findNearestRegisteredIcForDistanceOnlyTest(
                 icArea,

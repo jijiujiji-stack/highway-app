@@ -5667,6 +5667,344 @@ const IC_MASTER = {
                 note: "SHUTO_IC_MASTERの「清新町」（内回り入口を代表方向として採用）に対する外回り方向のミラーレコード。首都高公式サイト(shutoko.jp route-c2/seishincho)で外回り出口の存在を確認済み。座標はMapFan「清新町ランプ（中央環状線）【出口（外回り）】」で確認(35.6651955,139.8530795)。内回り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
             }
         ]
+    },
+
+    // 以下、線形路線（上り/下り）30件向けのミラーエリア群。
+    // gaikan/gaikanUchimawari・shutoC1Uchimawari/shutoC2Uchimawariと同じ設計方針。
+    // SHUTO_IC_MASTER本体側（代表方向、entranceSelectable:true/exitSelectable:false）に対し、
+    // 逆方向（現在exitSelectable:falseで抑制している側）をミラーレコードとして登録する。
+    // orderは本体側の同ICのorder値を負数化。googleNameは本体側と同一にし、identity一致を可能にする。
+    // 座標は、本体側で既にentranceLat/exitLatが別々に確認済みのIC（26件）はexitLat/exitLngをそのまま転用し、
+    // 単一の共有座標のみだった4件（目黒・飯田橋・小松川・一之江）は今回新たにMapFanで逆方向ランプ座標を確認した。
+
+    shuto6MukoUchimawari: {
+        label: "首都高速6号向島線方面（逆方向）",
+        exits: [
+            {
+                order: -4,
+                displayName: "駒形",
+                googleName: "首都高速6号向島線 駒形出入口",
+                lat: 35.707552,
+                lng: 139.798075,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.707552, entranceLng: 139.798075, exitLat: 35.707552, exitLng: 139.798075,
+                note: "SHUTO_IC_MASTERの「駒形」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.707552,139.798075)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            }
+        ]
+    },
+
+    shuto6MisatoUchimawari: {
+        label: "首都高速6号三郷線方面（逆方向）",
+        exits: [
+            {
+                order: -4,
+                displayName: "三郷",
+                googleName: "首都高速6号三郷線 三郷出入口",
+                lat: 35.835239,
+                lng: 139.857745,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.835239, entranceLng: 139.857745, exitLat: 35.835239, exitLng: 139.857745,
+                note: "SHUTO_IC_MASTERの「三郷」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.835239,139.857745)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            }
+        ]
+    },
+
+    shuto7KomatsugawaUchimawari: {
+        label: "首都高速7号小松川線方面（逆方向）",
+        exits: [
+            {
+                order: -2,
+                displayName: "小松川",
+                googleName: "首都高速7号小松川線 小松川出入口",
+                lat: 35.69924,
+                lng: 139.8662864,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.69924, entranceLng: 139.8662864, exitLat: 35.69924, exitLng: 139.8662864,
+                note: "SHUTO_IC_MASTERの「小松川」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。首都高公式サイト(shutoko.jp route-7/komatsugawa)で下り出口の存在を確認済み。座標はMapFan「小松川ランプ（７号小松川線）【出口（下り）】」で新規確認(35.69924,139.8662864)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -3,
+                displayName: "一之江",
+                googleName: "首都高速7号小松川線 一之江出入口",
+                lat: 35.6975345,
+                lng: 139.8815616,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.6975345, entranceLng: 139.8815616, exitLat: 35.6975345, exitLng: 139.8815616,
+                note: "SHUTO_IC_MASTERの「一之江」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。首都高公式サイト(shutoko.jp route-7/ichinoe)で下り出口の存在を確認済み。座標はMapFan「一之江ランプ（７号小松川線）【出口（下り）】」で新規確認(35.6975345,139.8815616)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            }
+        ]
+    },
+
+    shuto1UenoUchimawari: {
+        label: "首都高速1号上野線方面（逆方向）",
+        exits: [
+            {
+                order: -3,
+                displayName: "入谷",
+                googleName: "首都高速1号上野線 入谷出入口",
+                lat: 35.719763,
+                lng: 139.783689,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.719763, entranceLng: 139.783689, exitLat: 35.719763, exitLng: 139.783689,
+                note: "SHUTO_IC_MASTERの「入谷」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.719763,139.783689)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            }
+        ]
+    },
+
+    shuto4ShinjukuUchimawari: {
+        label: "首都高速4号新宿線方面（逆方向）",
+        exits: [
+            {
+                order: -4,
+                displayName: "初台",
+                googleName: "首都高速4号新宿線 初台出入口",
+                lat: 35.680202,
+                lng: 139.684429,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.680202, entranceLng: 139.684429, exitLat: 35.680202, exitLng: 139.684429,
+                note: "SHUTO_IC_MASTERの「初台」（下り入口を代表方向として採用）に対する上り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.680202,139.684429)。下り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -5,
+                displayName: "幡ヶ谷",
+                googleName: "首都高速4号新宿線 幡ヶ谷出入口",
+                lat: 35.676663,
+                lng: 139.675273,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.676663, entranceLng: 139.675273, exitLat: 35.676663, exitLng: 139.675273,
+                note: "SHUTO_IC_MASTERの「幡ヶ谷」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.676663,139.675273)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            }
+        ]
+    },
+
+    shuto5IkebukuroUchimawari: {
+        label: "首都高速5号池袋線方面（逆方向）",
+        exits: [
+            {
+                order: -2,
+                displayName: "西神田",
+                googleName: "首都高速5号池袋線 西神田出入口",
+                lat: 35.697927,
+                lng: 139.752251,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.697927, entranceLng: 139.752251, exitLat: 35.697927, exitLng: 139.752251,
+                note: "SHUTO_IC_MASTERの「西神田」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.697927,139.752251)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -3,
+                displayName: "飯田橋",
+                googleName: "首都高速5号池袋線 飯田橋出入口",
+                lat: 35.7037737,
+                lng: 139.7448305,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.7037737, entranceLng: 139.7448305, exitLat: 35.7037737, exitLng: 139.7448305,
+                note: "SHUTO_IC_MASTERの「飯田橋」（下り入口を代表方向として採用）に対する上り方向のミラーレコード。首都高公式サイト(shutoko.jp route-5/iidabashi)で上り出口の存在を確認済み。座標はMapFan「飯田橋ランプ（５号池袋線）【出口（上り）】」で新規確認(35.7037737,139.7448305)。下り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -5,
+                displayName: "護国寺",
+                googleName: "首都高速5号池袋線 護国寺出入口",
+                lat: 35.719170,
+                lng: 139.725720,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.719170, entranceLng: 139.725720, exitLat: 35.719170, exitLng: 139.725720,
+                note: "SHUTO_IC_MASTERの「護国寺」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.719170,139.725720)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -7,
+                displayName: "北池袋",
+                googleName: "首都高速5号池袋線 北池袋出入口",
+                lat: 35.740540,
+                lng: 139.707525,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.740540, entranceLng: 139.707525, exitLat: 35.740540, exitLng: 139.707525,
+                note: "SHUTO_IC_MASTERの「北池袋」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.740540,139.707525)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -9,
+                displayName: "中台",
+                googleName: "首都高速5号池袋線 中台出入口",
+                lat: 35.775913,
+                lng: 139.678934,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.775913, entranceLng: 139.678934, exitLat: 35.775913, exitLng: 139.678934,
+                note: "SHUTO_IC_MASTERの「中台」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.775913,139.678934)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -10,
+                displayName: "高島平",
+                googleName: "首都高速5号池袋線 高島平出入口",
+                lat: 35.785819,
+                lng: 139.646359,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.785819, entranceLng: 139.646359, exitLat: 35.785819, exitLng: 139.646359,
+                note: "SHUTO_IC_MASTERの「高島平」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.785819,139.646359)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -11,
+                displayName: "戸田南",
+                googleName: "首都高速5号池袋線 戸田南出入口",
+                lat: 35.805776,
+                lng: 139.649120,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.805776, entranceLng: 139.649120, exitLat: 35.805776, exitLng: 139.649120,
+                note: "SHUTO_IC_MASTERの「戸田南」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.805776,139.649120)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -12,
+                displayName: "戸田",
+                googleName: "首都高速5号池袋線 戸田出入口",
+                lat: 35.820069,
+                lng: 139.644340,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.820069, entranceLng: 139.644340, exitLat: 35.820069, exitLng: 139.644340,
+                note: "SHUTO_IC_MASTERの「戸田」（下り入口を代表方向として採用）に対する上り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.820069,139.644340)。下り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            }
+        ]
+    },
+
+    shuto3ShibuyaUchimawari: {
+        label: "首都高速3号渋谷線方面（逆方向）",
+        exits: [
+            {
+                order: -1,
+                displayName: "高樹町",
+                googleName: "首都高速3号渋谷線 高樹町出入口",
+                lat: 35.659301,
+                lng: 139.719804,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.659301, entranceLng: 139.719804, exitLat: 35.659301, exitLng: 139.719804,
+                note: "SHUTO_IC_MASTERの「高樹町」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.659301,139.719804)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -3,
+                displayName: "池尻",
+                googleName: "首都高速3号渋谷線 池尻出入口",
+                lat: 35.649044,
+                lng: 139.681494,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.649044, entranceLng: 139.681494, exitLat: 35.649044, exitLng: 139.681494,
+                note: "SHUTO_IC_MASTERの「池尻」（下り入口を代表方向として採用）に対する上り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.649044,139.681494)。下り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -4,
+                displayName: "三軒茶屋",
+                googleName: "首都高速3号渋谷線 三軒茶屋出入口",
+                lat: 35.644056,
+                lng: 139.672592,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.644056, entranceLng: 139.672592, exitLat: 35.644056, exitLng: 139.672592,
+                note: "SHUTO_IC_MASTERの「三軒茶屋」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.644056,139.672592)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            }
+        ]
+    },
+
+    shuto2MeguroUchimawari: {
+        label: "首都高速2号目黒線方面（逆方向）",
+        exits: [
+            {
+                order: -1,
+                displayName: "天現寺",
+                googleName: "首都高速2号目黒線 天現寺出入口",
+                lat: 35.646625,
+                lng: 139.725832,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.646625, entranceLng: 139.725832, exitLat: 35.646625, exitLng: 139.725832,
+                note: "SHUTO_IC_MASTERの「天現寺」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.646625,139.725832)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -2,
+                displayName: "目黒",
+                googleName: "首都高速2号目黒線 目黒出入口",
+                lat: 35.6360629,
+                lng: 139.7184032,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.6360629, entranceLng: 139.7184032, exitLat: 35.6360629, exitLng: 139.7184032,
+                note: "SHUTO_IC_MASTERの「目黒」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。首都高公式サイト(shutoko.jp route-2/meguro)で下り出口の存在を確認済み。座標はMapFan「目黒ランプ（２号目黒線）【出口（下り）】」で新規確認(35.6360629,139.7184032)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -4,
+                displayName: "荏原",
+                googleName: "首都高速2号目黒線 荏原出入口",
+                lat: 35.618687,
+                lng: 139.715724,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.618687, entranceLng: 139.715724, exitLat: 35.618687, exitLng: 139.715724,
+                note: "SHUTO_IC_MASTERの「荏原」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.618687,139.715724)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            }
+        ]
+    },
+
+    shutoBWanganUchimawari: {
+        label: "首都高速湾岸線方面（逆方向）",
+        exits: [
+            {
+                order: -7,
+                displayName: "臨海副都心",
+                googleName: "首都高速湾岸線 臨海副都心出入口",
+                lat: 35.625993,
+                lng: 139.773874,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.625993, entranceLng: 139.773874, exitLat: 35.625993, exitLng: 139.773874,
+                note: "SHUTO_IC_MASTERの「臨海副都心」（西行き入口を代表方向として採用）に対する東行き方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.625993,139.773874)。西行き方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -8,
+                displayName: "大井",
+                googleName: "首都高速湾岸線 大井出入口",
+                lat: 35.611819,
+                lng: 139.756607,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.611819, entranceLng: 139.756607, exitLat: 35.611819, exitLng: 139.756607,
+                note: "SHUTO_IC_MASTERの「大井」（東行き入口を代表方向として採用）に対する西行き方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.611819,139.756607)。東行き方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -11,
+                displayName: "湾岸環八",
+                googleName: "首都高速湾岸線 湾岸環八出入口",
+                lat: 35.540368,
+                lng: 139.792927,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.540368, entranceLng: 139.792927, exitLat: 35.540368, exitLng: 139.792927,
+                note: "SHUTO_IC_MASTERの「湾岸環八」（西行き入口を代表方向として採用）に対する東行き方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.540368,139.792927)。西行き方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -17,
+                displayName: "三溪園",
+                googleName: "首都高速湾岸線 三溪園出入口",
+                lat: 35.412549,
+                lng: 139.661584,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.412549, entranceLng: 139.661584, exitLat: 35.412549, exitLng: 139.661584,
+                note: "SHUTO_IC_MASTERの「三溪園」（西行き入口を代表方向として採用）に対する東行き方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.412549,139.661584)。西行き方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -18,
+                displayName: "磯子",
+                googleName: "首都高速湾岸線 磯子出入口",
+                lat: 35.397064,
+                lng: 139.617192,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.397064, entranceLng: 139.617192, exitLat: 35.397064, exitLng: 139.617192,
+                note: "SHUTO_IC_MASTERの「磯子」（東行き入口を代表方向として採用）に対する西行き方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.397064,139.617192)。東行き方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            }
+        ]
+    },
+
+    shutoS1KawaguchiUchimawari: {
+        label: "首都高速川口線方面（逆方向）",
+        exits: [
+            {
+                order: -3,
+                displayName: "加賀",
+                googleName: "首都高速川口線 加賀出入口",
+                lat: 35.794786,
+                lng: 139.759737,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.794786, entranceLng: 139.759737, exitLat: 35.794786, exitLng: 139.759737,
+                note: "SHUTO_IC_MASTERの「加賀」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.794786,139.759737)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -4,
+                displayName: "足立入谷",
+                googleName: "首都高速川口線 足立入谷出入口",
+                lat: 35.804822,
+                lng: 139.759663,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.804822, entranceLng: 139.759663, exitLat: 35.804822, exitLng: 139.759663,
+                note: "SHUTO_IC_MASTERの「足立入谷」（下り入口を代表方向として採用）に対する上り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.804822,139.759663)。下り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -6,
+                displayName: "安行",
+                googleName: "首都高速川口線 安行出入口",
+                lat: 35.835560,
+                lng: 139.755615,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.835560, entranceLng: 139.755615, exitLat: 35.835560, exitLng: 139.755615,
+                note: "SHUTO_IC_MASTERの「安行」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.835560,139.755615)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            },
+            {
+                order: -7,
+                displayName: "新井宿",
+                googleName: "首都高速川口線 新井宿出入口",
+                lat: 35.847266,
+                lng: 139.737857,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.847266, entranceLng: 139.737857, exitLat: 35.847266, exitLng: 139.737857,
+                note: "SHUTO_IC_MASTERの「新井宿」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.847266,139.737857)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
+            }
+        ]
     }
 
 };
@@ -10309,11 +10647,18 @@ function inferTravelDirectionForIcArea(
         }
 
         // gaikan等のIC_MASTERエリアではなく、SHUTO_IC_MASTER側routeCode
-        // （"C1"/"C2"等）で管理されている環状路線向けのフォールバック。
+        // （"C1"/"C2"等）またはrouteName（例："首都高速6号向島線"）で
+        // 管理されている路線向けのフォールバック。
+        // routeNameでの一致も許容するのは、routeCode:"6"が
+        // 6号向島線・6号三郷線の2路線で重複しているため、
+        // routeCodeだけでは路線を一意に指定できないケースがあるため。
         // IC_MASTER[icArea]が存在しない場合のみ参照するため、
         // 既存のgaikan/gaikanUchimawari等の挙動には影響しない。
         return SHUTO_IC_MASTER.find(ic =>
-            ic.routeCode === icArea &&
+            (
+                ic.routeCode === icArea ||
+                ic.routeName === icArea
+            ) &&
             getIcIdentity(ic) === targetIdentity
         ) || null;
     };
@@ -12024,6 +12369,52 @@ function logHighwayRoutePolylineAnalysis(
                 shutoLoopTravelDirection === 1
                     ? "並び順どおり"
                     : shutoLoopTravelDirection === -1
+                        ? "並び順の逆（ミラー側）"
+                        : "判定不能"
+            );
+        });
+
+        // 線形路線（上り/下り）10路線向けの試験ログ。
+        // routeCode:"6"が6号向島線・6号三郷線の2路線で重複しているため、
+        // ここではrouteCodeではなくrouteNameで該当passedIcEntryを探す
+        // （inferTravelDirectionForIcAreaのSHUTO_IC_MASTERフォールバックは
+        // routeCode/routeNameのいずれの一致でも動作するよう対応済み）。
+        // 実際の上り/下りとの対応は路線ごとに未確認のため、ここでは断定しない。
+        [
+            "首都高速6号向島線",
+            "首都高速6号三郷線",
+            "首都高速7号小松川線",
+            "首都高速1号上野線",
+            "首都高速4号新宿線",
+            "首都高速5号池袋線",
+            "首都高速3号渋谷線",
+            "首都高速2号目黒線",
+            "首都高速湾岸線",
+            "首都高速川口線"
+        ].forEach(routeName => {
+            const shutoLinearPassedIcEntry =
+                passedIcEntries.find(item =>
+                    item.icArea === "shuto" &&
+                    item.exit?.routeName === routeName
+                );
+
+            if (!shutoLinearPassedIcEntry) {
+                return;
+            }
+
+            const shutoLinearTravelDirection =
+                inferTravelDirectionForIcArea(
+                    routeName,
+                    shutoLinearPassedIcEntry.exit,
+                    passedIcEntries,
+                    buildIcDefinitionIdentity
+                );
+
+            console.log(
+                routeName + "方向判定：",
+                shutoLinearTravelDirection === 1
+                    ? "並び順どおり"
+                    : shutoLinearTravelDirection === -1
                         ? "並び順の逆（ミラー側）"
                         : "判定不能"
             );

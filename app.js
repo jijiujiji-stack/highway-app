@@ -10175,7 +10175,7 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             decodeRoutesEncodedPolyline(encodedPolyline);
 
         const sampledPoints =
-            sampleRoutePointsByDistance(routePoints, 2000);
+            sampleRoutePointsByDistance(routePoints, 500);
 
         const icDefinitions =
             getAllRouteAnalysisIcDefinitions();

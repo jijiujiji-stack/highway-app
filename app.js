@@ -5534,6 +5534,7 @@ const IC_MASTER = {
                 order: -1,
                 displayName: "宝町",
                 googleName: "首都高速都心環状線 宝町出入口",
+                roadType: "首都高",
                 lat: 35.67788556,
                 lng: 139.77513532,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.67788556, entranceLng: 139.77513532, exitLat: 35.67788556, exitLng: 139.77513532,
@@ -5543,6 +5544,7 @@ const IC_MASTER = {
                 order: -2,
                 displayName: "京橋",
                 googleName: "首都高速都心環状線 京橋出入口",
+                roadType: "首都高",
                 lat: 35.6750043,
                 lng: 139.7726618,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.6750043, entranceLng: 139.7726618, exitLat: 35.6750043, exitLng: 139.7726618,
@@ -5552,6 +5554,7 @@ const IC_MASTER = {
                 order: -5,
                 displayName: "汐留",
                 googleName: "首都高速都心環状線 汐留出入口",
+                roadType: "首都高",
                 lat: 35.6633142,
                 lng: 139.7625511,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.6633142, entranceLng: 139.7625511, exitLat: 35.6633142, exitLng: 139.7625511,
@@ -5561,6 +5564,7 @@ const IC_MASTER = {
                 order: -7,
                 displayName: "飯倉",
                 googleName: "首都高速都心環状線 飯倉出入口",
+                roadType: "首都高",
                 lat: 35.6600066,
                 lng: 139.7368456,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.6600066, entranceLng: 139.7368456, exitLat: 35.6600066, exitLng: 139.7368456,
@@ -5580,6 +5584,7 @@ const IC_MASTER = {
                 order: -1,
                 displayName: "中環大井南",
                 googleName: "首都高速中央環状線 中環大井南出入口",
+                roadType: "首都高",
                 lat: 35.6013968,
                 lng: 139.7557747,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.6013968, entranceLng: 139.7557747, exitLat: 35.6013968, exitLng: 139.7557747,
@@ -5589,6 +5594,7 @@ const IC_MASTER = {
                 order: -2,
                 displayName: "五反田",
                 googleName: "首都高速中央環状線 五反田出入口",
+                roadType: "首都高",
                 lat: 35.6279557,
                 lng: 139.7131047,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.6279557, entranceLng: 139.7131047, exitLat: 35.6279557, exitLng: 139.7131047,
@@ -5598,6 +5604,7 @@ const IC_MASTER = {
                 order: -3,
                 displayName: "富ヶ谷",
                 googleName: "首都高速中央環状線 富ヶ谷出入口",
+                roadType: "首都高",
                 lat: 35.6639768,
                 lng: 139.6878959,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.6639768, entranceLng: 139.6878959, exitLat: 35.6639768, exitLng: 139.6878959,
@@ -5607,6 +5614,7 @@ const IC_MASTER = {
                 order: -4,
                 displayName: "初台南",
                 googleName: "首都高速中央環状線 初台南出入口",
+                roadType: "首都高",
                 lat: 35.6755305,
                 lng: 139.6877129,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.6755305, entranceLng: 139.6877129, exitLat: 35.6755305, exitLng: 139.6877129,
@@ -5616,6 +5624,7 @@ const IC_MASTER = {
                 order: -5,
                 displayName: "中野長者橋",
                 googleName: "首都高速中央環状線 中野長者橋出入口",
+                roadType: "首都高",
                 lat: 35.6936813,
                 lng: 139.682356,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.6936813, entranceLng: 139.682356, exitLat: 35.6936813, exitLng: 139.682356,
@@ -5625,6 +5634,7 @@ const IC_MASTER = {
                 order: -10,
                 displayName: "王子南",
                 googleName: "首都高速中央環状線 王子南出入口",
+                roadType: "首都高",
                 lat: 35.7552346,
                 lng: 139.7423909,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.7552346, entranceLng: 139.7423909, exitLat: 35.7552346, exitLng: 139.7423909,
@@ -5634,6 +5644,7 @@ const IC_MASTER = {
                 order: -14,
                 displayName: "小菅",
                 googleName: "首都高速中央環状線 小菅出入口",
+                roadType: "首都高",
                 lat: 35.7511342,
                 lng: 139.8210043,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.7511342, entranceLng: 139.8210043, exitLat: 35.7511342, exitLng: 139.8210043,
@@ -5643,6 +5654,7 @@ const IC_MASTER = {
                 order: -16,
                 displayName: "平井大橋",
                 googleName: "首都高速中央環状線 平井大橋出入口",
+                roadType: "首都高",
                 lat: 35.7147245,
                 lng: 139.8505446,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.7147245, entranceLng: 139.8505446, exitLat: 35.7147245, exitLng: 139.8505446,
@@ -5652,6 +5664,7 @@ const IC_MASTER = {
                 order: -18,
                 displayName: "船堀橋",
                 googleName: "首都高速中央環状線 船堀橋出入口",
+                roadType: "首都高",
                 lat: 35.688526,
                 lng: 139.8577375,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.688526, entranceLng: 139.8577375, exitLat: 35.688526, exitLng: 139.8577375,
@@ -5661,6 +5674,7 @@ const IC_MASTER = {
                 order: -19,
                 displayName: "清新町",
                 googleName: "首都高速中央環状線 清新町出入口",
+                roadType: "首都高",
                 lat: 35.6651955,
                 lng: 139.8530795,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.6651955, entranceLng: 139.8530795, exitLat: 35.6651955, exitLng: 139.8530795,
@@ -5684,6 +5698,7 @@ const IC_MASTER = {
                 order: -4,
                 displayName: "駒形",
                 googleName: "首都高速6号向島線 駒形出入口",
+                roadType: "首都高",
                 lat: 35.707552,
                 lng: 139.798075,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.707552, entranceLng: 139.798075, exitLat: 35.707552, exitLng: 139.798075,
@@ -5699,6 +5714,7 @@ const IC_MASTER = {
                 order: -4,
                 displayName: "三郷",
                 googleName: "首都高速6号三郷線 三郷出入口",
+                roadType: "首都高",
                 lat: 35.835239,
                 lng: 139.857745,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.835239, entranceLng: 139.857745, exitLat: 35.835239, exitLng: 139.857745,
@@ -5714,6 +5730,7 @@ const IC_MASTER = {
                 order: -2,
                 displayName: "小松川",
                 googleName: "首都高速7号小松川線 小松川出入口",
+                roadType: "首都高",
                 lat: 35.69924,
                 lng: 139.8662864,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.69924, entranceLng: 139.8662864, exitLat: 35.69924, exitLng: 139.8662864,
@@ -5723,6 +5740,7 @@ const IC_MASTER = {
                 order: -3,
                 displayName: "一之江",
                 googleName: "首都高速7号小松川線 一之江出入口",
+                roadType: "首都高",
                 lat: 35.6975345,
                 lng: 139.8815616,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.6975345, entranceLng: 139.8815616, exitLat: 35.6975345, exitLng: 139.8815616,
@@ -5738,6 +5756,7 @@ const IC_MASTER = {
                 order: -3,
                 displayName: "入谷",
                 googleName: "首都高速1号上野線 入谷出入口",
+                roadType: "首都高",
                 lat: 35.719763,
                 lng: 139.783689,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.719763, entranceLng: 139.783689, exitLat: 35.719763, exitLng: 139.783689,
@@ -5753,6 +5772,7 @@ const IC_MASTER = {
                 order: -4,
                 displayName: "初台",
                 googleName: "首都高速4号新宿線 初台出入口",
+                roadType: "首都高",
                 lat: 35.680202,
                 lng: 139.684429,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.680202, entranceLng: 139.684429, exitLat: 35.680202, exitLng: 139.684429,
@@ -5762,6 +5782,7 @@ const IC_MASTER = {
                 order: -5,
                 displayName: "幡ヶ谷",
                 googleName: "首都高速4号新宿線 幡ヶ谷出入口",
+                roadType: "首都高",
                 lat: 35.676663,
                 lng: 139.675273,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.676663, entranceLng: 139.675273, exitLat: 35.676663, exitLng: 139.675273,
@@ -5863,6 +5884,7 @@ const IC_MASTER = {
                 order: -1,
                 displayName: "高樹町",
                 googleName: "首都高速3号渋谷線 高樹町出入口",
+                roadType: "首都高",
                 lat: 35.659301,
                 lng: 139.719804,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.659301, entranceLng: 139.719804, exitLat: 35.659301, exitLng: 139.719804,
@@ -5872,6 +5894,7 @@ const IC_MASTER = {
                 order: -3,
                 displayName: "池尻",
                 googleName: "首都高速3号渋谷線 池尻出入口",
+                roadType: "首都高",
                 lat: 35.649044,
                 lng: 139.681494,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.649044, entranceLng: 139.681494, exitLat: 35.649044, exitLng: 139.681494,
@@ -5881,6 +5904,7 @@ const IC_MASTER = {
                 order: -4,
                 displayName: "三軒茶屋",
                 googleName: "首都高速3号渋谷線 三軒茶屋出入口",
+                roadType: "首都高",
                 lat: 35.644056,
                 lng: 139.672592,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.644056, entranceLng: 139.672592, exitLat: 35.644056, exitLng: 139.672592,
@@ -5896,6 +5920,7 @@ const IC_MASTER = {
                 order: -1,
                 displayName: "天現寺",
                 googleName: "首都高速2号目黒線 天現寺出入口",
+                roadType: "首都高",
                 lat: 35.646625,
                 lng: 139.725832,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.646625, entranceLng: 139.725832, exitLat: 35.646625, exitLng: 139.725832,
@@ -5905,6 +5930,7 @@ const IC_MASTER = {
                 order: -2,
                 displayName: "目黒",
                 googleName: "首都高速2号目黒線 目黒出入口",
+                roadType: "首都高",
                 lat: 35.6360629,
                 lng: 139.7184032,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.6360629, entranceLng: 139.7184032, exitLat: 35.6360629, exitLng: 139.7184032,
@@ -5914,6 +5940,7 @@ const IC_MASTER = {
                 order: -4,
                 displayName: "荏原",
                 googleName: "首都高速2号目黒線 荏原出入口",
+                roadType: "首都高",
                 lat: 35.618687,
                 lng: 139.715724,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.618687, entranceLng: 139.715724, exitLat: 35.618687, exitLng: 139.715724,
@@ -5929,6 +5956,7 @@ const IC_MASTER = {
                 order: -7,
                 displayName: "臨海副都心",
                 googleName: "首都高速湾岸線 臨海副都心出入口",
+                roadType: "首都高",
                 lat: 35.625993,
                 lng: 139.773874,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.625993, entranceLng: 139.773874, exitLat: 35.625993, exitLng: 139.773874,
@@ -5938,6 +5966,7 @@ const IC_MASTER = {
                 order: -8,
                 displayName: "大井",
                 googleName: "首都高速湾岸線 大井出入口",
+                roadType: "首都高",
                 lat: 35.611819,
                 lng: 139.756607,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.611819, entranceLng: 139.756607, exitLat: 35.611819, exitLng: 139.756607,
@@ -5947,6 +5976,7 @@ const IC_MASTER = {
                 order: -11,
                 displayName: "湾岸環八",
                 googleName: "首都高速湾岸線 湾岸環八出入口",
+                roadType: "首都高",
                 lat: 35.540368,
                 lng: 139.792927,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.540368, entranceLng: 139.792927, exitLat: 35.540368, exitLng: 139.792927,
@@ -5956,6 +5986,7 @@ const IC_MASTER = {
                 order: -17,
                 displayName: "三溪園",
                 googleName: "首都高速湾岸線 三溪園出入口",
+                roadType: "首都高",
                 lat: 35.412549,
                 lng: 139.661584,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.412549, entranceLng: 139.661584, exitLat: 35.412549, exitLng: 139.661584,
@@ -5965,6 +5996,7 @@ const IC_MASTER = {
                 order: -18,
                 displayName: "磯子",
                 googleName: "首都高速湾岸線 磯子出入口",
+                roadType: "首都高",
                 lat: 35.397064,
                 lng: 139.617192,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.397064, entranceLng: 139.617192, exitLat: 35.397064, exitLng: 139.617192,
@@ -5980,6 +6012,7 @@ const IC_MASTER = {
                 order: -3,
                 displayName: "加賀",
                 googleName: "首都高速川口線 加賀出入口",
+                roadType: "首都高",
                 lat: 35.794786,
                 lng: 139.759737,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.794786, entranceLng: 139.759737, exitLat: 35.794786, exitLng: 139.759737,
@@ -5989,6 +6022,7 @@ const IC_MASTER = {
                 order: -4,
                 displayName: "足立入谷",
                 googleName: "首都高速川口線 足立入谷出入口",
+                roadType: "首都高",
                 lat: 35.804822,
                 lng: 139.759663,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.804822, entranceLng: 139.759663, exitLat: 35.804822, exitLng: 139.759663,
@@ -5998,6 +6032,7 @@ const IC_MASTER = {
                 order: -6,
                 displayName: "安行",
                 googleName: "首都高速川口線 安行出入口",
+                roadType: "首都高",
                 lat: 35.835560,
                 lng: 139.755615,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.835560, entranceLng: 139.755615, exitLat: 35.835560, exitLng: 139.755615,
@@ -6007,6 +6042,7 @@ const IC_MASTER = {
                 order: -7,
                 displayName: "新井宿",
                 googleName: "首都高速川口線 新井宿出入口",
+                roadType: "首都高",
                 lat: 35.847266,
                 lng: 139.737857,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.847266, entranceLng: 139.737857, exitLat: 35.847266, exitLng: 139.737857,
@@ -10832,9 +10868,9 @@ function getShutoMirrorGoogleNameSet() {
 }
 
 // SHUTO_IC_MASTER側routeName → 対応するミラーエリアのキー。
-// 段階的接続のため、resolveEffectiveShutoExit内では今回
-// "首都高速5号池袋線"のみを実際に使用対象とし、他は今回まだ
-// 接続しない（将来の拡張時にこのマップをそのまま使う想定）。
+// gaikan（東京外環自動車道）はSHUTO_IC_MASTER側のICではなく
+// routeNameフィールド自体を持たないため、このマップには含まれない
+// （resolveGaikanDirectionalIcArea側で別途・既存の仕組みにより処理される）。
 const SHUTO_MIRROR_AREA_KEY_BY_ROUTE_NAME = {
     "首都高速都心環状線": "shutoC1Uchimawari",
     "首都高速中央環状線": "shutoC2Uchimawari",
@@ -10856,16 +10892,23 @@ const SHUTO_MIRROR_AREA_KEY_BY_ROUTE_NAME = {
 // 直接参照している既存の判定箇所（isShutoIcSelectableForRole等）は
 // 一切変更せずに、正しい値を読むようになる。
 //
-// 段階的接続の第一弾として、今回は"首都高速5号池袋線"のみを対象とする。
-// それ以外の路線（gaikan・C1・C2・他の線形路線含む）は、
-// この関数の冒頭で早期returnし、無変更のexitをそのまま返す。
+// SHUTO_MIRROR_AREA_KEY_BY_ROUTE_NAMEに対応エリアが無い路線
+// （方向依存ミラーを持たない大多数のIC、およびgaikan＝routeName自体を
+// 持たないため必然的に対象外になる）は、この関数の冒頭で早期returnし、
+// 無変更のexitをそのまま返す。5号池袋線での実車確認（順方向・逆方向とも）
+// 済みのロジックを、全路線に対して同一のまま適用する。
 function resolveEffectiveShutoExit(
     exit,
     polylineAnalysis,
     getIcIdentity
 ) {
 
-    if (!exit || exit.routeName !== "首都高速5号池袋線") {
+    const mirrorAreaKey =
+        exit
+            ? SHUTO_MIRROR_AREA_KEY_BY_ROUTE_NAME[exit.routeName]
+            : null;
+
+    if (!exit || !mirrorAreaKey || !IC_MASTER[mirrorAreaKey]) {
         return exit;
     }
 
@@ -10875,15 +10918,10 @@ function resolveEffectiveShutoExit(
         return exit;
     }
 
-    const mirrorAreaKey =
-        SHUTO_MIRROR_AREA_KEY_BY_ROUTE_NAME[exit.routeName];
-
     const mirrorExit =
-        mirrorAreaKey && IC_MASTER[mirrorAreaKey]
-            ? IC_MASTER[mirrorAreaKey].exits.find(candidate =>
-                getIcIdentity(candidate) === identity
-            )
-            : null;
+        IC_MASTER[mirrorAreaKey].exits.find(candidate =>
+            getIcIdentity(candidate) === identity
+        );
 
     if (!mirrorExit) {
         return exit;

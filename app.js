@@ -10886,6 +10886,41 @@ const SHUTO_MIRROR_AREA_KEY_BY_ROUTE_NAME = {
     "首都高速川口線": "shutoS1KawaguchiUchimawari"
 };
 
+// buildForwardExitComparisonIcCandidates側はroute経路の全サンプル点
+// (500m間隔)を走査するため、同一ICに複数のサンプル点が対応し、
+// resolveEffectiveShutoExit自体は毎回（正しく）呼ばれる。
+// 差し替え結果には影響を与えず、コンソールログのみをpolylineAnalysisごと・
+// 同一IC＋同一ミラー先ごとに1回に間引くための補助。
+// polylineAnalysisをキーにしたWeakMapのため、新しいルート解析が
+// 行われれば自然に別スコープになる。
+const shutoMirrorSubstitutionLoggedKeysByAnalysis = new WeakMap();
+
+function hasLoggedShutoMirrorSubstitution(polylineAnalysis, key) {
+
+    if (!polylineAnalysis) {
+        return false;
+    }
+
+    let loggedKeys =
+        shutoMirrorSubstitutionLoggedKeysByAnalysis.get(polylineAnalysis);
+
+    if (!loggedKeys) {
+        loggedKeys = new Set();
+        shutoMirrorSubstitutionLoggedKeysByAnalysis.set(
+            polylineAnalysis,
+            loggedKeys
+        );
+    }
+
+    if (loggedKeys.has(key)) {
+        return true;
+    }
+
+    loggedKeys.add(key);
+
+    return false;
+}
+
 // 方向判定の結果に応じて、候補ICをSHUTO_IC_MASTER本体側のオブジェクトのまま
 // 使うか、ミラーエリア側のオブジェクトに差し替えるかを決定する。
 // 差し替えは候補収集の入口で行うため、entranceSelectable/exitSelectableを
@@ -10940,12 +10975,24 @@ function resolveEffectiveShutoExit(
     // この±1とミラー側採用の対応は実車確認前提の暫定判断のため、
     // 実車確認で逆と分かった場合はこの符号判定のみを反転すればよい。
     if (travelDirection === -1) {
-        console.log(
-            "[方向判定→候補差し替え] " +
-            exit.displayName +
-            "（" + exit.routeName + "）は" +
-            "方向判定によりミラー側（" + mirrorAreaKey + "）に差し替えました。"
-        );
+        // buildForwardExitComparisonIcCandidates側は500m間隔の
+        // routeTrace全件（同一ICに複数サンプル点が対応し得る）に対して
+        // 差し替え判定自体は毎回行うが、ログはpolylineAnalysisごとに
+        // 同一IC・同一ミラー先につき1回だけ出す（差し替え結果自体は
+        // 従来どおり毎回returnするため、候補選定の挙動は変わらない）。
+        if (
+            !hasLoggedShutoMirrorSubstitution(
+                polylineAnalysis,
+                identity + "|" + mirrorAreaKey
+            )
+        ) {
+            console.log(
+                "[方向判定→候補差し替え] " +
+                exit.displayName +
+                "（" + exit.routeName + "）は" +
+                "方向判定によりミラー側（" + mirrorAreaKey + "）に差し替えました。"
+            );
+        }
 
         return mirrorExit;
     }

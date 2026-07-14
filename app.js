@@ -4386,35 +4386,45 @@ const IC_MASTER = {
     yokohamaShindo: {
         label: "横浜新道方面",
         exits: [
-            { order: 1, displayName: "保土ヶ谷IC", googleName: "横浜新道 保土ヶ谷インターチェンジ", lat: 35.474, lng: 139.586, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 1, connection: true, connectedRoads: ["yokohamaShindo", "daisanKeihin"],
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.474, entranceLng: 139.586, exitLat: 35.474, exitLng: 139.586
+            { order: 1, displayName: "保土ヶ谷IC", googleName: "横浜新道 保土ヶ谷インターチェンジ", lat: 35.47087, lng: 139.5945796, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 1, connection: true, connectedRoads: ["yokohamaShindo", "daisanKeihin"],
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.47087, entranceLng: 139.5945796, exitLat: 35.47087, exitLng: 139.5945796,
+                note: "daisanKeihin側の保土ヶ谷ICとは別名称の施設（第三京浜道路 保土ヶ谷ICとは逆方向）。MapFanで「保土ヶ谷ＩＣ（横浜新道）【入口（下り）】」「【出口（上り）】」の個別ページを確認したが、「【入口（上り）】」「【出口（下り）】」に相当するページは見つからず、下り線入口・上り線出口のみと判断。本アプリは走行方向を区別できないため、入口方向（下り）を代表方向として採用し、上り出口はexitSelectable:falseとした。座標はMapFan「保土ヶ谷ＩＣ（横浜新道）【入口（下り）】」個別ページで確認(35.47087,139.5945796)。従来座標(35.474,139.586)から約850m修正。"
             },
-            { order: 2, displayName: "常盤台出口", googleName: "横浜新道 常盤台出口", lat: 35.473, lng: 139.590, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 2,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.473, entranceLng: 139.590, exitLat: 35.473, exitLng: 139.590
+            { order: 2, displayName: "常盤台出口", googleName: "横浜新道 常盤台出口", lat: 35.470693, lng: 139.594187, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 2,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.470693, entranceLng: 139.594187, exitLat: 35.4701192, exitLng: 139.5932507,
+                note: "MapFanで「常盤台ＩＣ（横浜新道）【出口（上り）】」の個別ページを確認(35.4701192,139.5932507)。下り線入口はMapFanの個別ページが見つからず、NAVITIMEのPOI「横浜新道 常盤台 下り 入口」（座標35.470693,139.594187、上り出口から約95m）で存在を確認。入口（下り）・出口（上り）の存在は確認できたが「【入口（上り）】」「【出口（下り）】」は見つからず、方向限定と判断。本アプリは走行方向を区別できないため、入口方向（下り）を代表方向として採用し、上り出口はexitSelectable:falseとした。entranceLat/Lngの座標源はMapFanではなくNAVITIME（精度はMapFan個別ページより劣る可能性あり）。従来座標(35.473,139.590)から約270m修正。"
             },
-            { order: 3, displayName: "峰岡出口", googleName: "横浜新道 峰岡出口", lat: 35.463, lng: 139.590, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 3,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.463, entranceLng: 139.590, exitLat: 35.463, exitLng: 139.590
+            { order: 3, displayName: "峰岡出口", googleName: "横浜新道 峰岡出口", lat: 35.4654828, lng: 139.5917984, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 3,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.4654828, entranceLng: 139.5917984, exitLat: 35.4654828, exitLng: 139.5917984,
+                note: "Wikipedia「峰岡インターチェンジ」記事で、開通当初は下り線に入口・出口とも存在したが、合流の危険性から1996年の横浜新道改良時に入口を廃止し、以後は下り線出口のみのクォーターICになったことを確認。MapFanでも「【出口（下り）】」の個別ページのみ存在し「【入口】」に相当するページは無し。よってentranceSelectable:falseとした（方向限定ではなく入口自体が現存しない）。座標はMapFan「峰岡ＩＣ（横浜新道）【出口（下り）】」個別ページで確認(35.4654828,139.5917984)。従来座標(35.463,139.590)から約320m修正。"
             },
-            { order: 4, displayName: "星川入口", googleName: "横浜新道 星川入口", lat: 35.459, lng: 139.588, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 4,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.459, entranceLng: 139.588, exitLat: 35.459, exitLng: 139.588
+            { order: 4, displayName: "星川入口", googleName: "横浜新道 星川入口", lat: 35.4602758, lng: 139.5882476, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 4,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.4602758, entranceLng: 139.5882476, exitLat: 35.4602758, exitLng: 139.5882476,
+                note: "Wikipedia「星川インターチェンジ」記事で、下り線入口のみのクォーターICであり出口は存在しないことを確認。MapFanでも「【入口（下り）】」の個別ページのみ存在し「【出口】」に相当するページは無し。よってexitSelectable:falseとした（方向限定ではなく出口自体が現存しない）。座標はMapFan「星川ＩＣ（横浜新道）【入口（下り）】」個別ページで確認(35.4602758,139.5882476)。従来座標(35.459,139.588)から約130m修正。"
             },
-            { order: 5, displayName: "藤塚IC", googleName: "横浜新道 藤塚インターチェンジ", lat: 35.458, lng: 139.567, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 5,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.458, entranceLng: 139.567, exitLat: 35.458, exitLng: 139.567
+            { order: 5, displayName: "藤塚IC", googleName: "横浜新道 藤塚インターチェンジ", lat: 35.4520219, lng: 139.5735383, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 5,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.4520219, entranceLng: 139.5735383, exitLat: 35.4520219, exitLng: 139.5735383,
+                note: "Wikipedia「横浜新道」記事の一覧表で「新保土ヶ谷ICのランプと接続（横浜新道本線とは接続していない）下り線は出口のみ」と記載されていることを確認。MapFanでも「【入口（上り）】」「【出口】」の個別ページのみ確認でき「【入口（下り）】」に相当するページは無し。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。座標はMapFan「藤塚ＩＣ（横浜新道）【入口（上り）】」個別ページで確認(35.4520219,139.5735383)。従来座標(35.458,139.567)から約850m修正。"
             },
-            { order: 6, displayName: "新保土ヶ谷IC", googleName: "横浜新道 新保土ヶ谷インターチェンジ", lat: 35.455, lng: 139.557, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 6, connection: true, connectedRoads: ["yokohamaShindo", "hodogayaBypass"],
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.455, entranceLng: 139.557, exitLat: 35.455, exitLng: 139.557
+            { order: 6, displayName: "新保土ヶ谷IC", googleName: "横浜新道 新保土ヶ谷インターチェンジ", lat: 35.451481755027, lng: 139.56704453685, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 6, connection: true, connectedRoads: ["yokohamaShindo", "hodogayaBypass"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.451481755027, entranceLng: 139.56704453685, exitLat: 35.451481755027, exitLng: 139.56704453685,
+                note: "MapFanで「新保土ヶ谷ＩＣ（横浜新道）【入口】」「【出口】」を確認（上り/下りの区別なし＝両方向利用可能）。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標は【入口】ページのルート検索結果に埋め込まれた座標(35.451481755027,139.56704453685)を使用（【出口】個別ページはアクセス時に404となり直接確認できなかったため、entranceLat/Lngと同一値をexitLat/Lngにも使用。至近距離の同一JCTのため実用上の誤差は小さいと判断）。従来座標(35.455,139.557)から約950m修正。"
             },
-            { order: 7, displayName: "今井IC", googleName: "横浜新道 今井インターチェンジ", lat: 35.441, lng: 139.551, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 7,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.441, entranceLng: 139.551, exitLat: 35.441, exitLng: 139.551
+            { order: 7, displayName: "今井IC", googleName: "横浜新道 今井インターチェンジ", lat: 35.4429, lng: 139.5605, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 7,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.4437025, entranceLng: 139.5603989, exitLat: 35.4420949, exitLng: 139.5605898,
+                note: "MapFanで「今井ＩＣ（横浜新道）【入口（上り）】」「【入口（下り）】」「【出口（下り）】」の3個別ページを確認。「【出口（上り）】」のMapFan個別ページは検索で見つからなかったが、NAVITIMEに「今井IC 上り 出口」のPOIが別途存在することを確認し、上下線とも入口・出口が利用可能なフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(35.4437025,139.5603989)、exitLat/Lngを出口(下り)(35.4420949,139.5605898)に設定。従来座標(35.441,139.551)から約850m修正。"
             },
-            { order: 8, displayName: "川上IC", googleName: "横浜新道 川上インターチェンジ", lat: 35.429, lng: 139.542, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 8,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.429, entranceLng: 139.542, exitLat: 35.429, exitLng: 139.542
+            { order: 8, displayName: "川上IC", googleName: "横浜新道 川上インターチェンジ", lat: 35.43047, lng: 139.55101, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 8,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.4311727, entranceLng: 139.5512192, exitLat: 35.4297672, exitLng: 139.5508059,
+                note: "MapFanで「川上ＩＣ（横浜新道）【入口（上り）】」「【出口（上り）】」「【出口（下り）】」の3個別ページを確認。「【入口（下り）】」のMapFan個別ページは検索で見つからなかったが、NAVITIMEに「川上IC 下り 入口」のPOIが別途存在することを確認し、上下線とも入口・出口が利用可能なフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(35.4311727,139.5512192)、exitLat/Lngを出口(下り)(35.4297672,139.5508059)に設定。従来座標(35.429,139.542)から約650m修正。"
             },
-            { order: 9, displayName: "上矢部IC", googleName: "横浜新道 上矢部インターチェンジ", lat: 35.409, lng: 139.529, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 9,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.409, entranceLng: 139.529, exitLat: 35.409, exitLng: 139.529
+            { order: 9, displayName: "上矢部IC", googleName: "横浜新道 上矢部インターチェンジ", lat: 35.4186287, lng: 139.5372975, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 9,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.4186287, entranceLng: 139.5372975, exitLat: 35.4186287, exitLng: 139.5372975,
+                note: "Wikipedia「横浜新道」記事の一覧表で「下り線は入口のみ」と記載されていることを確認。MapFan・NAVITIMEでも「上り入口」「上り出口」「下り入口」の3種が確認でき、「下り出口」に相当するページは見つからなかった。すなわち入口は上下線とも利用可能（universal）だが、出口は上り線のみで下り線に出口が無い（方向限定）。本アプリは走行方向を区別できないため、上下線とも利用可能な入口をentranceSelectable:trueとし、方向限定のある出口をexitSelectable:falseとした（従来の代表方向＝入口を優先する方針と整合）。座標はMapFan「上矢部ＩＣ（横浜新道）【入口（上り）】」個別ページで確認(35.4186287,139.5372975)。従来座標(35.409,139.529)から約1.3km修正。"
             },
-            { order: 10, displayName: "戸塚終点", googleName: "横浜新道 戸塚終点", lat: 35.397, lng: 139.530, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 10,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.397, entranceLng: 139.530, exitLat: 35.397, exitLng: 139.530
+            { order: 10, displayName: "戸塚終点", googleName: "横浜新道 戸塚終点", lat: 35.4121206, lng: 139.5321646, roadType: "横浜新道", routeBranch: "yokohamaShindo", branchOrder: 10,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.4121206, entranceLng: 139.5321646, exitLat: 35.4121206, exitLng: 139.5321646,
+                note: "横浜新道の終点（横浜市戸塚区、国道1号戸塚道路に接続）。MapFanでは本施設が「戸塚ＩＣ（横浜新道）」の名称で登録されており、「【入口（上り）】」「【出口（下り）】」の個別ページを確認したが、「【入口（下り）】」「【出口（上り）】」に相当するページは見つからず、上り線入口・下り線出口のみと判断（起点側の玉川IC・保土ヶ谷ICと同様の終点特有の構造）。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。displayNameは既存の「戸塚終点」を維持（MapFan上の表記は「戸塚IC」）。座標はMapFan「戸塚ＩＣ（横浜新道）【入口（上り）】」個別ページで確認(35.4121206,139.5321646)。従来座標(35.397,139.530)から約1.7km修正。"
             }
         ]
     },
@@ -4423,26 +4433,33 @@ const IC_MASTER = {
     hodogayaBypass: {
         label: "保土ヶ谷バイパス方面",
         exits: [
-            { order: 1, displayName: "新保土ヶ谷IC", googleName: "保土ヶ谷バイパス 新保土ヶ谷インターチェンジ", lat: 35.455, lng: 139.557, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 1, connection: true, connectedRoads: ["hodogayaBypass", "yokohamaShindo"],
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.455, entranceLng: 139.557, exitLat: 35.455, exitLng: 139.557
+            { order: 1, displayName: "新保土ヶ谷IC", googleName: "保土ヶ谷バイパス 新保土ヶ谷インターチェンジ", lat: 35.451481755027, lng: 139.56704453685, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 1, connection: true, connectedRoads: ["hodogayaBypass", "yokohamaShindo"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.451481755027, entranceLng: 139.56704453685, exitLat: 35.451481755027, exitLng: 139.56704453685,
+                note: "yokohamaShindo側の新保土ヶ谷IC（同一JCT）と同じ座標・方向判定を採用。NAVITIMEに「保土ヶ谷バイパス 新保土ヶ谷IC 上り 出口」等のPOIがあり、保土ヶ谷バイパス側でも入口・出口とも存在することを確認したが、保土ヶ谷バイパス（国道16号バイパス）はNEXCO管轄外の国交省管理道路のためMapFanの個別ランプページが少なく、hodogayaBypass専用の座標は確認できなかった。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はyokohamaShindo側で確認済みの新保土ヶ谷IC【入口】座標を流用。従来座標(35.455,139.557)から約950m修正。"
             },
-            { order: 2, displayName: "新桜ヶ丘IC", googleName: "保土ヶ谷バイパス 新桜ヶ丘インターチェンジ", lat: 35.451, lng: 139.542, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 2,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.451, entranceLng: 139.542, exitLat: 35.451, exitLng: 139.542
+            { order: 2, displayName: "新桜ヶ丘IC", googleName: "保土ヶ谷バイパス 新桜ヶ丘インターチェンジ", lat: 35.45349, lng: 139.559043, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 2,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.45349, entranceLng: 139.559043, exitLat: 35.45349, exitLng: 139.559043,
+                note: "NAVITIMEのPOIで「保土ヶ谷バイパス 新桜ヶ丘IC 上り 入口」「下り 出口」の存在を確認したが、「上り出口」「下り入口」に相当するPOIは見つからず、方向限定と判断。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。保土ヶ谷バイパスはMapFanの個別ランプページが乏しく、座標はNAVITIME掲載の一般座標(35.45349,139.559043)を使用（ランプ単位の精度ではない可能性あり）。従来座標(35.451,139.542)から約1.5km修正。"
             },
             { order: 3, displayName: "南本宿IC", googleName: "保土ヶ谷バイパス 南本宿インターチェンジ", lat: 35.457, lng: 139.526, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 3,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.457, entranceLng: 139.526, exitLat: 35.457, exitLng: 139.526
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.457, entranceLng: 139.526, exitLat: 35.457, exitLng: 139.526,
+                note: "NAVITIMEのPOIで「保土ヶ谷バイパス 南本宿IC 上り 入口」「上り 出口」「下り 出口」の3種の存在を確認したが、「下り 入口」に相当するPOIは見つからなかった。すなわち出口は上下線とも利用可能（universal）だが、入口は上り線のみで下り線に入口が無い（方向限定）。本アプリは走行方向を区別できないため、上下線とも利用可能な出口をexitSelectable:trueとし、方向限定のある入口をentranceSelectable:falseとした。座標はMapFan・NAVITIMEともランプ単位の緯度経度が確認できなかったため、既存座標(35.457,139.526)を維持（精度未確認、要再確認）。"
             },
-            { order: 4, displayName: "本村IC", googleName: "保土ヶ谷バイパス 本村インターチェンジ", lat: 35.466, lng: 139.514, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 4,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.466, entranceLng: 139.514, exitLat: 35.466, exitLng: 139.514
+            { order: 4, displayName: "本村IC", googleName: "保土ヶ谷バイパス 本村インターチェンジ", lat: 35.4667, lng: 139.535783, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 4,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.466905, entranceLng: 139.535771, exitLat: 35.466461, exitLng: 139.535794,
+                note: "NAVITIMEのPOIで「保土ヶ谷バイパス 本村IC 上り 入口」「下り 出口」「下り 入口」に加え、上り出口の存在も別ソース（SpotsNinja）で確認でき、上下線とも入口・出口が利用可能なフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。保土ヶ谷バイパスはMapFanの個別ランプページが乏しく、座標はNAVITIME掲載の座標（entranceLat/Lngは上り入口35.466905,139.535771、exitLat/Lngは下り出口35.466461,139.535794）を使用。従来座標(35.466,139.514)から約1.9km修正。"
             },
-            { order: 5, displayName: "下川井IC", googleName: "保土ヶ谷バイパス 下川井インターチェンジ", lat: 35.486, lng: 139.506, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 5,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.486, entranceLng: 139.506, exitLat: 35.486, exitLng: 139.506
+            { order: 5, displayName: "下川井IC", googleName: "保土ヶ谷バイパス 下川井インターチェンジ", lat: 35.481422, lng: 139.51546, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 5,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.482348, entranceLng: 139.514068, exitLat: 35.480496, exitLng: 139.516852,
+                note: "NAVITIMEのPOIで「保土ヶ谷バイパス 下川井IC」の上り入口・上り出口・下り入口・下り出口の4種全ての存在を確認し、上下線とも入口・出口が利用可能なフルICと判断（1974年、狩場IC～上川井IC区間開通時から供用）。entranceSelectable/exitSelectableは変更なし（trueのまま）。保土ヶ谷バイパスはMapFanの個別ランプページが乏しく、座標はNAVITIME掲載の座標（entranceLat/Lngは上り入口35.482348,139.514068、exitLat/Lngは下り出口35.480496,139.516852）を使用。従来座標(35.486,139.506)から約900m修正。"
             },
-            { order: 6, displayName: "上川井IC", googleName: "保土ヶ谷バイパス 上川井インターチェンジ", lat: 35.497, lng: 139.494, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 6,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.497, entranceLng: 139.494, exitLat: 35.497, exitLng: 139.494
+            { order: 6, displayName: "上川井IC", googleName: "保土ヶ谷バイパス 上川井インターチェンジ", lat: 35.494309, lng: 139.499432, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 6,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.494309, entranceLng: 139.499432, exitLat: 35.494309, exitLng: 139.499432,
+                note: "NAVITIMEのPOIで「保土ヶ谷バイパス 上川井IC」は上り入口・下り出口の存在のみ確認でき、上り出口・下り入口に相当するPOIは見つからず、方向限定と判断。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。保土ヶ谷バイパスはMapFanの個別ランプページが乏しく、座標はNAVITIME掲載の一般座標(35.494309,139.499432)を使用（ランプ単位の精度ではない可能性あり）。従来座標(35.497,139.494)から約540m修正。"
             },
             { order: 7, displayName: "横浜町田IC", googleName: "保土ヶ谷バイパス 横浜町田インターチェンジ", lat: 35.513, lng: 139.474, roadType: "保土ヶ谷バイパス", routeBranch: "hodogayaBypass", branchOrder: 7, connection: true, connectedRoads: ["hodogayaBypass", "tomei"],
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.513, entranceLng: 139.474, exitLat: 35.513, exitLng: 139.474
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.513, entranceLng: 139.474, exitLat: 35.513, exitLng: 139.474,
+                note: "検証未完了・変更保留。ウェブ検索で「横浜町田IC～上川井IC相互間の出入は不可」という趣旨の情報（保土ヶ谷バイパス「町田立体」区間の段階開通に起因）が見つかったが、これは単純な上り/下り・入口/出口の方向限定ではなく、隣接IC間の特定区間での通行制限とみられ、本アプリのentranceSelectable/exitSelectableモデルでは正確に表現できない可能性が高い。誤った修正を避けるため、今回はentranceSelectable/exitSelectable・座標とも変更していない。次回、町田立体の開通区間・通行可否をより詳しく確認したうえで再検証が必要。"
             }
         ]
     },

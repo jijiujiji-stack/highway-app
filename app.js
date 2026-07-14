@@ -4166,8 +4166,9 @@ const IC_MASTER = {
             { order: 3, displayName: "稲城IC", googleName: "中央自動車道 稲城インターチェンジ", lat: 35.638, lng: 139.510,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.638, entranceLng: 139.510, exitLat: 35.638, exitLng: 139.510
             },
-            { order: 3.5, displayName: "府中SIC", googleName: "中央自動車道 府中スマートインターチェンジ", lat: 35.660, lng: 139.496,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.660, entranceLng: 139.496, exitLat: 35.660, exitLng: 139.496
+            { order: 3.5, displayName: "府中SIC", googleName: "中央自動車道 府中スマートインターチェンジ", lat: 35.6597187, lng: 139.4993254,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.6597187, entranceLng: 139.4993254, exitLat: 35.66022529455, exitLng: 139.49907940595,
+                note: "【2026-07-14調査・座標＋exitSelectable修正】東京都府中市公式サイト・Car Watch記事で「府中スマートインターチェンジは中央道の府中バス停を利用して設置され、下り線に八王子方面への入口、上り線に八王子方面からの出口のみが存在し、新宿・高井戸方面への接続はないハーフIC」と確認。MapFanでも【出口（上り）】【入口（下り）】の2ページのみ確認でき、【入口（上り）】【出口（下り）】は複数回の検索でも発見できなかった。本アプリは走行方向を区別できないため、入口方向（下り）を代表方向として採用し、上り出口の存在に関わらず下り方向にはない出口はexitSelectable:falseとした。座標はentranceLat/Lngを入口(下り)(35.6597187,139.4993254)、exitLat/Lngを出口(上り)(35.66022529455,139.49907940595)に設定。従来座標(35.660,139.496)から約302m修正。"
             },
             { order: 4, displayName: "国立府中IC", googleName: "中央自動車道 国立府中インターチェンジ", lat: 35.668, lng: 139.457,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.668, entranceLng: 139.457, exitLat: 35.668, exitLng: 139.457
@@ -4181,8 +4182,9 @@ const IC_MASTER = {
             { order: 7, displayName: "上野原IC", googleName: "中央自動車道 上野原インターチェンジ", lat: 35.631, lng: 139.109,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.631, entranceLng: 139.109, exitLat: 35.631, exitLng: 139.109
             },
-            { order: 7.5, displayName: "談合坂SIC", googleName: "中央自動車道 談合坂スマートインターチェンジ", lat: 35.629, lng: 139.045,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.629, entranceLng: 139.045, exitLat: 35.629, exitLng: 139.045
+            { order: 7.5, displayName: "談合坂SIC", googleName: "中央自動車道 談合坂スマートインターチェンジ", lat: 35.6237903, lng: 139.0428968,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.6237903, entranceLng: 139.0428968, exitLat: 35.6238141, exitLng: 139.0434099,
+                note: "【2026-07-14調査・座標のみ修正】WebSearchで「上り線（東京方面）はSA・PA接続型で談合坂SA（上り）を経由し、下り線（名古屋・長野方面）は本線直結型」という複雑な運用ルール（SA自体を利用できるか否かの違い）を確認したが、これは入口・出口の可否そのものには影響せず、全方向で利用可能なフルICであることを確認。MapFanでも方向表記のない【入口】【出口】の2ページ（実質同一地点、約46m差）を確認。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.6237903,139.0428968)、exitLat/Lngを出口(35.6238141,139.0434099)に設定。従来座標(35.629,139.045)から約610m修正。"
             },
             { order: 8, displayName: "大月IC", googleName: "中央自動車道 大月インターチェンジ", lat: 35.616, lng: 138.949,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.616, entranceLng: 138.949, exitLat: 35.616, exitLng: 138.949
@@ -4193,14 +4195,16 @@ const IC_MASTER = {
             { order: 10, displayName: "一宮御坂IC", googleName: "中央自動車道 一宮御坂インターチェンジ", lat: 35.657, lng: 138.688,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.657, entranceLng: 138.688, exitLat: 35.657, exitLng: 138.688
             },
-            { order: 10.5, displayName: "笛吹八代SIC", googleName: "中央自動車道 笛吹八代スマートインターチェンジ", lat: 35.623, lng: 138.636,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.623, entranceLng: 138.636, exitLat: 35.623, exitLng: 138.636
+            { order: 10.5, displayName: "笛吹八代SIC", googleName: "中央自動車道 笛吹八代スマートインターチェンジ", lat: 35.622877, lng: 138.634789,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.622877, entranceLng: 138.634789, exitLat: 35.622877, exitLng: 138.634789,
+                note: "【2026-07-14調査・座標のみ修正】NAVITIMEで上り出口・上り入口・下り出口・下り入口の4方向の存在を確認し、フルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。MapFanでは【出口（上り）】(35.623745,138.6335718)・【入口（下り）】(35.6220085,138.6360058)の2点のみ確認でき、代表座標方式（入口(上り)・出口(下り)）に必要な個別ランプ座標は確認できなかったため、確認できた2点の中間点(35.622877,138.634789)を暫定使用した。従来座標(35.623,138.636)から約235m修正。次回、入口(上り)・出口(下り)の個別座標が確認できた場合は再検証が必要。"
             },
             { order: 11, displayName: "甲府昭和IC", googleName: "中央自動車道 甲府昭和インターチェンジ", lat: 35.627, lng: 138.553,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.627, entranceLng: 138.553, exitLat: 35.627, exitLng: 138.553
             },
-            { order: 12, displayName: "双葉SIC", googleName: "中央自動車道 双葉スマートインターチェンジ", lat: 35.705, lng: 138.503,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.705, entranceLng: 138.503, exitLat: 35.705, exitLng: 138.503
+            { order: 12, displayName: "双葉SIC", googleName: "中央自動車道 双葉スマートインターチェンジ", lat: 35.6802812, lng: 138.5126466,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.6802812, entranceLng: 138.5126466, exitLat: 35.6813188, exitLng: 138.5106729,
+                note: "【2026-07-14調査・座標のみ修正】開設当初（2005年4月供用開始）は東京方面（上り）のみのハーフICだったが、2009年11月21日に名古屋・長野方面（下り）が開通しフルICとなったことを確認。東京方面（上り線）入口と名古屋・長野方面（下り線）入口は別々の場所にある。entranceSelectable/exitSelectableは現状（フルIC）と一致しているため変更なし（trueのまま）。MapFanで入口(上り)・入口(下り)・出口(下り)の3個別ランプページを確認。座標はentranceLat/Lngを入口(上り)(35.6802812,138.5126466)、exitLat/Lngを出口(下り)(35.6813188,138.5106729)に設定。従来座標(35.705,138.503)は実測値から約2.9km離れていたため、大幅な修正となった。"
             },
             { order: 13, displayName: "韮崎IC", googleName: "中央自動車道 韮崎インターチェンジ", lat: 35.718, lng: 138.445,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.718, entranceLng: 138.445, exitLat: 35.718, exitLng: 138.445
@@ -4221,7 +4225,8 @@ const IC_MASTER = {
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.031, entranceLng: 138.114, exitLat: 36.031, exitLng: 138.114
             },
             { order: 18.5, displayName: "諏訪湖SIC", googleName: "中央自動車道 諏訪湖スマートインターチェンジ", lat: 36.026, lng: 138.079,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.026, entranceLng: 138.079, exitLat: 36.026, exitLng: 138.079
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.026, entranceLng: 138.079, exitLat: 36.026, exitLng: 138.079,
+                note: "【2026-07-14調査】2025年7月27日15時開通の新しいSICで、中央自動車道 諏訪湖サービスエリアに直結、上下線とも全方向・24時間利用可能なフルICであることをNEXCO中日本プレスリリース等で確認。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標は開通から日が浅くMapFan個別ランプページ等で確認できなかったため、既存値を維持（精度未確認、要再確認）。"
             },
             { order: 19, displayName: "岡谷IC", googleName: "長野自動車道 岡谷インターチェンジ", lat: 36.056, lng: 138.050,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.056, entranceLng: 138.050, exitLat: 36.056, exitLng: 138.050
@@ -4232,8 +4237,9 @@ const IC_MASTER = {
             { order: 21, displayName: "松本IC", googleName: "長野自動車道 松本インターチェンジ", lat: 36.219, lng: 137.940,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.219, entranceLng: 137.940, exitLat: 36.219, exitLng: 137.940
             },
-            { order: 21.5, displayName: "梓川SIC", googleName: "長野自動車道 梓川スマートインターチェンジ", lat: 36.266, lng: 137.933,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.266, entranceLng: 137.933, exitLat: 36.266, exitLng: 137.933
+            { order: 21.5, displayName: "梓川SIC", googleName: "長野自動車道 梓川スマートインターチェンジ", lat: 36.2689233, lng: 137.931837,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.2689233, entranceLng: 137.931837, exitLat: 36.261153, exitLng: 137.933979,
+                note: "【2026-07-14調査・座標のみ修正】WebSearchで「上下線ともに全方向対応（2010年11月27日供用開始、梓川SAに併設）」と確認。MapFanで入口（上り・下り）・出口（上り・下り）の4個別ページの存在を確認し、フルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(36.2689233,137.931837)、exitLat/Lngを出口(下り)(36.261153,137.933979)に設定。従来座標(36.266,137.933)から約342m修正。"
             },
             { order: 22, displayName: "安曇野IC", googleName: "長野自動車道 安曇野インターチェンジ", lat: 36.300, lng: 137.898,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.300, entranceLng: 137.898, exitLat: 36.300, exitLng: 137.898

@@ -3305,9 +3305,10 @@ const IC_MASTER = {
                 order: 1.5,
                 displayName: "三郷料金所SIC",
                 googleName: "常磐自動車道 三郷料金所スマートインターチェンジ",
-                lat: 35.865,
-                lng: 139.883,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.865, entranceLng: 139.883, exitLat: 35.865, exitLng: 139.883
+                lat: 35.865347,
+                lng: 139.883112,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.865347, entranceLng: 139.883112, exitLat: 35.865347, exitLng: 139.883112,
+                note: "【2026-07-14調査・座標のみ修正】開設当初は東京方面（上り線）出入口のないハーフSICだったが、NEXCO東日本・埼玉県道路公社プレスリリース、三郷市公式サイトで2025年3月22日15時に東京方面出入口が開通し現在はフルICであることを確認。entranceSelectable/exitSelectableは現状（フルIC）と一致しているため変更なし（trueのまま）。座標は、NAVITIMEで確認した上り出口(35.867528,139.8846)・下り出口(35.863166,139.881624)の中間点(35.865347,139.883112)を暫定使用（入口側の個別ランプ座標は確認できなかったため）。従来座標(35.865,139.883)から約40m修正。"
             },
             {
                 order: 2,
@@ -3377,9 +3378,10 @@ const IC_MASTER = {
                 order: 9.5,
                 displayName: "石岡小美玉SIC",
                 googleName: "常磐自動車道 石岡小美玉スマートインターチェンジ",
-                lat: 36.221,
-                lng: 140.281,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.221, entranceLng: 140.281, exitLat: 36.221, exitLng: 140.281
+                lat: 36.220098676433,
+                lng: 140.28267299652,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.220098676433, entranceLng: 140.28267299652, exitLat: 36.2201567, exitLng: 140.282711,
+                note: "【2026-07-14調査・座標のみ修正】MapFanで「石岡小美玉スマートＩＣ（常磐自動車道）【入口】」「【出口】」の2ページ（方向表記なし、実質同一地点）を確認し、NAVITIMEでも上り出口・上り入口・下り出口・下り入口の4接続点の存在を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(36.220098676433,140.28267299652)、exitLat/Lngを出口(36.2201567,140.282711)に設定。従来座標(36.221,140.281)から約180m修正。"
             },
             {
                 order: 10,
@@ -3394,9 +3396,10 @@ const IC_MASTER = {
                 order: 10.5,
                 displayName: "友部SA SIC",
                 googleName: "常磐自動車道 友部SAスマートインターチェンジ",
-                lat: 36.309,
-                lng: 140.341,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.309, entranceLng: 140.341, exitLat: 36.309, exitLng: 140.341
+                lat: 36.3090533,
+                lng: 140.3430539,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.3090533, entranceLng: 140.3430539, exitLat: 36.3108753, exitLng: 140.3395277,
+                note: "【2026-07-14調査・座標のみ修正】MapFanで「友部ＳＡスマートＩＣ（常磐自動車道）」の入口（上り・下り）・出口（上り・下り）の4個別ページ全てを確認し、上下線とも入口・出口が利用可能なフルICと判断（2005年7月1日供用開始、24時間利用可）。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(36.3090533,140.3430539)、exitLat/Lngを出口(下り)(36.3108753,140.3395277)に設定。従来座標(36.309,140.341)から約184m修正。"
             },
 
             {
@@ -3420,9 +3423,10 @@ const IC_MASTER = {
                 order: 12.5,
                 displayName: "水戸北SIC",
                 googleName: "常磐自動車道 水戸北スマートインターチェンジ",
-                lat: 36.417,
-                lng: 140.425,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.417, entranceLng: 140.425, exitLat: 36.417, exitLng: 140.425
+                lat: 36.4159698,
+                lng: 140.4272421,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.4159698, entranceLng: 140.4272421, exitLat: 36.4186953, exitLng: 140.4244002,
+                note: "【2026-07-14調査・座標のみ修正】MapFanで「水戸北スマートＩＣ（常磐自動車道）」の入口（上り・下り）・出口（上り・下り）の4個別ページ全てを確認し、上下線とも入口・出口が利用可能なフルICと判断（本線直結型、日本初の本線直結型スマートIC、2006年9月試行運用開始、2009年4月本格運用開始）。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(36.4159698,140.4272421)、exitLat/Lngを出口(下り)(36.4186953,140.4244002)に設定。従来座標(36.417,140.425)から約231m修正。"
             },
             {
                 order: 13,
@@ -3436,9 +3440,10 @@ const IC_MASTER = {
                 order: 13.5,
                 displayName: "東海SIC",
                 googleName: "常磐自動車道 東海スマートインターチェンジ",
-                lat: 36.485,
-                lng: 140.551,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.485, entranceLng: 140.551, exitLat: 36.485, exitLng: 140.551
+                lat: 36.4835923,
+                lng: 140.5503132,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.4835923, entranceLng: 140.5503132, exitLat: 36.4856089, exitLng: 140.5531738,
+                note: "【2026-07-14調査・座標のみ修正】MapFanで「東海ＰＡスマートＩＣ（常磐自動車道）」の入口（上り・下り）・出口（上り・下り）の4個別ページ全てを確認し、上下線とも入口・出口が利用可能なフルICと判断（東海PAに接続、24時間利用可、ETC専用）。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(36.4835923,140.5503132)、exitLat/Lngを出口(下り)(36.4856089,140.5531738)に設定。従来座標(36.485,140.551)から約169m修正。"
             },
             {
                 order: 14,

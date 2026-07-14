@@ -4933,45 +4933,45 @@ const IC_MASTER = {
                 order: 3,
                 displayName: "原木IC",
                 googleName: "京葉道路 原木インターチェンジ",
-                lat: 35.704,
-                lng: 139.959,
+                lat: 35.7038372,
+                lng: 139.9502179,
                 routeBranch: "keiyo",
                 branchOrder: 3,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.704, entranceLng: 139.959, exitLat: 35.704, exitLng: 139.959,
-                note: "【未検証】今回、公式サイト・MapFanでの個別確認を実施できなかった。方向限定を示す情報は検索範囲内では見つからなかったが、確認不足のため座標・entranceSelectable/exitSelectableとも変更していない。次回要検証。"
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.7038372, entranceLng: 139.9502179, exitLat: 35.7041526, exitLng: 139.950391,
+                note: "【未検証】今回、公式サイト・MapFanでの個別確認を実施できなかった。方向限定を示す情報は検索範囲内では見つからなかったが、確認不足のため座標・entranceSelectable/exitSelectableとも変更していない。次回要検証。【2026-07-14再調査・座標のみ修正】MapFanで4個別ランプページ（入口上り・入口下り・出口上り・出口下り）全てを確認し、フルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(35.7038372,139.9502179)、exitLat/Lngを出口(下り)(35.7041526,139.950391)に設定。従来座標(35.704,139.959)から約787m修正。"
             },
             {
                 order: 4,
                 displayName: "船橋IC",
                 googleName: "京葉道路 船橋インターチェンジ",
-                lat: 35.693,
-                lng: 139.990,
+                lat: 35.6996362,
+                lng: 139.9708625,
                 routeBranch: "keiyo",
                 branchOrder: 4,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.693, entranceLng: 139.990, exitLat: 35.693, exitLng: 139.990,
-                note: "【未検証】今回、公式サイト・MapFanでの個別確認を実施できなかった。方向限定を示す情報は検索範囲内では見つからなかったが、確認不足のため座標・entranceSelectable/exitSelectableとも変更していない。次回要検証。"
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.6996362, entranceLng: 139.9708625, exitLat: 35.6996411, exitLng: 139.9690933,
+                note: "【未検証】今回、公式サイト・MapFanでの個別確認を実施できなかった。方向限定を示す情報は検索範囲内では見つからなかったが、確認不足のため座標・entranceSelectable/exitSelectableとも変更していない。次回要検証。【2026-07-14再調査・修正】Wikipedia「船橋インターチェンジ」記事で「下り（千葉方面）の出入口と上り（東京方面）入口が設置されているスリークォーターインターチェンジ。上り（東京方面）出口は設置されていない」と確認。別の独立した情報源（f-keiba.com、花輪IC関連記事内の言及「船橋ICの出口が下り線側にしかないハーフICのため」）でも同じ事実を確認し、MapFanでも【出口（上り）】の個別ページは発見できなかった。上り・下りとも入口は存在するためentranceSelectable:trueは維持し、下り方向でのみ出口が存在するためexitSelectableをfalseに修正した。座標はentranceLat/Lngを入口(35.6996362,139.9708625)、exitLat/Lngを出口(下り)(35.6996411,139.9690933)に設定。従来座標(35.693,139.990)から約1,956m修正。"
             },
             {
                 order: 5,
                 displayName: "花輪IC",
                 googleName: "京葉道路 花輪インターチェンジ",
-                lat: 35.689,
-                lng: 140.015,
+                lat: 35.685038678062,
+                lng: 140.0013387493,
                 routeBranch: "keiyo",
                 branchOrder: 5,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.689, entranceLng: 140.015, exitLat: 35.689, exitLng: 140.015,
-                note: "【未検証】今回、公式サイト・MapFanでの個別確認を実施できなかった。方向限定を示す情報は検索範囲内では見つからなかったが、確認不足のため座標・entranceSelectable/exitSelectableとも変更していない。次回要検証。"
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.685038678062, entranceLng: 140.0013387493, exitLat: 35.6868734, exitLng: 139.9999833,
+                note: "【未検証】今回、公式サイト・MapFanでの個別確認を実施できなかった。方向限定を示す情報は検索範囲内では見つからなかったが、確認不足のため座標・entranceSelectable/exitSelectableとも変更していない。次回要検証。【2026-07-14再調査・座標のみ修正】MapFanで4個別ランプページ（入口上り・入口下り・出口上り・出口下り）全てを確認し、フルICと判断（もともと下り線入口がないハーフICだったが1993年10月に下り入口が開通し現在はフルIC）。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(35.685038678062,140.0013387493)、exitLat/Lngを出口(下り)(35.6868734,139.9999833)に設定。従来座標(35.689,140.015)から約1,340m修正。"
             },
             {
                 order: 6,
                 displayName: "武石IC",
                 googleName: "京葉道路 武石インターチェンジ",
-                lat: 35.675,
-                lng: 140.061,
+                lat: 35.6696655,
+                lng: 140.0636598,
                 routeBranch: "keiyo",
                 branchOrder: 6,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.675, entranceLng: 140.061, exitLat: 35.675, exitLng: 140.061,
-                note: "【未検証】今回、公式サイト・MapFanでの個別確認を実施できなかった。方向限定を示す情報は検索範囲内では見つからなかったが、確認不足のため座標・entranceSelectable/exitSelectableとも変更していない。次回要検証。"
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.6696655, entranceLng: 140.0636598, exitLat: 35.6700694, exitLng: 140.0638652,
+                note: "【未検証】今回、公式サイト・MapFanでの個別確認を実施できなかった。方向限定を示す情報は検索範囲内では見つからなかったが、確認不足のため座標・entranceSelectable/exitSelectableとも変更していない。次回要検証。【2026-07-14再調査・座標のみ修正】MapFanで入口(上り)・入口(下り)・出口(下り)の3個別ランプページを確認。出口(上り)のMapFan個別ページは発見できなかったが、NAVITIME個別スポット（上り出口からのルート案内ページ）で実在を確認できたためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(35.6696655,140.0636598)、exitLat/Lngを出口(下り)(35.6700694,140.0638652)に設定。従来座標(35.675,140.061)から約623m修正。"
             },
             {
                 order: 7,
@@ -5012,12 +5012,12 @@ const IC_MASTER = {
                 order: 9,
                 displayName: "松ヶ丘IC",
                 googleName: "京葉道路 松ヶ丘インターチェンジ",
-                lat: 35.583,
-                lng: 140.158,
+                lat: 35.595749987548,
+                lng: 140.14786921486,
                 routeBranch: "keiyo",
                 branchOrder: 9,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.583, entranceLng: 140.158, exitLat: 35.583, exitLng: 140.158,
-                note: "【未検証】今回、公式サイト・MapFanでの個別確認を実施できなかった。方向限定を示す情報は検索範囲内では見つからなかったが、確認不足のため座標・entranceSelectable/exitSelectableとも変更していない。次回要検証。"
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.595749987548, entranceLng: 140.14786921486, exitLat: 35.594497, exitLng: 140.147964,
+                note: "【未検証】今回、公式サイト・MapFanでの個別確認を実施できなかった。方向限定を示す情報は検索範囲内では見つからなかったが、確認不足のため座標・entranceSelectable/exitSelectableとも変更していない。次回要検証。【2026-07-14再調査・座標のみ修正】MapFanで4個別ランプページ（入口上り・入口下り・出口上り・出口下り）全てを確認し、フルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(35.595749987548,140.14786921486)、exitLat/Lngを出口(下り)(35.594497,140.147964)に設定。従来座標(35.583,140.158)から約1,628m修正。"
             },
             {
                 order: 10,

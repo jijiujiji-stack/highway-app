@@ -4605,11 +4605,12 @@ const IC_MASTER = {
                 order: 1,
                 displayName: "浮島IC",
                 googleName: "首都高速湾岸線 浮島インターチェンジ",
-                lat: 35.521,
-                lng: 139.788,
+                lat: 35.520593,
+                lng: 139.787833,
                 routeBranch: "aqualine",
                 branchOrder: 1,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.521, entranceLng: 139.788, exitLat: 35.521, exitLng: 139.788
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.520593, entranceLng: 139.787833, exitLat: 35.520593, exitLng: 139.787833,
+                note: "MapFanで「浮島ＩＣ（東京湾アクアライン）【入口（下り）】」「【出口（上り）】」の個別ページを確認したが、「【入口（上り）】」「【出口（下り）】」に相当するページは見つからず、下り線入口・上り線出口のみと判断（川崎側の起点特有の構造）。本アプリは走行方向を区別できないため、入口方向（下り）を代表方向として採用し、上り出口はexitSelectable:falseとした。座標はMapFan「浮島ＩＣ（東京湾アクアライン）【入口（下り）】」個別ページで確認(35.520593,139.787833)。従来座標(35.521,139.788)からごくわずかな修正。なお既存googleNameは「首都高速湾岸線 浮島インターチェンジ」だが、MapFan上の施設名は「東京湾アクアライン」表記であり、既存googleNameは変更していない（要再確認）。"
             },
             {
                 order: 2,
@@ -4620,31 +4621,34 @@ const IC_MASTER = {
                 isSelectable: false,
                 routeBranch: "aqualine",
                 branchOrder: 1.5,
-                entranceSelectable: false, exitSelectable: false, entranceLat: 35.463, entranceLng: 139.875, exitLat: 35.463, exitLng: 139.875
+                entranceSelectable: false, exitSelectable: false, entranceLat: 35.463, entranceLng: 139.875, exitLat: 35.463, exitLng: 139.875,
+                note: "海ほたるPAは東京湾アクアライン海上区間のパーキングエリアで、地上部との出入口を持たない（本線上のPAのみ）。isSelectable:false/entranceSelectable:false/exitSelectable:falseは妥当であり、変更していない。座標の個別確認は今回省略（PAのため候補選定への影響なし）。"
             },
             {
                 order: 3,
                 displayName: "木更津金田IC",
                 googleName: "東京湾アクアライン 木更津金田インターチェンジ",
-                lat: 35.435,
-                lng: 139.921,
+                lat: 35.4335959,
+                lng: 139.9216386,
                 connection: true,
                 connectedRoads: ["aqualine", "tateyama"],
                 routeBranch: "aqualine",
                 branchOrder: 2,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.435, entranceLng: 139.921, exitLat: 35.435, exitLng: 139.921
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.4335959, entranceLng: 139.9216386, exitLat: 35.4335959, exitLng: 139.9216386,
+                note: "【確認不可・複雑につき変更保留】MapFan調査で、木更津金田ICには「木更津金田ＩＣ（東京湾アクアライン）」（入口(上り)+出口(下り)）と「木更津金田ＩＣ（東京湾アクアライン連絡道）」（出口(上り)+入口(下り)）という2つの別名称の施設が存在し、合わせると上下線とも入口・出口が利用可能であることを確認した。ただし本アプリのgoogleNameは「東京湾アクアライン 木更津金田インターチェンジ」（連絡道を含まない）であり、Google Routes APIが実際にどちらの施設・方向で経路を解決するか確認できなかったため、entranceSelectable/exitSelectableは変更せず現状維持（true/true）とした。座標はMapFan「木更津金田ＩＣ（東京湾アクアライン）【入口（上り）】」個別ページで確認(35.4335959,139.9216386)。従来座標(35.435,139.921)から約200m修正。次回、Google Maps上での実際の経路解決結果を確認したうえで再検証が必要。"
             },
             {
                 order: 4,
                 displayName: "袖ケ浦IC",
                 googleName: "東京湾アクアライン連絡道 袖ケ浦インターチェンジ",
-                lat: 35.418,
-                lng: 139.980,
+                lat: 35.413996,
+                lng: 139.953819,
                 connection: true,
                 connectedRoads: ["aqualine", "tateyama"],
                 routeBranch: "aqualine",
                 branchOrder: 3,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.418, entranceLng: 139.980, exitLat: 35.418, exitLng: 139.980
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.4139093, entranceLng: 139.9538054, exitLat: 35.4140821, exitLng: 139.9538333,
+                note: "MapFanで「袖ヶ浦ＩＣ（東京湾アクアライン連絡道）」の入口（上り・下り）・出口（上り・下り）の4個別ページ全てを確認し、上下線とも入口・出口が利用可能なフルICと判断（NEXCO東日本プレスリリース「上り線 出口ランプ夜間閉鎖」でも運用実態を確認）。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(35.4139093,139.9538054)、exitLat/Lngを出口(下り)(35.4140821,139.9538333)に設定。従来座標(35.418,139.980)から約2.4km修正。"
             }
         ]
     },
@@ -4659,99 +4663,108 @@ const IC_MASTER = {
                 order: -3,
                 displayName: "浮島IC",
                 googleName: "首都高速湾岸線 浮島インターチェンジ",
-                lat: 35.521,
-                lng: 139.788,
+                lat: 35.520593,
+                lng: 139.787833,
                 routeBranch: "aqualine",
                 branchOrder: 1,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.521, entranceLng: 139.788, exitLat: 35.521, exitLng: 139.788
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.520593, entranceLng: 139.787833, exitLat: 35.520593, exitLng: 139.787833,
+                note: "aqualine側の浮島ICと同一施設・同一検証結果（下り入口・上り出口のみ、MapFan確認）。詳細はaqualine側のnote参照。従来座標(35.521,139.788)からごくわずかな修正。"
             },
             {
                 order: -2,
                 displayName: "木更津金田IC",
                 googleName: "東京湾アクアライン 木更津金田インターチェンジ",
-                lat: 35.435,
-                lng: 139.921,
+                lat: 35.4335959,
+                lng: 139.9216386,
                 connection: true,
                 connectedRoads: ["aqualine", "tateyama"],
                 routeBranch: "aqualine",
                 branchOrder: 2,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.435, entranceLng: 139.921, exitLat: 35.435, exitLng: 139.921
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.4335959, entranceLng: 139.9216386, exitLat: 35.4335959, exitLng: 139.9216386,
+                note: "aqualine側の木更津金田ICと同一施設。【確認不可・複雑につき変更保留】2つの別名称施設（アクアライン本体／連絡道）が存在するため、entranceSelectable/exitSelectableは変更していない。詳細はaqualine側のnote参照。従来座標(35.435,139.921)から約200m修正。"
             },
             {
                 order: -1,
                 displayName: "袖ケ浦IC",
                 googleName: "東京湾アクアライン連絡道 袖ケ浦インターチェンジ",
-                lat: 35.418,
-                lng: 139.980,
+                lat: 35.413996,
+                lng: 139.953819,
                 connection: true,
                 connectedRoads: ["aqualine", "tateyama"],
                 routeBranch: "aqualine",
                 branchOrder: 3,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.418, entranceLng: 139.980, exitLat: 35.418, exitLng: 139.980
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.4139093, entranceLng: 139.9538054, exitLat: 35.4140821, exitLng: 139.9538333,
+                note: "aqualine側の袖ケ浦ICと同一施設・同一検証結果（フルIC、MapFan4個別ページ確認）。詳細はaqualine側のnote参照。従来座標(35.418,139.980)から約2.4km修正。"
             },
             {
                 order: 0,
                 displayName: "蘇我IC",
                 googleName: "京葉道路 蘇我インターチェンジ",
-                lat: 35.568,
-                lng: 140.158,
+                lat: 35.568778,
+                lng: 140.137740,
                 connection: true,
                 connectedRoads: ["keiyo", "tateyama", "tokan"],
                 routeBranch: "keiyo",
                 branchOrder: 10,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.568, entranceLng: 140.158, exitLat: 35.568, exitLng: 140.158
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.568778, entranceLng: 140.137740, exitLat: 35.5686381, exitLng: 140.1382367,
+                note: "MapFanで「蘇我ＩＣ（京葉道路）【入口（上り）】」「【出口（下り）】」の個別ページを確認したが、「【入口（下り）】」「【出口（上り）】」に相当するページは無く、上り線入口・下り線出口のみと判断。なお別途「蘇我ＩＣ（館山自動車道）」という異なる道路名の施設（出口(上り)+入口(下り)）も存在するが、本アプリのgoogleNameは「京葉道路 蘇我インターチェンジ」（keiyo側と同一）のため、京葉道路側の検証結果を採用した。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。座標はentranceLat/Lngを入口(上り)(35.568778,140.13774)、exitLat/Lngを出口(下り)(35.5686381,140.1382367)に設定。従来座標(35.568,140.158)から約1.8km修正。keiyo側の蘇我ICと同一検証結果。"
             },
             {
                 order: 1,
                 displayName: "市原IC",
                 googleName: "館山自動車道 市原インターチェンジ",
-                lat: 35.498,
-                lng: 140.104,
+                lat: 35.498328,
+                lng: 140.091534,
                 connection: true,
                 connectedRoads: ["keiyo", "tateyama"],
                 routeBranch: "keiyo",
                 branchOrder: 11,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.498, entranceLng: 140.104, exitLat: 35.498, exitLng: 140.104
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.498328, entranceLng: 140.091534, exitLat: 35.498328, exitLng: 140.091534,
+                note: "NAVITIME・MapFanで「市原ＩＣ（館山自動車道）」の上り入口・上り出口・下り入口・下り出口の4種全ての存在を確認し、上下線とも入口・出口が利用可能なフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はMapFan「市原ＩＣ（館山自動車道）【入口】」個別ページで確認(35.498328,140.091534)。従来座標(35.498,140.104)から約1.1km修正。keiyo側の市原ICと同一検証結果。"
             },
             {
                 order: 2,
                 displayName: "姉崎袖ケ浦IC",
                 googleName: "館山自動車道 姉崎袖ケ浦インターチェンジ",
-                lat: 35.432,
-                lng: 140.043,
+                lat: 35.431120,
+                lng: 140.043380,
                 routeBranch: "keiyo",
                 branchOrder: 12,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.432, entranceLng: 140.043, exitLat: 35.432, exitLng: 140.043
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.431120, entranceLng: 140.043380, exitLat: 35.431120, exitLng: 140.043380,
+                note: "MapFanで「姉崎袖ヶ谷ＩＣ（館山自動車道）【出口】」（上り/下りの区別なし）の個別ページを確認し、フルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。2025年3月25日にETC専用料金所化（袖ケ浦市公式情報）。座標はMapFan個別ページで確認(35.431120,140.043380)。従来座標(35.432,140.043)からごくわずかな修正。keiyo側の姉崎袖ケ浦ICと同一検証結果。"
             },
             {
                 order: 3,
                 displayName: "木更津北IC",
                 googleName: "館山自動車道 木更津北インターチェンジ",
-                lat: 35.394,
-                lng: 139.967,
+                lat: 35.385951,
+                lng: 140.001856,
                 routeBranch: "aqualine",
                 branchOrder: 4,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.394, entranceLng: 139.967, exitLat: 35.394, exitLng: 139.967
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.385951, entranceLng: 140.001856, exitLat: 35.385951, exitLng: 140.001856,
+                note: "NAVITIMEで「木更津北IC」の上り入口・上り出口・下り入口・下り出口の4種全ての存在を確認し、MapFanでも上り/下りの区別のない【入口】【出口】ページを確認、フルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はMapFan「木更津北ＩＣ（館山自動車道）【入口】」個別ページで確認(35.385951,140.001856)。従来座標(35.394,139.967)から約3.2km修正。keiyo側の木更津北ICと同一検証結果。なおrouteBranchが\"aqualine\"のままだが、本ICは館山自動車道上に位置し実際のアクアライン上のICではない（アクアライン系トップパネル表示順の調査結果として別途報告）。"
             },
             {
                 order: 4,
                 displayName: "木更津南IC",
                 googleName: "館山自動車道 木更津南インターチェンジ",
-                lat: 35.365,
-                lng: 139.935,
+                lat: 35.350226,
+                lng: 139.924807,
                 routeBranch: "aqualine",
                 branchOrder: 5,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.365, entranceLng: 139.935, exitLat: 35.365, exitLng: 139.935
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.350226, entranceLng: 139.924807, exitLat: 35.350226, exitLng: 139.924807,
+                note: "MapFanで「木更津南ＩＣ（館山自動車道（木更津南線））【入口（上り）】」「【出口（下り）】」の個別ページを確認したが、逆方向の個別ページは見つからず、上り線入口・下り線出口のみと判断。Wikipedia「木更津南インターチェンジ」記事によれば、国道127号側・国道16号側の2つの出入口が約2km離れて存在し構造がやや複雑である旨の記載があるが、方向限定自体はMapFanで確認済み。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。座標はMapFan「木更津南ＩＣ（館山自動車道（木更津南線））【入口（上り）】」個別ページで確認(35.350226,139.924807)。従来座標(35.365,139.935)から約1.9km修正。keiyo側の木更津南ICと同一検証結果。routeBranchが\"aqualine\"のままである点は木更津北IC同様。"
             },
             {
                 order: 5,
                 displayName: "君津IC",
                 googleName: "館山自動車道 君津インターチェンジ",
-                lat: 35.333,
-                lng: 139.902,
+                lat: 35.318046,
+                lng: 139.941582,
                 routeBranch: "aqualine",
                 branchOrder: 6,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.333, entranceLng: 139.902, exitLat: 35.333, exitLng: 139.902
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.318046, entranceLng: 139.941582, exitLat: 35.3179543, exitLng: 139.9416659,
+                note: "MapFanで「君津ＩＣ（館山自動車道）【入口】」「【出口】」（上り/下りの区別なし）の個別ページを確認し、フルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.318046,139.941582)、exitLat/Lngを出口(35.3179543,139.9416659)に設定。従来座標(35.333,139.902)から約4km修正（誤差が特に大きかった）。keiyo側の君津ICと同一検証結果。routeBranchが\"aqualine\"のままである点は木更津北IC同様。"
             },
             {
                 order: 5.5,
@@ -4761,47 +4774,52 @@ const IC_MASTER = {
                 lng: 139.927,
                 routeBranch: "aqualine",
                 branchOrder: 6.5,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.283, entranceLng: 139.927, exitLat: 35.283, exitLng: 139.927
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.283, entranceLng: 139.927, exitLat: 35.283, exitLng: 139.927,
+                note: "君津市公式サイト・go-etc.jp等で、君津PAスマートICは上り線（東京・千葉方面）が入口専用、下り線（館山方面）が出口専用のハーフSICであることを確認（利用時間6～22時、ETC専用）。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。座標については、MapFanの個別ランプページを検索したが直接確認できるページが見つからなかったため、既存座標(35.283,139.927)を維持（精度未確認、要再確認）。"
             },
             {
                 order: 6,
                 displayName: "富津中央IC",
                 googleName: "館山自動車道 富津中央インターチェンジ",
-                lat: 35.273,
-                lng: 139.855,
+                lat: 35.250847,
+                lng: 139.886036,
                 routeBranch: "aqualine",
                 branchOrder: 7,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.273, entranceLng: 139.855, exitLat: 35.273, exitLng: 139.855
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.250847, entranceLng: 139.886036, exitLat: 35.250764, exitLng: 139.886091,
+                note: "MapFan・NAVITIMEで「富津中央ＩＣ（館山自動車道）」の上り入口・上り出口・下り入口・下り出口の4種全ての存在を確認し、フルICと判断。2023年12月7日にETC専用料金所化。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.250847,139.886036)、exitLat/Lngを出口(35.250764,139.886091)に設定。従来座標(35.273,139.855)から約4km修正（誤差が特に大きかった）。routeBranchが\"aqualine\"のままである点は木更津北IC同様。"
             },
             {
                 order: 7,
                 displayName: "富津竹岡IC",
                 googleName: "富津館山道路 富津竹岡インターチェンジ",
-                lat: 35.204,
-                lng: 139.825,
+                lat: 35.198177,
+                lng: 139.859819,
                 routeBranch: "aqualine",
                 branchOrder: 8,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.204, entranceLng: 139.825, exitLat: 35.204, exitLng: 139.825
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.198177, entranceLng: 139.859819, exitLat: 35.198177, exitLng: 139.859819,
+                note: "【確認不可・複雑につき変更保留】MapFan調査で、富津竹岡ICには「富津竹岡ＩＣ（富津館山道路）」（入口(下り)+出口(上り)）と「富津竹岡ＩＣ（館山自動車道）」（入口(上り)+出口(下り)）という2つの別名称の施設が存在し、合わせると上下線とも入口・出口が利用可能であることを確認した。本アプリのgoogleNameは「富津館山道路 富津竹岡インターチェンジ」だが、木更津金田ICと同様の複雑さがあるため、entranceSelectable/exitSelectableは変更せず現状維持（true/true）とした。座標はMapFan「富津竹岡ＩＣ（富津館山道路）【入口（下り）】」個別ページで確認(35.198177,139.859819)。従来座標(35.204,139.825)から約3.2km修正。次回、Google Maps上での実際の経路解決結果を確認したうえで再検証が必要。routeBranchが\"aqualine\"のままである点は木更津北IC同様。"
             },
             {
                 order: 8,
                 displayName: "鋸南保田IC",
                 googleName: "富津館山道路 鋸南保田インターチェンジ",
-                lat: 35.140,
-                lng: 139.827,
+                lat: 35.142949,
+                lng: 139.845656,
                 routeBranch: "aqualine",
                 branchOrder: 9,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.140, entranceLng: 139.827, exitLat: 35.140, exitLng: 139.827
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.142949, entranceLng: 139.845656, exitLat: 35.142949, exitLng: 139.845656,
+                note: "MapFanで「鋸南保田ＩＣ（富津館山道路）【入口】」「【出口】」（上り/下りの区別なし）の個別ページを確認し、フルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はMapFan「鋸南保田ＩＣ（富津館山道路）【入口】」個別ページで確認(35.142949,139.845656)。従来座標(35.140,139.827)から約1.7km修正。routeBranchが\"aqualine\"のままである点は木更津北IC同様。"
             },
             {
                 order: 9,
                 displayName: "富浦IC",
                 googleName: "富津館山道路 富浦インターチェンジ",
-                lat: 35.034,
-                lng: 139.832,
+                lat: 35.038399,
+                lng: 139.850475,
                 routeBranch: "aqualine",
                 branchOrder: 10,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.034, entranceLng: 139.832, exitLat: 35.034, exitLng: 139.832
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.038399, entranceLng: 139.850475, exitLat: 35.038399, exitLng: 139.850475,
+                note: "富津館山道路（現在の館山自動車道系統）の終点（南房総市）。MapFanで「富浦ＩＣ（富津館山道路）【入口（上り）】」「【出口（下り）】」の個別ページを確認したが、逆方向の個別ページは見つからず、上り線入口・下り線出口のみと判断（終点特有の構造。玉川IC・保土ヶ谷IC・戸塚終点と同様のパターン）。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。座標はMapFan「富浦ＩＣ（富津館山道路）【入口（上り）】」個別ページで確認(35.038399,139.850475)。従来座標(35.034,139.832)から約1.8km修正。routeBranchが\"aqualine\"のままである点は木更津北IC同様。"
             }
         ]
     },
@@ -4841,11 +4859,12 @@ const IC_MASTER = {
                 order: 1,
                 displayName: "篠崎IC",
                 googleName: "京葉道路 篠崎インターチェンジ",
-                lat: 35.707,
-                lng: 139.898,
+                lat: 35.705171,
+                lng: 139.908254,
                 routeBranch: "keiyo",
                 branchOrder: 1,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.707, entranceLng: 139.898, exitLat: 35.707, exitLng: 139.898
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.705171, entranceLng: 139.908254, exitLat: 35.705171, exitLng: 139.908254,
+                note: "Wikipedia「篠崎インターチェンジ」記事で「千葉方面の出入口のみ設置されているハーフインターチェンジ」（下り線＝一般道路→有料道路の入口のみ、上り線＝有料道路→一般道路の出口のみ）と確認。MapFanでも「篠崎出入口（京葉道路）【入口（下り）】」の個別ページを確認。本アプリは走行方向を区別できないため、入口方向（下り）を代表方向として採用し、上り出口はexitSelectable:falseとした。座標はMapFan「篠崎出入口（京葉道路）【入口（下り）】」個別ページで確認(35.705171,139.908254)。従来座標(35.707,139.898)から約930m修正。PROJECT_HANDOFF.md記載の「荒川区役所→幕張メッセ」例でNEXCO入口として使われているのは下り方向のためentranceSelectable:trueの範囲内。"
             },
             {
                 order: 2,
@@ -4855,7 +4874,8 @@ const IC_MASTER = {
                 lng: 139.931,
                 routeBranch: "keiyo",
                 branchOrder: 2,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.715, entranceLng: 139.931, exitLat: 35.715, exitLng: 139.931
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.715, entranceLng: 139.931, exitLat: 35.715, exitLng: 139.931,
+                note: "【確認不可・複雑につき変更保留】Wikipedia「京葉市川インターチェンジ」記事で「原木方面出口と篠崎方面入口」「篠崎方面出口（側道方面）と原木方面入口」という、2箇所に分散した構造が記載されており、組み合わせると上下線とも入口・出口が利用可能と考えられるが、個別ランプ座標・正確な位置関係をMapFanで確認しきれなかった。entranceSelectable/exitSelectableは変更せず現状維持（true/true）とし、座標も既存値を維持（精度未確認、要再確認）。"
             },
             {
                 order: 3,
@@ -4865,7 +4885,8 @@ const IC_MASTER = {
                 lng: 139.959,
                 routeBranch: "keiyo",
                 branchOrder: 3,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.704, entranceLng: 139.959, exitLat: 35.704, exitLng: 139.959
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.704, entranceLng: 139.959, exitLat: 35.704, exitLng: 139.959,
+                note: "【未検証】今回、公式サイト・MapFanでの個別確認を実施できなかった。方向限定を示す情報は検索範囲内では見つからなかったが、確認不足のため座標・entranceSelectable/exitSelectableとも変更していない。次回要検証。"
             },
             {
                 order: 4,
@@ -4875,7 +4896,8 @@ const IC_MASTER = {
                 lng: 139.990,
                 routeBranch: "keiyo",
                 branchOrder: 4,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.693, entranceLng: 139.990, exitLat: 35.693, exitLng: 139.990
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.693, entranceLng: 139.990, exitLat: 35.693, exitLng: 139.990,
+                note: "【未検証】今回、公式サイト・MapFanでの個別確認を実施できなかった。方向限定を示す情報は検索範囲内では見つからなかったが、確認不足のため座標・entranceSelectable/exitSelectableとも変更していない。次回要検証。"
             },
             {
                 order: 5,
@@ -4885,7 +4907,8 @@ const IC_MASTER = {
                 lng: 140.015,
                 routeBranch: "keiyo",
                 branchOrder: 5,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.689, entranceLng: 140.015, exitLat: 35.689, exitLng: 140.015
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.689, entranceLng: 140.015, exitLat: 35.689, exitLng: 140.015,
+                note: "【未検証】今回、公式サイト・MapFanでの個別確認を実施できなかった。方向限定を示す情報は検索範囲内では見つからなかったが、確認不足のため座標・entranceSelectable/exitSelectableとも変更していない。次回要検証。"
             },
             {
                 order: 6,
@@ -4895,27 +4918,30 @@ const IC_MASTER = {
                 lng: 140.061,
                 routeBranch: "keiyo",
                 branchOrder: 6,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.675, entranceLng: 140.061, exitLat: 35.675, exitLng: 140.061
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.675, entranceLng: 140.061, exitLat: 35.675, exitLng: 140.061,
+                note: "【未検証】今回、公式サイト・MapFanでの個別確認を実施できなかった。方向限定を示す情報は検索範囲内では見つからなかったが、確認不足のため座標・entranceSelectable/exitSelectableとも変更していない。次回要検証。"
             },
             {
                 order: 7,
                 displayName: "穴川IC",
                 googleName: "京葉道路 穴川インターチェンジ",
-                lat: 35.644,
-                lng: 140.119,
+                lat: 35.643392,
+                lng: 140.111988,
                 routeBranch: "keiyo",
                 branchOrder: 7,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.644, entranceLng: 140.119, exitLat: 35.644, exitLng: 140.119
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.643392, entranceLng: 140.111988, exitLat: 35.643392, exitLng: 140.111988,
+                note: "【確認不可・複雑につき変更保留】検索の結果、穴川ICは「穴川西IC」「穴川中IC」「穴川東IC」という3つの別々のランプの集合体であり、それぞれ入口・出口の方向が異なる可能性があることが分かった（例：西=上り入口、中=下り入口、東=上り出口）。単一のdisplayName「穴川IC」ではこの3分割構造を正確に表現できないため、entranceSelectable/exitSelectableは変更せず現状維持（true/true）とした。座標のみ一般的な位置情報で更新(35.643392,140.111988、従来からの修正量は小さい)。次回、3ランプそれぞれの方向を個別に確認したうえで再検証が必要。"
             },
             {
                 order: 8,
                 displayName: "貝塚IC",
                 googleName: "京葉道路 貝塚インターチェンジ",
-                lat: 35.625,
-                lng: 140.150,
+                lat: 35.624121,
+                lng: 140.142331,
                 routeBranch: "keiyo",
                 branchOrder: 8,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.625, entranceLng: 140.150, exitLat: 35.625, exitLng: 140.150
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.624121, entranceLng: 140.142331, exitLat: 35.624121, exitLng: 140.142331,
+                note: "ブログ等の調査記事で「貝塚ICはハーフICであり、下り（市原・木更津方面）は流出、上り（幕張・船橋方面）は流入のみ」と確認。MapFanでも「貝塚ＩＣ（京葉道路）【入口（上り）】」の個別ページを確認。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。座標はMapFan「貝塚ＩＣ（京葉道路）【入口（上り）】」個別ページで確認(35.624121,140.142331)。従来座標(35.625,140.150)から約700m修正。"
             },
             {
                 order: 9,
@@ -4925,71 +4951,78 @@ const IC_MASTER = {
                 lng: 140.158,
                 routeBranch: "keiyo",
                 branchOrder: 9,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.583, entranceLng: 140.158, exitLat: 35.583, exitLng: 140.158
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.583, entranceLng: 140.158, exitLat: 35.583, exitLng: 140.158,
+                note: "【未検証】今回、公式サイト・MapFanでの個別確認を実施できなかった。方向限定を示す情報は検索範囲内では見つからなかったが、確認不足のため座標・entranceSelectable/exitSelectableとも変更していない。次回要検証。"
             },
             {
                 order: 10,
                 displayName: "蘇我IC",
                 googleName: "京葉道路 蘇我インターチェンジ",
-                lat: 35.568,
-                lng: 140.158,
+                lat: 35.568778,
+                lng: 140.137740,
                 connection: true,
                 connectedRoads: ["keiyo", "tateyama", "tokan"],
                 routeBranch: "keiyo",
                 branchOrder: 10,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.568, entranceLng: 140.158, exitLat: 35.568, exitLng: 140.158
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.568778, entranceLng: 140.137740, exitLat: 35.5686381, exitLng: 140.1382367,
+                note: "tateyama側の蘇我ICと同一施設・同一検証結果（上り入口・下り出口のみ、MapFan確認）。詳細はtateyama側のnote参照。従来座標(35.568,140.158)から約1.8km修正。"
             },
             {
                 order: 11,
                 displayName: "市原IC",
                 googleName: "館山自動車道 市原インターチェンジ",
-                lat: 35.498,
-                lng: 140.104,
+                lat: 35.498328,
+                lng: 140.091534,
                 connection: true,
                 connectedRoads: ["keiyo", "tateyama"],
                 routeBranch: "keiyo",
                 branchOrder: 11,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.498, entranceLng: 140.104, exitLat: 35.498, exitLng: 140.104
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.498328, entranceLng: 140.091534, exitLat: 35.498328, exitLng: 140.091534,
+                note: "tateyama側の市原ICと同一施設・同一検証結果（フルIC）。詳細はtateyama側のnote参照。従来座標(35.498,140.104)から約1.1km修正。"
             },
             {
                 order: 12,
                 displayName: "姉崎袖ケ浦IC",
                 googleName: "館山自動車道 姉崎袖ケ浦インターチェンジ",
-                lat: 35.432,
-                lng: 140.043,
+                lat: 35.431120,
+                lng: 140.043380,
                 routeBranch: "keiyo",
                 branchOrder: 12,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.432, entranceLng: 140.043, exitLat: 35.432, exitLng: 140.043
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.431120, entranceLng: 140.043380, exitLat: 35.431120, exitLng: 140.043380,
+                note: "tateyama側の姉崎袖ケ浦ICと同一施設・同一検証結果（フルIC、2025年3月ETC専用化）。詳細はtateyama側のnote参照。従来座標(35.432,140.043)からごくわずかな修正。"
             },
             {
                 order: 13,
                 displayName: "木更津北IC",
                 googleName: "館山自動車道 木更津北インターチェンジ",
-                lat: 35.394,
-                lng: 139.967,
+                lat: 35.385951,
+                lng: 140.001856,
                 routeBranch: "keiyo",
                 branchOrder: 13,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.394, entranceLng: 139.967, exitLat: 35.394, exitLng: 139.967
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.385951, entranceLng: 140.001856, exitLat: 35.385951, exitLng: 140.001856,
+                note: "tateyama側の木更津北ICと同一施設・同一検証結果（フルIC）。詳細はtateyama側のnote参照。従来座標(35.394,139.967)から約3.2km修正。"
             },
             {
                 order: 14,
                 displayName: "木更津南IC",
                 googleName: "館山自動車道 木更津南インターチェンジ",
-                lat: 35.365,
-                lng: 139.935,
+                lat: 35.350226,
+                lng: 139.924807,
                 routeBranch: "keiyo",
                 branchOrder: 14,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.365, entranceLng: 139.935, exitLat: 35.365, exitLng: 139.935
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.350226, entranceLng: 139.924807, exitLat: 35.350226, exitLng: 139.924807,
+                note: "tateyama側の木更津南ICと同一施設・同一検証結果（上り入口・下り出口のみ、MapFan確認）。詳細はtateyama側のnote参照。従来座標(35.365,139.935)から約1.9km修正。"
             },
             {
                 order: 15,
                 displayName: "君津IC",
                 googleName: "館山自動車道 君津インターチェンジ",
-                lat: 35.333,
-                lng: 139.902,
+                lat: 35.318046,
+                lng: 139.941582,
                 routeBranch: "keiyo",
                 branchOrder: 15,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.333, entranceLng: 139.902, exitLat: 35.333, exitLng: 139.902
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.318046, entranceLng: 139.941582, exitLat: 35.3179543, exitLng: 139.9416659,
+                note: "tateyama側の君津ICと同一施設・同一検証結果（フルIC）。詳細はtateyama側のnote参照。従来座標(35.333,139.902)から約4km修正（誤差が特に大きかった）。"
             }
         ]
     },

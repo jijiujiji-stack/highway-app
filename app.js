@@ -6085,6 +6085,37 @@ function buildIcDefinitionIdentity(ic) {
     );
 }
 
+// IC_MASTER冒頭のコメント（「接続道路のICは重複登録を許可する。例:
+// 木更津金田ICをアクアライン・館山道双方へ保持する。」）の通り、接続道路の
+// ICはIC_MASTER内で意図的に複数エリアに重複登録されている。
+// dedupeIcDefinitionsByIdentityは、この重複の中から候補選定・道路ラベル判定用の
+// 代表1件を選ぶ役割を持つが、従来は「Object.entries(IC_MASTER)の記述順で
+// 先に処理された方」という、記述順という偶然に依存した優先順位だった
+// （蘇我IC・藤岡IC等で、googleNameの道路名と実際に優先されるエリアが
+// 一致しない誤りが実車確認で見つかった）。
+// ここでは、googleNameに含まれる道路名パターンから「本来所属すべきエリア」を
+// 判定し、記述順より優先する。パターンに一致しないgoogleName（この5道路に
+// 該当しないIC、SHUTO_IC_MASTER側等）には一切影響しない。
+const NEXCO_AREA_KEY_BY_ROAD_NAME_PATTERN = [
+    [/京葉/, "keiyo"],
+    [/館山/, "tateyama"],
+    [/関越/, "kanetsu"],
+    [/上信越/, "joshinetsu"],
+    [/東京湾アクアライン/, "aqualine"]
+];
+
+function getExpectedNexcoAreaKeyForGoogleName(googleName) {
+
+    const value = String(googleName || "");
+
+    const matchedRule =
+        NEXCO_AREA_KEY_BY_ROAD_NAME_PATTERN.find(([pattern]) =>
+            pattern.test(value)
+        );
+
+    return matchedRule ? matchedRule[1] : null;
+}
+
 function dedupeIcDefinitionsByIdentity(icList) {
 
     const definitionsByIdentity = new Map();
@@ -6117,6 +6148,18 @@ function dedupeIcDefinitionsByIdentity(icList) {
             return;
         }
 
+        const expectedAreaKey =
+            getExpectedNexcoAreaKeyForGoogleName(ic.googleName);
+
+        const icMatchesExpectedArea =
+            expectedAreaKey !== null &&
+            ic.sourceAreaKey === expectedAreaKey;
+
+        const existingMatchesExpectedArea =
+            expectedAreaKey !== null &&
+            Boolean(existing) &&
+            existing.sourceAreaKey === expectedAreaKey;
+
         if (
             !existing ||
             (
@@ -6126,6 +6169,10 @@ function dedupeIcDefinitionsByIdentity(icList) {
             (
                 existing.isMirror === true &&
                 ic.isMirror !== true
+            ) ||
+            (
+                icMatchesExpectedArea &&
+                !existingMatchesExpectedArea
             )
         ) {
             definitionsByIdentity.set(identity, ic);

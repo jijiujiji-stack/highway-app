@@ -4706,8 +4706,8 @@ const IC_MASTER = {
                 connectedRoads: ["keiyo", "tateyama", "tokan"],
                 routeBranch: "keiyo",
                 branchOrder: 10,
-                entranceSelectable: true, exitSelectable: false, entranceLat: 35.568778, entranceLng: 140.137740, exitLat: 35.5686381, exitLng: 140.1382367,
-                note: "MapFanで「蘇我ＩＣ（京葉道路）【入口（上り）】」「【出口（下り）】」の個別ページを確認したが、「【入口（下り）】」「【出口（上り）】」に相当するページは無く、上り線入口・下り線出口のみと判断。なお別途「蘇我ＩＣ（館山自動車道）」という異なる道路名の施設（出口(上り)+入口(下り)）も存在するが、本アプリのgoogleNameは「京葉道路 蘇我インターチェンジ」（keiyo側と同一）のため、京葉道路側の検証結果を採用した。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。座標はentranceLat/Lngを入口(上り)(35.568778,140.13774)、exitLat/Lngを出口(下り)(35.5686381,140.1382367)に設定。従来座標(35.568,140.158)から約1.8km修正。keiyo側の蘇我ICと同一検証結果。"
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.568778, entranceLng: 140.137740, exitLat: 35.5686381, exitLng: 140.1382367,
+                note: "MapFanで「蘇我ＩＣ（京葉道路）【入口（上り）】」「【出口（下り）】」の個別ページを確認したが、「【入口（下り）】」「【出口（上り）】」に相当するページは無く、上り線入口・下り線出口のみと判断。なお別途「蘇我ＩＣ（館山自動車道）」という異なる道路名の施設（出口(上り)+入口(下り)）も存在するが、本アプリのgoogleNameは「京葉道路 蘇我インターチェンジ」（keiyo側と同一）のため、京葉道路側の検証結果を採用した。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。座標はentranceLat/Lngを入口(上り)(35.568778,140.13774)、exitLat/Lngを出口(下り)(35.5686381,140.1382367)に設定。従来座標(35.568,140.158)から約1.8km修正。keiyo側の蘇我ICと同一検証結果。【2026-07-14訂正】Wikipedia「蘇我インターチェンジ」記事で「かつては上り方面への出入口のみであったが、2007年5月30日に下り方面出入口が供用開始され、フルインターチェンジとなった」ことを確認。NAVITIMEでも京葉道路側（上り入口・下り出口）・館山自動車道側（下り入口・上り出口）の双方のランプが存在することを確認しており、2007年の下り出口供用開始によりexitSelectable:falseは誤りと判断し、falseからtrueに訂正した。entranceSelectable/座標は変更していない。"
             },
             {
                 order: 1,
@@ -4990,8 +4990,8 @@ const IC_MASTER = {
                 connectedRoads: ["keiyo", "tateyama", "tokan"],
                 routeBranch: "keiyo",
                 branchOrder: 10,
-                entranceSelectable: true, exitSelectable: false, entranceLat: 35.568778, entranceLng: 140.137740, exitLat: 35.5686381, exitLng: 140.1382367,
-                note: "tateyama側の蘇我ICと同一施設・同一検証結果（上り入口・下り出口のみ、MapFan確認）。詳細はtateyama側のnote参照。従来座標(35.568,140.158)から約1.8km修正。"
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.568778, entranceLng: 140.137740, exitLat: 35.5686381, exitLng: 140.1382367,
+                note: "tateyama側の蘇我ICと同一施設・同一検証結果（上り入口・下り出口のみ、MapFan確認）。詳細はtateyama側のnote参照。従来座標(35.568,140.158)から約1.8km修正。【2026-07-14訂正】Wikipedia「蘇我インターチェンジ」記事で「かつては上り方面への出入口のみであったが、2007年5月30日に下り方面出入口が供用開始され、フルインターチェンジとなった」ことを確認。NAVITIMEでも京葉道路側（上り入口・下り出口）・館山自動車道側（下り入口・上り出口）の双方のランプが存在することを確認しており、2007年の下り出口供用開始によりexitSelectable:falseは誤りと判断し、falseからtrueに訂正した。entranceSelectable/座標は変更していない。tateyama側の蘇我ICと同一訂正内容。"
             },
             {
                 order: 11,

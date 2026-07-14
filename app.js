@@ -3685,11 +3685,12 @@ const IC_MASTER = {
                 order: 3,
                 displayName: "厚木PA SIC",
                 googleName: "首都圏中央連絡自動車道 厚木PAスマートインターチェンジ",
-                lat: 35.490,
-                lng: 139.369,
+                lat: 35.4884095,
+                lng: 139.3683913,
                 routeBranch: "west",
                 branchOrder: 3,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.490, entranceLng: 139.369, exitLat: 35.490, exitLng: 139.369
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.4884095, entranceLng: 139.3683913, exitLat: 35.4884162, exitLng: 139.3684817,
+                note: "【2026-07-14調査・座標のみ修正】WebSearchで「出入口方向は全方向で利用可能で、圏央道の内回り・外回りともに出入りが可能。方向制限がなくハーフICではなくフルインターチェンジ」と確認（2020年9月26日供用開始）。MapFanで入口・出口×内回り・外回りの4個別ページ全てを確認。entranceSelectable/exitSelectableは変更なし（trueのまま）。外回り・内回りそれぞれのペア（入口・出口）は約10m以内で同一地点にまとまっているが、外回りクラスターと内回りクラスターは互いに約700m離れている（本線→PA→本線がUターンに近いランプを形成する構造のため）。いずれの方向でも入口・出口とも利用可能なため機能上の差はないが、代表座標として外回り側を採用した。座標はentranceLat/Lngを入口(外回り)(35.4884095,139.3683913)、exitLat/Lngを出口(外回り)(35.4884162,139.3684817)に設定。従来座標(35.490,139.369)から約184m修正。"
             },
             {
                 order: 4,
@@ -4060,11 +4061,12 @@ const IC_MASTER = {
                 order: 39,
                 displayName: "大網白里SIC",
                 googleName: "首都圏中央連絡自動車道 大網白里スマートインターチェンジ",
-                lat: 35.514,
-                lng: 140.295,
+                lat: 35.5140514,
+                lng: 140.2945796,
                 routeBranch: "southeast",
                 branchOrder: 39,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.514, entranceLng: 140.295, exitLat: 35.514, exitLng: 140.295
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.5140514, entranceLng: 140.2945796, exitLat: 35.5140638, exitLng: 140.2945378,
+                note: "【2026-07-14調査・座標のみ修正】Wikipedia「大網白里スマートインターチェンジ」記事で「本線直結型（トランペット型）で構成され、ETC搭載の全車種が24時間利用可能、両方向とも出入り可能」と確認（2019年3月24日開通）。トランペット型構造のため方向別のランプ分離はなく、ハーフICではない。MapFanで入口・出口の2個別ページ（方向表記なし、実質同一地点、約4m差）を確認。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.5140514,140.2945796)、exitLat/Lngを出口(35.5140638,140.2945378)に設定。従来座標(35.514,140.295)から約40m修正。"
             },
             {
                 order: 40,
@@ -4080,11 +4082,12 @@ const IC_MASTER = {
                 order: 41,
                 displayName: "茂原長柄SIC",
                 googleName: "首都圏中央連絡自動車道 茂原長柄スマートインターチェンジ",
-                lat: 35.448,
-                lng: 140.248,
+                lat: 35.4504808,
+                lng: 140.25106,
                 routeBranch: "southeast",
                 branchOrder: 41,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.448, entranceLng: 140.248, exitLat: 35.448, exitLng: 140.248
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.4504808, entranceLng: 140.25106, exitLat: 35.450495794474, exitLng: 140.2510016242,
+                note: "【2026-07-14調査・座標のみ修正】WebSearchで「本線直結型、ETC搭載の全車種が24時間利用可能、上下線とも出入可。一旦停止型のフルIC形式（全方向利用可能）であり、ハーフICではなくフルIC形式として設計されている」と確認（2020年2月16日開通）。MapFanで入口・出口の2個別ページ（方向表記なし、実質同一地点、約2m差）を確認。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.4504808,140.25106)、exitLat/Lngを出口(35.450495794474,140.2510016242)に設定。従来座標(35.448,140.248)から約390m修正。"
             },
             {
                 order: 42,

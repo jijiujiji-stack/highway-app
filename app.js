@@ -4756,6 +4756,19 @@ const IC_MASTER = {
                 note: "MapFanで「木更津南ＩＣ（館山自動車道（木更津南線））【入口（上り）】」「【出口（下り）】」の個別ページを確認したが、逆方向の個別ページは見つからず、上り線入口・下り線出口のみと判断。Wikipedia「木更津南インターチェンジ」記事によれば、国道127号側・国道16号側の2つの出入口が約2km離れて存在し構造がやや複雑である旨の記載があるが、方向限定自体はMapFanで確認済み。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。座標はMapFan「木更津南ＩＣ（館山自動車道（木更津南線））【入口（上り）】」個別ページで確認(35.350226,139.924807)。従来座標(35.365,139.935)から約1.9km修正。keiyo側の木更津南ICと同一検証結果。routeBranchが\"aqualine\"のままである点は木更津北IC同様。"
             },
             {
+                order: 4,
+                displayName: "木更津南IC",
+                googleName: "館山自動車道 木更津南インターチェンジ",
+                lat: 35.350226,
+                lng: 139.924807,
+                isMirror: true,
+                mirrorOf: 5,
+                routeBranch: "aqualine",
+                branchOrder: 5.5,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.350226, entranceLng: 139.924807, exitLat: 35.350226, exitLng: 139.924807,
+                note: "【Phase 2・方向判定ミラー】本体（上り方向・入口専用）に対する下り方向のミラーレコード。MapFan「【出口（下り）】」ページの確認結果（本体note参照）に基づき、下り方向では出口のみが利用可能なため追加。方向別の正確な座標は未確認のため、本体座標を暫定使用。resolveEffectiveNexcoExitにより、走行方向判定（inferTravelDirectionForIcArea）が下り方向と判定した場合にのみ、候補選定時にこのレコードへ差し替えられる。符号判定は実車確認前提の暫定値のため、実車確認で逆と分かった場合はNEXCO_MIRROR_SWAP_DIRECTION_BY_GOOGLE_NAMEの符号のみを反転すればよい。keiyo側にも同一施設の重複登録があり、そちらにも同様のミラーレコードを追加している。"
+            },
+            {
                 order: 5,
                 displayName: "君津IC",
                 googleName: "館山自動車道 君津インターチェンジ",
@@ -4776,6 +4789,19 @@ const IC_MASTER = {
                 branchOrder: 6.5,
                 entranceSelectable: true, exitSelectable: false, entranceLat: 35.283, entranceLng: 139.927, exitLat: 35.283, exitLng: 139.927,
                 note: "君津市公式サイト・go-etc.jp等で、君津PAスマートICは上り線（東京・千葉方面）が入口専用、下り線（館山方面）が出口専用のハーフSICであることを確認（利用時間6～22時、ETC専用）。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。座標については、MapFanの個別ランプページを検索したが直接確認できるページが見つからなかったため、既存座標(35.283,139.927)を維持（精度未確認、要再確認）。"
+            },
+            {
+                order: 5.5,
+                displayName: "君津PA SIC",
+                googleName: "館山自動車道 君津PAスマートインターチェンジ",
+                lat: 35.283,
+                lng: 139.927,
+                isMirror: true,
+                mirrorOf: 6.5,
+                routeBranch: "aqualine",
+                branchOrder: 6.75,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.283, entranceLng: 139.927, exitLat: 35.283, exitLng: 139.927,
+                note: "【Phase 2・方向判定ミラー】本体（上り方向・入口専用）に対する下り方向のミラーレコード。君津市公式サイト・go-etc.jp等の確認結果（本体note参照）に基づき、下り方向では出口のみが利用可能なため追加。branchOrderは通常の「本体+0.5」ではなく6.75とした（本体6.5に+0.5すると7.0となり、直後の富津中央ICのbranchOrder:7と衝突するため）。座標は本体同様、精度未確認のまま暫定使用（本体note参照、要再確認）。resolveEffectiveNexcoExitにより、走行方向判定（inferTravelDirectionForIcArea）が下り方向と判定した場合にのみ、候補選定時にこのレコードへ差し替えられる。符号判定は実車確認前提の暫定値のため、実車確認で逆と分かった場合はNEXCO_MIRROR_SWAP_DIRECTION_BY_GOOGLE_NAMEの符号のみを反転すればよい。"
             },
             {
                 order: 6,
@@ -4820,6 +4846,19 @@ const IC_MASTER = {
                 branchOrder: 10,
                 entranceSelectable: true, exitSelectable: false, entranceLat: 35.038399, entranceLng: 139.850475, exitLat: 35.038399, exitLng: 139.850475,
                 note: "富津館山道路（現在の館山自動車道系統）の終点（南房総市）。MapFanで「富浦ＩＣ（富津館山道路）【入口（上り）】」「【出口（下り）】」の個別ページを確認したが、逆方向の個別ページは見つからず、上り線入口・下り線出口のみと判断（終点特有の構造。玉川IC・保土ヶ谷IC・戸塚終点と同様のパターン）。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。座標はMapFan「富浦ＩＣ（富津館山道路）【入口（上り）】」個別ページで確認(35.038399,139.850475)。従来座標(35.034,139.832)から約1.8km修正。routeBranchが\"aqualine\"のままである点は木更津北IC同様。"
+            },
+            {
+                order: 9,
+                displayName: "富浦IC",
+                googleName: "富津館山道路 富浦インターチェンジ",
+                lat: 35.038399,
+                lng: 139.850475,
+                isMirror: true,
+                mirrorOf: 10,
+                routeBranch: "aqualine",
+                branchOrder: 10.5,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.038399, entranceLng: 139.850475, exitLat: 35.038399, exitLng: 139.850475,
+                note: "【Phase 2・方向判定ミラー】本体（上り方向・入口専用）に対する下り方向のミラーレコード。MapFan「【出口（下り）】」ページの確認結果（本体note参照）に基づき、下り方向では出口のみが利用可能なため追加。方向別の正確な座標は未確認のため、本体座標を暫定使用。resolveEffectiveNexcoExitにより、走行方向判定（inferTravelDirectionForIcArea）が下り方向と判定した場合にのみ、候補選定時にこのレコードへ差し替えられる。符号判定は実車確認前提の暫定値のため、実車確認で逆と分かった場合はNEXCO_MIRROR_SWAP_DIRECTION_BY_GOOGLE_NAMEの符号のみを反転すればよい。"
             }
         ]
     },
@@ -5038,6 +5077,19 @@ const IC_MASTER = {
                 branchOrder: 14,
                 entranceSelectable: true, exitSelectable: false, entranceLat: 35.350226, entranceLng: 139.924807, exitLat: 35.350226, exitLng: 139.924807,
                 note: "tateyama側の木更津南ICと同一施設・同一検証結果（上り入口・下り出口のみ、MapFan確認）。詳細はtateyama側のnote参照。従来座標(35.365,139.935)から約1.9km修正。"
+            },
+            {
+                order: 14,
+                displayName: "木更津南IC",
+                googleName: "館山自動車道 木更津南インターチェンジ",
+                lat: 35.350226,
+                lng: 139.924807,
+                isMirror: true,
+                mirrorOf: 14,
+                routeBranch: "keiyo",
+                branchOrder: 14.5,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.350226, entranceLng: 139.924807, exitLat: 35.350226, exitLng: 139.924807,
+                note: "【Phase 2・方向判定ミラー】tateyama側の木更津南IC（branchOrder:5.5）ミラーレコードと同一施設・同一検証結果。詳細はtateyama側のミラーレコードのnote参照。"
             },
             {
                 order: 15,
@@ -11075,23 +11127,30 @@ function resolveEffectiveShutoExit(
     return exit;
 }
 
-// 【Phase 1】NEXCO系（IC_MASTER）ICのうち、方向によって入口/出口の可否が
-// 異なるICについて、resolveEffectiveShutoExitと同じ考え方（走行方向判定→
+// 【Phase 1／Phase 2】NEXCO系（IC_MASTER）ICのうち、方向によって入口/出口の
+// 可否が異なるICについて、resolveEffectiveShutoExitと同じ考え方（走行方向判定→
 // 候補差し替え）を最小限適用する、首都高側とは完全に独立した新規関数。
 // 首都高側のresolveEffectiveShutoExit・SHUTO_MIRROR_AREA_KEY_BY_ROUTE_NAME・
 // getShutoMirrorGoogleNameSetは一切変更していない。
 //
-// 現時点では貝塚IC・篠崎IC（ともにkeiyoエリア）の2件のみをgoogleName直指定で
-// 対応する。全路線対応の汎用マップはまだ作らない（Phase 1のスコープ）。
+// Phase 1では貝塚IC・篠崎IC（ともにkeiyoエリア）の2件、Phase 2では
+// 木更津南IC（tateyama・keiyoの重複登録の両方）・富浦IC・君津PA SIC
+// （いずれもtateyamaエリア）の3件を追加し、計5件をgoogleName直指定で
+// 対応する。全路線対応の汎用マップはまだ作らない（現時点のスコープ）。
 //
 // NEXCO_MIRROR_SWAP_DIRECTION_BY_GOOGLE_NAMEの値は「この符号のtravelDirectionの
 // ときミラー側に差し替える」という意味。本体側が担う方向（貝塚IC＝上り入口、
-// 篠崎IC＝下り入口）が互いに逆であるため、2件の符号もそれぞれ異なる
-// （+1/-1）。SHUTO側と同様、実車確認前提の暫定値のため、実車確認で逆と
-// 分かった場合はICごとにこの符号のみを反転すればよい。
+// 篠崎IC＝下り入口）が互いに逆であるため、Phase 1の2件の符号は異なる
+// （+1/-1）。Phase 2で追加した3件はいずれも「上り入口を代表方向とするIC」
+// という構造上の共通点から、貝塚ICと同じ符号（+1）を暫定設定している。
+// SHUTO側と同様、実車確認前提の暫定値のため、実車確認で逆と分かった場合は
+// ICごとにこの符号のみを反転すればよい。
 const NEXCO_MIRROR_SWAP_DIRECTION_BY_GOOGLE_NAME = {
     "京葉道路 貝塚インターチェンジ": 1,
-    "京葉道路 篠崎インターチェンジ": -1
+    "京葉道路 篠崎インターチェンジ": -1,
+    "館山自動車道 木更津南インターチェンジ": 1,
+    "富津館山道路 富浦インターチェンジ": 1,
+    "館山自動車道 君津PAスマートインターチェンジ": 1
 };
 
 const nexcoMirrorSubstitutionLoggedKeysByAnalysis = new WeakMap();
@@ -11133,17 +11192,26 @@ function resolveEffectiveNexcoExit(
             ? NEXCO_MIRROR_SWAP_DIRECTION_BY_GOOGLE_NAME[exit.googleName]
             : undefined;
 
+    // 木更津南IC・富浦IC・君津PA SICはIC_MASTER上のrouteBranchが
+    // "aqualine"のままだが、実際の格納先エリアはtateyama/keiyoである
+    // （既知のデータ不整合。routeBranch自体は修正せず、ここでは
+    // エリア検索専用にsourceAreaKeyを優先して使う）。
+    // mirrorExit検索内のcandidate.routeBranch === exit.routeBranchは
+    // 本体とミラーが同じrouteBranch値を持つ前提のままでよいため変更しない。
+    const containingAreaKey =
+        exit?.sourceAreaKey || exit?.routeBranch;
+
     if (
         !exit ||
         swapDirection === undefined ||
-        !exit.routeBranch ||
-        !IC_MASTER[exit.routeBranch]
+        !containingAreaKey ||
+        !IC_MASTER[containingAreaKey]
     ) {
         return exit;
     }
 
     const mirrorExit =
-        IC_MASTER[exit.routeBranch].exits.find(candidate =>
+        IC_MASTER[containingAreaKey].exits.find(candidate =>
             candidate.isMirror === true &&
             candidate.mirrorOf === exit.branchOrder &&
             candidate.routeBranch === exit.routeBranch
@@ -11155,7 +11223,7 @@ function resolveEffectiveNexcoExit(
 
     const travelDirection =
         inferTravelDirectionForIcArea(
-            exit.routeBranch,
+            containingAreaKey,
             exit,
             polylineAnalysis?.passedIcEntries,
             getIcIdentity

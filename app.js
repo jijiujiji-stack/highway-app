@@ -4922,12 +4922,12 @@ const IC_MASTER = {
                 order: 2,
                 displayName: "京葉市川IC",
                 googleName: "京葉道路 京葉市川インターチェンジ",
-                lat: 35.715,
-                lng: 139.931,
+                lat: 35.7095,
+                lng: 139.9260,
                 routeBranch: "keiyo",
                 branchOrder: 2,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.715, entranceLng: 139.931, exitLat: 35.715, exitLng: 139.931,
-                note: "【確認不可・複雑につき変更保留】Wikipedia「京葉市川インターチェンジ」記事で「原木方面出口と篠崎方面入口」「篠崎方面出口（側道方面）と原木方面入口」という、2箇所に分散した構造が記載されており、組み合わせると上下線とも入口・出口が利用可能と考えられるが、個別ランプ座標・正確な位置関係をMapFanで確認しきれなかった。entranceSelectable/exitSelectableは変更せず現状維持（true/true）とし、座標も既存値を維持（精度未確認、要再確認）。"
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.7095, entranceLng: 139.9260, exitLat: 35.7095, exitLng: 139.9260,
+                note: "【確認不可・複雑につき変更保留】Wikipedia「京葉市川インターチェンジ」記事で「原木方面出口と篠崎方面入口」「篠崎方面出口（側道方面）と原木方面入口」という、2箇所に分散した構造が記載されており、組み合わせると上下線とも入口・出口が利用可能と考えられるが、個別ランプ座標・正確な位置関係をMapFanで確認しきれなかった。entranceSelectable/exitSelectableは変更せず現状維持（true/true）とし、座標も既存値を維持（精度未確認、要再確認）。【2026-07-14再調査・座標のみ修正】再調査でMapFan個別ランプ4件「出口（上り）」(35.7085369,139.9266556)・「入口（上り）」(35.7086469,139.9258594)・「入口（下り）」(35.7103786,139.9269518)・「出口（下り）」(35.7102639,139.924385)を新たに発見。旧座標(35.715,139.931)がこの4点の中心から約760m離れていたため、4点の中心付近(35.7095,139.9260)に修正した（Google Places実データ(35.7094155,139.9266051)ともほぼ一致）。Wikipediaによれば実際には田尻・鬼高・稲荷木×2の4住所、最大6ランプに及ぶ構造であり、1点での代表には限界がある。entranceSelectable/exitSelectableの構造的な正確性（方向別の分割等）は今回は変更しておらず、将来の別課題（複数地点IC設計）として持ち越す。"
             },
             {
                 order: 3,

@@ -4867,6 +4867,19 @@ const IC_MASTER = {
                 note: "Wikipedia「篠崎インターチェンジ」記事で「千葉方面の出入口のみ設置されているハーフインターチェンジ」（下り線＝一般道路→有料道路の入口のみ、上り線＝有料道路→一般道路の出口のみ）と確認。MapFanでも「篠崎出入口（京葉道路）【入口（下り）】」の個別ページを確認。本アプリは走行方向を区別できないため、入口方向（下り）を代表方向として採用し、上り出口はexitSelectable:falseとした。座標はMapFan「篠崎出入口（京葉道路）【入口（下り）】」個別ページで確認(35.705171,139.908254)。従来座標(35.707,139.898)から約930m修正。PROJECT_HANDOFF.md記載の「荒川区役所→幕張メッセ」例でNEXCO入口として使われているのは下り方向のためentranceSelectable:trueの範囲内。"
             },
             {
+                order: 1,
+                displayName: "篠崎IC",
+                googleName: "京葉道路 篠崎インターチェンジ",
+                lat: 35.705171,
+                lng: 139.908254,
+                isMirror: true,
+                mirrorOf: 1,
+                routeBranch: "keiyo",
+                branchOrder: 1.5,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.705171, entranceLng: 139.908254, exitLat: 35.705171, exitLng: 139.908254,
+                note: "【Phase 1・方向判定ミラー】本体（下り方向・入口専用）に対する上り方向のミラーレコード。Wikipedia「篠崎インターチェンジ」記事の「上り線＝有料道路→一般道路の出口のみ」に基づき、上り方向では出口のみが利用可能なため追加。方向別の正確な座標は未確認のため、本体座標を暫定使用（本体のnote参照）。resolveEffectiveNexcoExitにより、走行方向判定（inferTravelDirectionForIcArea）が上り方向と判定した場合にのみ、候補選定時にこのレコードへ差し替えられる。symbol判定は実車確認前提の暫定値のため、実車確認で逆と分かった場合はNEXCO_MIRROR_SWAP_DIRECTION_BY_GOOGLE_NAMEの符号のみを反転すればよい。"
+            },
+            {
                 order: 2,
                 displayName: "京葉市川IC",
                 googleName: "京葉道路 京葉市川インターチェンジ",
@@ -4942,6 +4955,19 @@ const IC_MASTER = {
                 branchOrder: 8,
                 entranceSelectable: true, exitSelectable: false, entranceLat: 35.624121, entranceLng: 140.142331, exitLat: 35.624121, exitLng: 140.142331,
                 note: "ブログ等の調査記事で「貝塚ICはハーフICであり、下り（市原・木更津方面）は流出、上り（幕張・船橋方面）は流入のみ」と確認。MapFanでも「貝塚ＩＣ（京葉道路）【入口（上り）】」の個別ページを確認。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。座標はMapFan「貝塚ＩＣ（京葉道路）【入口（上り）】」個別ページで確認(35.624121,140.142331)。従来座標(35.625,140.150)から約700m修正。"
+            },
+            {
+                order: 8,
+                displayName: "貝塚IC",
+                googleName: "京葉道路 貝塚インターチェンジ",
+                lat: 35.624121,
+                lng: 140.142331,
+                isMirror: true,
+                mirrorOf: 8,
+                routeBranch: "keiyo",
+                branchOrder: 8.5,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.624121, entranceLng: 140.142331, exitLat: 35.624121, exitLng: 140.142331,
+                note: "【Phase 1・方向判定ミラー】本体（上り方向・入口専用）に対する下り方向のミラーレコード。ブログ等の調査記事の「下り（市原・木更津方面）は流出」に基づき、下り方向では出口のみが利用可能なため追加。方向別の正確な座標は未確認のため、本体座標を暫定使用（本体のnote参照）。resolveEffectiveNexcoExitにより、走行方向判定（inferTravelDirectionForIcArea）が下り方向と判定した場合にのみ、候補選定時にこのレコードへ差し替えられる。符号判定は実車確認前提の暫定値のため、実車確認で逆と分かった場合はNEXCO_MIRROR_SWAP_DIRECTION_BY_GOOGLE_NAMEの符号のみを反転すればよい。"
             },
             {
                 order: 9,
@@ -6078,11 +6104,28 @@ function dedupeIcDefinitionsByIdentity(icList) {
 
         const existing = definitionsByIdentity.get(identity);
 
+        // NEXCO方向判定ミラー（isMirror:true）は、候補選定の入口
+        // （resolveEffectiveNexcoExit等）でのみ明示的に参照される想定の
+        // 内部データであり、この一般的な重複排除では本体（非ミラー）を
+        // 優先する。本体が未登録の場合のみミラーが暫定的に採用されるが、
+        // 通常は同一identityの本体が必ず存在するため実質的に発生しない。
+        if (
+            ic.isMirror === true &&
+            existing &&
+            existing.isMirror !== true
+        ) {
+            return;
+        }
+
         if (
             !existing ||
             (
                 ic.source === "SHUTO_IC_MASTER" &&
                 existing.source !== "SHUTO_IC_MASTER"
+            ) ||
+            (
+                existing.isMirror === true &&
+                ic.isMirror !== true
             )
         ) {
             definitionsByIdentity.set(identity, ic);
@@ -10685,7 +10728,8 @@ function inferTravelDirectionForIcArea(
 
         if (IC_MASTER[icArea]) {
             return IC_MASTER[icArea].exits.find(exit =>
-                getIcIdentity(exit) === targetIdentity
+                getIcIdentity(exit) === targetIdentity &&
+                exit.isMirror !== true
             ) || null;
         }
 
@@ -10984,6 +11028,117 @@ function resolveEffectiveShutoExit(
     return exit;
 }
 
+// 【Phase 1】NEXCO系（IC_MASTER）ICのうち、方向によって入口/出口の可否が
+// 異なるICについて、resolveEffectiveShutoExitと同じ考え方（走行方向判定→
+// 候補差し替え）を最小限適用する、首都高側とは完全に独立した新規関数。
+// 首都高側のresolveEffectiveShutoExit・SHUTO_MIRROR_AREA_KEY_BY_ROUTE_NAME・
+// getShutoMirrorGoogleNameSetは一切変更していない。
+//
+// 現時点では貝塚IC・篠崎IC（ともにkeiyoエリア）の2件のみをgoogleName直指定で
+// 対応する。全路線対応の汎用マップはまだ作らない（Phase 1のスコープ）。
+//
+// NEXCO_MIRROR_SWAP_DIRECTION_BY_GOOGLE_NAMEの値は「この符号のtravelDirectionの
+// ときミラー側に差し替える」という意味。本体側が担う方向（貝塚IC＝上り入口、
+// 篠崎IC＝下り入口）が互いに逆であるため、2件の符号もそれぞれ異なる
+// （+1/-1）。SHUTO側と同様、実車確認前提の暫定値のため、実車確認で逆と
+// 分かった場合はICごとにこの符号のみを反転すればよい。
+const NEXCO_MIRROR_SWAP_DIRECTION_BY_GOOGLE_NAME = {
+    "京葉道路 貝塚インターチェンジ": 1,
+    "京葉道路 篠崎インターチェンジ": -1
+};
+
+const nexcoMirrorSubstitutionLoggedKeysByAnalysis = new WeakMap();
+
+function hasLoggedNexcoMirrorSubstitution(polylineAnalysis, key) {
+
+    if (!polylineAnalysis) {
+        return false;
+    }
+
+    let loggedKeys =
+        nexcoMirrorSubstitutionLoggedKeysByAnalysis.get(polylineAnalysis);
+
+    if (!loggedKeys) {
+        loggedKeys = new Set();
+        nexcoMirrorSubstitutionLoggedKeysByAnalysis.set(
+            polylineAnalysis,
+            loggedKeys
+        );
+    }
+
+    if (loggedKeys.has(key)) {
+        return true;
+    }
+
+    loggedKeys.add(key);
+
+    return false;
+}
+
+function resolveEffectiveNexcoExit(
+    exit,
+    polylineAnalysis,
+    getIcIdentity
+) {
+
+    const swapDirection =
+        exit
+            ? NEXCO_MIRROR_SWAP_DIRECTION_BY_GOOGLE_NAME[exit.googleName]
+            : undefined;
+
+    if (
+        !exit ||
+        swapDirection === undefined ||
+        !exit.routeBranch ||
+        !IC_MASTER[exit.routeBranch]
+    ) {
+        return exit;
+    }
+
+    const mirrorExit =
+        IC_MASTER[exit.routeBranch].exits.find(candidate =>
+            candidate.isMirror === true &&
+            candidate.mirrorOf === exit.branchOrder &&
+            candidate.routeBranch === exit.routeBranch
+        );
+
+    if (!mirrorExit) {
+        return exit;
+    }
+
+    const travelDirection =
+        inferTravelDirectionForIcArea(
+            exit.routeBranch,
+            exit,
+            polylineAnalysis?.passedIcEntries,
+            getIcIdentity
+        );
+
+    // 判定不能（null）の場合は安全側として本体のexitをそのまま使う。
+    if (travelDirection === swapDirection) {
+        const identity = getIcIdentity(exit);
+
+        if (
+            identity &&
+            !hasLoggedNexcoMirrorSubstitution(
+                polylineAnalysis,
+                identity + "|" + exit.routeBranch
+            )
+        ) {
+            console.log(
+                "[NEXCO方向判定→候補差し替え] " +
+                exit.displayName +
+                "（" + exit.routeBranch + "）は" +
+                "方向判定によりミラー側に差し替えました。"
+            );
+        }
+
+        return mirrorExit;
+    }
+
+    return exit;
+}
+
 function filterEntranceCandidatesByRouteSection({
     polylineAnalysis,
     candidates,
@@ -11007,7 +11162,8 @@ function filterEntranceCandidatesByRouteSection({
         }
 
         return IC_MASTER[icArea].exits.find(exit =>
-            getIcIdentity(exit) === targetIdentity
+            getIcIdentity(exit) === targetIdentity &&
+            exit.isMirror !== true
         ) || null;
     };
 
@@ -11070,6 +11226,7 @@ function filterEntranceCandidatesByRouteSection({
             IC_MASTER[icArea].exits
                 .filter(exit =>
                     exit.isSelectable !== false &&
+                    exit.isMirror !== true &&
                     !isShutoIcForRouteAnalysis(exit) &&
                     getComparablePosition(
                         exit,
@@ -11572,7 +11729,8 @@ function buildPolylineBasedComparisonIcCandidates(
                         (a.order ?? 999) - (b.order ?? 999)
                     )
                     .filter(exit =>
-                        exit.isSelectable !== false
+                        exit.isSelectable !== false &&
+                        exit.isMirror !== true
                     );
 
             const referenceIndex =
@@ -11736,8 +11894,12 @@ function buildForwardExitComparisonIcCandidates(
 
     routeTrace.forEach(routePoint => {
         const exit =
-            resolveEffectiveShutoExit(
-                routePoint.exit,
+            resolveEffectiveNexcoExit(
+                resolveEffectiveShutoExit(
+                    routePoint.exit,
+                    polylineAnalysis,
+                    getIcIdentity
+                ),
                 polylineAnalysis,
                 getIcIdentity
             );
@@ -13656,7 +13818,8 @@ function findIcDefinitionForMultiExitComparison(googleName) {
 
         const found =
             IC_MASTER[areaKey].exits.find(exit =>
-                exit.googleName === googleName
+                exit.googleName === googleName &&
+                exit.isMirror !== true
             );
 
         if (found) {
@@ -22268,6 +22431,13 @@ async function findNearestIcInfoByPoint(
     for (const exit of exits) {
 
         if (exit.isSelectable === false) {
+            continue;
+        }
+
+        // 方向判定ミラー（isMirror:true）は本体とほぼ同一座標のため
+        // 最近傍判定が不安定になる。この関数は役割別（entrance/exit）の
+        // 判定を行わない汎用検索のため、ミラーは除外し常に本体を対象とする。
+        if (exit.isMirror === true) {
             continue;
         }
 

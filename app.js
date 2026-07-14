@@ -4783,25 +4783,25 @@ const IC_MASTER = {
                 order: 5.5,
                 displayName: "君津PA SIC",
                 googleName: "館山自動車道 君津PAスマートインターチェンジ",
-                lat: 35.283,
-                lng: 139.927,
+                lat: 35.283047,
+                lng: 139.92587,
                 routeBranch: "aqualine",
                 branchOrder: 6.5,
-                entranceSelectable: true, exitSelectable: false, entranceLat: 35.283, entranceLng: 139.927, exitLat: 35.283, exitLng: 139.927,
-                note: "君津市公式サイト・go-etc.jp等で、君津PAスマートICは上り線（東京・千葉方面）が入口専用、下り線（館山方面）が出口専用のハーフSICであることを確認（利用時間6～22時、ETC専用）。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。座標については、MapFanの個別ランプページを検索したが直接確認できるページが見つからなかったため、既存座標(35.283,139.927)を維持（精度未確認、要再確認）。"
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.283047, entranceLng: 139.92587, exitLat: 35.283047, exitLng: 139.92587,
+                note: "君津市公式サイト・go-etc.jp等で、君津PAスマートICは上り線（東京・千葉方面）が入口専用、下り線（館山方面）が出口専用のハーフSICであることを確認（利用時間6～22時、ETC専用）。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。座標については、MapFanの個別ランプページを検索したが直接確認できるページが見つからなかったため、既存座標(35.283,139.927)を維持（精度未確認、要再確認）。【2026-07-14再調査・座標のみ修正】MapFan個別ランプページは今回も発見できなかったが、NAVITIME「館山自動車道 君津PAスマートIC 上り 入口」のランプ単位座標(35.283047,139.92587)を確認し、Yahoo!地図・Mapionの2情報源とも約100m以内で一致することを確認した。既存の暫定値との差は約62mと小さかったが、「精度未確認」の状態を解消するため座標を更新した。"
             },
             {
                 order: 5.5,
                 displayName: "君津PA SIC",
                 googleName: "館山自動車道 君津PAスマートインターチェンジ",
-                lat: 35.283,
-                lng: 139.927,
+                lat: 35.283047,
+                lng: 139.92587,
                 isMirror: true,
                 mirrorOf: 6.5,
                 routeBranch: "aqualine",
                 branchOrder: 6.75,
-                entranceSelectable: false, exitSelectable: true, entranceLat: 35.283, entranceLng: 139.927, exitLat: 35.283, exitLng: 139.927,
-                note: "【Phase 2・方向判定ミラー】本体（上り方向・入口専用）に対する下り方向のミラーレコード。君津市公式サイト・go-etc.jp等の確認結果（本体note参照）に基づき、下り方向では出口のみが利用可能なため追加。branchOrderは通常の「本体+0.5」ではなく6.75とした（本体6.5に+0.5すると7.0となり、直後の富津中央ICのbranchOrder:7と衝突するため）。座標は本体同様、精度未確認のまま暫定使用（本体note参照、要再確認）。resolveEffectiveNexcoExitにより、走行方向判定（inferTravelDirectionForIcArea）が下り方向と判定した場合にのみ、候補選定時にこのレコードへ差し替えられる。符号判定は実車確認前提の暫定値のため、実車確認で逆と分かった場合はNEXCO_MIRROR_SWAP_DIRECTION_BY_GOOGLE_NAMEの符号のみを反転すればよい。"
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.283047, entranceLng: 139.92587, exitLat: 35.283047, exitLng: 139.92587,
+                note: "【Phase 2・方向判定ミラー】本体（上り方向・入口専用）に対する下り方向のミラーレコード。君津市公式サイト・go-etc.jp等の確認結果（本体note参照）に基づき、下り方向では出口のみが利用可能なため追加。branchOrderは通常の「本体+0.5」ではなく6.75とした（本体6.5に+0.5すると7.0となり、直後の富津中央ICのbranchOrder:7と衝突するため）。座標は本体同様、精度未確認のまま暫定使用（本体note参照、要再確認）。resolveEffectiveNexcoExitにより、走行方向判定（inferTravelDirectionForIcArea）が下り方向と判定した場合にのみ、候補選定時にこのレコードへ差し替えられる。符号判定は実車確認前提の暫定値のため、実車確認で逆と分かった場合はNEXCO_MIRROR_SWAP_DIRECTION_BY_GOOGLE_NAMEの符号のみを反転すればよい。【2026-07-14再調査・座標のみ修正】本体側の再調査でNAVITIME「上り入口」のランプ単位座標(35.283047,139.92587)をYahoo!地図・Mapionとのクロスチェックで確認できたため、本体と同じ座標に更新した（詳細は本体note参照）。"
             },
             {
                 order: 6,

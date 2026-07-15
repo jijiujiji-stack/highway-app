@@ -4287,8 +4287,9 @@ const IC_MASTER = {
             { order: 4, displayName: "横浜町田IC", googleName: "東名高速道路 横浜町田インターチェンジ", lat: 35.513, lng: 139.474, connection: true, connectedRoads: ["tomei", "hodogayaBypass"],
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.513, entranceLng: 139.474, exitLat: 35.513, exitLng: 139.474
             },
-            { order: 5, displayName: "綾瀬SIC", googleName: "東名高速道路 綾瀬スマートインターチェンジ", lat: 35.436, lng: 139.429,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.436, entranceLng: 139.429, exitLat: 35.436, exitLng: 139.429
+            { order: 5, displayName: "綾瀬SIC", googleName: "東名高速道路 綾瀬スマートインターチェンジ", lat: 35.4487631, lng: 139.4196304,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.4487631, entranceLng: 139.4196304, exitLat: 35.4464764, exitLng: 139.421388,
+                note: "【2026-07-14調査・座標のみ修正】2021年3月31日開通。WebSearchで「上り（東京方面）と下り（名古屋方面）双方の本線へ直結するフルインター」と確認。MapFanで入口（上り・下り）・出口（上り・下り）の4個別ページ全ての存在を確認。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(35.4487631,139.4196304)、exitLat/Lngを出口(下り)(35.4464764,139.421388)に設定。従来座標(35.436,139.429)から約1,655m修正。"
             },
             { order: 6, displayName: "厚木IC", googleName: "東名高速道路 厚木インターチェンジ", lat: 35.417, lng: 139.364, connection: true, connectedRoads: ["tomei", "odawaraAtsugi"],
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.417, entranceLng: 139.364, exitLat: 35.417, exitLng: 139.364
@@ -4299,14 +4300,16 @@ const IC_MASTER = {
             { order: 8, displayName: "大井松田IC", googleName: "東名高速道路 大井松田インターチェンジ", lat: 35.344, lng: 139.152,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.344, entranceLng: 139.152, exitLat: 35.344, exitLng: 139.152
             },
-            { order: 8.5, displayName: "足柄SIC", googleName: "東名高速道路 足柄スマートインターチェンジ", lat: 35.314, lng: 138.966,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.314, entranceLng: 138.966, exitLat: 35.314, exitLng: 138.966
+            { order: 8.5, displayName: "足柄SIC", googleName: "東名高速道路 足柄スマートインターチェンジ", lat: 35.3164564, lng: 138.9671662,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.3164564, entranceLng: 138.9671662, exitLat: 35.3157162, exitLng: 138.9683378,
+                note: "【2026-07-14調査・座標のみ修正】2019年3月9日開通、足柄SA併設。WebSearchで「両方向（東京方面・名古屋方面）で24時間利用可能」と確認。MapFanで入口（上り・下り）・出口（上り・下り）の4個別ページ全ての存在を確認。上り線出口はSA構内経由でSA立ち寄り可能、下り線出口はSA立ち寄り不可という運用上の違いはあるが、entranceSelectable/exitSelectable判定には影響しない。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(35.3164564,138.9671662)、exitLat/Lngを出口(下り)(35.3157162,138.9683378)に設定。従来座標(35.314,138.966)から約293m修正。"
             },
             { order: 9, displayName: "御殿場IC", googleName: "東名高速道路 御殿場インターチェンジ", lat: 35.300, lng: 138.934,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.300, entranceLng: 138.934, exitLat: 35.300, exitLng: 138.934
             },
-            { order: 9.5, displayName: "駒門SIC", googleName: "東名高速道路 駒門スマートインターチェンジ", lat: 35.239, lng: 138.908,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.239, entranceLng: 138.908, exitLat: 35.239, exitLng: 138.908
+            { order: 9.5, displayName: "駒門SIC", googleName: "東名高速道路 駒門スマートインターチェンジ", lat: 35.253972, lng: 138.9076832,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.253972, entranceLng: 138.9076832, exitLat: 35.2383306, exitLng: 138.909969,
+                note: "【2026-07-14調査・座標のみ修正】2020年3月28日開通。MapFanで入口（上り・下り）・出口（上り・下り）の4個別ページ全ての存在を確認し、NAVITIME・Yahoo!地図の独立クロスチェックでも座標を確認済み。Wikipedia「駒門パーキングエリア」記事で、駒門PA下り線側が新東名延伸工事に伴い2017年4月20日に約1.7km裾野IC方向へ移設されたことを確認しており、これが入口(上り)と出口(下り)の座標が約1.7km離れている理由である（物理的な移設が原因であり、座標誤りではない）。入口(上り)・出口(下り)の役割自体は単純で機能上の曖昧さはないため、entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(35.253972,138.9076832)、exitLat/Lngを出口(下り)(35.2383306,138.909969)に設定。従来座標(35.239,138.908)から約1,667m修正。"
             },
             { order: 10, displayName: "裾野IC", googleName: "東名高速道路 裾野インターチェンジ", lat: 35.190, lng: 138.909,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.190, entranceLng: 138.909, exitLat: 35.190, exitLng: 138.909
@@ -4314,20 +4317,23 @@ const IC_MASTER = {
             { order: 11, displayName: "沼津IC", googleName: "東名高速道路 沼津インターチェンジ", lat: 35.156, lng: 138.860,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.156, entranceLng: 138.860, exitLat: 35.156, exitLng: 138.860
             },
-            { order: 11.5, displayName: "愛鷹SIC", googleName: "東名高速道路 愛鷹スマートインターチェンジ", lat: 35.143, lng: 138.837,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.143, entranceLng: 138.837, exitLat: 35.143, exitLng: 138.837
+            { order: 11.5, displayName: "愛鷹SIC", googleName: "東名高速道路 愛鷹スマートインターチェンジ", lat: 35.143973061378, lng: 138.83606316867,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.143973061378, entranceLng: 138.83606316867, exitLat: 35.1417214, exitLng: 138.837579,
+                note: "【2026-07-14調査・座標のみ修正】静岡県初のスマートIC。WebSearchで「上下双方向で24時間利用可能」と確認。MapFanで入口（上り・下り）・出口（上り・下り）の4個別ページ全ての存在を確認。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(35.143973061378,138.83606316867)、exitLat/Lngを出口(下り)(35.1417214,138.837579)に設定。従来座標(35.143,138.837)から約138m修正。"
             },
             { order: 12, displayName: "富士IC", googleName: "東名高速道路 富士インターチェンジ", lat: 35.180, lng: 138.671,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.180, entranceLng: 138.671, exitLat: 35.180, exitLng: 138.671
             },
-            { order: 12.5, displayName: "富士川SIC", googleName: "東名高速道路 富士川スマートインターチェンジ", lat: 35.159, lng: 138.619,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.159, entranceLng: 138.619, exitLat: 35.159, exitLng: 138.619
+            { order: 12.5, displayName: "富士川SIC", googleName: "東名高速道路 富士川スマートインターチェンジ", lat: 35.1617098, lng: 138.6193492,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.1617098, entranceLng: 138.6193492, exitLat: 35.1562755, exitLng: 138.6179363,
+                note: "【2026-07-14調査・座標のみ修正】NEXCO中日本プレスリリース「3月18日 東名高速道路 富士川スマートＩＣが全方向でご利用が可能になります -名古屋方面(下り線)入口が開通します-」で、過去は下り線入口がないハーフICだったが現在は全方向利用可能なフルICであることを確認。entranceSelectable/exitSelectableは現状（フルIC）と一致しているため変更なし（trueのまま）。MapFanで方向表記のない【入口】ページと【出口（上り）】【出口（下り）】ページを確認。座標はentranceLat/Lngを入口(35.1617098,138.6193492)、exitLat/Lngを出口(下り)(35.1562755,138.6179363)に設定。従来座標(35.159,138.619)から約303m修正。"
             },
             { order: 13, displayName: "清水IC", googleName: "東名高速道路 清水インターチェンジ", lat: 35.037, lng: 138.477,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.037, entranceLng: 138.477, exitLat: 35.037, exitLng: 138.477
             },
-            { order: 13.5, displayName: "日本平久能山SIC", googleName: "東名高速道路 日本平久能山スマートインターチェンジ", lat: 34.962, lng: 138.422,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 34.962, entranceLng: 138.422, exitLat: 34.962, exitLng: 138.422
+            { order: 13.5, displayName: "日本平久能山SIC", googleName: "東名高速道路 日本平久能山スマートインターチェンジ", lat: 34.9591911, lng: 138.4245705,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 34.9591911, entranceLng: 138.4245705, exitLat: 34.9597322, exitLng: 138.4244571,
+                note: "【2026-07-14調査・座標のみ修正】2019年9月14日開通。WebSearchで「本線へ直接接続するETC専用IC、上り・下りとも入口・出口があり、バスや大型トラックも利用可能なフルインター形式」と確認（静岡市公式サイトも確認）。MapFanでは方向表記のない【入口】【出口】の2ページ（約60m差、実質同一地点）を確認。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(34.9591911,138.4245705)、exitLat/Lngを出口(34.9597322,138.4244571)に設定。従来座標(34.962,138.422)から約391m修正。"
             },
             { order: 14, displayName: "静岡IC", googleName: "東名高速道路 静岡インターチェンジ", lat: 34.944, lng: 138.395,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 34.944, entranceLng: 138.395, exitLat: 34.944, exitLng: 138.395
@@ -4335,8 +4341,9 @@ const IC_MASTER = {
             { order: 15, displayName: "焼津IC", googleName: "東名高速道路 焼津インターチェンジ", lat: 34.861, lng: 138.302,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 34.861, entranceLng: 138.302, exitLat: 34.861, exitLng: 138.302
             },
-            { order: 15.5, displayName: "大井川焼津藤枝SIC", googleName: "東名高速道路 大井川焼津藤枝スマートインターチェンジ", lat: 34.821, lng: 138.269,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 34.821, entranceLng: 138.269, exitLat: 34.821, exitLng: 138.269
+            { order: 15.5, displayName: "大井川焼津藤枝SIC", googleName: "東名高速道路 大井川焼津藤枝スマートインターチェンジ", lat: 34.8191127, lng: 138.2623882,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 34.8191127, entranceLng: 138.2623882, exitLat: 34.8159419, exitLng: 138.2668815,
+                note: "【2026-07-14調査・座標のみ修正】2016年3月12日開通、東名高速道路で最初の本線直結型スマートIC。WebSearchで「両方向で24時間利用可能」と確認。MapFanで入口（上り・下り）・出口（上り・下り）の4個別ページの存在を確認したが、出口(下り)の座標は複数回の検索でも取得できなかったため、exitLat/Lngは入口(下り)(34.8159419,138.2668815)の座標を暫定使用した。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(34.8191127,138.2623882)に設定。従来座標(34.821,138.269)から約640m修正。次回、出口(下り)の個別座標が確認できた場合は再検証が必要。"
             },
             { order: 16, displayName: "吉田IC", googleName: "東名高速道路 吉田インターチェンジ", lat: 34.781, lng: 138.252,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 34.781, entranceLng: 138.252, exitLat: 34.781, exitLng: 138.252
@@ -4356,8 +4363,9 @@ const IC_MASTER = {
             { order: 21, displayName: "磐田IC", googleName: "東名高速道路 磐田インターチェンジ", lat: 34.783, lng: 137.823,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 34.783, entranceLng: 137.823, exitLat: 34.783, exitLng: 137.823
             },
-            { order: 21.5, displayName: "遠州豊田SIC", googleName: "東名高速道路 遠州豊田スマートインターチェンジ", lat: 34.748, lng: 137.840,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 34.748, entranceLng: 137.840, exitLat: 34.748, exitLng: 137.840
+            { order: 21.5, displayName: "遠州豊田SIC", googleName: "東名高速道路 遠州豊田スマートインターチェンジ", lat: 34.749788, lng: 137.8412663,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 34.749788, entranceLng: 137.8412663, exitLat: 34.7465646, exitLng: 137.8394543,
+                note: "【2026-07-14調査・座標のみ修正】遠州豊田PA併設。WebSearchで「上り出口・上り入口・下り出口・下り入口の4方向」の存在を確認（「上下線ともに遠州豊田スマートIC入口から遠州豊田PAの利用はできません」という運用上の注意点はあるが、entranceSelectable/exitSelectable判定には影響しない）。MapFanで4個別ページ全ての存在を確認。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(34.749788,137.8412663)、exitLat/Lngを出口(下り)(34.7465646,137.8394543)に設定。従来座標(34.748,137.840)から約230m修正。"
             },
             { order: 22, displayName: "浜松IC", googleName: "東名高速道路 浜松インターチェンジ", lat: 34.758, lng: 137.773,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 34.758, entranceLng: 137.773, exitLat: 34.758, exitLng: 137.773

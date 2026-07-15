@@ -3690,11 +3690,12 @@ const IC_MASTER = {
                 order: 2,
                 displayName: "圏央厚木IC",
                 googleName: "首都圏中央連絡自動車道 圏央厚木インターチェンジ",
-                lat: 35.480,
-                lng: 139.372,
+                lat: 35.4760372,
+                lng: 139.3669842,
                 routeBranch: "west",
                 branchOrder: 2,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.480, entranceLng: 139.372, exitLat: 35.480, exitLng: 139.372
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.4760372, entranceLng: 139.3669842, exitLat: 35.4759495, exitLng: 139.3670142,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「圏央厚木ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし、2013年3月30日開通）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.4760372,139.3669842)、exitLat/Lngを出口(35.4759495,139.3670142)に設定。従来座標(35.480,139.372)から約450m修正。"
             },
             {
                 order: 3,
@@ -3711,31 +3712,45 @@ const IC_MASTER = {
                 order: 4,
                 displayName: "相模原愛川IC",
                 googleName: "首都圏中央連絡自動車道 相模原愛川インターチェンジ",
-                lat: 35.527,
-                lng: 139.359,
+                lat: 35.5269767,
+                lng: 139.3601754,
                 routeBranch: "west",
                 branchOrder: 4,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.527, entranceLng: 139.359, exitLat: 35.527, exitLng: 139.359
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.5269767, entranceLng: 139.3601754, exitLat: 35.52717, exitLng: 139.3597919,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「相模原愛川ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.5269767,139.3601754)、exitLat/Lngを出口(35.52717,139.3597919)に設定。従来座標(35.527,139.359)から約40m修正。"
             },
             {
                 order: 5,
                 displayName: "相模原IC",
                 googleName: "首都圏中央連絡自動車道 相模原インターチェンジ",
-                lat: 35.582,
-                lng: 139.293,
+                lat: 35.5799227,
+                lng: 139.2912452,
                 routeBranch: "west",
                 branchOrder: 5,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.582, entranceLng: 139.293, exitLat: 35.582, exitLng: 139.293
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.5799227, entranceLng: 139.2912452, exitLat: 35.5797893, exitLng: 139.2913229,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「相模原ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし。2022年6月30日よりETC専用化）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.5799227,139.2912452)、exitLat/Lngを出口(35.5797893,139.2913229)に設定。従来座標(35.582,139.293)から約250m修正。"
             },
             {
                 order: 6,
                 displayName: "高尾山IC",
                 googleName: "首都圏中央連絡自動車道 高尾山インターチェンジ",
-                lat: 35.623,
-                lng: 139.263,
+                lat: 35.6230676,
+                lng: 139.2632221,
                 routeBranch: "west",
                 branchOrder: 6,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.623, entranceLng: 139.263, exitLat: 35.623, exitLng: 139.263
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.6230676, entranceLng: 139.2632221, exitLat: 35.6232828, exitLng: 139.2629606,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「高尾山ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし、2012年3月25日開通）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.6230676,139.2632221)、exitLat/Lngを出口(35.6232828,139.2629606)に設定。従来座標(35.623,139.263)から約50m修正。"
+            },
+            {
+                order: 6.5,
+                displayName: "八王子西IC",
+                googleName: "首都圏中央連絡自動車道 八王子西インターチェンジ",
+                lat: 35.6820928,
+                lng: 139.2541464,
+                routeBranch: "west",
+                branchOrder: 6.5,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.6820928, entranceLng: 139.2541464, exitLat: 35.6804436, exitLng: 139.2553875,
+                note: "【2026-07-15新規追加】これまでIC_MASTER.kenoに未登録だったIC。高尾山ICと八王子JCTの間、東京都八王子市に位置し、中央道八王子ICの西方にある。2007年6月23日に中央道方向のみのハーフICとして開通し、2016年12月24日15時に関越道方向の出入口も開通して現在はフルIC（Wikipedia「八王子西インターチェンジ」、NEXCO中日本プレスリリースで確認）。entranceSelectable/exitSelectableはtrue/true。座標はMapFanで確認した入口(外回り)(35.6820928,139.2541464)、出口(35.6804436,139.2553875)を使用。"
             },
             {
                 order: 7,
@@ -3754,51 +3769,56 @@ const IC_MASTER = {
                 order: 8,
                 displayName: "あきる野IC",
                 googleName: "首都圏中央連絡自動車道 あきる野インターチェンジ",
-                lat: 35.718,
-                lng: 139.284,
+                lat: 35.718217505915,
+                lng: 139.28533770591,
                 routeBranch: "northwest",
                 branchOrder: 8,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.718, entranceLng: 139.284, exitLat: 35.718, exitLng: 139.284
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.718217505915, entranceLng: 139.28533770591, exitLat: 35.7181315, exitLng: 139.2852863,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「あきる野ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.718217505915,139.28533770591)、exitLat/Lngを出口(35.7181315,139.2852863)に設定。従来座標(35.718,139.284)から約100m修正。"
             },
             {
                 order: 9,
                 displayName: "日の出IC",
                 googleName: "首都圏中央連絡自動車道 日の出インターチェンジ",
-                lat: 35.736,
-                lng: 139.282,
+                lat: 35.7393065,
+                lng: 139.2840487,
                 routeBranch: "northwest",
                 branchOrder: 9,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.736, entranceLng: 139.282, exitLat: 35.736, exitLng: 139.282
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.7393065, entranceLng: 139.2840487, exitLat: 35.7393083, exitLng: 139.2839726,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「日の出ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし、2002年3月29日開通）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.7393065,139.2840487)、exitLat/Lngを出口(35.7393083,139.2839726)に設定。従来座標(35.736,139.282)から約370m修正。"
             },
             {
                 order: 10,
                 displayName: "青梅IC",
                 googleName: "首都圏中央連絡自動車道 青梅インターチェンジ",
-                lat: 35.797,
-                lng: 139.323,
+                lat: 35.7962251,
+                lng: 139.3183337,
                 routeBranch: "northwest",
                 branchOrder: 10,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.797, entranceLng: 139.323, exitLat: 35.797, exitLng: 139.323
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.7962251, entranceLng: 139.3183337, exitLat: 35.7961642, exitLng: 139.3183489,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「青梅ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.7962251,139.3183337)、exitLat/Lngを出口(35.7961642,139.3183489)に設定。従来座標(35.797,139.323)から約90m修正。"
             },
             {
                 order: 11,
                 displayName: "入間IC",
                 googleName: "首都圏中央連絡自動車道 入間インターチェンジ",
-                lat: 35.818,
-                lng: 139.369,
+                lat: 35.8131411,
+                lng: 139.3749811,
                 routeBranch: "northwest",
                 branchOrder: 11,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.818, entranceLng: 139.369, exitLat: 35.818, exitLng: 139.369
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.8131411, entranceLng: 139.3749811, exitLat: 35.8132276, exitLng: 139.3749299,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「入間ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.8131411,139.3749811)、exitLat/Lngを出口(35.8132276,139.3749299)に設定。従来座標(35.818,139.369)から約620m修正。"
             },
             {
                 order: 12,
                 displayName: "狭山日高IC",
                 googleName: "首都圏中央連絡自動車道 狭山日高インターチェンジ",
-                lat: 35.865,
-                lng: 139.378,
+                lat: 35.8672405,
+                lng: 139.3791636,
                 routeBranch: "northwest",
                 branchOrder: 12,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.865, entranceLng: 139.378, exitLat: 35.865, exitLng: 139.378
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.8672405, entranceLng: 139.3791636, exitLat: 35.8671986, exitLng: 139.379077,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「狭山日高ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし、1996年3月26日開通）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.8672405,139.3791636)、exitLat/Lngを出口(35.8671986,139.379077)に設定。従来座標(35.865,139.378)から約250m修正。"
             },
             {
                 order: 13,
@@ -3811,34 +3831,51 @@ const IC_MASTER = {
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.920, entranceLng: 139.389, exitLat: 35.920, exitLng: 139.389
             },
             {
+                order: 13.5,
+                displayName: "鶴ヶ島JCT",
+                googleName: "首都圏中央連絡自動車道 鶴ヶ島ジャンクション",
+                lat: 35.934053,
+                lng: 139.406431,
+                isSelectable: false,
+                connection: true,
+                connectedRoads: ["keno", "kanetsu"],
+                routeBranch: "northwest",
+                branchOrder: 13.5,
+                entranceSelectable: false, exitSelectable: false, entranceLat: 35.934053, entranceLng: 139.406431, exitLat: 35.934053, exitLng: 139.406431,
+                note: "【2026-07-15新規追加】これまでIC_MASTER.kenoに未登録だったJCT。圏央道と関越自動車道を接続し、1996年3月26日供用開始（Wikipedia「鶴ヶ島ジャンクション」で確認）。圏央鶴ヶ島ICと坂戸ICの間、埼玉県鶴ヶ島市藤金に位置する。座標は北緯35度56分2.59秒 東経139度24分23.15秒を10進法に変換。isSelectable/entranceSelectable/exitSelectableはfalseで登録。"
+            },
+            {
                 order: 14,
                 displayName: "坂戸IC",
                 googleName: "首都圏中央連絡自動車道 坂戸インターチェンジ",
-                lat: 35.967,
-                lng: 139.444,
+                lat: 35.9711092,
+                lng: 139.4496371,
                 routeBranch: "northwest",
                 branchOrder: 14,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.967, entranceLng: 139.444, exitLat: 35.967, exitLng: 139.444
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.9711092, entranceLng: 139.4496371, exitLat: 35.971127, exitLng: 139.449679,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「坂戸ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.9711092,139.4496371)、exitLat/Lngを出口(35.971127,139.449679)に設定。従来座標(35.967,139.444)から約620m修正。"
             },
             {
                 order: 15,
                 displayName: "川島IC",
                 googleName: "首都圏中央連絡自動車道 川島インターチェンジ",
-                lat: 35.981,
-                lng: 139.466,
+                lat: 35.9844674946,
+                lng: 139.46448996185,
                 routeBranch: "northwest",
                 branchOrder: 15,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.981, entranceLng: 139.466, exitLat: 35.981, exitLng: 139.466
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.9844674946, entranceLng: 139.46448996185, exitLat: 35.984357, exitLng: 139.4643404,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「川島ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし、2008年3月29日開通）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.9844674946,139.46448996185)、exitLat/Lngを出口(35.984357,139.4643404)に設定。従来座標(35.981,139.466)から約370m修正。"
             },
             {
                 order: 16,
                 displayName: "桶川北本IC",
                 googleName: "首都圏中央連絡自動車道 桶川北本インターチェンジ",
-                lat: 36.002,
-                lng: 139.520,
+                lat: 35.996876800829,
+                lng: 139.52221227224,
                 routeBranch: "northwest",
                 branchOrder: 16,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.002, entranceLng: 139.520, exitLat: 36.002, exitLng: 139.520
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.996876800829, entranceLng: 139.52221227224, exitLat: 35.9972056, exitLng: 139.5222498,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「桶川北本ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.996876800829,139.52221227224)、exitLat/Lngを出口(35.9972056,139.5222498)に設定。従来座標(36.002,139.520)から約570m修正。"
             },
             {
                 order: 17,
@@ -3854,11 +3891,12 @@ const IC_MASTER = {
                 order: 18,
                 displayName: "白岡菖蒲IC",
                 googleName: "首都圏中央連絡自動車道 白岡菖蒲インターチェンジ",
-                lat: 36.047,
-                lng: 139.623,
+                lat: 36.044179147597,
+                lng: 139.62599272778,
                 routeBranch: "northwest",
                 branchOrder: 18,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.047, entranceLng: 139.623, exitLat: 36.047, exitLng: 139.623
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.044179147597, entranceLng: 139.62599272778, exitLat: 36.0442661, exitLng: 139.6259802,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「白岡菖蒲ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし、2011年5月29日開通）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(36.044179147597,139.62599272778)、exitLat/Lngを出口(36.0442661,139.6259802)に設定。従来座標(36.047,139.623)から約320m修正。"
             },
             {
                 order: 19,
@@ -3887,51 +3925,56 @@ const IC_MASTER = {
                 order: 21,
                 displayName: "五霞IC",
                 googleName: "首都圏中央連絡自動車道 五霞インターチェンジ",
-                lat: 36.101,
-                lng: 139.774,
+                lat: 36.0910491,
+                lng: 139.7640806,
                 routeBranch: "northeast",
                 branchOrder: 21,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.101, entranceLng: 139.774, exitLat: 36.101, exitLng: 139.774
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.0910491, entranceLng: 139.7640806, exitLat: 36.0907128, exitLng: 139.7645541,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「五霞ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし、2015年3月29日開通）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(36.0910491,139.7640806)、exitLat/Lngを出口(36.0907128,139.7645541)に設定。従来座標(36.101,139.774)から約1.1km修正。"
             },
             {
                 order: 22,
                 displayName: "境古河IC",
                 googleName: "首都圏中央連絡自動車道 境古河インターチェンジ",
-                lat: 36.113,
-                lng: 139.833,
+                lat: 36.1285735,
+                lng: 139.8099014,
                 routeBranch: "northeast",
                 branchOrder: 22,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.113, entranceLng: 139.833, exitLat: 36.113, exitLng: 139.833
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.1285735, entranceLng: 139.8099014, exitLat: 36.1284207, exitLng: 139.8096572,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「境古河ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(36.1285735,139.8099014)、exitLat/Lngを出口(36.1284207,139.8096572)に設定。従来座標(36.113,139.833)から約2.1km修正。"
             },
             {
                 order: 23,
                 displayName: "坂東IC",
                 googleName: "首都圏中央連絡自動車道 坂東インターチェンジ",
-                lat: 36.063,
-                lng: 139.914,
+                lat: 36.0856318,
+                lng: 139.8935551,
                 routeBranch: "northeast",
                 branchOrder: 23,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.063, entranceLng: 139.914, exitLat: 36.063, exitLng: 139.914
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.0856318, entranceLng: 139.8935551, exitLat: 36.0856718, exitLng: 139.8936193,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「坂東ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(36.0856318,139.8935551)、exitLat/Lngを出口(36.0856718,139.8936193)に設定。従来座標(36.063,139.914)から約2.9km修正。"
             },
             {
                 order: 24,
                 displayName: "常総IC",
                 googleName: "首都圏中央連絡自動車道 常総インターチェンジ",
-                lat: 36.044,
-                lng: 140.012,
+                lat: 36.0794866,
+                lng: 139.9842857,
                 routeBranch: "northeast",
                 branchOrder: 24,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.044, entranceLng: 140.012, exitLat: 36.044, exitLng: 140.012
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.0794866, entranceLng: 139.9842857, exitLat: 36.0796008, exitLng: 139.9842933,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「常総ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(36.0794866,139.9842857)、exitLat/Lngを出口(36.0796008,139.9842933)に設定。従来座標(36.044,140.012)から約4.4km修正（境古河IC・つくば中央ICとの並び順と矛盾しないことを確認済み）。"
             },
             {
                 order: 25,
                 displayName: "つくば中央IC",
                 googleName: "首都圏中央連絡自動車道 つくば中央インターチェンジ",
-                lat: 36.079,
-                lng: 140.073,
+                lat: 36.0567693,
+                lng: 140.0843141,
                 routeBranch: "northeast",
                 branchOrder: 25,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.079, entranceLng: 140.073, exitLat: 36.079, exitLng: 140.073
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.0567693, entranceLng: 140.0843141, exitLat: 36.056668133888, exitLng: 140.08432427344,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「つくば中央ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(36.0567693,140.0843141)、exitLat/Lngを出口(36.056668133888,140.08432427344)に設定。従来座標(36.079,140.073)から約2.7km修正。"
             },
             {
                 order: 26,
@@ -3950,11 +3993,12 @@ const IC_MASTER = {
                 order: 27,
                 displayName: "つくば牛久IC",
                 googleName: "首都圏中央連絡自動車道 つくば牛久インターチェンジ",
-                lat: 36.037,
-                lng: 140.119,
+                lat: 36.0267196,
+                lng: 140.1344449,
                 routeBranch: "northeast",
                 branchOrder: 27,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.037, entranceLng: 140.119, exitLat: 36.037, exitLng: 140.119
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.0267196, entranceLng: 140.1344449, exitLat: 36.026524483553, exitLng: 140.13440963653,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「つくば牛久ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(36.0267196,140.1344449)、exitLat/Lngを出口(36.026524483553,140.13440963653)に設定。従来座標(36.037,140.119)から約1.7km修正。"
             },
             {
                 order: 28,
@@ -3990,31 +4034,34 @@ const IC_MASTER = {
                 order: 31,
                 displayName: "稲敷東IC",
                 googleName: "首都圏中央連絡自動車道 稲敷東インターチェンジ",
-                lat: 35.919,
-                lng: 140.383,
+                lat: 35.9236686,
+                lng: 140.3443843,
                 routeBranch: "northeast",
                 branchOrder: 31,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.919, entranceLng: 140.383, exitLat: 35.919, exitLng: 140.383
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.9236686, entranceLng: 140.3443843, exitLat: 35.9236086, exitLng: 140.3444001,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「稲敷東ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.9236686,140.3443843)、exitLat/Lngを出口(35.9236086,140.3444001)に設定。従来座標(35.919,140.383)から約3.4km修正。"
             },
             {
                 order: 32,
                 displayName: "神崎IC",
                 googleName: "首都圏中央連絡自動車道 神崎インターチェンジ",
-                lat: 35.894,
-                lng: 140.408,
+                lat: 35.899985599283,
+                lng: 140.37666045394,
                 routeBranch: "northeast",
                 branchOrder: 32,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.894, entranceLng: 140.408, exitLat: 35.894, exitLng: 140.408
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.899985599283, entranceLng: 140.37666045394, exitLat: 35.8999464, exitLng: 140.3765605,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「神崎ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.899985599283,140.37666045394)、exitLat/Lngを出口(35.8999464,140.3765605)に設定。従来座標(35.894,140.408)から約2.6km修正。"
             },
             {
                 order: 33,
                 displayName: "下総IC",
                 googleName: "首都圏中央連絡自動車道 下総インターチェンジ",
-                lat: 35.873,
-                lng: 140.432,
+                lat: 35.862493,
+                lng: 140.3888525,
                 routeBranch: "northeast",
                 branchOrder: 33,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.873, entranceLng: 140.432, exitLat: 35.873, exitLng: 140.432
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.862493, entranceLng: 140.3888525, exitLat: 35.8624417, exitLng: 140.3888327,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「下総ＩＣ（圏央道）【入口】」「【出口】」（方向表記なし）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.862493,140.3888525)、exitLat/Lngを出口(35.8624417,140.3888327)に設定。従来座標(35.873,140.432)から約3.0km修正。"
             },
             {
                 order: 34,
@@ -4033,11 +4080,12 @@ const IC_MASTER = {
                 order: 35,
                 displayName: "松尾横芝IC",
                 googleName: "首都圏中央連絡自動車道 松尾横芝インターチェンジ",
-                lat: 35.663,
-                lng: 140.438,
+                lat: 35.6630016,
+                lng: 140.4391423,
                 routeBranch: "southeast",
                 branchOrder: 35,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.663, entranceLng: 140.438, exitLat: 35.663, exitLng: 140.438
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.6630016, entranceLng: 140.4391423, exitLat: 35.6633273, exitLng: 140.4390699,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「松尾横芝ＩＣ（圏央道（千葉区間））【入口（外回り）】」「【出口（内回り）】」を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(外回り)(35.6630016,140.4391423)、exitLat/Lngを出口(内回り)(35.6633273,140.4390699)に設定。従来座標(35.663,140.438)から約40m修正。なお、大栄JCT～松尾横芝IC間（約18.5km）は2026年7月現在未開通であり、大栄JCT方面からは直接到達できない点に注意（詳細は別途調査メモ参照）。"
             },
             {
                 order: 36,
@@ -4108,21 +4156,23 @@ const IC_MASTER = {
                 order: 42,
                 displayName: "茂原長南IC",
                 googleName: "首都圏中央連絡自動車道 茂原長南インターチェンジ",
-                lat: 35.402,
-                lng: 140.245,
+                lat: 35.4016576,
+                lng: 140.2444509,
                 routeBranch: "southeast",
                 branchOrder: 42,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.402, entranceLng: 140.245, exitLat: 35.402, exitLng: 140.245
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.4016576, entranceLng: 140.2444509, exitLat: 35.4016381, exitLng: 140.2445353,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「茂原長南ＩＣ（圏央道（千葉区間））【入口】」「【出口】」（方向表記なし）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.4016576,140.2444509)、exitLat/Lngを出口(35.4016381,140.2445353)に設定。従来座標(35.402,140.245)から約60m修正。"
             },
             {
                 order: 43,
                 displayName: "市原鶴舞IC",
                 googleName: "首都圏中央連絡自動車道 市原鶴舞インターチェンジ",
-                lat: 35.363,
-                lng: 140.185,
+                lat: 35.3624953,
+                lng: 140.1856249,
                 routeBranch: "southeast",
                 branchOrder: 43,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.363, entranceLng: 140.185, exitLat: 35.363, exitLng: 140.185
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.3624953, entranceLng: 140.1856249, exitLat: 35.3625526, exitLng: 140.1855522,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「市原鶴舞ＩＣ（圏央道（千葉区間））【入口】」「【出口】」（方向表記なし、2013年4月27日開通）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.3624953,140.1856249)、exitLat/Lngを出口(35.3625526,140.1855522)に設定。従来座標(35.363,140.185)から約80m修正。"
             },
             {
                 order: 44,

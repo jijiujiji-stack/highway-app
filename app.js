@@ -5317,10 +5317,10 @@ const IC_MASTER = {
                 order: 51,
                 displayName: "和光IC",
                 googleName: "東京外環自動車道 和光インターチェンジ",
-                lat: 35.7874079,
-                lng: 139.6148932,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.7874079, entranceLng: 139.6148932, exitLat: 35.7874079, exitLng: 139.6148932,
-                note: "フルIC。入口(外回り)はMapFan「和光IC(東京外環自動車道)【入口(外回り)】」で確認(35.7874079,139.6148932)。出口(外回り)の個別ランプ座標はMapFan上で特定できず未確認のため入口側座標にフォールバック。出口側座標は要再確認。"
+                lat: 35.7847447,
+                lng: 139.6125082,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.7874079, entranceLng: 139.6148932, exitLat: 35.7820814, exitLng: 139.6101231,
+                note: "フルIC。入口(外回り)はMapFan「和光IC(東京外環自動車道)【入口(外回り)】」で確認(35.7874079,139.6148932)。出口(外回り)の個別ランプ座標はMapFan上で特定できず未確認のため入口側座標にフォールバック。出口側座標は要再確認。【2026-07-15再調査・座標のみ修正】出口(外回り)の座標が今回MapFan「和光IC(東京外環自動車道)【出口(外回り)】」(https://mapfan.com/spots/S3Y,J,VBT)で新たに確認でき(35.7820814,139.6101231)、既存の暫定値（入口座標へのフォールバック）との差は約733mだった。他のフルIC（和光北IC・草加IC等）と同じ「入口・出口の中間点」方式に統一し、lat/lngを(35.7847447,139.6125082)に更新した。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
             {
                 order: 52,

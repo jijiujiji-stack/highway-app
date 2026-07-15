@@ -3556,8 +3556,9 @@ const IC_MASTER = {
             { order: 3, displayName: "所沢IC", googleName: "関越自動車道 所沢インターチェンジ", lat: 35.801, lng: 139.498,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.801, entranceLng: 139.498, exitLat: 35.801, exitLng: 139.498
             },
-            { order: 4, displayName: "三芳SIC", googleName: "関越自動車道 三芳スマートインターチェンジ", lat: 35.843, lng: 139.518,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.843, entranceLng: 139.518, exitLat: 35.843, exitLng: 139.518
+            { order: 4, displayName: "三芳SIC", googleName: "関越自動車道 三芳スマートインターチェンジ", lat: 35.843881, lng: 139.505918,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.843881, entranceLng: 139.505918, exitLat: 35.8398432, exitLng: 139.5020565,
+                note: "【2026-07-15調査・座標のみ修正】関越自動車道で最も東京寄りのスマートIC。NEXCO東日本プレスリリースで、過去約9年間は新潟方面（下り）のみのハーフICだったが、2024年3月10日15時に東京方面（上り入口・下り出口）が開通し現在はフルICであることを確認。entranceSelectable/exitSelectableは現状（フルIC）と一致しているため変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(35.843881,139.505918)、exitLat/Lngを出口(下り)(35.8398432,139.5020565)に設定。従来座標(35.843,139.518)から約1,094m修正。"
             },
             { order: 5, displayName: "川越IC", googleName: "関越自動車道 川越インターチェンジ", lat: 35.907, lng: 139.483,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.907, entranceLng: 139.483, exitLat: 35.907, exitLng: 139.483
@@ -3565,8 +3566,9 @@ const IC_MASTER = {
             { order: 6, displayName: "鶴ヶ島IC", googleName: "関越自動車道 鶴ヶ島インターチェンジ", lat: 35.944, lng: 139.394,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.944, entranceLng: 139.394, exitLat: 35.944, exitLng: 139.394
             },
-            { order: 7, displayName: "坂戸西SIC", googleName: "関越自動車道 坂戸西スマートインターチェンジ", lat: 35.971, lng: 139.356,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.971, entranceLng: 139.356, exitLat: 35.971, exitLng: 139.356
+            { order: 7, displayName: "坂戸西SIC", googleName: "関越自動車道 坂戸西スマートインターチェンジ", lat: 35.9662598, lng: 139.3780673,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.9662598, entranceLng: 139.3780673, exitLat: 35.9662598, exitLng: 139.3780673,
+                note: "【2026-07-15調査・座標のみ修正】2013年8月25日開通。WebSearchで「上下線ともに全方向対応、上り・下りで別々の入口・出口を持つフルインター」と確認（坂戸市公式サイトも確認）。entranceSelectable/exitSelectableは変更なし（trueのまま）。MapFanで【出口（下り）】(35.9662598,139.3780673)は座標を確認できたが、【入口（上り）】は個別ページが404エラーとなり座標を確認できなかったため、entranceLat/Lng・exitLat/Lngとも出口(下り)の座標を暫定使用した。従来座標(35.971,139.356)から約2,059m修正。次回、入口(上り)の個別座標が確認できた場合は再検証が必要。"
             },
             { order: 8, displayName: "東松山IC", googleName: "関越自動車道 東松山インターチェンジ", lat: 36.036, lng: 139.377,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.036, entranceLng: 139.377, exitLat: 36.036, exitLng: 139.377
@@ -3577,17 +3579,20 @@ const IC_MASTER = {
             { order: 10, displayName: "花園IC", googleName: "関越自動車道 花園インターチェンジ", lat: 36.115, lng: 139.214,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.115, entranceLng: 139.214, exitLat: 36.115, exitLng: 139.214
             },
-            { order: 10.5, displayName: "寄居SIC", googleName: "関越自動車道 寄居スマートインターチェンジ", lat: 36.173, lng: 139.194,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.173, entranceLng: 139.194, exitLat: 36.173, exitLng: 139.194
+            { order: 10.5, displayName: "寄居SIC", googleName: "関越自動車道 寄居スマートインターチェンジ", lat: 36.172622, lng: 139.196341,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.172622, entranceLng: 139.196341, exitLat: 36.17379647716, exitLng: 139.1913859715,
+                note: "【2026-07-15調査・座標のみ修正】下り線が2019年3月28日、上り線が2021年3月28日と段階的に開通し、現在は上下線とも出入口を持つ全方向スマートICであることをNEXCO東日本プレスリリース等で確認。entranceSelectable/exitSelectableは変更なし（trueのまま）。MapFanで入口（上り・下り）・出口（上り・下り）の4個別ページ全ての存在を確認。座標はentranceLat/Lngを入口(上り)(36.172622,139.196341)、exitLat/Lngを出口(下り)(36.17379647716,139.1913859715)に設定。従来座標(36.173,139.194)から約214m修正。"
             },
             { order: 11, displayName: "本庄児玉IC", googleName: "関越自動車道 本庄児玉インターチェンジ", lat: 36.223, lng: 139.152,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.223, entranceLng: 139.152, exitLat: 36.223, exitLng: 139.152
             },
-            { order: 11.5, displayName: "上里SIC", googleName: "関越自動車道 上里スマートインターチェンジ", lat: 36.256, lng: 139.119,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.256, entranceLng: 139.119, exitLat: 36.256, exitLng: 139.119
+            { order: 11.5, displayName: "上里SIC", googleName: "関越自動車道 上里スマートインターチェンジ", lat: 36.2566705, lng: 139.1171445,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.2566705, entranceLng: 139.1171445, exitLat: 36.255604, exitLng: 139.116856,
+                note: "【2026-07-15調査・座標のみ修正】上里SA併設。MapFanで入口（上り・下り）・出口（下り）のページの存在を確認し、フルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(36.2566705,139.1171445)、exitLat/Lngを出口(下り)(36.255604,139.116856)に設定。従来座標(36.256,139.119)から約183m修正。"
             },
-            { order: 12, displayName: "高崎玉村SIC", googleName: "関越自動車道 高崎玉村スマートインターチェンジ", lat: 36.284, lng: 139.101,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.284, entranceLng: 139.101, exitLat: 36.284, exitLng: 139.101
+            { order: 12, displayName: "高崎玉村SIC", googleName: "関越自動車道 高崎玉村スマートインターチェンジ", lat: 36.3087809, lng: 139.0938883,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.3087809, entranceLng: 139.0938883, exitLat: 36.3086123, exitLng: 139.0871443,
+                note: "【2026-07-15調査・座標のみ修正】群馬県内スマートICで初の本線直結型。WebSearchで「上り線と下り線に入口・出口がそれぞれある、全方向対応」と確認（高崎市公式サイトの設置位置図も確認）。entranceSelectable/exitSelectableは変更なし（trueのまま）。MapFanで入口（上り・下り）・出口（上り・下り）の4個別ページ全ての存在を確認。座標はentranceLat/Lngを入口(上り)(36.3087809,139.0938883)、exitLat/Lngを出口(下り)(36.3086123,139.0871443)に設定。従来座標(36.284,139.101)は実測値から約2.83km離れていたため、大幅な修正となった。"
             },
             { order: 13, displayName: "高崎IC", googleName: "関越自動車道 高崎インターチェンジ", lat: 36.308, lng: 139.063, connection: true, connectedRoads: ["kanetsu", "joshinetsu"],
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.308, entranceLng: 139.063, exitLat: 36.308, exitLng: 139.063
@@ -3595,8 +3600,9 @@ const IC_MASTER = {
             { order: 14, displayName: "前橋IC", googleName: "関越自動車道 前橋インターチェンジ", lat: 36.384, lng: 139.055,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.384, entranceLng: 139.055, exitLat: 36.384, exitLng: 139.055
             },
-            { order: 15, displayName: "駒寄SIC", googleName: "関越自動車道 駒寄スマートインターチェンジ", lat: 36.441, lng: 139.010,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.441, entranceLng: 139.010, exitLat: 36.441, exitLng: 139.010
+            { order: 15, displayName: "駒寄SIC", googleName: "関越自動車道 駒寄スマートインターチェンジ", lat: 36.4307719, lng: 139.0161246,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.4307719, entranceLng: 139.0161246, exitLat: 36.4307719, exitLng: 139.0161246,
+                note: "【2026-07-15調査・座標のみ修正】駒寄PA併設。WebSearchで「上下線ともに全方向対応、24時間利用可能」と確認。「上り線の駒寄PAを利用した後は駒寄スマートIC出口は利用できない。下り線の駒寄スマートIC入口から駒寄PAの利用はできない」という運用上の注意点はあるが、entranceSelectable/exitSelectable判定には影響しない。entranceSelectable/exitSelectableは変更なし（trueのまま）。MapFanで【入口（上り）】(36.4307719,139.0161246)は座標を確認できたが、【出口（下り）】は座標を確認できなかったため、entranceLat/Lng・exitLat/Lngとも入口(上り)の座標を暫定使用した。従来座標(36.441,139.010)から約1,263m修正。次回、出口(下り)の個別座標が確認できた場合は再検証が必要。"
             },
             { order: 16, displayName: "渋川伊香保IC", googleName: "関越自動車道 渋川伊香保インターチェンジ", lat: 36.493, lng: 139.007,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.493, entranceLng: 139.007, exitLat: 36.493, exitLng: 139.007
@@ -3634,8 +3640,9 @@ const IC_MASTER = {
             { order: 2, displayName: "吉井IC", googleName: "上信越自動車道 吉井インターチェンジ", lat: 36.250, lng: 138.986,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.250, entranceLng: 138.986, exitLat: 36.250, exitLng: 138.986
             },
-            { order: 2.5, displayName: "甘楽SIC", googleName: "上信越自動車道 甘楽スマートインターチェンジ", lat: 36.242, lng: 138.946,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.242, entranceLng: 138.946, exitLat: 36.242, exitLng: 138.946
+            { order: 2.5, displayName: "甘楽SIC", googleName: "上信越自動車道 甘楽スマートインターチェンジ", lat: 36.2431847, lng: 138.9458636,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.2431847, entranceLng: 138.9458636, exitLat: 36.2431847, exitLng: 138.9458636,
+                note: "【2026-07-15調査・座標のみ修正】2023年3月25日開通。「環道型退出路」という新しい退出路設計を採用。WebSearchで「上下線ともに24時間利用可能」と確認。「下り線（上越方面）はPA利用後にSIC流出可能だがSIC流入時はPA利用不可、上り線（藤岡方面）は逆」という運用上の注意点はあるが、entranceSelectable/exitSelectable判定には影響しない。entranceSelectable/exitSelectableは変更なし（trueのまま）。MapFanで【入口（上り）】(36.2431847,138.9458636)は座標を確認できたが、【出口（下り）】は座標を確認できなかったため、entranceLat/Lng・exitLat/Lngとも入口(上り)の座標を暫定使用した。従来座標(36.242,138.946)から約133m修正。次回、出口(下り)の個別座標が確認できた場合は再検証が必要。"
             },
             { order: 3, displayName: "富岡IC", googleName: "上信越自動車道 富岡インターチェンジ", lat: 36.250, lng: 138.891,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.250, entranceLng: 138.891, exitLat: 36.250, exitLng: 138.891

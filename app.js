@@ -11931,7 +11931,8 @@ function buildPolylineBasedComparisonIcCandidates(
     const forwardExitSelection =
         buildForwardExitComparisonIcCandidates(
             polylineAnalysis,
-            getIcIdentity
+            getIcIdentity,
+            candidateAreas
         );
 
     const exitCandidateIcs =
@@ -11976,7 +11977,8 @@ function buildPolylineBasedComparisonIcCandidates(
 
 function buildForwardExitComparisonIcCandidates(
     polylineAnalysis,
-    getIcIdentity
+    getIcIdentity,
+    candidateAreas
 ) {
 
     const routeTrace =
@@ -12122,6 +12124,23 @@ function buildForwardExitComparisonIcCandidates(
             }
             else if (isConnectionJunction) {
                 exclusionReason = "接続用JCT";
+            }
+            else if (
+                Array.isArray(candidateAreas) &&
+                candidateAreas.length > 0 &&
+                !candidate.isShuto &&
+                !candidateAreas.includes(candidate.icArea)
+            ) {
+                // 複合JCT付近（例：三郷JCT＝外環×常磐道、市川南IC等）で、
+                // 実際には走行していない別道路のICが最近傍として誤って
+                // routeTraceに混入するケースへの対策。candidateAreasは
+                // 実際に走行した道路から構築されているため、そこに含まれない
+                // エリアのIC（首都高を除く）は出口比較候補から除外する。
+                // candidateAreasが空（NEXCO道路エリアを特定できないルート）
+                // の場合は、安全側としてこの条件を発動させない。
+                exclusionReason =
+                    "candidateAreas外のエリアのため除外" +
+                    "（複合JCT付近での誤最近傍IC対策）";
             }
             else if (entranceExclusionReasons.has(identity)) {
                 exclusionReason =

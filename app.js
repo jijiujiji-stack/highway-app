@@ -5187,43 +5187,47 @@ const IC_MASTER = {
                 order: 0,
                 displayName: "蘇我IC",
                 googleName: "京葉道路 蘇我インターチェンジ",
-                lat: 35.568,
-                lng: 140.158,
+                lat: 35.568778,
+                lng: 140.137740,
                 connection: true,
                 connectedRoads: ["keiyo", "tokan", "tateyama"],
                 routeBranch: "keiyo",
                 branchOrder: 10,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.568, entranceLng: 140.158, exitLat: 35.568, exitLng: 140.158
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.568778, entranceLng: 140.137740, exitLat: 35.5686381, exitLng: 140.1382367,
+                note: "【2026-07-15調査・keiyo/tateyama側と統一】tokan側の3件目の重複登録であり、keiyo/tateyama側の蘇我ICと同一施設・同一検証結果（上り入口・下り出口のみ、MapFan確認）。詳細はkeiyo側のnote参照。従来座標(35.568,140.158)から約1.8km修正。Wikipedia「蘇我インターチェンジ」記事で2007年5月30日にフルインターチェンジ化したことを確認済みのため、entranceSelectable/exitSelectableはtrue/trueで変更なし。keiyo/tateyama側と同一の座標・値に統一した。"
             },
             {
                 order: 1,
                 displayName: "湾岸習志野IC",
                 googleName: "東関東自動車道 湾岸習志野インターチェンジ",
-                lat: 35.665,
-                lng: 140.016,
+                lat: 35.6624612,
+                lng: 140.0241855,
                 routeBranch: "tokan",
                 branchOrder: 3,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.665, entranceLng: 140.016, exitLat: 35.665, exitLng: 140.016
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.6624612, entranceLng: 140.0241855, exitLat: 35.6624612, exitLng: 140.0241855,
+                note: "【2026-07-15調査】ハーフIC。上り線（市川・東京方面）は入口のみ、下り線（成田・潮来方面）は出口のみ。湾岸千葉ICとセットで1つのフルICとして機能する。MapFanで「湾岸習志野ＩＣ（東関東自動車道）【入口（上り）】」「【出口（下り）】」の個別ページを確認したが、【入口（下り）】【出口（上り）】に相当するページは見つからず、構造と整合。本アプリの主な利用方向（下り方向）で実際に使える役割を優先する方針に基づき、下り方向で使える出口をexitSelectable:trueとし、上り方向のみの入口はentranceSelectable:falseとした（入口方向を代表とするPhase 1・貝塚IC/篠崎ICとは異なる基準）。座標はexitLat/Lngを出口(下り)(35.6624612,140.0241855)に設定。従来座標(35.665,140.016)から約793m修正。"
             },
             {
                 order: 2,
                 displayName: "湾岸千葉IC",
                 googleName: "東関東自動車道 湾岸千葉インターチェンジ",
-                lat: 35.638,
-                lng: 140.060,
+                lat: 35.6507885,
+                lng: 140.0524224,
                 routeBranch: "tokan",
                 branchOrder: 4,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.638, entranceLng: 140.060, exitLat: 35.638, exitLng: 140.060
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.6507885, entranceLng: 140.0524224, exitLat: 35.6507885, exitLng: 140.0524224,
+                note: "【2026-07-15調査】ハーフIC。上り線（東京方面）は出口のみ、下り線（成田・潮来方面）は入口のみ。湾岸習志野ICとセットで1つのフルICとして機能する。MapFanで「湾岸千葉ＩＣ（東関東自動車道）【入口（下り）】」「【出口（上り）】」の個別ページを確認したが、【入口（上り）】【出口（下り）】に相当するページは見つからず、構造と整合。本アプリの主な利用方向（下り方向）で実際に使える役割を優先する方針に基づき、下り方向で使える入口をentranceSelectable:trueとし、上り方向のみの出口はexitSelectable:falseとした。座標はentranceLat/Lngを入口(下り)(35.6507885,140.0524224)に設定。従来座標(35.638,140.060)から約1.58km修正。"
             },
             {
                 order: 3,
                 displayName: "千葉北IC",
                 googleName: "東関東自動車道 千葉北インターチェンジ",
-                lat: 35.676,
-                lng: 140.131,
+                lat: 35.6722126,
+                lng: 140.1205806,
                 routeBranch: "tokan",
                 branchOrder: 5,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.676, entranceLng: 140.131, exitLat: 35.676, exitLng: 140.131
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.6722126, entranceLng: 140.1205806, exitLat: 35.672391812865, exitLng: 140.12055367128,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「千葉北ＩＣ（東関東自動車道）【入口】」「【出口】」（方向表記なし）を確認し、NAVITIMEでも上り入口・上り出口・下り出口・下り入口の4方向存在の言及を確認したため、フルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.6722126,140.1205806)、exitLat/Lngを出口(35.672391812865,140.12055367128)に設定。従来座標(35.676,140.131)から修正。"
             },
             {
                 order: 4,
@@ -5299,11 +5303,12 @@ const IC_MASTER = {
                 order: 11,
                 displayName: "潮来IC",
                 googleName: "東関東自動車道 潮来インターチェンジ",
-                lat: 35.952,
-                lng: 140.574,
+                lat: 35.9370535,
+                lng: 140.58743,
                 routeBranch: "tokan",
                 branchOrder: 13,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.952, entranceLng: 140.574, exitLat: 35.952, exitLng: 140.574
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.9370535, entranceLng: 140.58743, exitLat: 35.9370535, exitLng: 140.58743,
+                note: "【2026-07-15調査】ハーフIC。上り入口・下り出口のみ（東関東自動車道のこのアプリ登録範囲の終点）。MapFanで「潮来ＩＣ（東関東自動車道）【入口（上り）】」「【出口（下り）】」の個別ページを確認。本アプリの主な利用方向（下り方向）で実際に使える役割を優先する方針に基づき、下り方向で使える出口をexitSelectable:trueとし、上り方向のみの入口はentranceSelectable:falseとした（入口方向を代表とするPhase 1・貝塚IC/篠崎ICとは異なる基準）。座標はexitLat/Lngを出口(下り)(35.9370535,140.58743)に設定。従来座標(35.952,140.574)から約2.06km修正。"
             }
         ]
     },

@@ -3314,25 +3314,28 @@ const IC_MASTER = {
                 order: 2,
                 displayName: "流山IC",
                 googleName: "常磐自動車道 流山インターチェンジ",
-                lat: 35.889,
-                lng: 139.911,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.889, entranceLng: 139.911, exitLat: 35.889, exitLng: 139.911
+                lat: 35.880116,
+                lng: 139.899009,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.880116, entranceLng: 139.899009, exitLat: 35.8800715, exitLng: 139.8988157,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「流山ＩＣ（常磐自動車道）【入口】」「【出口】」（方向表記なし、入口・出口ともほぼ同一地点）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.880116,139.899009)、exitLat/Lngを出口(35.8800715,139.8988157)に設定。従来座標(35.889,139.911)から約1.5km修正。"
             },
             {
                 order: 3,
                 displayName: "柏IC",
                 googleName: "常磐自動車道 柏インターチェンジ",
-                lat: 35.899,
-                lng: 139.953,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.899, entranceLng: 139.953, exitLat: 35.899, exitLng: 139.953
+                lat: 35.9074632,
+                lng: 139.9381266,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.9074632, entranceLng: 139.9381266, exitLat: 35.9076551, exitLng: 139.9381257,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「柏ＩＣ（常磐自動車道）【入口】」「【出口】」を確認し、NAVITIMEで上り入口・上り出口・下り入口・下り出口の4方向存在も確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.9074632,139.9381266)、exitLat/Lngを出口(35.9076551,139.9381257)に設定。従来座標(35.899,139.953)から約1.6km修正。"
             },
             {
                 order: 4,
                 displayName: "谷和原IC",
                 googleName: "常磐自動車道 谷和原インターチェンジ",
-                lat: 35.984,
-                lng: 140.000,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.984, entranceLng: 140.000, exitLat: 35.984, exitLng: 140.000
+                lat: 35.9726857,
+                lng: 139.9816383,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.9726857, entranceLng: 139.9816383, exitLat: 35.9729157, exitLng: 139.981621,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「谷和原ＩＣ（常磐自動車道）【入口】」「【出口】」（方向表記なし）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.9726857,139.9816383)、exitLat/Lngを出口(35.9729157,139.981621)に設定。従来座標(35.984,140.000)から約2.1km修正。"
             },
             {
                 order: 5,
@@ -3340,39 +3343,45 @@ const IC_MASTER = {
                 googleName: "常磐自動車道 守谷サービスエリア",
                 lat: 35.941,
                 lng: 139.993,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.941, entranceLng: 139.993, exitLat: 35.941, exitLng: 139.993
+                isSelectable: false,
+                entranceSelectable: false, exitSelectable: false, entranceLat: 35.941, entranceLng: 139.993, exitLat: 35.941, exitLng: 139.993,
+                note: "【2026-07-15調査・isSelectable:falseに変更】（仮称）守谷SAスマートICは2024年9月6日付でNEXCO東日本・国土交通省により新規事業化されたが、2025年度から着工し2030年度開通を目指す段階（守谷市公式サイト・日本工業経済新聞）であり、2026年7月現在は未開通。国交省の新規事業採択時評価資料では完成予定年月日を令和16年3月（2034年3月）とする記載もあり、開通時期には情報源間で幅があるが、いずれにせよ現時点で守谷SAから本線への出入りは一切できない。そのためentranceSelectable/exitSelectable/isSelectableをすべてfalseに変更。座標は変更なし。開通後に改めてMapFan等で座標確認のうえ有効化すること。"
             },
             {
                 order: 6,
                 displayName: "谷田部IC",
                 googleName: "常磐自動車道 谷田部インターチェンジ",
-                lat: 36.003,
-                lng: 140.076,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.003, entranceLng: 140.076, exitLat: 36.003, exitLng: 140.076
+                lat: 36.0223131,
+                lng: 140.0838017,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.0223131, entranceLng: 140.0838017, exitLat: 36.0214309, exitLng: 140.08531,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「谷田部ＩＣ（常磐自動車道）【入口】」「【出口】」（方向表記なし、1981年開通）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(36.0223131,140.0838017)、exitLat/Lngを出口(36.0214309,140.08531)に設定。従来座標(36.003,140.076)から約2.2km修正。"
             },
             {
                 order: 7,
                 displayName: "桜土浦IC",
                 googleName: "常磐自動車道 桜土浦インターチェンジ",
-                lat: 36.047,
-                lng: 140.141,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.047, entranceLng: 140.141, exitLat: 36.047, exitLng: 140.141
+                lat: 36.05839935,
+                lng: 140.15770271,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.05839935, entranceLng: 140.15770271, exitLat: 36.0585571, exitLng: 140.1579634,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「桜土浦ＩＣ（常磐自動車道）【入口】」「【出口】」（方向表記なし）を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(36.05839935,140.15770271)、exitLat/Lngを出口(36.0585571,140.1579634)に設定。従来座標(36.047,140.141)から約2.0km修正。"
             },
             {
                 order: 8,
                 displayName: "土浦北IC",
                 googleName: "常磐自動車道 土浦北インターチェンジ",
-                lat: 36.107,
-                lng: 140.197,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.107, entranceLng: 140.197, exitLat: 36.107, exitLng: 140.197
+                lat: 36.1185855,
+                lng: 140.1874296,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.1185855, entranceLng: 140.1874296, exitLat: 36.1186855, exitLng: 140.1875489,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「土浦北ＩＣ（常磐自動車道）【入口】」「【出口】」を確認し、NAVITIMEで上り・下りそれぞれの入口・出口の存在も確認したためフルICと判断（1982年開通）。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(36.1185855,140.1874296)、exitLat/Lngを出口(36.1186855,140.1875489)に設定。従来座標(36.107,140.197)から約1.55km修正。"
             },
             {
                 order: 9,
                 displayName: "千代田石岡IC",
                 googleName: "常磐自動車道 千代田石岡インターチェンジ",
-                lat: 36.171,
-                lng: 140.259,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.171, entranceLng: 140.259, exitLat: 36.171, exitLng: 140.259
+                lat: 36.1714792,
+                lng: 140.2486563,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.1714792, entranceLng: 140.2486563, exitLat: 36.1714958, exitLng: 140.2488688,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「千代田石岡ＩＣ（常磐自動車道）【入口】」「【出口】」を確認し、NAVITIMEで上り・下りの入口・出口の存在も確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(36.1714792,140.2486563)、exitLat/Lngを出口(36.1714958,140.2488688)に設定。従来座標(36.171,140.259)から約0.9km修正。"
             },
             {
                 order: 9.5,
@@ -3387,9 +3396,10 @@ const IC_MASTER = {
                 order: 10,
                 displayName: "岩間IC",
                 googleName: "常磐自動車道 岩間インターチェンジ",
-                lat: 36.300,
-                lng: 140.306,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.300, entranceLng: 140.306, exitLat: 36.300, exitLng: 140.306
+                lat: 36.2788329,
+                lng: 140.3215571,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.2788329, entranceLng: 140.3215571, exitLat: 36.2787815, exitLng: 140.3216226,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「岩間ＩＣ（常磐自動車道）【入口】」「【出口】」を確認し、NAVITIMEで上り入口・下り入口・下り出口の個別ページも確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(36.2788329,140.3215571)、exitLat/Lngを出口(36.2787815,140.3216226)に設定。従来座標(36.300,140.306)から約2.9km修正。"
             },
 
             {
@@ -3403,21 +3413,13 @@ const IC_MASTER = {
             },
 
             {
-                order: 11,
-                displayName: "友部SA",
-                googleName: "常磐自動車道 友部サービスエリア",
-                lat: 36.317,
-                lng: 140.346,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.317, entranceLng: 140.346, exitLat: 36.317, exitLng: 140.346
-            },
-
-            {
                 order: 12,
                 displayName: "水戸IC",
                 googleName: "常磐自動車道 水戸インターチェンジ",
-                lat: 36.381,
-                lng: 140.366,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.381, entranceLng: 140.366, exitLat: 36.381, exitLng: 140.366
+                lat: 36.3857038,
+                lng: 140.3809513,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.3857038, entranceLng: 140.3809513, exitLat: 36.3856437, exitLng: 140.3808258,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「水戸ＩＣ（常磐自動車道）【入口】」「【出口】」を確認し、上り・下りの入口・出口の存在も確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(36.3857038,140.3809513)、exitLat/Lngを出口(36.3856437,140.3808258)に設定。従来座標(36.381,140.366)から約1.44km修正。"
             },
             {
                 order: 12.5,
@@ -3432,9 +3434,10 @@ const IC_MASTER = {
                 order: 13,
                 displayName: "那珂IC",
                 googleName: "常磐自動車道 那珂インターチェンジ",
-                lat: 36.486,
-                lng: 140.472,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.486, entranceLng: 140.472, exitLat: 36.486, exitLng: 140.472
+                lat: 36.4527573,
+                lng: 140.4721514,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.4527573, entranceLng: 140.4721514, exitLat: 36.4520801, exitLng: 140.4717993,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「那珂ＩＣ（常磐自動車道）【入口】」「【出口】」を確認し、NAVITIMEで上り入口・上り出口・下り入口・下り出口の4方向存在も確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.486,140.472)は隣接する水戸北SIC(36.416)・東海SIC(36.4836)との並び順（南から北）と矛盾しており、実態より約3.8km北にずれていたと考えられる。新座標(36.452)は水戸北SICと東海SICの間に収まり、道路の並び順と整合する。座標はentranceLat/Lngを入口(36.4527573,140.4721514)、exitLat/Lngを出口(36.4520801,140.4717993)に設定。"
             },
             {
                 order: 13.5,
@@ -3449,9 +3452,10 @@ const IC_MASTER = {
                 order: 14,
                 displayName: "日立南太田IC",
                 googleName: "常磐自動車道 日立南太田インターチェンジ",
-                lat: 36.565,
-                lng: 140.543,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.565, entranceLng: 140.543, exitLat: 36.565, exitLng: 140.543
+                lat: 36.505991,
+                lng: 140.576371,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.505991, entranceLng: 140.576371, exitLat: 36.5060019, exitLng: 140.5764634,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「日立南太田ＩＣ（常磐自動車道）【入口】」「【出口】」を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.565,140.543)との差が約7.2kmとかなり大きいが、MapFanと住所ベースのMapion（茨城県日立市大和田町、日立市と常陸太田市の境界付近、東海村方面への最寄りIC）の2つの独立した情報源で座標が一致しており、確認値の信頼性は高い。座標はentranceLat/Lngを入口(36.505991,140.576371)、exitLat/Lngを出口(36.5060019,140.5764634)に設定。"
             },
             {
                 order: 15,
@@ -3473,33 +3477,37 @@ const IC_MASTER = {
                 order: 17,
                 displayName: "北茨城IC",
                 googleName: "常磐自動車道 北茨城インターチェンジ",
-                lat: 36.819,
-                lng: 140.744,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.819, entranceLng: 140.744, exitLat: 36.819, exitLng: 140.744
+                lat: 36.7954348,
+                lng: 140.7282678,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.7954348, entranceLng: 140.7282678, exitLat: 36.7954996, exitLng: 140.7282704,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「北茨城ＩＣ（常磐自動車道）【入口】」「【出口】」を確認し、NAVITIMEで上り・下りとも入口・出口の存在も確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(36.7954348,140.7282678)、exitLat/Lngを出口(36.7954996,140.7282704)に設定。従来座標(36.819,140.744)から約4.4km修正。"
             },
             {
                 order: 18,
                 displayName: "いわき勿来IC",
                 googleName: "常磐自動車道 いわき勿来インターチェンジ",
-                lat: 36.906,
-                lng: 140.786,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.906, entranceLng: 140.786, exitLat: 36.906, exitLng: 140.786
+                lat: 36.9046227,
+                lng: 140.7533887,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.9046227, entranceLng: 140.7533887, exitLat: 36.9047092, exitLng: 140.7533341,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「いわき勿来ＩＣ（常磐自動車道）【入口】」「【出口】」を確認し、上り・下りとも入口・出口の存在も確認したためフルICと判断（1988年開通）。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(36.9046227,140.7533887)、exitLat/Lngを出口(36.9047092,140.7533341)に設定。従来座標(36.906,140.786)から約2.9km修正。"
             },
             {
                 order: 19,
                 displayName: "いわき湯本IC",
                 googleName: "常磐自動車道 いわき湯本インターチェンジ",
-                lat: 37.008,
-                lng: 140.828,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 37.008, entranceLng: 140.828, exitLat: 37.008, exitLng: 140.828
+                lat: 37.000805,
+                lng: 140.8155608,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 37.000805, entranceLng: 140.8155608, exitLat: 37.0008083, exitLng: 140.8156662,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「いわき湯本ＩＣ（常磐自動車道）【入口】」「【出口】」を確認したためフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(37.000805,140.8155608)、exitLat/Lngを出口(37.0008083,140.8156662)に設定。従来座標(37.008,140.828)から約1.9km修正。"
             },
             {
                 order: 20,
                 displayName: "いわき中央IC",
                 googleName: "常磐自動車道 いわき中央インターチェンジ",
-                lat: 37.067,
-                lng: 140.849,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 37.067, entranceLng: 140.849, exitLat: 37.067, exitLng: 140.849
+                lat: 37.0705934,
+                lng: 140.8398687,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 37.0705934, entranceLng: 140.8398687, exitLat: 37.0706541, exitLng: 140.8397592,
+                note: "【2026-07-15調査・座標のみ修正】MapFanで「いわき中央ＩＣ（常磐自動車道）【入口】」「【出口】」を確認したためフルICと判断（1988年開通、いわき駅・市街地最寄り）。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(37.0705934,140.8398687)、exitLat/Lngを出口(37.0706541,140.8397592)に設定。従来座標(37.067,140.849)から約0.9km修正。"
             }
 
 

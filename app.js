@@ -4222,92 +4222,113 @@ const IC_MASTER = {
             { order: -1, displayName: "一ツ橋（首都高）", googleName: "首都高速都心環状線 一ツ橋出入口", lat: 35.692, lng: 139.758, experimental: true, roadType: "首都高",
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.692, entranceLng: 139.758, exitLat: 35.692, exitLng: 139.758
             },
-            { order: 1, displayName: "高井戸IC", googleName: "中央自動車道 高井戸インターチェンジ", lat: 35.684, lng: 139.611,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.684, entranceLng: 139.611, exitLat: 35.684, exitLng: 139.611
+            { order: 1, displayName: "高井戸IC", googleName: "中央自動車道 高井戸インターチェンジ", lat: 35.6794482, lng: 139.6090794,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.6794482, entranceLng: 139.6090794, exitLat: 35.6794482, exitLng: 139.6090794,
+                note: "【2026-07-16調査・構造修正】Wikipedia「高井戸インターチェンジ」、乗りものニュース(trafficnews.jp/post/119263)、Merkmal(merkmal-biz.jp/post/57540)の複数情報源で、下り線入口は開通以来一度も建設されていない（住民反対のため半世紀近く未着工）クオーターICであることを確認。上り線（都心方面）への出口のみが存在するため、entranceSelectable:falseに修正（従来はtrueだったが誤り）。2022年6月に杉並区が下り入口建設支援の方針を表明しているが、2026年7月現在も着工・開通の一次情報はなく、将来開通の可能性がある（開通ニュースが出た時点で再確認要）。座標はMapFan「高井戸ＩＣ（中央自動車道）【出口（上り）】」(35.6794482,139.6090794)で確認。従来座標(35.684,139.611)から約536m南西へ修正。"
             },
-            { order: 2, displayName: "調布IC", googleName: "中央自動車道 調布インターチェンジ", lat: 35.650, lng: 139.536,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.650, entranceLng: 139.536, exitLat: 35.650, exitLng: 139.536
+            { order: 2, displayName: "調布IC", googleName: "中央自動車道 調布インターチェンジ", lat: 35.659387, lng: 139.535350,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.659387, entranceLng: 139.535350, exitLat: 35.659264, exitLng: 139.535433,
+                note: "【2026-07-16調査・座標のみ修正】MapFan「調布ＩＣ（中央自動車道）【入口】」(35.659387,139.535350)「【出口】」(35.659264,139.535433)を確認（方向表記なし＝上下線とも利用可能）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.650,139.536)から約1.04km北へ修正。"
             },
-            { order: 3, displayName: "稲城IC", googleName: "中央自動車道 稲城インターチェンジ", lat: 35.638, lng: 139.510,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.638, entranceLng: 139.510, exitLat: 35.638, exitLng: 139.510
+            { order: 3, displayName: "稲城IC", googleName: "中央自動車道 稲城インターチェンジ", lat: 35.6533559, lng: 139.511935,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.6533559, entranceLng: 139.511935, exitLat: 35.6533559, exitLng: 139.511935,
+                note: "【2026-07-16調査・構造修正】Wikipedia「稲城インターチェンジ」でハーフICと確認。高井戸方面（都心方面）への入口と高井戸方面からの出口のみで、八王子方面への出入口はなし。MapFan「稲城ＩＣ（中央自動車道）【入口（上り）】」(35.6533559,139.511935)「【出口（下り）】」(35.6555611,139.5156709)のみ存在し、上り出口・下り入口のページは見つからず。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、exitSelectable:falseに修正（従来はtrueだったが誤り）。2015年開通の府中SIC（下り入口＋上り出口）と方向的に補完し合う構造（稲城ICとちょうど逆パターン）。座標は入口(上り)(35.6533559,139.511935)を採用。従来座標(35.638,139.510)から約1.72km北東へ修正。"
             },
             { order: 3.5, displayName: "府中SIC", googleName: "中央自動車道 府中スマートインターチェンジ", lat: 35.6597187, lng: 139.4993254,
                 entranceSelectable: true, exitSelectable: false, entranceLat: 35.6597187, entranceLng: 139.4993254, exitLat: 35.66022529455, exitLng: 139.49907940595,
                 note: "【2026-07-14調査・座標＋exitSelectable修正】東京都府中市公式サイト・Car Watch記事で「府中スマートインターチェンジは中央道の府中バス停を利用して設置され、下り線に八王子方面への入口、上り線に八王子方面からの出口のみが存在し、新宿・高井戸方面への接続はないハーフIC」と確認。MapFanでも【出口（上り）】【入口（下り）】の2ページのみ確認でき、【入口（上り）】【出口（下り）】は複数回の検索でも発見できなかった。本アプリは走行方向を区別できないため、入口方向（下り）を代表方向として採用し、上り出口の存在に関わらず下り方向にはない出口はexitSelectable:falseとした。座標はentranceLat/Lngを入口(下り)(35.6597187,139.4993254)、exitLat/Lngを出口(上り)(35.66022529455,139.49907940595)に設定。従来座標(35.660,139.496)から約302m修正。"
             },
-            { order: 4, displayName: "国立府中IC", googleName: "中央自動車道 国立府中インターチェンジ", lat: 35.668, lng: 139.457,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.668, entranceLng: 139.457, exitLat: 35.668, exitLng: 139.457
+            { order: 4, displayName: "国立府中IC", googleName: "中央自動車道 国立府中インターチェンジ", lat: 35.6745031, lng: 139.4429727,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.6745031, entranceLng: 139.4429727, exitLat: 35.6742594, exitLng: 139.4423788,
+                note: "【2026-07-16調査・座標のみ修正】MapFan「国立府中ＩＣ【入口】」(35.6745031,139.4429727)「【出口】」(35.6742594,139.4423788)を確認（方向表記なし）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.668,139.457)から約1.48km北西へ修正。"
             },
-            { order: 5, displayName: "八王子IC", googleName: "中央自動車道 八王子インターチェンジ", lat: 35.657, lng: 139.335,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.657, entranceLng: 139.335, exitLat: 35.657, exitLng: 139.335
+            { order: 5, displayName: "八王子IC", googleName: "中央自動車道 八王子インターチェンジ", lat: 35.6786623, lng: 139.3453319,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.6786623, entranceLng: 139.3453319, exitLat: 35.6784097, exitLng: 139.3441239,
+                note: "【2026-07-16調査・座標のみ修正】Wikipedia「八王子インターチェンジ」で上下線とも入口あり、上り線出口＋下り線に第1出口（16号バイパス方面）・第2出口（16号本線方面）の計2出口を確認。MapFanで「【入口（上り）】」(35.6786623,139.3453319)「【入口（下り）】」(35.6785033,139.3447615)「【出口】」(35.6784097,139.3441239)「【出口（下り）】」(35.6737057,139.3537599＝約900m離れた別ランプ)を確認。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標は主要クラスタを採用し、下り専用の遠い方の出口は代表点に含めていない。従来座標(35.657,139.335)から約2.57km北東へ修正。"
             },
-            { order: 6, displayName: "相模湖IC", googleName: "中央自動車道 相模湖インターチェンジ", lat: 35.616, lng: 139.190,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.616, entranceLng: 139.190, exitLat: 35.616, exitLng: 139.190
+            { order: 6, displayName: "相模湖IC", googleName: "中央自動車道 相模湖インターチェンジ", lat: 35.6154847, lng: 139.1700081,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.6154847, entranceLng: 139.1700081, exitLat: 35.6154942, exitLng: 139.1699444,
+                note: "【2026-07-16調査・座標のみ修正】MapFan「相模湖ＩＣ【入口】」(35.6154847,139.1700081)「【出口】」(35.6154942,139.1699444)を確認（方向表記なし）。近隣の「相模湖東IC」はクオーターIC(下り出口のみ)だが本ICとは別施設のため無関係。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.616,139.190)から約1.81km西へ修正。"
             },
-            { order: 7, displayName: "上野原IC", googleName: "中央自動車道 上野原インターチェンジ", lat: 35.631, lng: 139.109,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.631, entranceLng: 139.109, exitLat: 35.631, exitLng: 139.109
+            { order: 7, displayName: "上野原IC", googleName: "中央自動車道 上野原インターチェンジ", lat: 35.6187917, lng: 139.1138878,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.6187917, entranceLng: 139.1138878, exitLat: 35.6187775, exitLng: 139.1139427,
+                note: "【2026-07-16調査・座標のみ修正】MapFan「上野原ＩＣ【入口】」(35.6187917,139.1138878)「【出口】」(35.6187775,139.1139427)を確認（方向表記なし）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.631,139.109)から約1.43km南東へ修正。"
             },
             { order: 7.5, displayName: "談合坂SIC", googleName: "中央自動車道 談合坂スマートインターチェンジ", lat: 35.6237903, lng: 139.0428968,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.6237903, entranceLng: 139.0428968, exitLat: 35.6238141, exitLng: 139.0434099,
                 note: "【2026-07-14調査・座標のみ修正】WebSearchで「上り線（東京方面）はSA・PA接続型で談合坂SA（上り）を経由し、下り線（名古屋・長野方面）は本線直結型」という複雑な運用ルール（SA自体を利用できるか否かの違い）を確認したが、これは入口・出口の可否そのものには影響せず、全方向で利用可能なフルICであることを確認。MapFanでも方向表記のない【入口】【出口】の2ページ（実質同一地点、約46m差）を確認。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(35.6237903,139.0428968)、exitLat/Lngを出口(35.6238141,139.0434099)に設定。従来座標(35.629,139.045)から約610m修正。"
             },
-            { order: 8, displayName: "大月IC", googleName: "中央自動車道 大月インターチェンジ", lat: 35.616, lng: 138.949,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.616, entranceLng: 138.949, exitLat: 35.616, exitLng: 138.949
+            { order: 8, displayName: "大月IC", googleName: "中央自動車道 大月インターチェンジ", lat: 35.6038574, lng: 138.924613,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.6038574, entranceLng: 138.924613, exitLat: 35.603883, exitLng: 138.924718,
+                note: "【2026-07-16調査・座標のみ修正】MapFan「大月ＩＣ【入口】」(35.6038574,138.924613、方向表記なし)「【出口（上り）】」(35.603883,138.924718)を確認。NAVITIME検索で「中央自動車道 大月IC 下り 出口」ページの存在も確認したが、正確な個別座標は未取得（要再確認）。2003年の大月JCT改築で大月ICと一体化した構造。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.616,138.949)から約2.58km南西へ修正。"
             },
-            { order: 9, displayName: "勝沼IC", googleName: "中央自動車道 勝沼インターチェンジ", lat: 35.686, lng: 138.739,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.686, entranceLng: 138.739, exitLat: 35.686, exitLng: 138.739
+            { order: 9, displayName: "勝沼IC", googleName: "中央自動車道 勝沼インターチェンジ", lat: 35.6522691, lng: 138.734407,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.6522691, entranceLng: 138.734407, exitLat: 35.652144, exitLng: 138.734480,
+                note: "【2026-07-16調査・座標のみ修正】MapFan「勝沼ＩＣ【入口】」(35.6522691,138.734407)「【出口】」(35.652144,138.734480)を確認（方向表記なし）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.686,138.739)から約3.79km南へ修正。"
             },
-            { order: 10, displayName: "一宮御坂IC", googleName: "中央自動車道 一宮御坂インターチェンジ", lat: 35.657, lng: 138.688,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.657, entranceLng: 138.688, exitLat: 35.657, exitLng: 138.688
+            { order: 10, displayName: "一宮御坂IC", googleName: "中央自動車道 一宮御坂インターチェンジ", lat: 35.6363294, lng: 138.6747078,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.6363294, entranceLng: 138.6747078, exitLat: 35.633734, exitLng: 138.679111,
+                note: "【2026-07-16調査・座標のみ修正】MapFan「一宮御坂ＩＣ【入口】」(35.6363294,138.6747078、方向表記なし)を確認。【出口】個別ページはMapFanで特定できなかったため、NAVITIME「中央自動車道 一宮御坂IC 下り 出口」(35.633734,138.679111)で代替確認（要再確認）。Wikipediaにハーフ等の記載はなく、入口・出口とも料金ブース3基（ETC専用2・一般1）で対称的構成。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.657,138.688)から約2.64km南西へ修正。"
             },
             { order: 10.5, displayName: "笛吹八代SIC", googleName: "中央自動車道 笛吹八代スマートインターチェンジ", lat: 35.622877, lng: 138.634789,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.622877, entranceLng: 138.634789, exitLat: 35.622877, exitLng: 138.634789,
                 note: "【2026-07-14調査・座標のみ修正】NAVITIMEで上り出口・上り入口・下り出口・下り入口の4方向の存在を確認し、フルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。MapFanでは【出口（上り）】(35.623745,138.6335718)・【入口（下り）】(35.6220085,138.6360058)の2点のみ確認でき、代表座標方式（入口(上り)・出口(下り)）に必要な個別ランプ座標は確認できなかったため、確認できた2点の中間点(35.622877,138.634789)を暫定使用した。従来座標(35.623,138.636)から約235m修正。次回、入口(上り)・出口(下り)の個別座標が確認できた場合は再検証が必要。"
             },
-            { order: 11, displayName: "甲府昭和IC", googleName: "中央自動車道 甲府昭和インターチェンジ", lat: 35.627, lng: 138.553,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.627, entranceLng: 138.553, exitLat: 35.627, exitLng: 138.553
+            { order: 11, displayName: "甲府昭和IC", googleName: "中央自動車道 甲府昭和インターチェンジ", lat: 35.6443223, lng: 138.54056,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.6443223, entranceLng: 138.54056, exitLat: 35.6443808, exitLng: 138.5405097,
+                note: "【2026-07-16調査・座標のみ修正】MapFan「甲府昭和ＩＣ【入口】」(35.6443223,138.54056)「【出口】」(35.6443808,138.5405097)を確認（方向表記なし）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.627,138.553)から約2.24km北東へ修正。"
             },
             { order: 12, displayName: "双葉SIC", googleName: "中央自動車道 双葉スマートインターチェンジ", lat: 35.6802812, lng: 138.5126466,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.6802812, entranceLng: 138.5126466, exitLat: 35.6813188, exitLng: 138.5106729,
                 note: "【2026-07-14調査・座標のみ修正】開設当初（2005年4月供用開始）は東京方面（上り）のみのハーフICだったが、2009年11月21日に名古屋・長野方面（下り）が開通しフルICとなったことを確認。東京方面（上り線）入口と名古屋・長野方面（下り線）入口は別々の場所にある。entranceSelectable/exitSelectableは現状（フルIC）と一致しているため変更なし（trueのまま）。MapFanで入口(上り)・入口(下り)・出口(下り)の3個別ランプページを確認。座標はentranceLat/Lngを入口(上り)(35.6802812,138.5126466)、exitLat/Lngを出口(下り)(35.6813188,138.5106729)に設定。従来座標(35.705,138.503)は実測値から約2.9km離れていたため、大幅な修正となった。"
             },
-            { order: 13, displayName: "韮崎IC", googleName: "中央自動車道 韮崎インターチェンジ", lat: 35.718, lng: 138.445,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.718, entranceLng: 138.445, exitLat: 35.718, exitLng: 138.445
+            { order: 13, displayName: "韮崎IC", googleName: "中央自動車道 韮崎インターチェンジ", lat: 35.720358, lng: 138.465114,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.720358, entranceLng: 138.465114, exitLat: 35.722803, exitLng: 138.465125,
+                note: "【2026-07-16調査・座標のみ修正】MapFan「韮崎ＩＣ【出口】」(35.722803,138.465125)を確認。【入口】個別ページはMapFanで404となり直接確認不可のため、Wikipedia所在地座標(35.7203583,138.4651139)を暫定使用（要再確認）。入口2/出口3ブースで方向限定表記なし、フルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
-            { order: 14, displayName: "須玉IC", googleName: "中央自動車道 須玉インターチェンジ", lat: 35.795, lng: 138.406,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.795, entranceLng: 138.406, exitLat: 35.795, exitLng: 138.406
+            { order: 14, displayName: "須玉IC", googleName: "中央自動車道 須玉インターチェンジ", lat: 35.773514, lng: 138.420569,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.773514, entranceLng: 138.420569, exitLat: 35.773448, exitLng: 138.420475,
+                note: "【2026-07-16調査・座標のみ修正】MapFan「須玉ＩＣ【入口】」(35.773514,138.420569)「【出口】」(35.773448,138.420475)を確認（方向表記なし）。Wikipedia座標(35.7727972,138.4238944)とも近似一致。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.795,138.406)から約2.6km修正。"
             },
-            { order: 15, displayName: "長坂IC", googleName: "中央自動車道 長坂インターチェンジ", lat: 35.841, lng: 138.366,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.841, entranceLng: 138.366, exitLat: 35.841, exitLng: 138.366
+            { order: 15, displayName: "長坂IC", googleName: "中央自動車道 長坂インターチェンジ", lat: 35.833392, lng: 138.389958,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.833392, entranceLng: 138.389958, exitLat: 35.833411, exitLng: 138.390026,
+                note: "【2026-07-16調査・座標のみ修正】MapFan「長坂ＩＣ【入口】」(35.833392,138.389958)「【出口】」(35.833411,138.390026)を確認（方向表記なし、フルICとWikipediaに明記）。Wikipedia座標(35.8363250,138.3885111)も近傍。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.841,138.366)から約2.3km修正。"
             },
-            { order: 16, displayName: "小淵沢IC", googleName: "中央自動車道 小淵沢インターチェンジ", lat: 35.888, lng: 138.316,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.888, entranceLng: 138.316, exitLat: 35.888, exitLng: 138.316
+            { order: 16, displayName: "小淵沢IC", googleName: "中央自動車道 小淵沢インターチェンジ", lat: 35.870211, lng: 138.309598,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.870211, entranceLng: 138.309598, exitLat: 35.870178, exitLng: 138.309540,
+                note: "【2026-07-16調査・座標のみ修正】MapFan「小淵沢ＩＣ【入口】」(35.870211,138.309598)「【出口】」(35.870178,138.309540)を確認（方向表記なし）。Wikipedia座標(35.8707611,138.3114778)とも整合。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.888,138.316)から約2.1km修正。"
             },
-            { order: 17, displayName: "諏訪南IC", googleName: "中央自動車道 諏訪南インターチェンジ", lat: 35.973, lng: 138.232,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.973, entranceLng: 138.232, exitLat: 35.973, exitLng: 138.232
+            { order: 17, displayName: "諏訪南IC", googleName: "中央自動車道 諏訪南インターチェンジ", lat: 35.936407, lng: 138.213577,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.936407, entranceLng: 138.213577, exitLat: 35.936450, exitLng: 138.213655,
+                note: "【2026-07-16調査・座標のみ修正】MapFan「諏訪南ＩＣ【入口】」(35.936407,138.213577)「【出口】」(35.936450,138.213655)を確認（方向表記なし）。Wikipedia座標(35.9374500,138.2107111)とも近い。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.973,138.232)から約4.4km修正（今回調査した通常IC21件中、乖離が最大）。"
             },
-            { order: 18, displayName: "諏訪IC", googleName: "中央自動車道 諏訪インターチェンジ", lat: 36.031, lng: 138.114,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.031, entranceLng: 138.114, exitLat: 36.031, exitLng: 138.114
+            { order: 18, displayName: "諏訪IC", googleName: "中央自動車道 諏訪インターチェンジ", lat: 36.007708, lng: 138.130064,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.007708, entranceLng: 138.130064, exitLat: 36.007786, exitLng: 138.130017,
+                note: "【2026-07-16調査・座標のみ修正】MapFan「諏訪ＩＣ【入口】」(36.007708,138.130064)「【出口】」(36.007786,138.130017)を確認（入口3/出口6ブース、方向限定表記なし）。Wikipedia座標(36.003139,138.128028、所在地住所ベースでやや南寄り)、NAVITIME経由の36.003558,138.125587も参考値として近似。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.031,138.114)から約2.9km修正。"
             },
             { order: 18.5, displayName: "諏訪湖SIC", googleName: "中央自動車道 諏訪湖スマートインターチェンジ", lat: 36.026, lng: 138.079,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.026, entranceLng: 138.079, exitLat: 36.026, exitLng: 138.079,
                 note: "【2026-07-14調査】2025年7月27日15時開通の新しいSICで、中央自動車道 諏訪湖サービスエリアに直結、上下線とも全方向・24時間利用可能なフルICであることをNEXCO中日本プレスリリース等で確認。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標は開通から日が浅くMapFan個別ランプページ等で確認できなかったため、既存値を維持（精度未確認、要再確認）。"
             },
-            { order: 19, displayName: "岡谷IC", googleName: "長野自動車道 岡谷インターチェンジ", lat: 36.056, lng: 138.050,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.056, entranceLng: 138.050, exitLat: 36.056, exitLng: 138.050
+            { order: 19, displayName: "岡谷IC", googleName: "長野自動車道 岡谷インターチェンジ", lat: 36.086041, lng: 138.039685,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.086041, entranceLng: 138.039685, exitLat: 36.085700, exitLng: 138.039597,
+                note: "【2026-07-16調査・座標のみ修正】MapFan「岡谷ＩＣ【入口】」(36.086041,138.039685)「【出口】」(36.085700,138.039597)を確認（入口3/出口5ブース、方向限定表記なし）。Wikipedia座標(36.082775,138.038075、岡谷JCTから3.7km地点と明記＝岡谷JCTとは別施設と確認済み)。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.056,138.050)から約3.4km修正。"
             },
-            { order: 20, displayName: "塩尻IC", googleName: "長野自動車道 塩尻インターチェンジ", lat: 36.093, lng: 137.963,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.093, entranceLng: 137.963, exitLat: 36.093, exitLng: 137.963
+            { order: 20, displayName: "塩尻IC", googleName: "長野自動車道 塩尻インターチェンジ", lat: 36.117071, lng: 137.979454,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.117071, entranceLng: 137.979454, exitLat: 36.117014, exitLng: 137.979508,
+                note: "【2026-07-16調査・座標のみ修正】MapFan「塩尻ＩＣ【入口】」(36.117071,137.979454)「【出口】」(36.117014,137.979508)を確認（入口2/出口3ブース、方向限定表記なし。塩尻北ICとは別施設と確認済み）。Wikipedia座標(36.1182722,137.9816500)とも近似。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.093,137.963)から約3.0km修正。"
             },
-            { order: 21, displayName: "松本IC", googleName: "長野自動車道 松本インターチェンジ", lat: 36.219, lng: 137.940,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.219, entranceLng: 137.940, exitLat: 36.219, exitLng: 137.940
+            { order: 21, displayName: "松本IC", googleName: "長野自動車道 松本インターチェンジ", lat: 36.232035, lng: 137.940170,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.232035, entranceLng: 137.940170, exitLat: 36.231188, exitLng: 137.940274,
+                note: "【2026-07-16調査・座標のみ修正】MapFan「松本ＩＣ【入口】」(36.232035,137.940170)「【出口】」(36.231188,137.940274)を確認（入口3/出口6ブース、方向限定表記なし）。Wikipedia座標(36.2334556,137.9385111)とも近似。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.219,137.940)から約1.4km修正（今回調査した通常IC21件中、乖離が最小）。"
             },
             { order: 21.5, displayName: "梓川SIC", googleName: "長野自動車道 梓川スマートインターチェンジ", lat: 36.2689233, lng: 137.931837,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.2689233, entranceLng: 137.931837, exitLat: 36.261153, exitLng: 137.933979,
                 note: "【2026-07-14調査・座標のみ修正】WebSearchで「上下線ともに全方向対応（2010年11月27日供用開始、梓川SAに併設）」と確認。MapFanで入口（上り・下り）・出口（上り・下り）の4個別ページの存在を確認し、フルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(36.2689233,137.931837)、exitLat/Lngを出口(下り)(36.261153,137.933979)に設定。従来座標(36.266,137.933)から約342m修正。"
             },
-            { order: 22, displayName: "安曇野IC", googleName: "長野自動車道 安曇野インターチェンジ", lat: 36.300, lng: 137.898,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.300, entranceLng: 137.898, exitLat: 36.300, exitLng: 137.898
+            { order: 22, displayName: "安曇野IC", googleName: "長野自動車道 安曇野インターチェンジ", lat: 36.300446, lng: 137.924027,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.300446, entranceLng: 137.924027, exitLat: 36.300450, exitLng: 137.923889,
+                note: "【2026-07-16調査・座標のみ修正】MapFan「安曇野ＩＣ【入口】」(36.300446,137.924027)「【出口】」(36.300450,137.923889)を確認（入口3/出口5ブース、方向限定表記なし。WikipediaにフルICと明記）。Wikipedia座標(36.2985861,137.9253556)も整合。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.300,137.898)から約2.3km修正。"
             }
         ]
     },

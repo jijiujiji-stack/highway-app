@@ -273,6 +273,10 @@ button {
     font-weight: normal;
 }
 
+.assumed-route-no-toll-note {
+    color: var(--color-equal);
+}
+
 .assumed-route-road {
     display: inline-block;
     margin: 0 2px;

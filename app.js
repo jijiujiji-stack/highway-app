@@ -241,15 +241,86 @@ function isProbablyNoTollRouteByMetrics(
     );
 }
 
+// 以下2つの閾値は理論的な初期提案値であり、実車確認での調整が前提。
+// MATCH_DISTANCE_METERSは「同じ道」とみなす距離、MATCH_RATIO_THRESHOLDは
+// 「ほぼ同一ルート」とみなす一致率の下限。
+const POLYLINE_COMPARISON_MATCH_DISTANCE_METERS = 50;
+const POLYLINE_COMPARISON_MATCH_RATIO_THRESHOLD = 0.9;
+
+// isProbablyNoTollRouteByMetrics（所要時間・距離の差による間接判定）とは
+// 別に、高速利用ルートと有料回避ルートの実際の経路形状（Polyline）を
+// 直接比較し、ほぼ同一経路であれば「有料道路を実質使っていない」と
+// 判定する。highway側はpolylineAnalysis.sampledPoints
+// （analyzeHighwayRoutePolyline側で既にデコード・サンプリング済み、
+// 500m間隔）をそのまま再利用し、local側のencodedPolylineのみ新たに
+// デコード・サンプリングすることで、重複計算を避けている。
+function isProbablyNoTollRouteByPolylineComparison(
+    polylineAnalysis,
+    localRoute
+) {
+    const sampledHighwayPoints =
+        polylineAnalysis?.sampledPoints;
+
+    const localEncodedPolyline =
+        localRoute?.polyline?.encodedPolyline;
+
+    if (
+        !Array.isArray(sampledHighwayPoints) ||
+        sampledHighwayPoints.length === 0 ||
+        !localEncodedPolyline
+    ) {
+        return false;
+    }
+
+    const localPoints =
+        decodeRoutesEncodedPolyline(localEncodedPolyline);
+
+    if (localPoints.length === 0) {
+        return false;
+    }
+
+    const sampledLocalPoints =
+        sampleRoutePointsByDistance(localPoints, 500);
+
+    if (sampledLocalPoints.length === 0) {
+        return false;
+    }
+
+    const matchedCount =
+        sampledHighwayPoints.filter(highwayPoint =>
+            sampledLocalPoints.some(localPoint =>
+                calculateDistance(
+                    highwayPoint.lat,
+                    highwayPoint.lng,
+                    localPoint.lat,
+                    localPoint.lng
+                ) <= POLYLINE_COMPARISON_MATCH_DISTANCE_METERS
+            )
+        ).length;
+
+    const matchRatio =
+        matchedCount / sampledHighwayPoints.length;
+
+    return (
+        matchRatio >=
+        POLYLINE_COMPARISON_MATCH_RATIO_THRESHOLD
+    );
+}
+
+// 「※有料未使用かも」表示は、Polyline直接比較方式
+// （isProbablyNoTollRouteByPolylineComparison、「参考：高速利用ルート」欄）
+// に一本化したため無効化。関数自体はisProbablyNoTollRouteByMetricsとともに
+// 削除せず残し、常に非表示相当（空文字）を返すようにしている。
 function createProbablyNoTollRouteNoteHtml(
     isProbablyNoTollRoute
 ) {
 
-    return isProbablyNoTollRoute
-        ? "<div class=\"probably-no-toll-note\">※有料未使用かも</div>"
-        : "";
+    return "";
 }
 
+// 「※有料未使用かも」表示は、Polyline直接比較方式
+// （isProbablyNoTollRouteByPolylineComparison、「参考：高速利用ルート」欄）
+// に一本化したため無効化。関数自体は削除せず残し、常に非表示にする。
 function updateProbablyNoTollRouteNote(
     isProbablyNoTollRoute
 ) {
@@ -264,19 +335,11 @@ function updateProbablyNoTollRouteNote(
         return;
     }
 
-    note.textContent =
-        isProbablyNoTollRoute
-            ? "※有料未使用かも"
-            : "";
+    note.textContent = "";
+    note.hidden = true;
 
-    note.hidden = !isProbablyNoTollRoute;
-
-    spacer.textContent =
-        isProbablyNoTollRoute
-            ? "※有料未使用かも"
-            : "";
-
-    spacer.hidden = !isProbablyNoTollRoute;
+    spacer.textContent = "";
+    spacer.hidden = true;
 }
 
 function incrementRouteSearchUsage() {
@@ -749,7 +812,12 @@ function updateDashboardAssumedRouteForComparisonMode() {
 
     dashboardAssumedRouteValue.innerHTML =
         "<span class=\"dashboard-assumed-route-label\">参考：高速利用ルート</span>" +
-        (assumedRouteHtml || "ルート情報なし");
+        (
+            lastProbablyNoTollRouteByPolylineComparison
+                ? "<span class=\"assumed-route-no-toll-note\">" +
+                    "（有料道路を使用していません）</span>"
+                : (assumedRouteHtml || "ルート情報なし")
+        );
 }
 
 function createMainTollEstimateHtml(tollEstimate) {
@@ -6822,6 +6890,7 @@ let lastResolvedIcArea = null;
 let lastSearchMode = "";
 let lastLocalRouteMinutes = null;
 let lastProbablyNoTollRoute = false;
+let lastProbablyNoTollRouteByPolylineComparison = false;
 
 let invalidIcResults = [];
 
@@ -8000,7 +8069,7 @@ async function getLocalRoute(
                     CONFIG.GOOGLE_MAPS_API_KEY,
 
                 "X-Goog-FieldMask":
-                    "routes.duration,routes.distanceMeters"
+                    "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline"
             },
 
             body: JSON.stringify({
@@ -8131,6 +8200,16 @@ async function displayRouteComparison(
 
     lastHighwayRoutePolylineAnalysis =
         polylineAnalysis;
+
+    // 高速利用ルート・有料回避ルートの実際の経路形状（Polyline）を直接
+    // 比較し、ほぼ同一経路なら「有料道路を実質使っていない」とみなす。
+    // 「参考：高速利用ルート」欄への表示にのみ使う（トップパネルの
+    // isProbablyNoTollRoute／updateProbablyNoTollRouteNoteとは別系統）。
+    lastProbablyNoTollRouteByPolylineComparison =
+        isProbablyNoTollRouteByPolylineComparison(
+            polylineAnalysis,
+            local
+        );
 
     lastHighwayRoutePolylineAnalysisKey =
         polylineAnalysis
@@ -8394,7 +8473,10 @@ async function displayRouteComparison(
         document
             .getElementById("dashboardAssumedRouteValue")
             .innerHTML =
-            assumedRouteHtml || "ルート情報なし";
+            lastProbablyNoTollRouteByPolylineComparison
+                ? "<span class=\"assumed-route-no-toll-note\">" +
+                    "（有料道路を使用していません）</span>"
+                : (assumedRouteHtml || "ルート情報なし");
     }
 
     document

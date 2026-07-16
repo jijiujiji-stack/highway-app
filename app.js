@@ -554,18 +554,86 @@ function createAssumedRouteIcPart(
     };
 }
 
+// buildAssumedRouteHtml用：ICオブジェクト（shutoEntranceIc等）が
+// routeTrace（走行順のサンプル点列）上で最初に現れる位置
+// （routeDistanceMeters）を探す。googleName優先、なければdisplayNameで照合。
+function findAssumedRouteIcRouteDistanceMeters(routeTrace, ic) {
+    if (!ic) {
+        return null;
+    }
+
+    const match = routeTrace.find(item =>
+        item.exit &&
+        (
+            ic.googleName
+                ? item.exit.googleName === ic.googleName
+                : item.exit.displayName === ic.displayName
+        )
+    );
+
+    return match ? match.routeDistanceMeters : null;
+}
+
+// buildAssumedRouteHtml用：道路ラベル（shortenHighwayRoadName後の表示名）
+// に対応する元ラベル群が、roadSwitches（走行順の道路切替地点）で
+// 切り替わった位置を探す。切替地点自体はfrom/toの中間点のため、
+// 切替直後のIC（afterExit）自身の位置と比較し、遅い方（Math.max）を
+// 採用することで、entrance系ICとの同着（タイブレークで解決）を保証する。
+// 該当する切替が見つからない場合（ルート先頭からその道路のケース）は、
+// routeTrace内でそのラベルが最初に現れる位置にフォールバックする。
+function findAssumedRouteRoadRouteDistanceMeters(
+    routeTrace,
+    roadSwitches,
+    matchingRawLabels
+) {
+    const switchEntry =
+        roadSwitches.find(item =>
+            matchingRawLabels.includes(item.toRoad)
+        );
+
+    if (switchEntry) {
+        const afterExitDistanceMeters =
+            findAssumedRouteIcRouteDistanceMeters(
+                routeTrace,
+                switchEntry.afterExit
+            );
+
+        return afterExitDistanceMeters !== null
+            ? Math.max(
+                switchEntry.routeDistanceMeters,
+                afterExitDistanceMeters
+            )
+            : switchEntry.routeDistanceMeters;
+    }
+
+    const firstOccurrence =
+        routeTrace.find(item =>
+            matchingRawLabels.includes(item.roadLabel)
+        );
+
+    return firstOccurrence
+        ? firstOccurrence.routeDistanceMeters
+        : Infinity;
+}
+
 function buildAssumedRouteHtml(polylineAnalysis) {
     if (!polylineAnalysis) {
         return "";
     }
 
+    // ノイズ補正済みのrouteTrace/roadSwitchesのみ使用する
+    // （rawRouteTrace/rawRoadSwitchesは誤混入対策前のため使わない）。
+    const routeTrace = polylineAnalysis.routeTrace || [];
+    const roadSwitches = polylineAnalysis.roadSwitches || [];
+
+    const rawRoadLabels =
+        polylineAnalysis.displayRoadSequence ||
+        polylineAnalysis.roadSequence ||
+        [];
+
     const routeRoads = [
         ...new Set(
-            (
-                polylineAnalysis.displayRoadSequence ||
-                polylineAnalysis.roadSequence ||
-                []
-            )
+            rawRoadLabels
                 .map(shortenHighwayRoadName)
                 .filter(roadName =>
                     roadName && roadName !== "首都高"
@@ -573,29 +641,82 @@ function buildAssumedRouteHtml(polylineAnalysis) {
         )
     ];
 
+    // tieRankは同一routeDistanceMetersでの並び順を決めるタイブレーク。
+    // 「entrance系IC→道路名」「道路名→exit系IC」という自然な並びに
+    // なるよう、entrance系を負、道路名を0、exit系を正にしている。
+    const buildIcPart = (ic, role, roadPrefix, tieRank) => {
+        const part = createAssumedRouteIcPart(ic, role, roadPrefix);
+
+        if (!part) {
+            return null;
+        }
+
+        const routeDistanceMeters =
+            findAssumedRouteIcRouteDistanceMeters(routeTrace, ic);
+
+        return {
+            ...part,
+            tieRank,
+            routeDistanceMeters:
+                routeDistanceMeters !== null
+                    ? routeDistanceMeters
+                    : (
+                        role === "entrance"
+                            ? -Infinity
+                            : Infinity
+                    )
+        };
+    };
+
     const routeParts = [
-        createAssumedRouteIcPart(
+        buildIcPart(
             polylineAnalysis.shutoEntranceIc,
             "entrance",
-            "首都高"
+            "首都高",
+            -1
         ),
-        createAssumedRouteIcPart(
+        buildIcPart(
             polylineAnalysis.shutoExitIc,
-            "exit"
+            "exit",
+            "",
+            1
         ),
-        createAssumedRouteIcPart(
+        buildIcPart(
             polylineAnalysis.nexcoEntranceIc,
-            "entrance"
+            "entrance",
+            "",
+            -1
         ),
-        ...routeRoads.map(roadName => ({
-            identity: "road:" + roadName,
-            html: createAssumedRouteRoadHtml(roadName)
-        })),
-        createAssumedRouteIcPart(
+        buildIcPart(
             polylineAnalysis.nexcoExitIc,
-            "exit"
-        )
-    ].filter(Boolean);
+            "exit",
+            "",
+            1
+        ),
+        ...routeRoads.map(roadName => {
+            const matchingRawLabels =
+                rawRoadLabels.filter(rawLabel =>
+                    shortenHighwayRoadName(rawLabel) === roadName
+                );
+
+            return {
+                identity: "road:" + roadName,
+                html: createAssumedRouteRoadHtml(roadName),
+                tieRank: 0,
+                routeDistanceMeters:
+                    findAssumedRouteRoadRouteDistanceMeters(
+                        routeTrace,
+                        roadSwitches,
+                        matchingRawLabels
+                    )
+            };
+        })
+    ]
+        .filter(Boolean)
+        .sort((a, b) =>
+            (a.routeDistanceMeters - b.routeDistanceMeters) ||
+            (a.tieRank - b.tieRank)
+        );
 
     const displayedIdentities = new Set();
 

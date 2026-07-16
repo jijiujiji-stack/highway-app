@@ -4262,6 +4262,11 @@ const IC_MASTER = {
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.6038574, entranceLng: 138.924613, exitLat: 35.603883, exitLng: 138.924718,
                 note: "【2026-07-16調査・座標のみ修正】MapFan「大月ＩＣ【入口】」(35.6038574,138.924613、方向表記なし)「【出口（上り）】」(35.603883,138.924718)を確認。NAVITIME検索で「中央自動車道 大月IC 下り 出口」ページの存在も確認したが、正確な個別座標は未取得（要再確認）。2003年の大月JCT改築で大月ICと一体化した構造。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.616,138.949)から約2.58km南西へ修正。"
             },
+            { order: 8.6, displayName: "大月JCT", googleName: "中央自動車道 大月ジャンクション", lat: 35.602342, lng: 138.916861,
+                isSelectable: false, connection: true, connectedRoads: ["chuo", "fujiyoshida"],
+                entranceSelectable: false, exitSelectable: false, entranceLat: 35.602342, entranceLng: 138.916861, exitLat: 35.602342, exitLng: 138.916861,
+                note: "【2026-07-16調査・新規追加】中央自動車道本線と中央道富士吉田線の分岐点。Wikipedia「大月ジャンクション」座標(北緯35度36分8.43秒 東経138度55分0.7秒)を10進変換。大月ICと構造上一体化しているが、既存のJCT登録パターン（八王子JCT・鶴ヶ島JCT・久喜白岡JCT等、いずれも接続する2エリアのうちorder列上に物理的に存在する側にのみ1件登録）に倣い、fujiyoshida側には重複登録せずchuo側にのみ登録。座標は既存chuoの大月IC(35.6038574,138.924613)から約1.5km。"
+            },
             { order: 9, displayName: "勝沼IC", googleName: "中央自動車道 勝沼インターチェンジ", lat: 35.6522691, lng: 138.734407,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.6522691, entranceLng: 138.734407, exitLat: 35.652144, exitLng: 138.734480,
                 note: "【2026-07-16調査・座標のみ修正】MapFan「勝沼ＩＣ【入口】」(35.6522691,138.734407)「【出口】」(35.652144,138.734480)を確認（方向表記なし）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.686,138.739)から約3.79km南へ修正。"
@@ -4329,6 +4334,25 @@ const IC_MASTER = {
             { order: 22, displayName: "安曇野IC", googleName: "長野自動車道 安曇野インターチェンジ", lat: 36.300446, lng: 137.924027,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.300446, entranceLng: 137.924027, exitLat: 36.300450, exitLng: 137.923889,
                 note: "【2026-07-16調査・座標のみ修正】MapFan「安曇野ＩＣ【入口】」(36.300446,137.924027)「【出口】」(36.300450,137.923889)を確認（入口3/出口5ブース、方向限定表記なし。WikipediaにフルICと明記）。Wikipedia座標(36.2985861,137.9253556)も整合。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.300,137.898)から約2.3km修正。"
+            }
+        ]
+    },
+
+
+    fujiyoshida: {
+        label: "中央道 富士吉田線方面",
+        exits: [
+            { order: 1, displayName: "都留IC", googleName: "中央自動車道富士吉田線 都留インターチェンジ", lat: 35.5614664, lng: 138.907034,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.5614664, entranceLng: 138.907034, exitLat: 35.5614144, exitLng: 138.9070686,
+                note: "【2026-07-16調査・新規追加】1971年3月29日開設（当初クオーターIC）、1984年ハーフIC化を経て2011年8月10日フルIC化（河口湖方向の入口・出口が追加）。大月JCT方向・河口湖方向とも入口・出口利用可（フルIC）。座標はMapFan「都留ＩＣ（中央自動車道（河口湖線））【入口】」(35.5614664,138.907034)「【出口】」(35.5614144,138.9070686)で確認（方向表記なし）。出典：https://ja.wikipedia.org/wiki/都留インターチェンジ"
+            },
+            { order: 2, displayName: "富士吉田西桂SIC", googleName: "中央自動車道富士吉田線 富士吉田西桂スマートインターチェンジ", lat: 35.5077553, lng: 138.8300251,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.5077553, entranceLng: 138.8300251, exitLat: 35.5077353, exitLng: 138.8299946,
+                note: "【2026-07-16調査・新規追加】段階開通（2018年4月15日：大月JCT方面供用、同年8月6日：河口湖IC方面供用）を経て現在フルIC。ETC搭載全車種24時間、上下線とも出入可。座標はMapFan「富士吉田西桂スマートＩＣ（中央自動車道（河口湖線））【入口】」(35.5077553,138.8300251)「【出口】」(35.5077353,138.8299946)で確認（方向表記なし。方向別個別ランプページは見つからず、実際に方向別の物理的なランプ分岐があるかは未確認）。出典：https://ja.wikipedia.org/wiki/富士吉田西桂スマートインターチェンジ"
+            },
+            { order: 3, displayName: "河口湖IC", googleName: "中央自動車道富士吉田線 河口湖インターチェンジ", lat: 35.4859964, lng: 138.7750739,
+                entranceSelectable: false, exitSelectable: true, entranceLat: 35.4859964, entranceLng: 138.7750739, exitLat: 35.4859964, exitLng: 138.7750739,
+                note: "【2026-07-16調査・新規追加】1969年3月17日開通のハーフIC。大月JCT方面のみの出入口で、富士吉田/東富士五湖道路方面の出入口はなし（隣接する富士吉田IC(1.0km先、東富士五湖道路)とセットで実質フルICを構成するが、本アプリの範囲＝中央道富士吉田線には含めていない）。本アプリの並び順（大月JCT→河口湖方向）では「下り出口」のみが該当方向のため、exitSelectable:trueとしexit座標はMapFan「河口湖ＩＣ【出口（下り）】」(35.4859964,138.7750739)を採用。「上り入口」（河口湖から大月方面へ向かう入口、MapFan【入口（上り）】35.485998,138.7749156で確認）は本アプリの並び順では使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。出典：https://ja.wikipedia.org/wiki/河口湖インターチェンジ"
             }
         ]
     },

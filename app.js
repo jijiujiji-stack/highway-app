@@ -893,17 +893,17 @@ const SHUTO_IC_MASTER = [
         routeCode: "6",
         routeName: "首都高速6号向島線",
         order: 6,
-        lat: 35.731,
-        lng: 139.817,
-        entranceLat: 35.731,
-        entranceLng: 139.817,
-        exitLat: 35.731,
-        exitLng: 139.817,
+        lat: 35.7357056,
+        lng: 139.8150419,
+        entranceLat: 35.7357056,
+        entranceLng: 139.8150419,
+        exitLat: 35.7357056,
+        exitLng: 139.8150419,
         entranceSelectable: true,
         exitSelectable: true,
         sourceAreaKeys: ["joban", "chuo", "tomei", "aqualine", "keiyo", "tokan"],
         sourceGoogleNames: ["首都高速6号向島線 堤通出入口"],
-        note: "既存IC_MASTERから正規化登録。現時点では未参照。"
+        note: "【2026-07-18調査・座標修正】従来は「既存IC_MASTERから正規化登録。現時点では未参照。」という暫定登録で、座標も(35.731,139.817)という未検証の丸め値だった。MapFan「堤通ランプ（６号向島線）【入口（下り）】」で実測座標(35.7357056,139.8150419)を確認し修正。従来座標からの誤差は約551m。参考情報として、NAVITIME等の別情報源では(35.739613,139.815804)という値も見られ、MapFan実測値とは約460mの差異がある（上り/下りいずれの代表点を採用しているかの違いによる可能性があり、断定はできない）。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
     },
     {
         id: "shuto-6-hakozaki",
@@ -998,17 +998,17 @@ const SHUTO_IC_MASTER = [
         routeCode: "6",
         routeName: "首都高速6号三郷線",
         order: 1,
-        lat: 35.777,
-        lng: 139.820,
-        entranceLat: 35.777,
-        entranceLng: 139.820,
-        exitLat: 35.777,
-        exitLng: 139.820,
+        lat: 35.7776257,
+        lng: 139.8258096,
+        entranceLat: 35.7776257,
+        entranceLng: 139.8258096,
+        exitLat: 35.7776257,
+        exitLng: 139.8258096,
         entranceSelectable: true,
         exitSelectable: true,
         sourceAreaKeys: ["joban"],
         sourceGoogleNames: ["首都高速中央環状線 加平出入口"],
-        note: "公式路線区分に合わせて6号三郷線へ修正。googleNameは既存互換のため旧表記を暫定維持。"
+        note: "公式路線区分に合わせて6号三郷線へ修正。googleNameは既存互換のため旧表記を暫定維持。【2026-07-18調査・座標修正】従来は(35.777,139.820)という未検証の丸め値だった。MapFan「加平ランプ（６号三郷線）【入口】」で実測座標(35.7776257,139.8258096)を確認し修正。従来座標からの誤差は約528m。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
     },
     {
         id: "shuto-6-yashio-minami",
@@ -10034,6 +10034,13 @@ function getRouteAnalysisIcAreaKey(exit) {
     );
 }
 
+// 診断用しきい値（段階1）。実際にどれだけの点がこの距離を超えて
+// 「最も近いだけの遠いIC」を拾っているかを可視化するためのもので、
+// 現時点ではこの値を使ったフィルタ・除外は一切行っていない
+// （isWithinThresholdフラグを付与し、ログ表示にのみ使う）。
+// 初期値であり、実データでの調整が前提。
+const IC_MASTER_NEAREST_THRESHOLD_METERS = 2000;
+
 function findNearestIcMasterEntryForRoutePoint(
     routePoint,
     icDefinitions,
@@ -10111,7 +10118,10 @@ function findNearestIcMasterEntryForRoutePoint(
 
     return {
         ...nearest,
-        distanceMeters: nearestDistanceMeters
+        distanceMeters: nearestDistanceMeters,
+        isWithinThreshold:
+            nearestDistanceMeters <=
+            IC_MASTER_NEAREST_THRESHOLD_METERS
     };
 }
 
@@ -10881,7 +10891,8 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 icArea: nearest.icArea,
                 roadLabel,
                 nearestIc: displayName,
-                distanceKm
+                distanceKm,
+                isWithinThreshold: nearest.isWithinThreshold
             });
 
             rawRouteTrace.push({
@@ -10891,7 +10902,10 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 lng: routePoint.lng,
                 roadLabel,
                 icArea: nearest.icArea,
-                exit: nearest.exit
+                exit: nearest.exit,
+                // 診断用（段階1）。フィルタ・除外には未使用。
+                distanceMeters: nearest.distanceMeters,
+                isWithinThreshold: nearest.isWithinThreshold
             });
         });
 
@@ -11229,13 +11243,356 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
         // による判定のため、実際には一般道しか通っていない区間でも、近くに
         // 首都高ICがあるだけで「首都高」と誤判定されることがある
         // （例：荒川区役所〜足立区役所間の「小菅」「四つ木」誤検出）。
-        // shutoEntranceIc/shutoExitIc側はselectShutoIcCandidateWindow／
-        // analyzeShutoIcCandidatesのmaxDistanceMeters=3000で保護されているため、
-        // shutoSegments側にも同じ3000m以内アンカーの存在チェックを追加する。
-        // この距離チェックはshutoSegments抽出時にのみ適用し、roadLabel自体・
-        // passedIcEntries・roadSwitches・nexcoEntranceIc/nexcoExitIc・
-        // shutoEntranceIc/shutoExitIcの計算方法は変更しない。
-        const SHUTO_SEGMENT_MAX_DISTANCE_METERS = 3000;
+        // 以前はアンカー1点判定（3000m以内に1点でもあればOK）で対応していたが、
+        // 「一瞬近くをかすめただけ」と「実際に区間を通して走行した」を
+        // 区別できないという限界があったため、以下の判定方式に全面置き換えた。
+        // フォールバックは持たない。
+        //
+        // 判定方式（設計セッションで合意した内容。閾値は初期値であり、
+        // 実データでの調整が前提）：
+        // 1. routeTrace（既存、総当たり再計算なし）を最近傍IC identityで
+        //    連続run化し、run中心を「極小値候補点」とする
+        // 2. 中心の前後2点・計5点（端では3〜4点）のウィンドウを切り出し、
+        //    ウィンドウ内で1位になったIC全てを候補化する
+        // 3. 候補ごとにウィンドウ5点への距離を計算し直し、山型
+        //    （前半広義単調減少・後半広義単調増加、許容誤差50m）になって
+        //    いるかを確認する。ウィンドウが片側しか確保できない場合は
+        //    確保できた側だけで単調な傾向を確認し、confidenceLevel:"edge"
+        //    として候補を採用する（判定不能による無条件棄却はしない）。
+        //    ウィンドウ内に複数IDが混在する場合はconfidenceLevel:"partial"
+        //    に格下げする
+        // 4. 山型が確認できた最初/最後の候補点の間で、order（路線内の並び順）
+        //    が単調に並んでいるかを確認する。routeCodeが変わる地点
+        //    （首都高の路線間乗り継ぎ、例：C2⇔K1）は区間全体が
+        //    roadLabel==="首都高"である限り無条件に許容する。roadLabel自体が
+        //    変わる地点（首都高⇔NEXCO間、今回のshutoSegments抽出範囲では
+        //    実際には発生しないが、将来の再利用に備えて用意）は、その地点の
+        //    ICがconnection===trueかつconnectedRoadsに前後両エリアを含む
+        //    場合のみ乗り継ぎとして許容する
+        // 5. 4を満たした区間のみ、正式なshutoSegmentsエントリとして確定する
+        const SHUTO_SEGMENT_WINDOW_RADIUS = 2;
+        const SHUTO_SEGMENT_DISTANCE_TOLERANCE_METERS = 50;
+        const SHUTO_SEGMENT_ORDER_TOLERANCE_VIOLATIONS = 1;
+
+        const CONFIDENCE_RANK = { full: 2, edge: 1, partial: 0 };
+
+        const getExitIdentity = exit =>
+            exit
+                ? (exit.googleName || exit.displayName || null)
+                : null;
+
+        const groupTraceItemsIntoRuns = items => {
+            const runs = [];
+
+            items.forEach((item, index) => {
+                const identity = getExitIdentity(item.exit);
+                const currentRun = runs[runs.length - 1];
+
+                if (
+                    currentRun &&
+                    currentRun.identity === identity
+                ) {
+                    currentRun.endIndex = index;
+                }
+                else {
+                    runs.push({
+                        identity,
+                        startIndex: index,
+                        endIndex: index
+                    });
+                }
+            });
+
+            return runs;
+        };
+
+        const extractWindowIndices = (
+            length,
+            centerIndex,
+            radius
+        ) => {
+            const startIndex = Math.max(0, centerIndex - radius);
+            const endIndex =
+                Math.min(length - 1, centerIndex + radius);
+
+            const indices = [];
+
+            for (
+                let index = startIndex;
+                index <= endIndex;
+                index++
+            ) {
+                indices.push(index);
+            }
+
+            return indices;
+        };
+
+        const evaluateMountainShape = distances => {
+            if (distances.length < 2) {
+                return { hasPeak: false };
+            }
+
+            const minValue = Math.min(...distances);
+            const minIndex = distances.indexOf(minValue);
+
+            const isNonIncreasing = arr =>
+                arr.every((value, index) =>
+                    index === 0 ||
+                    value <=
+                        arr[index - 1] +
+                        SHUTO_SEGMENT_DISTANCE_TOLERANCE_METERS
+                );
+
+            const isNonDecreasing = arr =>
+                arr.every((value, index) =>
+                    index === 0 ||
+                    value >=
+                        arr[index - 1] -
+                        SHUTO_SEGMENT_DISTANCE_TOLERANCE_METERS
+                );
+
+            const leftPart = distances.slice(0, minIndex + 1);
+            const rightPart = distances.slice(minIndex);
+
+            const leftOk =
+                leftPart.length < 2 || isNonIncreasing(leftPart);
+
+            const rightOk =
+                rightPart.length < 2 || isNonDecreasing(rightPart);
+
+            if (!leftOk || !rightOk) {
+                return { hasPeak: false };
+            }
+
+            const hasLeftContext = minIndex > 0;
+            const hasRightContext =
+                minIndex < distances.length - 1;
+
+            if (hasLeftContext && hasRightContext) {
+                return { hasPeak: true, confidenceLevel: "full" };
+            }
+
+            if (hasLeftContext || hasRightContext) {
+                return { hasPeak: true, confidenceLevel: "edge" };
+            }
+
+            return { hasPeak: false };
+        };
+
+        const evaluateCandidateWindow = (windowItems, candidateExit) => {
+            const distances =
+                windowItems.map(item =>
+                    calculateDistance(
+                        item.lat,
+                        item.lng,
+                        candidateExit.lat,
+                        candidateExit.lng
+                    )
+                );
+
+            const mountainResult = evaluateMountainShape(distances);
+
+            if (!mountainResult.hasPeak) {
+                return null;
+            }
+
+            const distinctIdentitiesInWindow =
+                new Set(
+                    windowItems.map(item =>
+                        getExitIdentity(item.exit)
+                    )
+                );
+
+            const hasReversal =
+                distinctIdentitiesInWindow.size > 1;
+
+            const confidenceLevel =
+                hasReversal && mountainResult.confidenceLevel === "full"
+                    ? "partial"
+                    : mountainResult.confidenceLevel;
+
+            return { confidenceLevel };
+        };
+
+        const findValidatedWaypoints = (
+            segmentTraceItems,
+            segmentStartTraceIndex
+        ) => {
+            const runs = groupTraceItemsIntoRuns(segmentTraceItems);
+            const waypointsByIdentity = new Map();
+
+            runs.forEach(run => {
+                if (!run.identity) {
+                    return;
+                }
+
+                const relativeCenterIndex =
+                    Math.floor(
+                        (run.startIndex + run.endIndex) / 2
+                    );
+
+                // ウィンドウは区間内だけでなく、ルート全体（routeTrace）から
+                // 取得する。区間外（区間の直前・直後）の点も含めることで、
+                // 「区間境界を挟んで本当に近づいて→離れていったか」を
+                // 判定できるようにする（区間内だけに限定すると、短い誤検出
+                // 区間ではウィンドウ自体が区間内で完結してしまい、山型の
+                // 判定材料が不足する）。
+                const absoluteCenterIndex =
+                    segmentStartTraceIndex + relativeCenterIndex;
+
+                const windowIndices =
+                    extractWindowIndices(
+                        routeTrace.length,
+                        absoluteCenterIndex,
+                        SHUTO_SEGMENT_WINDOW_RADIUS
+                    );
+
+                const windowItems =
+                    windowIndices.map(index => routeTrace[index]);
+
+                const candidateExitsByIdentity = new Map();
+
+                windowItems.forEach(item => {
+                    const identity = getExitIdentity(item.exit);
+
+                    if (
+                        identity &&
+                        !candidateExitsByIdentity.has(identity)
+                    ) {
+                        candidateExitsByIdentity.set(
+                            identity,
+                            item.exit
+                        );
+                    }
+                });
+
+                candidateExitsByIdentity.forEach(
+                    (candidateExit, identity) => {
+                        const evaluation =
+                            evaluateCandidateWindow(
+                                windowItems,
+                                candidateExit
+                            );
+
+                        if (!evaluation) {
+                            return;
+                        }
+
+                        const existing =
+                            waypointsByIdentity.get(identity);
+
+                        if (
+                            !existing ||
+                            CONFIDENCE_RANK[evaluation.confidenceLevel] >
+                                CONFIDENCE_RANK[existing.confidenceLevel]
+                        ) {
+                            waypointsByIdentity.set(identity, {
+                                exit: candidateExit,
+                                // segmentTraceItems（区間ローカル）基準の
+                                // インデックス。order連続性チェック
+                                // （区間内のスライス）で使うため、絶対位置
+                                // ではなく区間内の相対位置で保持する。
+                                traceIndex: relativeCenterIndex,
+                                confidenceLevel:
+                                    evaluation.confidenceLevel
+                            });
+                        }
+                    }
+                );
+            });
+
+            return [...waypointsByIdentity.values()]
+                .sort((a, b) => a.traceIndex - b.traceIndex);
+        };
+
+        const isJctContinuationBoundary = (previousItem, currentItem) => {
+            if (
+                !previousItem ||
+                !currentItem ||
+                previousItem.roadLabel === currentItem.roadLabel
+            ) {
+                return true;
+            }
+
+            // roadLabelが変わる地点（首都高⇔NEXCO間の乗り継ぎ）。
+            // shutoSegments抽出範囲は区間全体がroadLabel==="首都高"のため
+            // このブランチは現状発生しないが、将来的に首都高⇔NEXCOを
+            // またぐ範囲へこの関数を再利用する場合に備えて用意している。
+            const boundaryExit =
+                previousItem.exit?.connection === true
+                    ? previousItem.exit
+                    : currentItem.exit?.connection === true
+                        ? currentItem.exit
+                        : null;
+
+            if (
+                !boundaryExit ||
+                !Array.isArray(boundaryExit.connectedRoads)
+            ) {
+                return false;
+            }
+
+            return (
+                boundaryExit.connectedRoads.includes(
+                    previousItem.icArea
+                ) &&
+                boundaryExit.connectedRoads.includes(
+                    currentItem.icArea
+                )
+            );
+        };
+
+        const checkOrderContinuity = traceItems => {
+            let direction = 0;
+            let violations = 0;
+            let previousItem = null;
+
+            traceItems.forEach(item => {
+                if (
+                    previousItem &&
+                    !isJctContinuationBoundary(previousItem, item)
+                ) {
+                    violations +=
+                        SHUTO_SEGMENT_ORDER_TOLERANCE_VIOLATIONS + 1;
+                }
+
+                const exit = item.exit;
+                const previousExit = previousItem?.exit;
+
+                const sameRouteCode =
+                    Boolean(previousExit) &&
+                    Boolean(exit) &&
+                    previousExit.routeCode !== undefined &&
+                    exit.routeCode !== undefined &&
+                    previousExit.routeCode === exit.routeCode;
+
+                if (
+                    sameRouteCode &&
+                    Number.isFinite(previousExit.order) &&
+                    Number.isFinite(exit.order)
+                ) {
+                    const diff = exit.order - previousExit.order;
+
+                    if (diff !== 0) {
+                        if (direction === 0) {
+                            direction = Math.sign(diff);
+                        }
+                        else if (Math.sign(diff) !== direction) {
+                            violations++;
+                        }
+                    }
+                }
+
+                previousItem = item;
+            });
+
+            return {
+                isContinuous:
+                    violations <=
+                    SHUTO_SEGMENT_ORDER_TOLERANCE_VIOLATIONS
+            };
+        };
 
         const shutoSegments =
             correctedRoadSegments
@@ -11247,43 +11604,74 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                             segment.endTraceIndex + 1
                         );
 
-                    const hasNearbyShutoAnchor =
-                        segmentTraceItems.some(item =>
-                            item.exit &&
-                            calculateDistance(
-                                item.lat,
-                                item.lng,
-                                item.exit.lat,
-                                item.exit.lng
-                            ) <= SHUTO_SEGMENT_MAX_DISTANCE_METERS
+                    const waypoints =
+                        findValidatedWaypoints(
+                            segmentTraceItems,
+                            segment.startTraceIndex
                         );
 
-                    if (!hasNearbyShutoAnchor) {
+                    if (waypoints.length === 0) {
+                        return null;
+                    }
+
+                    const firstWaypoint = waypoints[0];
+
+                    const lastWaypoint =
+                        waypoints[waypoints.length - 1];
+
+                    const continuityCheck =
+                        checkOrderContinuity(
+                            segmentTraceItems.slice(
+                                firstWaypoint.traceIndex,
+                                lastWaypoint.traceIndex + 1
+                            )
+                        );
+
+                    if (!continuityCheck.isContinuous) {
                         return null;
                     }
 
                     const entranceIc =
-                        segmentTraceItems.find(item =>
-                            isEntranceRoleSelectable(item.exit)
-                        )?.exit || null;
+                        isEntranceRoleSelectable(firstWaypoint.exit)
+                            ? firstWaypoint.exit
+                            : segmentTraceItems.find(item =>
+                                isEntranceRoleSelectable(item.exit)
+                            )?.exit || null;
 
-                    let exitIc = null;
-
-                    for (
-                        let index = segmentTraceItems.length - 1;
-                        index >= 0;
-                        index--
-                    ) {
-                        if (
-                            isExitRoleSelectable(
-                                segmentTraceItems[index].exit
-                            )
+                    const findFallbackExitIc = () => {
+                        for (
+                            let index = segmentTraceItems.length - 1;
+                            index >= 0;
+                            index--
                         ) {
-                            exitIc =
-                                segmentTraceItems[index].exit;
-                            break;
+                            if (
+                                isExitRoleSelectable(
+                                    segmentTraceItems[index].exit
+                                )
+                            ) {
+                                return segmentTraceItems[index].exit;
+                            }
                         }
-                    }
+
+                        return null;
+                    };
+
+                    const exitIc =
+                        isExitRoleSelectable(lastWaypoint.exit)
+                            ? lastWaypoint.exit
+                            : findFallbackExitIc();
+
+                    const confidenceLevels =
+                        waypoints.map(
+                            waypoint => waypoint.confidenceLevel
+                        );
+
+                    const confidenceLevel =
+                        confidenceLevels.includes("partial")
+                            ? "partial"
+                            : confidenceLevels.includes("edge")
+                                ? "edge"
+                                : "full";
 
                     return {
                         entranceIc,
@@ -11291,7 +11679,8 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                         startTraceIndex:
                             segment.startTraceIndex,
                         endTraceIndex:
-                            segment.endTraceIndex
+                            segment.endTraceIndex,
+                        confidenceLevel
                     };
                 })
                 .filter(Boolean);
@@ -13751,6 +14140,45 @@ function logHighwayRoutePolylineAnalysis(
                     roadSwitch.beforeExit.displayName
             }))
         );
+
+        // 診断用（段階1）。findNearestIcMasterEntryForRoutePointに
+        // 距離上限が無いため、実際にはかなり離れたICを「最も近い」として
+        // 拾ってしまっている点がどれだけあるかを可視化する。
+        // isWithinThresholdはログ表示にのみ使い、候補選定・料金計算等の
+        // 実際のフィルタ条件としては一切使用していない。
+        const thresholdExceededTraceItems =
+            (routeTrace || []).filter(item =>
+                item.isWithinThreshold === false
+            );
+
+        console.log(
+            "最近傍ICしきい値(" +
+                IC_MASTER_NEAREST_THRESHOLD_METERS +
+                "m)超え件数:",
+            thresholdExceededTraceItems.length +
+                " / " +
+                (routeTrace || []).length +
+                "点"
+        );
+
+        if (thresholdExceededTraceItems.length > 0) {
+            console.log("しきい値超えの内訳:");
+            console.table(
+                thresholdExceededTraceItems.map(item => ({
+                    routeDistanceKm:
+                        Math.round(
+                            item.routeDistanceMeters / 100
+                        ) / 10,
+                    nearestIc:
+                        item.exit?.displayName || "不明",
+                    distanceKm:
+                        Math.round(
+                            (item.distanceMeters ?? 0) / 100
+                        ) / 10,
+                    roadLabel: item.roadLabel
+                }))
+            );
+        }
 
         console.log(
             "入口候補:",

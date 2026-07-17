@@ -3744,44 +3744,53 @@ const IC_MASTER = {
     kanetsu: {
         label: "関越道方面",
         exits: [
-            { order: 1, displayName: "練馬IC", googleName: "関越自動車道 練馬インターチェンジ", lat: 35.753, lng: 139.605,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.753, entranceLng: 139.605, exitLat: 35.753, exitLng: 139.605
+            { order: 1, displayName: "練馬IC", googleName: "関越自動車道 練馬インターチェンジ", lat: 35.754366, lng: 139.607664,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.754366, entranceLng: 139.607664, exitLat: 35.754593, exitLng: 139.607672,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「練馬ＩＣ【入口】」(35.754366,139.607664)「【出口】」(35.754593,139.607672)を確認。関越自動車道起点特有の構造で、外環道・首都高への直結はなくフルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.753,139.605)から約284m修正。"
             },
-            { order: 2, displayName: "大泉IC", googleName: "関越自動車道 大泉インターチェンジ", lat: 35.771, lng: 139.587,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.771, entranceLng: 139.587, exitLat: 35.771, exitLng: 139.587
+            { order: 2, displayName: "大泉IC", googleName: "関越自動車道 大泉インターチェンジ", lat: 35.757305, lng: 139.598116,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 35.757305, entranceLng: 139.598116, exitLat: 35.757305, exitLng: 139.598116,
+                note: "【2026-07-17調査・構造修正】Wikipedia「大泉インターチェンジ」「関越自動車道」「練馬インターチェンジ」の複数記事で、関越道側は新潟方面への下り入口のみで出口は実在せず、練馬方面への出場は練馬ICを利用する構造（クォーターIC）であることを確認。exitSelectableをtrueからfalseに変更。座標はMapFan「大泉ＩＣ（関越自動車道）【入口（下り）】」(35.757305,139.598116)の実測値に統一。従来座標(35.771,139.587)から約1.8km修正。"
             },
-            { order: 3, displayName: "所沢IC", googleName: "関越自動車道 所沢インターチェンジ", lat: 35.801, lng: 139.498,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.801, entranceLng: 139.498, exitLat: 35.801, exitLng: 139.498
+            { order: 3, displayName: "所沢IC", googleName: "関越自動車道 所沢インターチェンジ", lat: 35.809309, lng: 139.532881,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.809309, entranceLng: 139.532881, exitLat: 35.809564, exitLng: 139.532658,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「所沢ＩＣ【入口】」(35.809309,139.532881)「【出口】」(35.809564,139.532658)を確認。フルIC（推定）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.801,139.498)から約3.3km修正。"
             },
             { order: 4, displayName: "三芳SIC", googleName: "関越自動車道 三芳スマートインターチェンジ", lat: 35.843881, lng: 139.505918,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.843881, entranceLng: 139.505918, exitLat: 35.8398432, exitLng: 139.5020565,
                 note: "【2026-07-15調査・座標のみ修正】関越自動車道で最も東京寄りのスマートIC。NEXCO東日本プレスリリースで、過去約9年間は新潟方面（下り）のみのハーフICだったが、2024年3月10日15時に東京方面（上り入口・下り出口）が開通し現在はフルICであることを確認。entranceSelectable/exitSelectableは現状（フルIC）と一致しているため変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(35.843881,139.505918)、exitLat/Lngを出口(下り)(35.8398432,139.5020565)に設定。従来座標(35.843,139.518)から約1,094m修正。"
             },
-            { order: 5, displayName: "川越IC", googleName: "関越自動車道 川越インターチェンジ", lat: 35.907, lng: 139.483,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.907, entranceLng: 139.483, exitLat: 35.907, exitLng: 139.483
+            { order: 5, displayName: "川越IC", googleName: "関越自動車道 川越インターチェンジ", lat: 35.895486, lng: 139.461244,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.895486, entranceLng: 139.461244, exitLat: 35.895627, exitLng: 139.461080,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「川越ＩＣ【入口】」(35.895486,139.461244)「【出口】」(35.895627,139.461080)を確認。1975年フルIC化が明記されているフルIC。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.907,139.483)から約2.3km修正。"
             },
-            { order: 6, displayName: "鶴ヶ島IC", googleName: "関越自動車道 鶴ヶ島インターチェンジ", lat: 35.944, lng: 139.394,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.944, entranceLng: 139.394, exitLat: 35.944, exitLng: 139.394
+            { order: 6, displayName: "鶴ヶ島IC", googleName: "関越自動車道 鶴ヶ島インターチェンジ", lat: 35.948679, lng: 139.397728,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.948679, entranceLng: 139.397728, exitLat: 35.948535, exitLng: 139.397649,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「鶴ヶ島ＩＣ【入口】」(35.948679,139.397728)「【出口】」(35.948535,139.397649)を確認。フルIC（推定）。kenoエリアの圏央鶴ヶ島IC・鶴ヶ島JCTとは別施設（Wikipedia確認済み、混同ではない）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.944,139.394)から約617m修正。"
             },
             { order: 7, displayName: "坂戸西SIC", googleName: "関越自動車道 坂戸西スマートインターチェンジ", lat: 35.9662598, lng: 139.3780673,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.9662598, entranceLng: 139.3780673, exitLat: 35.9662598, exitLng: 139.3780673,
                 note: "【2026-07-15調査・座標のみ修正】2013年8月25日開通。WebSearchで「上下線ともに全方向対応、上り・下りで別々の入口・出口を持つフルインター」と確認（坂戸市公式サイトも確認）。entranceSelectable/exitSelectableは変更なし（trueのまま）。MapFanで【出口（下り）】(35.9662598,139.3780673)は座標を確認できたが、【入口（上り）】は個別ページが404エラーとなり座標を確認できなかったため、entranceLat/Lng・exitLat/Lngとも出口(下り)の座標を暫定使用した。従来座標(35.971,139.356)から約2,059m修正。次回、入口(上り)の個別座標が確認できた場合は再検証が必要。"
             },
-            { order: 8, displayName: "東松山IC", googleName: "関越自動車道 東松山インターチェンジ", lat: 36.036, lng: 139.377,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.036, entranceLng: 139.377, exitLat: 36.036, exitLng: 139.377
+            { order: 8, displayName: "東松山IC", googleName: "関越自動車道 東松山インターチェンジ", lat: 36.027854, lng: 139.384124,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.027854, entranceLng: 139.384124, exitLat: 36.028097, exitLng: 139.384236,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「東松山ＩＣ【入口】」(36.027854,139.384124)「【出口】」(36.028097,139.384236)を確認。1980年フルIC化が明記されているフルIC。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.036,139.377)から約1.1km修正。"
             },
-            { order: 9, displayName: "嵐山小川IC", googleName: "関越自動車道 嵐山小川インターチェンジ", lat: 36.060, lng: 139.300,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.060, entranceLng: 139.300, exitLat: 36.060, exitLng: 139.300
+            { order: 9, displayName: "嵐山小川IC", googleName: "関越自動車道 嵐山小川インターチェンジ", lat: 36.067373, lng: 139.308421,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.067373, entranceLng: 139.308421, exitLat: 36.067297, exitLng: 139.308352,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「嵐山小川ＩＣ【入口】」(36.067373,139.308421)「【出口】」(36.067297,139.308352)を確認。フルIC（推定）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.060,139.300)から約1.1km修正。"
             },
-            { order: 10, displayName: "花園IC", googleName: "関越自動車道 花園インターチェンジ", lat: 36.115, lng: 139.214,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.115, entranceLng: 139.214, exitLat: 36.115, exitLng: 139.214
+            { order: 10, displayName: "花園IC", googleName: "関越自動車道 花園インターチェンジ", lat: 36.122711, lng: 139.246134,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.122711, entranceLng: 139.246134, exitLat: 36.122596, exitLng: 139.246210,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「花園ＩＣ【入口】」(36.122711,139.246134)「【出口】」(36.122596,139.246210)を確認。フルIC（推定）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.115,139.214)から約3.0km修正。"
             },
             { order: 10.5, displayName: "寄居SIC", googleName: "関越自動車道 寄居スマートインターチェンジ", lat: 36.172622, lng: 139.196341,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.172622, entranceLng: 139.196341, exitLat: 36.17379647716, exitLng: 139.1913859715,
                 note: "【2026-07-15調査・座標のみ修正】下り線が2019年3月28日、上り線が2021年3月28日と段階的に開通し、現在は上下線とも出入口を持つ全方向スマートICであることをNEXCO東日本プレスリリース等で確認。entranceSelectable/exitSelectableは変更なし（trueのまま）。MapFanで入口（上り・下り）・出口（上り・下り）の4個別ページ全ての存在を確認。座標はentranceLat/Lngを入口(上り)(36.172622,139.196341)、exitLat/Lngを出口(下り)(36.17379647716,139.1913859715)に設定。従来座標(36.173,139.194)から約214m修正。"
             },
-            { order: 11, displayName: "本庄児玉IC", googleName: "関越自動車道 本庄児玉インターチェンジ", lat: 36.223, lng: 139.152,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.223, entranceLng: 139.152, exitLat: 36.223, exitLng: 139.152
+            { order: 11, displayName: "本庄児玉IC", googleName: "関越自動車道 本庄児玉インターチェンジ", lat: 36.221953, lng: 139.165558,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.221953, entranceLng: 139.165558, exitLat: 36.221952, exitLng: 139.165363,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「本庄児玉ＩＣ【入口】」(36.221953,139.165558)「【出口】」(36.221952,139.165363)を確認。フルIC（推定）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.223,139.152)から約1.2km修正。"
             },
             { order: 11.5, displayName: "上里SIC", googleName: "関越自動車道 上里スマートインターチェンジ", lat: 36.2566705, lng: 139.1171445,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.2566705, entranceLng: 139.1171445, exitLat: 36.255604, exitLng: 139.116856,
@@ -3791,36 +3800,45 @@ const IC_MASTER = {
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.3087809, entranceLng: 139.0938883, exitLat: 36.3086123, exitLng: 139.0871443,
                 note: "【2026-07-15調査・座標のみ修正】群馬県内スマートICで初の本線直結型。WebSearchで「上り線と下り線に入口・出口がそれぞれある、全方向対応」と確認（高崎市公式サイトの設置位置図も確認）。entranceSelectable/exitSelectableは変更なし（trueのまま）。MapFanで入口（上り・下り）・出口（上り・下り）の4個別ページ全ての存在を確認。座標はentranceLat/Lngを入口(上り)(36.3087809,139.0938883)、exitLat/Lngを出口(下り)(36.3086123,139.0871443)に設定。従来座標(36.284,139.101)は実測値から約2.83km離れていたため、大幅な修正となった。"
             },
-            { order: 13, displayName: "高崎IC", googleName: "関越自動車道 高崎インターチェンジ", lat: 36.308, lng: 139.063, connection: true, connectedRoads: ["kanetsu", "joshinetsu"],
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.308, entranceLng: 139.063, exitLat: 36.308, exitLng: 139.063
+            { order: 13, displayName: "高崎IC", googleName: "関越自動車道 高崎インターチェンジ", lat: 36.3401779, lng: 139.0594012,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.3401779, entranceLng: 139.0594012, exitLat: 36.3402546, exitLng: 139.0590909,
+                note: "【2026-07-17調査・構造修正】関越道と上信越道の実際の接続点は藤岡JCT（現状IC_MASTER未登録）であり、当ICは藤岡JCTから約2.4km離れた単独路線のICであるため、connection/connectedRoadsを削除した。藤岡JCTの新規登録は別途座標調査のうえ検討する。なお、座標もMapFan実測値（entrance 36.3401779,139.0594012／exit 36.3402546,139.0590909）に修正した。従来座標(36.308,139.063)から約3.6km修正。"
             },
-            { order: 14, displayName: "前橋IC", googleName: "関越自動車道 前橋インターチェンジ", lat: 36.384, lng: 139.055,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.384, entranceLng: 139.055, exitLat: 36.384, exitLng: 139.055
+            { order: 14, displayName: "前橋IC", googleName: "関越自動車道 前橋インターチェンジ", lat: 36.3759397, lng: 139.0303,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.3759397, entranceLng: 139.0303, exitLat: 36.3760967, exitLng: 139.0302083,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「前橋ＩＣ【入口】」(36.3759397,139.0303)「【出口】」(36.3760967,139.0302083)を確認。フルIC（明記あり）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.384,139.055)から約2.4km修正。"
             },
             { order: 15, displayName: "駒寄SIC", googleName: "関越自動車道 駒寄スマートインターチェンジ", lat: 36.4307719, lng: 139.0161246,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.4307719, entranceLng: 139.0161246, exitLat: 36.4307719, exitLng: 139.0161246,
                 note: "【2026-07-15調査・座標のみ修正】駒寄PA併設。WebSearchで「上下線ともに全方向対応、24時間利用可能」と確認。「上り線の駒寄PAを利用した後は駒寄スマートIC出口は利用できない。下り線の駒寄スマートIC入口から駒寄PAの利用はできない」という運用上の注意点はあるが、entranceSelectable/exitSelectable判定には影響しない。entranceSelectable/exitSelectableは変更なし（trueのまま）。MapFanで【入口（上り）】(36.4307719,139.0161246)は座標を確認できたが、【出口（下り）】は座標を確認できなかったため、entranceLat/Lng・exitLat/Lngとも入口(上り)の座標を暫定使用した。従来座標(36.441,139.010)から約1,263m修正。次回、出口(下り)の個別座標が確認できた場合は再検証が必要。"
             },
-            { order: 16, displayName: "渋川伊香保IC", googleName: "関越自動車道 渋川伊香保インターチェンジ", lat: 36.493, lng: 139.007,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.493, entranceLng: 139.007, exitLat: 36.493, exitLng: 139.007
+            { order: 16, displayName: "渋川伊香保IC", googleName: "関越自動車道 渋川伊香保インターチェンジ", lat: 36.4774907, lng: 139.0159981,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.4774907, entranceLng: 139.0159981, exitLat: 36.4776356, exitLng: 139.0159232,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「渋川伊香保ＩＣ【入口】」(36.4774907,139.0159981)「【出口】」(36.4776356,139.0159232)を確認。フルIC（明記あり）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.493,139.007)から約1.9km修正。"
             },
-            { order: 17, displayName: "赤城IC", googleName: "関越自動車道 赤城インターチェンジ", lat: 36.558, lng: 139.069,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.558, entranceLng: 139.069, exitLat: 36.558, exitLng: 139.069
+            { order: 17, displayName: "赤城IC", googleName: "関越自動車道 赤城インターチェンジ", lat: 36.5385722, lng: 139.0492941,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.5385722, entranceLng: 139.0492941, exitLat: 36.5385722, exitLng: 139.0492941,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「赤城ＩＣ【入口】」(36.5385722,139.0492941)を確認。未確認（推定フル）。出口側の個別ページは未特定のため、entranceLat/Lng・exitLat/Lngとも入口側の座標を暫定使用した。従来座標(36.558,139.069)から約2.8km修正。次回、出口側の個別座標が確認できた場合は再検証が必要。"
             },
-            { order: 18, displayName: "昭和IC", googleName: "関越自動車道 昭和インターチェンジ", lat: 36.634, lng: 139.101,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.634, entranceLng: 139.101, exitLat: 36.634, exitLng: 139.101
+            { order: 18, displayName: "昭和IC", googleName: "関越自動車道 昭和インターチェンジ", lat: 36.6127896, lng: 139.0665319,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.6127896, entranceLng: 139.0665319, exitLat: 36.6127728, exitLng: 139.0666025,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「昭和ＩＣ【入口】」(36.6127896,139.0665319)「【出口】」(36.6127728,139.0666025)を確認。「開発IC」区分のみでフルIC/ハーフICの明記なし（未確認）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.634,139.101)から約3.9km修正。"
             },
-            { order: 19, displayName: "沼田IC", googleName: "関越自動車道 沼田インターチェンジ", lat: 36.663, lng: 139.036,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.663, entranceLng: 139.036, exitLat: 36.663, exitLng: 139.036
+            { order: 19, displayName: "沼田IC", googleName: "関越自動車道 沼田インターチェンジ", lat: 36.6542705, lng: 139.0707428,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.6542705, entranceLng: 139.0707428, exitLat: 36.654136, exitLng: 139.0710797,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「沼田ＩＣ【入口】」(36.6542705,139.0707428)「【出口】」(36.654136,139.0710797)を確認。4方向ランプありのフルIC。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.663,139.036)から約3.3km修正。"
             },
-            { order: 20, displayName: "月夜野IC", googleName: "関越自動車道 月夜野インターチェンジ", lat: 36.748, lng: 138.988,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.748, entranceLng: 138.988, exitLat: 36.748, exitLng: 138.988
+            { order: 20, displayName: "月夜野IC", googleName: "関越自動車道 月夜野インターチェンジ", lat: 36.6723943, lng: 139.0067096,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.6723943, entranceLng: 139.0067096, exitLat: 36.6723614, exitLng: 139.0067789,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「月夜野ＩＣ【入口】」(36.6723943,139.0067096)「【出口】」(36.6723614,139.0067789)を確認。4方向ランプありのフルIC。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.748,138.988)から約8.5km修正（今回調査全体で最大、複数情報源一致）。"
             },
-            { order: 21, displayName: "水上IC", googleName: "関越自動車道 水上インターチェンジ", lat: 36.801, lng: 138.964,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.801, entranceLng: 138.964, exitLat: 36.801, exitLng: 138.964
+            { order: 21, displayName: "水上IC", googleName: "関越自動車道 水上インターチェンジ", lat: 36.7489782, lng: 138.9743213,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.7489782, entranceLng: 138.9743213, exitLat: 36.748893, exitLng: 138.974176,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「水上ＩＣ【出口】」(36.748893,138.974176)を確認。4方向ランプありのフルIC（T型信号交差点は構造上の特徴で方向制限ではない）。上り側の個別座標は未確認のため、entranceLat/Lngは出口側に近い座標を暫定使用した。従来座標(36.801,138.964)から約5.8km修正。次回、上り側の個別座標が確認できた場合は再検証が必要。"
             },
-            { order: 22, displayName: "藤岡IC", googleName: "上信越自動車道 藤岡インターチェンジ", lat: 36.269, lng: 139.074, connection: true, connectedRoads: ["kanetsu", "joshinetsu"],
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.269, entranceLng: 139.074, exitLat: 36.269, exitLng: 139.074
+            { order: 22, displayName: "藤岡IC", googleName: "上信越自動車道 藤岡インターチェンジ", lat: 36.2710485, lng: 139.0729449,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.2710485, entranceLng: 139.0729449, exitLat: 36.2709647, exitLng: 139.0731461,
+                note: "【2026-07-17調査・構造修正】関越道と上信越道の実際の接続点は藤岡JCT（現状IC_MASTER未登録）であり、当ICは藤岡JCTから約1.7km離れた単独路線のICであるため、connection/connectedRoadsを削除した。藤岡JCTの新規登録は別途座標調査のうえ検討する。なお、座標もMapFan実測値（entrance 36.2710485,139.0729449／exit 36.2709647,139.0731461）に修正した。従来座標(36.269,139.074)から約246m修正。"
             }
         ]
     },
@@ -3828,33 +3846,41 @@ const IC_MASTER = {
     joshinetsu: {
         label: "上信越道方面",
         exits: [
-            { order: 0, displayName: "高崎IC", googleName: "関越自動車道 高崎インターチェンジ", lat: 36.308, lng: 139.063, connection: true, connectedRoads: ["kanetsu", "joshinetsu"],
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.308, entranceLng: 139.063, exitLat: 36.308, exitLng: 139.063
+            { order: 0, displayName: "高崎IC", googleName: "関越自動車道 高崎インターチェンジ", lat: 36.3401779, lng: 139.0594012,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.3401779, entranceLng: 139.0594012, exitLat: 36.3402546, exitLng: 139.0590909,
+                note: "【2026-07-17調査・構造修正】関越道と上信越道の実際の接続点は藤岡JCT（現状IC_MASTER未登録）であり、当ICは藤岡JCTから約2.4km離れた単独路線のICであるため、connection/connectedRoadsを削除した。藤岡JCTの新規登録は別途座標調査のうえ検討する。なお、座標もMapFan実測値（entrance 36.3401779,139.0594012／exit 36.3402546,139.0590909）に修正した。従来座標(36.308,139.063)から約3.6km修正。"
             },
-            { order: 1, displayName: "藤岡IC", googleName: "上信越自動車道 藤岡インターチェンジ", lat: 36.269, lng: 139.074, connection: true, connectedRoads: ["kanetsu", "joshinetsu"],
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.269, entranceLng: 139.074, exitLat: 36.269, exitLng: 139.074
+            { order: 1, displayName: "藤岡IC", googleName: "上信越自動車道 藤岡インターチェンジ", lat: 36.2710485, lng: 139.0729449,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.2710485, entranceLng: 139.0729449, exitLat: 36.2709647, exitLng: 139.0731461,
+                note: "【2026-07-17調査・構造修正】関越道と上信越道の実際の接続点は藤岡JCT（現状IC_MASTER未登録）であり、当ICは藤岡JCTから約1.7km離れた単独路線のICであるため、connection/connectedRoadsを削除した。藤岡JCTの新規登録は別途座標調査のうえ検討する。なお、座標もMapFan実測値（entrance 36.2710485,139.0729449／exit 36.2709647,139.0731461）に修正した。従来座標(36.269,139.074)から約246m修正。"
             },
-            { order: 2, displayName: "吉井IC", googleName: "上信越自動車道 吉井インターチェンジ", lat: 36.250, lng: 138.986,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.250, entranceLng: 138.986, exitLat: 36.250, exitLng: 138.986
+            { order: 2, displayName: "吉井IC", googleName: "上信越自動車道 吉井インターチェンジ", lat: 36.2459409, lng: 138.9933904,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.2459409, entranceLng: 138.9933904, exitLat: 36.2459423, exitLng: 138.9933199,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「吉井ＩＣ【入口】」(36.2459409,138.9933904)「【出口】」(36.2459423,138.9933199)を確認。フルIC（明記あり）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.250,138.986)から約0.8km修正。"
             },
             { order: 2.5, displayName: "甘楽SIC", googleName: "上信越自動車道 甘楽スマートインターチェンジ", lat: 36.2431847, lng: 138.9458636,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.2431847, entranceLng: 138.9458636, exitLat: 36.2431847, exitLng: 138.9458636,
                 note: "【2026-07-15調査・座標のみ修正】2023年3月25日開通。「環道型退出路」という新しい退出路設計を採用。WebSearchで「上下線ともに24時間利用可能」と確認。「下り線（上越方面）はPA利用後にSIC流出可能だがSIC流入時はPA利用不可、上り線（藤岡方面）は逆」という運用上の注意点はあるが、entranceSelectable/exitSelectable判定には影響しない。entranceSelectable/exitSelectableは変更なし（trueのまま）。MapFanで【入口（上り）】(36.2431847,138.9458636)は座標を確認できたが、【出口（下り）】は座標を確認できなかったため、entranceLat/Lng・exitLat/Lngとも入口(上り)の座標を暫定使用した。従来座標(36.242,138.946)から約133m修正。次回、出口(下り)の個別座標が確認できた場合は再検証が必要。"
             },
-            { order: 3, displayName: "富岡IC", googleName: "上信越自動車道 富岡インターチェンジ", lat: 36.250, lng: 138.891,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.250, entranceLng: 138.891, exitLat: 36.250, exitLng: 138.891
+            { order: 3, displayName: "富岡IC", googleName: "上信越自動車道 富岡インターチェンジ", lat: 36.2452702, lng: 138.8940736,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.2452702, entranceLng: 138.8940736, exitLat: 36.2453034, exitLng: 138.8939873,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「富岡ＩＣ【入口】」(36.2452702,138.8940736)「【出口】」(36.2453034,138.8939873)を確認。フルIC（明記あり）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.250,138.891)から約0.6km修正。"
             },
-            { order: 4, displayName: "下仁田IC", googleName: "上信越自動車道 下仁田インターチェンジ", lat: 36.210, lng: 138.774,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.210, entranceLng: 138.774, exitLat: 36.210, exitLng: 138.774
+            { order: 4, displayName: "下仁田IC", googleName: "上信越自動車道 下仁田インターチェンジ", lat: 36.2324897, lng: 138.8212371,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.2324897, entranceLng: 138.8212371, exitLat: 36.2324335, exitLng: 138.821199,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「下仁田ＩＣ【入口】」(36.2324897,138.8212371)「【出口】」(36.2324335,138.821199)を確認。フルIC（明記あり）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.210,138.774)から約4.9km修正。"
             },
-            { order: 5, displayName: "松井田妙義IC", googleName: "上信越自動車道 松井田妙義インターチェンジ", lat: 36.309, lng: 138.733,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.309, entranceLng: 138.733, exitLat: 36.309, exitLng: 138.733
+            { order: 5, displayName: "松井田妙義IC", googleName: "上信越自動車道 松井田妙義インターチェンジ", lat: 36.3146133, lng: 138.7722971,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.3146133, entranceLng: 138.7722971, exitLat: 36.3145362, exitLng: 138.7723227,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「松井田妙義ＩＣ【入口】」(36.3146133,138.7722971)「【出口】」(36.3145362,138.7723227)を確認。未確認（推定フル）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.309,138.733)から約3.6km修正。"
             },
-            { order: 6, displayName: "碓氷軽井沢IC", googleName: "上信越自動車道 碓氷軽井沢インターチェンジ", lat: 36.338, lng: 138.640,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.338, entranceLng: 138.640, exitLat: 36.338, exitLng: 138.640
+            { order: 6, displayName: "碓氷軽井沢IC", googleName: "上信越自動車道 碓氷軽井沢インターチェンジ", lat: 36.2989419, lng: 138.6703012,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.2989419, entranceLng: 138.6703012, exitLat: 36.2989419, exitLng: 138.670181,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「碓氷軽井沢ＩＣ【入口】」(36.2989419,138.6703012)「【出口】」(36.2989419,138.670181)を確認。未確認（推定フル）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.338,138.640)から約5.1km修正。"
             },
-            { order: 7, displayName: "佐久IC", googleName: "上信越自動車道 佐久インターチェンジ", lat: 36.269, lng: 138.476,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.269, entranceLng: 138.476, exitLat: 36.269, exitLng: 138.476
+            { order: 7, displayName: "佐久IC", googleName: "上信越自動車道 佐久インターチェンジ", lat: 36.2851623, lng: 138.4804773,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.2851623, entranceLng: 138.4804773, exitLat: 36.2849406, exitLng: 138.4808629,
+                note: "【2026-07-17調査・座標のみ修正】MapFan「佐久ＩＣ【入口】」(36.2851623,138.4804773)「【出口】」(36.2849406,138.4808629)を確認。フルIC（明記あり）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.269,138.476)から約1.8km修正。"
             }
         ]
     },

@@ -430,15 +430,12 @@ function formatTollRouteLabel(startIc, endIc) {
     );
 }
 
-function getShutoTollEstimateForIcPair(startIc, endIc) {
-    if (
-        isShutoIc(startIc) ||
-        isShutoIc(endIc)
-    ) {
-        return SHUTO_TOLL_ESTIMATE_YEN;
-    }
-
-    return 0;
+// shutoEntryCountは、ルート中で首都高に乗った回数（polylineAnalysis.shutoEntryCount、
+// analyzeHighwayRoutePolyline側のshutoSegments.lengthから算出）。呼び出し側で
+// polylineAnalysisが無い場合は、isShutoIc(startIc)||isShutoIc(endIc)による
+// 従来の二値判定（1回分）をフォールバックとして渡すこと。
+function getShutoTollEstimateForIcPair(startIc, endIc, shutoEntryCount) {
+    return shutoEntryCount * SHUTO_TOLL_ESTIMATE_YEN;
 }
 
 // 入口比較V2・出口比較V2で共通利用する候補料金概算。
@@ -458,7 +455,13 @@ async function estimateComparisonCandidateToll({
     const shutoToll =
         getShutoTollEstimateForIcPair(
             startIc,
-            endIc
+            endIc,
+            polylineAnalysis?.shutoEntryCount ??
+                (
+                    (isShutoIc(startIc) || isShutoIc(endIc))
+                        ? 1
+                        : 0
+                )
         );
 
     const startIsShuto = isShutoIc(startIc);
@@ -8884,9 +8887,10 @@ async function estimateMainHighwayToll(
         );
 
     const shutoTollEstimate =
-        polylineAnalysis?.shutoEntranceIc
-            ? SHUTO_TOLL_ESTIMATE_YEN
-            : 0;
+        (
+            polylineAnalysis?.shutoEntryCount ??
+            (polylineAnalysis?.shutoEntranceIc ? 1 : 0)
+        ) * SHUTO_TOLL_ESTIMATE_YEN;
 
     let legacyStartIc = null;
     let legacyEndIc = null;
@@ -11215,6 +11219,85 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 )
                 : { candidates: [], selectedIc: null };
 
+        // shutoSegments：ルート中の首都高連続区間（correctedRoadSegments上で
+        // roadLabel==="首都高"の各区間）を、区間ごとの入口/出口IC付きで抽出する。
+        // shutoEntranceIc/shutoExitIc（ウィンドウ+スコアリング方式の単一値、
+        // 既存の意味のまま）とは別に、複数回の首都高利用を表現するための
+        // 追加フィールド。既存フィールドの計算・意味は変更していない。
+        //
+        // roadLabel自体はfindNearestIcMasterEntryForRoutePoint（距離上限なし）
+        // による判定のため、実際には一般道しか通っていない区間でも、近くに
+        // 首都高ICがあるだけで「首都高」と誤判定されることがある
+        // （例：荒川区役所〜足立区役所間の「小菅」「四つ木」誤検出）。
+        // shutoEntranceIc/shutoExitIc側はselectShutoIcCandidateWindow／
+        // analyzeShutoIcCandidatesのmaxDistanceMeters=3000で保護されているため、
+        // shutoSegments側にも同じ3000m以内アンカーの存在チェックを追加する。
+        // この距離チェックはshutoSegments抽出時にのみ適用し、roadLabel自体・
+        // passedIcEntries・roadSwitches・nexcoEntranceIc/nexcoExitIc・
+        // shutoEntranceIc/shutoExitIcの計算方法は変更しない。
+        const SHUTO_SEGMENT_MAX_DISTANCE_METERS = 3000;
+
+        const shutoSegments =
+            correctedRoadSegments
+                .filter(segment => segment.roadLabel === "首都高")
+                .map(segment => {
+                    const segmentTraceItems =
+                        routeTrace.slice(
+                            segment.startTraceIndex,
+                            segment.endTraceIndex + 1
+                        );
+
+                    const hasNearbyShutoAnchor =
+                        segmentTraceItems.some(item =>
+                            item.exit &&
+                            calculateDistance(
+                                item.lat,
+                                item.lng,
+                                item.exit.lat,
+                                item.exit.lng
+                            ) <= SHUTO_SEGMENT_MAX_DISTANCE_METERS
+                        );
+
+                    if (!hasNearbyShutoAnchor) {
+                        return null;
+                    }
+
+                    const entranceIc =
+                        segmentTraceItems.find(item =>
+                            isEntranceRoleSelectable(item.exit)
+                        )?.exit || null;
+
+                    let exitIc = null;
+
+                    for (
+                        let index = segmentTraceItems.length - 1;
+                        index >= 0;
+                        index--
+                    ) {
+                        if (
+                            isExitRoleSelectable(
+                                segmentTraceItems[index].exit
+                            )
+                        ) {
+                            exitIc =
+                                segmentTraceItems[index].exit;
+                            break;
+                        }
+                    }
+
+                    return {
+                        entranceIc,
+                        exitIc,
+                        startTraceIndex:
+                            segment.startTraceIndex,
+                        endTraceIndex:
+                            segment.endTraceIndex
+                    };
+                })
+                .filter(Boolean);
+
+        const shutoEntryCount = shutoSegments.length;
+
         return {
             roadSequence:
                 correctedRoadSummary.roadSequence,
@@ -11229,6 +11312,8 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 shutoEntranceAnalysis.selectedIc,
             shutoExitIc:
                 shutoExitAnalysis.selectedIc,
+            shutoSegments,
+            shutoEntryCount,
             shutoDetail: {
                 startSampleCount:
                     shutoDetailStartSamples.length,
@@ -15226,7 +15311,16 @@ async function searchMultiExitIcComparison() {
                 ) +
                 getShutoTollEstimateForIcPair(
                     highwayStartIc,
-                    highwayEndIc
+                    highwayEndIc,
+                    lastHighwayRoutePolylineAnalysis?.shutoEntryCount ??
+                        (
+                            (
+                                isShutoIc(highwayStartIc) ||
+                                isShutoIc(highwayEndIc)
+                            )
+                                ? 1
+                                : 0
+                        )
                 );
         }
 
@@ -15344,7 +15438,16 @@ async function searchMultiExitIcComparison() {
                         ) +
                         getShutoTollEstimateForIcPair(
                             highwayStartIc,
-                            exitIcDefinition
+                            exitIcDefinition,
+                            lastHighwayRoutePolylineAnalysis?.shutoEntryCount ??
+                                (
+                                    (
+                                        isShutoIc(highwayStartIc) ||
+                                        isShutoIc(exitIcDefinition)
+                                    )
+                                        ? 1
+                                        : 0
+                                )
                         );
                 }
 
@@ -15901,7 +16004,16 @@ async function searchEntranceIcComparisonV2(options = {}) {
             const shutoToll =
                 getShutoTollEstimateForIcPair(
                     exit,
-                    endIc
+                    endIc,
+                    lastHighwayRoutePolylineAnalysis?.shutoEntryCount ??
+                        (
+                            (
+                                isShutoIc(exit) ||
+                                isShutoIc(endIc)
+                            )
+                                ? 1
+                                : 0
+                        )
                 );
 
             const nonShutoToll =

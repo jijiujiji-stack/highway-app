@@ -307,6 +307,26 @@ function isProbablyNoTollRouteByPolylineComparison(
     );
 }
 
+// isProbablyNoTollRouteByPolylineComparison（ルート形状の直接比較、既存の
+// 表示判定）とは独立した、shutoSegments/nexcoEntranceIc/nexcoExitIcに基づく
+// 参考判定。トップパネルへの「旧判定・新判定」併記表示専用の追加情報であり、
+// 既存の判定ロジック・表示のON/OFF自体には使わない。
+function isProbablyNoTollRouteByShutoSegments(polylineAnalysis) {
+    if (!polylineAnalysis) {
+        return false;
+    }
+
+    const hasShutoSegments =
+        Array.isArray(polylineAnalysis.shutoSegments) &&
+        polylineAnalysis.shutoSegments.length > 0;
+
+    const hasNexcoIc =
+        Boolean(polylineAnalysis.nexcoEntranceIc) ||
+        Boolean(polylineAnalysis.nexcoExitIc);
+
+    return !hasShutoSegments && !hasNexcoIc;
+}
+
 // 「※有料未使用かも」表示は、Polyline直接比較方式
 // （isProbablyNoTollRouteByPolylineComparison、「参考：高速利用ルート」欄）
 // に一本化したため無効化。関数自体はisProbablyNoTollRouteByMetricsとともに
@@ -817,10 +837,44 @@ function updateDashboardAssumedRouteForComparisonMode() {
         "<span class=\"dashboard-assumed-route-label\">参考：高速利用ルート</span>" +
         (
             lastProbablyNoTollRouteByPolylineComparison
-                ? "<span class=\"assumed-route-no-toll-note\">" +
-                    "（有料道路を使用していません）</span>"
+                ? buildNoTollRouteNoteHtml(
+                    lastHighwayRoutePolylineAnalysis
+                )
                 : (assumedRouteHtml || "ルート情報なし")
         );
+}
+
+// 「（有料道路を使用していません）」表示に、既存のPolyline直接比較判定
+// （旧判定、この関数が呼ばれる時点で常に無料）と、shutoSegments/
+// nexcoEntranceIc/nexcoExitIcに基づく参考判定（新判定）を併記する。
+// 新判定はあくまで参考表示用の追加情報であり、この表示自体を出すかどうかの
+// 決定（旧判定＝isProbablyNoTollRouteByPolylineComparison）は変更しない。
+function buildNoTollRouteNoteHtml(polylineAnalysis) {
+    const isNoTollByShutoSegments =
+        isProbablyNoTollRouteByShutoSegments(polylineAnalysis);
+
+    const judgmentMismatch = !isNoTollByShutoSegments;
+
+    return (
+        "<span class=\"assumed-route-no-toll-note\">" +
+            "（有料道路を使用していません）" +
+            "<small class=\"assumed-route-no-toll-detail" +
+                (
+                    judgmentMismatch
+                        ? " assumed-route-no-toll-mismatch"
+                        : ""
+                ) +
+                "\">" +
+                "旧判定：無料 / 新判定：" +
+                (isNoTollByShutoSegments ? "無料" : "有料") +
+                (
+                    judgmentMismatch
+                        ? "　⚠一致していません"
+                        : ""
+                ) +
+            "</small>" +
+        "</span>"
+    );
 }
 
 function createMainTollEstimateHtml(tollEstimate) {

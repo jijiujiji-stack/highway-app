@@ -3706,38 +3706,49 @@ const IC_MASTER = {
     tohoku: {
         label: "東北道方面",
         exits: [
-            { order: 1, displayName: "浦和IC", googleName: "東北自動車道 浦和インターチェンジ",
-                entranceSelectable: true, exitSelectable: true
+            { order: 1, displayName: "浦和IC", googleName: "東北自動車道 浦和インターチェンジ", lat: 35.882906, lng: 139.7271844,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.882906, entranceLng: 139.7271844, exitLat: 35.8811945, exitLng: 139.7282741,
+                note: "【2026-07-17調査・座標新規追加】従来lat/lng等の座標フィールドが一切未設定だったため新規確定。MapFan「浦和ＩＣ【入口（上り）】」(35.882906,139.7271844)「【出口（下り）】」(35.8811945,139.7282741)を確認。Wikipedia「浦和インターチェンジ」によると、1980年3月26日の開通当初は宇都宮方面のみのハーフICだったが、2002年3月17日に東京方面出入口が新設されフルIC化。現在はフルIC。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
-            { order: 2, displayName: "岩槻IC", googleName: "東北自動車道 岩槻インターチェンジ",
-                entranceSelectable: true, exitSelectable: true
+            { order: 2, displayName: "岩槻IC", googleName: "東北自動車道 岩槻インターチェンジ", lat: 35.9385148, lng: 139.6868336,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.9385148, entranceLng: 139.6868336, exitLat: 35.938452, exitLng: 139.6867595,
+                note: "【2026-07-17調査・座標新規追加】従来lat/lng等の座標フィールドが一切未設定だったため新規確定。MapFan「岩槻ＩＣ【入口】」(35.9385148,139.6868336)「【出口】」(35.938452,139.6867595)を確認。入口・出口の個別ページが存在することからフルICと推定（NEXCO公式・Wikipediaに明記なし）。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
-            { order: 3, displayName: "蓮田SIC", googleName: "東北自動車道 蓮田スマートインターチェンジ",
-                entranceSelectable: true, exitSelectable: true
+            { order: 3, displayName: "蓮田SIC", googleName: "東北自動車道 蓮田スマートインターチェンジ", lat: 35.976823, lng: 139.666489,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.976823, entranceLng: 139.666489, exitLat: 35.9991262, exitLng: 139.6661119,
+                note: "【2026-07-17調査・座標新規追加】従来lat/lng等の座標フィールドが一切未設定だったため新規確定。MapFan「蓮田スマートＩＣ【入口（上り）】」(35.976823,139.666489)「【出口（下り）】」(35.9991262,139.6661119)を確認。Wikipedia・NEXCO東日本プレスリリース・蓮田市公式サイトにより、東京方面への入口（上り）・東京方面からの出口（下り）・宇都宮方面からの出口（上り）は供用済みだが、宇都宮方面（下り）への入口は事業中・未開通であることを確認。入口という機能自体は存在するため、entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
-            { order: 4, displayName: "久喜IC", googleName: "東北自動車道 久喜インターチェンジ",
-                entranceSelectable: true, exitSelectable: true
+            { order: 4, displayName: "久喜IC", googleName: "東北自動車道 久喜インターチェンジ", lat: 36.0612399, lng: 139.6567983,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.0612399, entranceLng: 139.6567983, exitLat: 36.0613326, exitLng: 139.6567954,
+                note: "【2026-07-17調査・座標新規追加】従来lat/lng等の座標フィールドが一切未設定だったため新規確定。MapFan「久喜ＩＣ【入口】」(36.0612399,139.6567983)「【出口】」(36.0613326,139.6567954)を確認。入口・出口の個別ページが存在することからフルICと推定（NEXCO公式・Wikipediaに明記なし）。keno側の久喜白岡JCT（座標36.049,139.658、約1.3km離れた別施設）とは混同ではないことを確認済み。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
-            { order: 5, displayName: "加須IC", googleName: "東北自動車道 加須インターチェンジ",
-                entranceSelectable: true, exitSelectable: true
+            { order: 5, displayName: "加須IC", googleName: "東北自動車道 加須インターチェンジ", lat: 36.1271446, lng: 139.6318021,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.1271446, entranceLng: 139.6318021, exitLat: 36.1272656, exitLng: 139.6315307,
+                note: "【2026-07-17調査・座標新規追加】従来lat/lng等の座標フィールドが一切未設定だったため新規確定。MapFan「加須ＩＣ【入口】」(36.1271446,139.6318021)「【出口】」(36.1272656,139.6315307)を確認。入口・出口の個別ページが存在することからフルICと推定（NEXCO公式・Wikipediaに明記なし）。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
-            { order: 6, displayName: "羽生IC", googleName: "東北自動車道 羽生インターチェンジ",
-                entranceSelectable: true, exitSelectable: true
+            { order: 6, displayName: "羽生IC", googleName: "東北自動車道 羽生インターチェンジ", lat: 36.1668255, lng: 139.5840919,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.1668255, entranceLng: 139.5840919, exitLat: 36.1667772, exitLng: 139.5841774,
+                note: "【2026-07-17調査・座標新規追加】従来lat/lng等の座標フィールドが一切未設定だったため新規確定。MapFan「羽生ＩＣ【入口】」(36.1668255,139.5840919)「【出口】」(36.1667772,139.5841774)を確認。入口・出口の個別ページが存在することからフルICと推定（NEXCO公式・Wikipediaに明記なし）。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
-            { order: 7, displayName: "館林IC", googleName: "東北自動車道 館林インターチェンジ",
-                entranceSelectable: true, exitSelectable: true
+            { order: 7, displayName: "館林IC", googleName: "東北自動車道 館林インターチェンジ", lat: 36.2273545, lng: 139.5741615,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.2273545, entranceLng: 139.5741615, exitLat: 36.227488299431, exitLng: 139.57386181402,
+                note: "【2026-07-17調査・座標新規追加】従来lat/lng等の座標フィールドが一切未設定だったため新規確定。MapFan「館林ＩＣ【入口】」(36.2273545,139.5741615)「【出口】」(36.227488299431,139.57386181402)を確認。入口・出口の個別ページが存在することからフルICと推定（NEXCO公式・Wikipediaに明記なし）。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
-            { order: 8, displayName: "佐野藤岡IC", googleName: "東北自動車道 佐野藤岡インターチェンジ",
-                entranceSelectable: true, exitSelectable: true
+            { order: 8, displayName: "佐野藤岡IC", googleName: "東北自動車道 佐野藤岡インターチェンジ", lat: 36.2941087, lng: 139.6158843,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.2941087, entranceLng: 139.6158843, exitLat: 36.2941087, exitLng: 139.6158843,
+                note: "【2026-07-17調査・座標新規追加】従来lat/lng等の座標フィールドが一切未設定だったため新規確定。MapFan「佐野藤岡ＩＣ【出口】」(36.2941087,139.6158843)を確認。入口側の個別ページは検索で特定できなかったため、entranceLat/Lng・exitLat/Lngとも出口座標を暫定使用した。入口・出口いずれかの個別ページが存在することからフルICと推定（NEXCO公式・Wikipediaに明記なし）。entranceSelectable/exitSelectableは変更なし（trueのまま）。次回、入口の個別座標が確認できた場合は再検証が必要。"
             },
-            { order: 9, displayName: "栃木IC", googleName: "東北自動車道 栃木インターチェンジ",
-                entranceSelectable: true, exitSelectable: true
+            { order: 9, displayName: "栃木IC", googleName: "東北自動車道 栃木インターチェンジ", lat: 36.4027283, lng: 139.7120006,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.4027283, entranceLng: 139.7120006, exitLat: 36.4028591, exitLng: 139.7116076,
+                note: "【2026-07-17調査・座標新規追加】従来lat/lng等の座標フィールドが一切未設定だったため新規確定。MapFan「栃木ＩＣ【入口】」(36.4027283,139.7120006)「【出口】」(36.4028591,139.7116076)を確認。入口・出口の個別ページが存在することからフルICと推定（NEXCO公式・Wikipediaに明記なし）。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
-            { order: 10, displayName: "鹿沼IC", googleName: "東北自動車道 鹿沼インターチェンジ",
-                entranceSelectable: true, exitSelectable: true
+            { order: 10, displayName: "鹿沼IC", googleName: "東北自動車道 鹿沼インターチェンジ", lat: 36.5354901, lng: 139.8023191,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.5354901, entranceLng: 139.8023191, exitLat: 36.5355532, exitLng: 139.8024622,
+                note: "【2026-07-17調査・座標新規追加】従来lat/lng等の座標フィールドが一切未設定だったため新規確定。MapFan「鹿沼ＩＣ【入口】」(36.5354901,139.8023191)「【出口】」(36.5355532,139.8024622)を確認。入口・出口の個別ページが存在することからフルICと推定（NEXCO公式・Wikipediaに明記なし）。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
-            { order: 11, displayName: "宇都宮IC", googleName: "東北自動車道 宇都宮インターチェンジ",
-                entranceSelectable: true, exitSelectable: true
+            { order: 11, displayName: "宇都宮IC", googleName: "東北自動車道 宇都宮インターチェンジ", lat: 36.6344803, lng: 139.8451272,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.6344803, entranceLng: 139.8451272, exitLat: 36.6344704, exitLng: 139.844862,
+                note: "【2026-07-17調査・座標新規追加】従来lat/lng等の座標フィールドが一切未設定だったため新規確定。MapFan「宇都宮ＩＣ【入口】」(36.6344803,139.8451272)「【出口】」(36.6344704,139.844862)を確認。入口・出口の個別ページが存在することからフルICと推定（NEXCO公式・Wikipediaに明記なし）。日光宇都宮道路との接続点でもある複合IC構造だが、今回は東北自動車道側の座標追加のみで複合IC化は対象外。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             }
         ]
     },

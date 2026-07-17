@@ -990,6 +990,29 @@ const SHUTO_IC_MASTER = [
         note: "上り・下りとも入口・出口（南北に入口・出口計4ランプが分散）。入口はETC専用。新規追加。首都高公式サイト(shutoko.jp route-6mu/mukoujima)で方向を確認。座標はMapFanの「向島ランプ（６号向島線）【入口（上り）】/【出口（上り）】」個別ページで上り側ランプを代表点として確認、入口・出口座標間約0.26kmの中間点。下り側ランプの座標は未採用。"
     },
     {
+        id: "shuto-jct-horikiri",
+        displayName: "堀切JCT",
+        googleName: "首都高速 堀切ジャンクション",
+        aliases: ["堀切JCT", "堀切ジャンクション"],
+        roadType: "首都高",
+        routeCode: "6",
+        routeName: "首都高速6号向島線",
+        lat: 35.744167,
+        lng: 139.823611,
+        entranceLat: 35.744167,
+        entranceLng: 139.823611,
+        exitLat: 35.744167,
+        exitLng: 139.823611,
+        isSelectable: false,
+        entranceSelectable: false,
+        exitSelectable: false,
+        connection: true,
+        connectedRoads: ["首都高速6号向島線", "首都高速中央環状線"],
+        sourceAreaKeys: [],
+        sourceGoogleNames: ["首都高速 堀切ジャンクション"],
+        note: "【2026-07-18新規追加】order連続性チェックのrouteIdentity統一化に伴い、首都高速6号向島線と中央環状線(C2)を接続するJCTとして新規登録。座標はWikipedia「堀切ジャンクション」記載の北緯35度44分39秒 東経139度49分25秒を10進法に変換（35.744167, 139.823611）。isSelectable/entranceSelectable/exitSelectableはfalse（IC_MASTER側の鶴ヶ島JCT等の既存JCT登録パターンを踏襲）。connectedRoadsはrouteCode（\"6\"は6号向島線・6号三郷線で共用のため識別に使えないことが前回調査で判明）ではなく、routeNameの値で指定。"
+    },
+    {
         id: "shuto-6-kahira",
         displayName: "加平",
         googleName: "首都高速中央環状線 加平出入口",
@@ -1072,6 +1095,29 @@ const SHUTO_IC_MASTER = [
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速6号三郷線 三郷出入口"],
         note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-6mi/misato)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。新規追加。座標はMapFanの「三郷ランプ（６号三郷線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.17kmの中間点。"
+    },
+    {
+        id: "shuto-jct-kosuge",
+        displayName: "小菅JCT",
+        googleName: "首都高速 小菅ジャンクション",
+        aliases: ["小菅JCT", "小菅ジャンクション"],
+        roadType: "首都高",
+        routeCode: "C2",
+        routeName: "首都高速中央環状線",
+        lat: 35.754167,
+        lng: 139.820833,
+        entranceLat: 35.754167,
+        entranceLng: 139.820833,
+        exitLat: 35.754167,
+        exitLng: 139.820833,
+        isSelectable: false,
+        entranceSelectable: false,
+        exitSelectable: false,
+        connection: true,
+        connectedRoads: ["首都高速中央環状線", "首都高速6号三郷線"],
+        sourceAreaKeys: [],
+        sourceGoogleNames: ["首都高速 小菅ジャンクション"],
+        note: "【2026-07-18新規追加】order連続性チェックのrouteIdentity統一化に伴い、中央環状線(C2)と首都高速6号三郷線を接続するJCTとして新規登録。座標はWikipedia「小菅ジャンクション」記載の北緯35度45分15秒 東経139度49分15秒を10進法に変換（35.754167, 139.820833）。isSelectable/entranceSelectable/exitSelectableはfalse。小菅出入口（既存エントリ、id: shuto-c2-kosuge、出入口ランプ）とは別地点・別エントリ。"
     },
     {
         id: "shuto-7-kinshicho",
@@ -1284,6 +1330,29 @@ const SHUTO_IC_MASTER = [
         note: "上り入口・下り出口。首都高公式サイト(shutoko.jp route-1u/iriya)の出入口ページの表で「入口:上り／出口:下り」（片方向のみ）と再確認し、本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。入口はETC専用。新規追加。座標はMapFanの「入谷ランプ（１号上野線）【入口（上り）】/【出口（下り）】」個別ページでランプごとに確認、入口・出口座標間約0.01kmの中間点。"
     },
     {
+        id: "shuto-jct-edobashi",
+        displayName: "江戸橋JCT",
+        googleName: "首都高速 江戸橋ジャンクション",
+        aliases: ["江戸橋JCT", "江戸橋ジャンクション"],
+        roadType: "首都高",
+        routeCode: "C1",
+        routeName: "首都高速都心環状線",
+        lat: 35.684167,
+        lng: 139.778611,
+        entranceLat: 35.684167,
+        entranceLng: 139.778611,
+        exitLat: 35.684167,
+        exitLng: 139.778611,
+        isSelectable: false,
+        entranceSelectable: false,
+        exitSelectable: false,
+        connection: true,
+        connectedRoads: ["首都高速都心環状線", "首都高速1号上野線", "首都高速6号向島線"],
+        sourceAreaKeys: [],
+        sourceGoogleNames: ["首都高速 江戸橋ジャンクション"],
+        note: "【2026-07-18新規追加】order連続性チェックのrouteIdentity統一化に伴い、都心環状線(C1)・首都高速1号上野線（起点）・首都高速6号向島線（起点）の3路線を接続するJCTとして新規登録（1963年供用開始、首都高初のJCT）。座標はWikipedia「江戸橋ジャンクション」記載の北緯35度41分03秒 東経139度46分43秒を10進法に変換（35.684167, 139.778611）。isSelectable/entranceSelectable/exitSelectableはfalse。"
+    },
+    {
         id: "shuto-4-takaido",
         displayName: "高井戸",
         googleName: "首都高速4号新宿線 高井戸出入口",
@@ -1429,6 +1498,29 @@ const SHUTO_IC_MASTER = [
         sourceAreaKeys: [],
         sourceGoogleNames: ["首都高速4号新宿線 永福出入口"],
         note: "上り・下りとも入口・出口（上りはETC専用）。新規追加。首都高公式サイト(shutoko.jp route-4/eifuku)で方向を確認。座標はMapFanの「永福ランプ（４号新宿線）【入口（下り）】/【出口（下り）】」個別ページで下り側ランプを代表点として確認、入口・出口座標間約0.29kmの中間点。上り側ランプの座標は未採用。"
+    },
+    {
+        id: "shuto-jct-miyakezaka",
+        displayName: "三宅坂JCT",
+        googleName: "首都高速 三宅坂ジャンクション",
+        aliases: ["三宅坂JCT", "三宅坂ジャンクション"],
+        roadType: "首都高",
+        routeCode: "C1",
+        routeName: "首都高速都心環状線",
+        lat: 35.680556,
+        lng: 139.743333,
+        entranceLat: 35.680556,
+        entranceLng: 139.743333,
+        exitLat: 35.680556,
+        exitLng: 139.743333,
+        isSelectable: false,
+        entranceSelectable: false,
+        exitSelectable: false,
+        connection: true,
+        connectedRoads: ["首都高速都心環状線", "首都高速4号新宿線"],
+        sourceAreaKeys: [],
+        sourceGoogleNames: ["首都高速 三宅坂ジャンクション"],
+        note: "【2026-07-18新規追加】order連続性チェックのrouteIdentity統一化に伴い、都心環状線(C1)と首都高速4号新宿線（起点）を接続するJCTとして新規登録。座標はWikipedia「三宅坂ジャンクション」記載の北緯35度40分50秒 東経139度44分36秒を10進法に変換（35.680556, 139.743333）。首都高速3号渋谷線は、法定路線名上は三宅坂JCTが起点とされるが、実運用上の呼称では谷町JCTが3号渋谷線の起点（三宅坂〜谷町間はC1として扱われる）であるため、本アプリのconnectedRoadsには3号渋谷線を含めていない（Wikipedia「首都高速3号渋谷線」で確認）。isSelectable/entranceSelectable/exitSelectableはfalse（IC_MASTER側の鶴ヶ島JCT等の既存JCT登録パターンを踏襲）。"
     },
     {
         id: "shuto-c1-daikancho",
@@ -11506,19 +11598,36 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 .sort((a, b) => a.traceIndex - b.traceIndex);
         };
 
-        const isJctContinuationBoundary = (previousItem, currentItem) => {
-            if (
-                !previousItem ||
-                !currentItem ||
-                previousItem.roadLabel === currentItem.roadLabel
-            ) {
+        // 路線移動の正当性チェックで使う識別キー。roadLabel（首都高／NEXCOの
+        // 大分類）だけでは、首都高内部の路線間移動（routeCodeが変わってもroadLabelは
+        // 常に"首都高"のまま）を検出できないため、首都高はrouteName、NEXCOは
+        // sourceAreaKeyという、より細かい路線単位の識別キーを使う。
+        const getRouteIdentity = exit => {
+            if (!exit) {
+                return null;
+            }
+
+            return isShutoIcForRouteAnalysis(exit)
+                ? (exit.routeName || null)
+                : (exit.sourceAreaKey || exit.sourceAreaKeys?.[0] || null);
+        };
+
+        // 路線（routeIdentity）が変わる地点では、首都高内部の乗り継ぎか
+        // 首都高⇔NEXCO間の乗り継ぎかを区別せず、必ずconnection===trueかつ
+        // connectedRoadsに前後両方のidentityを含むJCTエントリによる
+        // 裏付けを要求する（同一路線内であれば裏付け不要）。
+        const isRouteTransitionValidated = (previousItem, currentItem) => {
+            if (!previousItem || !currentItem) {
                 return true;
             }
 
-            // roadLabelが変わる地点（首都高⇔NEXCO間の乗り継ぎ）。
-            // shutoSegments抽出範囲は区間全体がroadLabel==="首都高"のため
-            // このブランチは現状発生しないが、将来的に首都高⇔NEXCOを
-            // またぐ範囲へこの関数を再利用する場合に備えて用意している。
+            const previousIdentity = getRouteIdentity(previousItem.exit);
+            const currentIdentity = getRouteIdentity(currentItem.exit);
+
+            if (previousIdentity === currentIdentity) {
+                return true;
+            }
+
             const boundaryExit =
                 previousItem.exit?.connection === true
                     ? previousItem.exit
@@ -11535,10 +11644,10 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
 
             return (
                 boundaryExit.connectedRoads.includes(
-                    previousItem.icArea
+                    previousIdentity
                 ) &&
                 boundaryExit.connectedRoads.includes(
-                    currentItem.icArea
+                    currentIdentity
                 )
             );
         };
@@ -11551,7 +11660,7 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             traceItems.forEach(item => {
                 if (
                     previousItem &&
-                    !isJctContinuationBoundary(previousItem, item)
+                    !isRouteTransitionValidated(previousItem, item)
                 ) {
                     violations +=
                         SHUTO_SEGMENT_ORDER_TOLERANCE_VIOLATIONS + 1;
@@ -11560,15 +11669,15 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 const exit = item.exit;
                 const previousExit = previousItem?.exit;
 
-                const sameRouteCode =
+                const sameRouteIdentity =
                     Boolean(previousExit) &&
                     Boolean(exit) &&
-                    previousExit.routeCode !== undefined &&
-                    exit.routeCode !== undefined &&
-                    previousExit.routeCode === exit.routeCode;
+                    getRouteIdentity(previousExit) !== null &&
+                    getRouteIdentity(exit) !== null &&
+                    getRouteIdentity(previousExit) === getRouteIdentity(exit);
 
                 if (
-                    sameRouteCode &&
+                    sameRouteIdentity &&
                     Number.isFinite(previousExit.order) &&
                     Number.isFinite(exit.order)
                 ) {

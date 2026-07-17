@@ -3749,6 +3749,72 @@ const IC_MASTER = {
             { order: 11, displayName: "宇都宮IC", googleName: "東北自動車道 宇都宮インターチェンジ", lat: 36.6344803, lng: 139.8451272,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.6344803, entranceLng: 139.8451272, exitLat: 36.6344704, exitLng: 139.844862,
                 note: "【2026-07-17調査・座標新規追加】従来lat/lng等の座標フィールドが一切未設定だったため新規確定。MapFan「宇都宮ＩＣ【入口】」(36.6344803,139.8451272)「【出口】」(36.6344704,139.844862)を確認。入口・出口の個別ページが存在することからフルICと推定（NEXCO公式・Wikipediaに明記なし）。日光宇都宮道路との接続点でもある複合IC構造だが、今回は東北自動車道側の座標追加のみで複合IC化は対象外。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
+            },
+            { order: 11.5, displayName: "上河内SIC", googleName: "東北自動車道 上河内スマートインターチェンジ", lat: 36.6917388, lng: 139.8929558,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.6917388, entranceLng: 139.8929558, exitLat: 36.6917908, exitLng: 139.8929707,
+                note: "【2026-07-17調査・座標新規追加】前回の矢板IC〜郡山JCT追加時に対象漏れがあったため追加。宇都宮IC(103.0km)と矢板IC(120.2km)の間、起点から約110.9kmに位置。MapFan「上河内スマートＩＣ【入口（上り）】」(36.6917388,139.8929558)「【出口（上り）】」(36.6917908,139.8929707)を確認。Wikipediaによると2007年4月1日にハーフIC本格運用開始、2010年12月18日に福島方面が新設されフルIC化。entranceSelectable/exitSelectableはtrueとした。"
+            },
+            { order: 12, displayName: "矢板IC", googleName: "東北自動車道 矢板インターチェンジ", lat: 36.7622164, lng: 139.9374504,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.7622164, entranceLng: 139.9374504, exitLat: 36.7622977, exitLng: 139.9374867,
+                note: "【2026-07-17調査・座標新規追加】新規区間（宇都宮IC以降〜郡山）のため新規追加。MapFan「矢板ＩＣ【入口】」(36.7622164,139.9374504)「【出口】」(36.7622977,139.9374867)を確認。Wikipedia「矢板インターチェンジ」に上下線双方向の記載あり、方向制限の明記なし。フルICと推定。1973年8月9日開通。entranceSelectable/exitSelectableはtrueとした。"
+            },
+            { order: 13, displayName: "矢板北SIC", googleName: "東北自動車道 矢板北スマートインターチェンジ", lat: 36.8229749, lng: 139.9104147,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.8229749, entranceLng: 139.9104147, exitLat: 36.8229749, exitLng: 139.9104147,
+                note: "【2026-07-17調査・座標新規追加】新規区間のため新規追加。MapFan「矢板北スマートＩＣ【入口（上り）】」(36.8229749,139.9104147)を確認。下り側の個別座標は検索で特定できなかったため、entranceLat/Lng・exitLat/Lngとも入口(上り)座標を暫定使用した。Wikipediaに「上下線ともに出入可」と明記されておりフルIC。2021年3月28日開通。entranceSelectable/exitSelectableはtrueとした。次回、下り側の個別座標が確認できた場合は再検証が必要。"
+            },
+            { order: 14, displayName: "西那須野塩原IC", googleName: "東北自動車道 西那須野塩原インターチェンジ", lat: 36.9161066, lng: 139.9406269,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.9161066, entranceLng: 139.9406269, exitLat: 36.9161066, exitLng: 139.9406269,
+                note: "【2026-07-17調査・座標新規追加】新規区間のため新規追加。MapFan「西那須野塩原ＩＣ【入口】」(36.9161066,139.9406269)を確認。出口の個別ページは検索で特定できなかったため、entranceLat/Lng・exitLat/Lngとも入口座標を暫定使用した。フルICと推定（NEXCO公式・Wikipediaに明記なし）。1974年12月20日開通。entranceSelectable/exitSelectableはtrueとした。次回、出口の個別座標が確認できた場合は再検証が必要。"
+            },
+            { order: 15, displayName: "黒磯板室IC", googleName: "東北自動車道 黒磯板室インターチェンジ", lat: 36.962049, lng: 139.9854459,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.962049, entranceLng: 139.9854459, exitLat: 36.962071, exitLng: 139.985313,
+                note: "【2026-07-17調査・座標新規追加】新規区間のため新規追加。MapFan「黒磯板室ＩＣ【入口】」(36.962049,139.9854459)「【出口】」(36.962071,139.985313)を確認。フルICと推定（NEXCO公式・Wikipediaに明記なし）。2009年3月29日開通、信号機付き平面交差構造。Wikipediaによると2025年4月26日にY字交差点での進路誤認による逆走多重事故（死亡3人・重傷2人・軽傷8人、計13人死傷）が発生し、2025年6月に矢印信号機・指定方向外通行禁止標識の大型化等の安全対策が実施された。entranceSelectable/exitSelectableは変更せずtrueとした。"
+            },
+            { order: 16, displayName: "那須IC", googleName: "東北自動車道 那須インターチェンジ", lat: 37.0024635, lng: 140.0382438,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 37.0024635, entranceLng: 140.0382438, exitLat: 37.0024199, exitLng: 140.0383253,
+                note: "【2026-07-17調査・座標新規追加】新規区間のため新規追加。MapFan「那須ＩＣ【入口】」(37.0024635,140.0382438)「【出口】」(37.0024199,140.0383253)を確認。フルICと推定（NEXCO公式・Wikipediaに明記なし）。1974年12月20日開通。entranceSelectable/exitSelectableはtrueとした。"
+            },
+            { order: 17, displayName: "那須高原SIC", googleName: "東北自動車道 那須高原スマートインターチェンジ", lat: 37.0547427, lng: 140.1004103,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 37.0547427, entranceLng: 140.1004103, exitLat: 37.0567907, exitLng: 140.0983925,
+                note: "【2026-07-17調査・座標新規追加】新規区間のため新規追加。MapFan「那須高原スマートＩＣ【入口（上り）】」(37.0547427,140.1004103)「【出口（下り）】」(37.0567907,140.0983925)を確認。Wikipediaによると2006年にハーフIC運用開始、2010年12月18日に福島方面が新設されフルIC化。entranceSelectable/exitSelectableはtrueとした。"
+            },
+            { order: 18, displayName: "白河IC", googleName: "東北自動車道 白河インターチェンジ", lat: 37.121053, lng: 140.163775,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 37.121053, entranceLng: 140.163775, exitLat: 37.121053, exitLng: 140.163775,
+                note: "【2026-07-17調査・座標新規追加】新規区間のため新規追加。MapFan「白河ＩＣ【入口】」(37.121053,140.163775)を確認。出口の個別ページは検索で特定できなかったため、entranceLat/Lng・exitLat/Lngとも入口座標を暫定使用した。フルICと推定（NEXCO公式・Wikipediaに明記なし）。1973年11月26日開通。entranceSelectable/exitSelectableはtrueとした。次回、出口の個別座標が確認できた場合は再検証が必要。"
+            },
+            { order: 19, displayName: "白河中央SIC", googleName: "東北自動車道 白河中央スマートインターチェンジ", lat: 37.1457539, lng: 140.2184747,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 37.1457539, entranceLng: 140.2184747, exitLat: 37.1456825, exitLng: 140.2184647,
+                note: "【2026-07-17調査・座標新規追加】新規区間のため新規追加。MapFan「白河中央スマートＩＣ【入口（上り）】」(37.1457539,140.2184747)「【出口（上り）】」(37.1456825,140.2184647)を確認。Wikipediaにより「全国初」の両方向流入流出型本線直結スマートICと明記されておりフルIC。2009年8月8日開通。entranceSelectable/exitSelectableはtrueとした。"
+            },
+            { order: 20, displayName: "矢吹IC", googleName: "東北自動車道 矢吹インターチェンジ", lat: 37.193502, lng: 140.29893850953,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 37.193502, entranceLng: 140.29893850953, exitLat: 37.193502, exitLng: 140.29893850953,
+                note: "【2026-07-17調査・座標新規追加】新規区間のため新規追加。MapFan「矢吹ＩＣ【出口】」(37.193502,140.29893850953)を確認。入口の個別ページは検索で存在を確認したがアクセス時に404となり座標を取得できなかったため、entranceLat/Lng・exitLat/Lngとも出口座標を暫定使用した。フルICと推定（NEXCO公式・Wikipediaに明記なし）。1973年11月26日開通、あぶくま高原道路と接続。entranceSelectable/exitSelectableはtrueとした。次回、入口の個別座標が確認できた場合は再検証が必要。"
+            },
+            { order: 21, displayName: "鏡石SIC", googleName: "東北自動車道 鏡石スマートインターチェンジ", lat: 37.2550158, lng: 140.3358209,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 37.2550158, entranceLng: 140.3358209, exitLat: 37.2550158, exitLng: 140.3358209,
+                note: "【2026-07-17調査・座標新規追加】新規区間のため新規追加。MapFan「鏡石スマートＩＣ【入口（上り）】」(37.2550158,140.3358209)を確認。出口の個別ページは検索で特定できなかったため、entranceLat/Lng・exitLat/Lngとも入口座標を暫定使用した。各種情報源で「利用可能方向：全方向」と明記されておりフルIC。2009年4月1日開通。entranceSelectable/exitSelectableはtrueとした。次回、出口の個別座標が確認できた場合は再検証が必要。"
+            },
+            { order: 22, displayName: "須賀川IC", googleName: "東北自動車道 須賀川インターチェンジ", lat: 37.2918561, lng: 140.3550815,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 37.2918561, entranceLng: 140.3550815, exitLat: 37.2919156, exitLng: 140.3551178,
+                note: "【2026-07-17調査・座標新規追加】新規区間のため新規追加。MapFan「須賀川ＩＣ【入口】」(37.2918561,140.3550815)「【出口】」(37.2919156,140.3551178)を確認。フルICと推定（NEXCO公式・Wikipediaに明記なし）。entranceSelectable/exitSelectableはtrueとした。"
+            },
+            { order: 23, displayName: "郡山南IC", googleName: "東北自動車道 郡山南インターチェンジ", lat: 37.3623208, lng: 140.3140083,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 37.3623208, entranceLng: 140.3140083, exitLat: 37.3623508, exitLng: 140.3141053,
+                note: "【2026-07-17調査・座標新規追加】新規区間のため新規追加。MapFan「郡山南ＩＣ【入口】」(37.3623208,140.3140083)「【出口】」(37.3623508,140.3141053)を確認。フルICと推定（NEXCO公式・Wikipediaに明記なし）。entranceSelectable/exitSelectableはtrueとした。"
+            },
+            { order: 24, displayName: "郡山中央SIC", googleName: "東北自動車道 郡山中央スマートインターチェンジ", lat: 37.4021063, lng: 140.3137506,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 37.4021063, entranceLng: 140.3137506, exitLat: 37.4021063, exitLng: 140.3137506,
+                note: "【2026-07-17調査・座標新規追加】新規区間のため新規追加。MapFan「郡山中央スマートＩＣ【入口（上り）】」(37.4021063,140.3137506)を確認。出口の個別ページは検索で特定できなかったため、entranceLat/Lng・exitLat/Lngとも入口座標を暫定使用した。各種情報源で「上下線ともに出入可」と明記されておりフルIC。2019年1月13日開通。entranceSelectable/exitSelectableはtrueとした。次回、出口の個別座標が確認できた場合は再検証が必要。"
+            },
+            { order: 25, displayName: "郡山IC", googleName: "東北自動車道 郡山インターチェンジ", lat: 37.4325478, lng: 140.3442763,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 37.4325478, entranceLng: 140.3442763, exitLat: 37.4320455, exitLng: 140.3448456,
+                note: "【2026-07-17調査・座標新規追加】新規区間のため新規追加。MapFan「郡山ＩＣ【入口】」(37.4325478,140.3442763)「【出口】」(37.4320455,140.3448456)を確認。フルICと推定（NEXCO公式・Wikipediaに明記なし）。1973年11月26日開通、郡山JCTの3.8km手前に位置。entranceSelectable/exitSelectableはtrueとした。"
+            },
+            { order: 26, displayName: "郡山JCT", googleName: "東北自動車道 郡山ジャンクション", lat: 37.4685207, lng: 140.3612396,
+                isSelectable: false,
+                connectedRoads: ["tohoku"],
+                entranceSelectable: false, exitSelectable: false, entranceLat: 37.4685207, entranceLng: 140.3612396, exitLat: 37.4685207, exitLng: 140.3612396,
+                note: "【2026-07-17調査・新規追加】東北自動車道(E4)と磐越自動車道(E49)を接続するダブルトランペット型JCT（1990年10月31日会津若松・新潟方面、1995年8月いわき方面の2段階開通、Wikipedia確認）。座標はMapFan「郡山JCT【仙台方面】」(37.4685207,140.3612396)を採用したが、他情報源では中心点として37.46604912,140.35740976や37.462735,140.360137という値もあり、情報源間で最大約700m程度のばらつきがある。ダブルトランペット型のため代表点の取り方は要再検討。磐越自動車道はIC_MASTERに未登録のため、connectedRoadsは現状tohokuのみとし、磐越道エリア新設時に追記する。isSelectable/entranceSelectable/exitSelectableはfalseで登録（八王子JCT・鶴ヶ島JCT・久喜白岡JCTと同じパターン）。"
             }
         ]
     },

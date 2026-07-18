@@ -9654,6 +9654,9 @@ async function estimateMainHighwayToll(
 
 function logMainHighwayTollCalculation(tollEstimate) {
 
+    const usedTollSections =
+        tollEstimate?.usedTollSections === true;
+
     const usedNexcoPolylineIc =
         tollEstimate?.usedNexcoPolylineIc === true;
 
@@ -9666,17 +9669,37 @@ function logMainHighwayTollCalculation(tollEstimate) {
             tollEstimate?.endIc
         );
 
+    // usedTollSections（TOLL TAG方式、有料区間タグベース）を、既存の
+    // 座標ベース方式の判定より優先して表示する。
     const calculationLogic =
-        usedNexcoPolylineIc
-            ? "Polyline解析NEXCO IC"
-            : usedPolylineAnalysis
-                ? "Polyline解析IC"
-                : usedIcCalculation
-                    ? "旧ロジックIC"
-                    : "距離ベース";
+        usedTollSections
+            ? "TOLL TAGタグ"
+            : usedNexcoPolylineIc
+                ? "Polyline解析NEXCO IC"
+                : usedPolylineAnalysis
+                    ? "Polyline解析IC"
+                    : usedIcCalculation
+                        ? "旧ロジックIC"
+                        : "距離ベース";
 
     console.group("[ETC概算 料金計算]");
     console.log("料金計算ロジック：", calculationLogic);
+
+    console.log(
+        "合計：約" +
+        Number(tollEstimate?.amount || 0).toLocaleString() +
+        "円" +
+        "（首都高：約" +
+        Number(tollEstimate?.shutoToll || 0).toLocaleString() +
+        "円 / 他道路：約" +
+        Number(tollEstimate?.highwayToll || 0).toLocaleString() +
+        "円）"
+    );
+
+    console.log(
+        "首都高利用回数（shutoEntryCount）：",
+        tollEstimate?.shutoEntryCount ?? "不明"
+    );
 
     if (usedIcCalculation) {
         console.log(
@@ -9691,7 +9714,9 @@ function logMainHighwayTollCalculation(tollEstimate) {
     else {
         console.log(
             "理由：",
-            tollEstimate?.fallbackReason || "不明"
+            tollEstimate?.fallbackReason ||
+                tollEstimate?.label ||
+                "不明"
         );
     }
 

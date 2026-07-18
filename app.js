@@ -1173,23 +1173,11 @@ function resolveTollSectionNexcoRoadLabel(section) {
 // 道路名）を先頭に付け、複数区間ある場合は2件目以降の区間にも同様に
 // pillを付けることで、区間の切り替わり・再入場が視覚的に分かるように
 // している。
+// tollSectionsが空配列の場合は空文字列を返す（呼び出し元の
+// buildTollUsageSummaryHtmlが、旧判定・新判定の併記表示を含めて
+// 一元的に処理するため、ここでは「有料道路なし」相当のメッセージは
+// 持たない）。
 function buildAssumedRouteHtmlFromTollSections(tollSections) {
-    if (!tollSections || tollSections.length === 0) {
-        // 旧判定（isProbablyNoTollRouteByPolylineComparison）とTOLL TAG
-        // 方式の結果が食い違い、旧判定が偽（＝有料道路使用ありと判定）に
-        // なった場合でも、tollSectionsが空ならここに到達する。従来は
-        // 空文字列を返しておりトップパネルが空白になり得たため、
-        // 明示的な文言を返すようにする。
-        return (
-            "<span class=\"assumed-route-toll-sections-empty\">" +
-            "有料道路は使用していません" +
-            "</span>" +
-            "<small class=\"assumed-route-no-toll-detail\">" +
-            "※TOLL TAG判定" +
-            "</small>"
-        );
-    }
-
     return (tollSections || [])
         .map(section => {
             const pillLabel =
@@ -1364,25 +1352,20 @@ function updateDashboardAssumedRouteForComparisonMode() {
         return;
     }
 
-    const assumedRouteHtml =
-        buildAssumedRouteHtml(lastHighwayRoutePolylineAnalysis);
-
     dashboardAssumedRouteValue.innerHTML =
         "<span class=\"dashboard-assumed-route-label\">参考：高速利用ルート</span>" +
-        (
+        buildTollUsageSummaryHtml(
+            lastHighwayRoutePolylineAnalysis,
             lastProbablyNoTollRouteByPolylineComparison
-                ? buildNoTollRouteNoteHtml(
-                    lastHighwayRoutePolylineAnalysis
-                )
-                : (assumedRouteHtml || "ルート情報なし")
         );
 }
 
 // 「（有料道路を使用していません）」表示に、既存のPolyline直接比較判定
 // （旧判定、この関数が呼ばれる時点で常に無料）と、shutoSegments/
 // nexcoEntranceIc/nexcoExitIcに基づく参考判定（新判定）を併記する。
-// 新判定はあくまで参考表示用の追加情報であり、この表示自体を出すかどうかの
-// 決定（旧判定＝isProbablyNoTollRouteByPolylineComparison）は変更しない。
+// より精度の高いTOLL TAG方式（buildTollUsageSummaryHtml）に表示は
+// 一本化したため現時点では呼び出し元から未参照だが、関数自体は
+// 削除せず残している。
 function buildNoTollRouteNoteHtml(polylineAnalysis) {
     const isNoTollByShutoSegments =
         isProbablyNoTollRouteByShutoSegments(polylineAnalysis);
@@ -1408,6 +1391,88 @@ function buildNoTollRouteNoteHtml(polylineAnalysis) {
                 ) +
             "</small>" +
         "</span>"
+    );
+}
+
+// 「（有料道路を使用していません）」に関する表示を一本化する。
+// 旧判定（isProbablyNoTollRouteByPolylineComparison、ルート形状比較）と
+// 新判定（TOLL TAG方式、tollSectionsの有無）を、常に「形状判定：◯◯ /
+// TOLLTAG：◯◯」という1行で併記する。
+// 判定ロジック自体（isProbablyNoTollRouteByPolylineComparison・
+// tollSectionsの算出方法）はここでは変更しない。
+//
+// 表示方針：
+// - 両判定とも「未使用」の場合：この判定行だけを表示する
+//   （実際に高速利用ルートが無いため、通常のルート表示は行わない）
+// - どちらかが「使用」の場合：通常のルート表示（buildAssumedRouteHtml）
+//   に加えて、この判定行を小さく併記する
+// - 新旧の判定が食い違う場合は、既存の.assumed-route-no-toll-mismatch
+//   （警告色）で強調する
+//
+// なお、旧「新判定」（shutoSegments/isProbablyNoTollRouteByShutoSegments）
+// は、より精度の高いTOLL TAG方式（tollSections）に置き換えられたため、
+// この表示では使用しない。関数自体は削除せず残している。
+function buildTollUsageSummaryHtml(
+    polylineAnalysis,
+    isOldNoToll
+) {
+    const hasTollTagData =
+        polylineAnalysis?.hasTollSectionStepsData === true;
+
+    const isNewNoToll =
+        hasTollTagData
+            ? !(
+                polylineAnalysis.tollSections &&
+                polylineAnalysis.tollSections.length > 0
+            )
+            : null;
+
+    const oldText =
+        isOldNoToll ? "有料未使用" : "有料使用";
+
+    const newText =
+        isNewNoToll === null
+            ? "不明"
+            : (isNewNoToll ? "有料未使用" : "有料使用");
+
+    const isMismatch =
+        isNewNoToll !== null &&
+        isOldNoToll !== isNewNoToll;
+
+    const summaryText =
+        "形状判定：" + oldText +
+        " / TOLLTAG：" + newText +
+        (
+            isMismatch
+                ? "　⚠一致していません"
+                : ""
+        );
+
+    const bothNoToll =
+        isOldNoToll && isNewNoToll === true;
+
+    if (bothNoToll) {
+        return (
+            "<span class=\"assumed-route-toll-sections-empty\">" +
+            escapeHtml(summaryText) +
+            "</span>"
+        );
+    }
+
+    const assumedRouteHtml =
+        buildAssumedRouteHtml(polylineAnalysis);
+
+    return (
+        (assumedRouteHtml || "ルート情報なし") +
+        "<small class=\"assumed-route-no-toll-detail" +
+            (
+                isMismatch
+                    ? " assumed-route-no-toll-mismatch"
+                    : ""
+            ) +
+            "\">" +
+            escapeHtml(summaryText) +
+        "</small>"
     );
 }
 
@@ -9274,11 +9339,6 @@ async function displayRouteComparison(
     );
 
     if (!suppressDashboardSummary) {
-        const assumedRouteHtml =
-            buildAssumedRouteHtml(
-                lastHighwayRoutePolylineAnalysis
-            );
-
         document
             .getElementById("dashboardCost")
             .innerHTML =
@@ -9287,10 +9347,10 @@ async function displayRouteComparison(
         document
             .getElementById("dashboardAssumedRouteValue")
             .innerHTML =
-            lastProbablyNoTollRouteByPolylineComparison
-                ? "<span class=\"assumed-route-no-toll-note\">" +
-                    "（有料道路を使用していません）</span>"
-                : (assumedRouteHtml || "ルート情報なし");
+            buildTollUsageSummaryHtml(
+                lastHighwayRoutePolylineAnalysis,
+                lastProbablyNoTollRouteByPolylineComparison
+            );
     }
 
     document

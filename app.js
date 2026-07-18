@@ -327,6 +327,155 @@ function isProbablyNoTollRouteByShutoSegments(polylineAnalysis) {
     return !hasShutoSegments && !hasNexcoIc;
 }
 
+// 【検証用・一時的】Google Routes APIのlegs.steps.navigationInstruction.
+// instructionsに含まれる「有料区間」文言を使った、座標ベース方式
+// （shutoSegments等）とは完全に独立した診断用の高速利用区間検出。
+// 判定ロジック（料金計算・表示・候補選定等）には一切使用していない。
+// 有効と判断されなければ元に戻す。
+const TOLL_SECTION_TAG_TEXT = "有料区間";
+const TOLL_SECTION_IC_MATCH_THRESHOLD_METERS = 500;
+
+// stepのstartLocation/endLocationは、他のRoutes APIのLocation型と同様に
+// { latLng: { latitude, longitude } }という構造を想定しているが、実際の
+// レスポンス構造は未確認のため、想定と異なる形（直接latitude/longitudeを
+// 持つ等）にもフォールバックできるようにしている。
+function extractLatLngFromRouteLocation(location) {
+    if (!location) {
+        return null;
+    }
+
+    const latLng = location.latLng || location;
+
+    if (
+        typeof latLng.latitude !== "number" ||
+        typeof latLng.longitude !== "number"
+    ) {
+        return null;
+    }
+
+    return {
+        lat: latLng.latitude,
+        lng: latLng.longitude
+    };
+}
+
+function detectTollSectionsFromSteps(highwayRoute) {
+    const steps =
+        (highwayRoute?.legs || []).flatMap(
+            leg => leg.steps || []
+        );
+
+    const taggedSteps = steps.map(step => ({
+        step,
+        isTollStep:
+            String(
+                step.navigationInstruction?.instructions || ""
+            ).includes(TOLL_SECTION_TAG_TEXT)
+    }));
+
+    const icDefinitions = getAllRouteAnalysisIcDefinitions();
+
+    const findNearestIcLabel = location => {
+        const latLng =
+            extractLatLngFromRouteLocation(location);
+
+        if (!latLng) {
+            return {
+                icName: "座標取得不可",
+                distanceMeters: null
+            };
+        }
+
+        let nearestIc = null;
+        let nearestDistanceMeters = Infinity;
+
+        icDefinitions.forEach(ic => {
+            const distanceMeters =
+                calculateDistance(
+                    latLng.lat,
+                    latLng.lng,
+                    ic.lat,
+                    ic.lng
+                );
+
+            if (distanceMeters < nearestDistanceMeters) {
+                nearestDistanceMeters = distanceMeters;
+                nearestIc = ic;
+            }
+        });
+
+        if (
+            !nearestIc ||
+            nearestDistanceMeters >
+                TOLL_SECTION_IC_MATCH_THRESHOLD_METERS
+        ) {
+            return {
+                icName: "IC不明（未登録の可能性）",
+                distanceMeters: nearestDistanceMeters
+            };
+        }
+
+        return {
+            icName: nearestIc.displayName,
+            distanceMeters: nearestDistanceMeters
+        };
+    };
+
+    const tollSectionRuns = [];
+    let currentRun = null;
+
+    taggedSteps.forEach(({ step, isTollStep }) => {
+        if (isTollStep) {
+            if (!currentRun) {
+                currentRun = { steps: [] };
+                tollSectionRuns.push(currentRun);
+            }
+
+            currentRun.steps.push(step);
+        }
+        else {
+            currentRun = null;
+        }
+    });
+
+    const tollSections =
+        tollSectionRuns.map(run => {
+            const firstStep = run.steps[0];
+            const lastStep =
+                run.steps[run.steps.length - 1];
+
+            const entranceLabel =
+                findNearestIcLabel(firstStep.startLocation);
+            const exitLabel =
+                findNearestIcLabel(lastStep.endLocation);
+
+            return {
+                stepCount: run.steps.length,
+                entranceLatLng:
+                    extractLatLngFromRouteLocation(
+                        firstStep.startLocation
+                    ),
+                exitLatLng:
+                    extractLatLngFromRouteLocation(
+                        lastStep.endLocation
+                    ),
+                entranceIcName: entranceLabel.icName,
+                entranceDistanceMeters:
+                    entranceLabel.distanceMeters,
+                exitIcName: exitLabel.icName,
+                exitDistanceMeters: exitLabel.distanceMeters,
+                rawFirstStartLocation:
+                    firstStep.startLocation,
+                rawLastEndLocation: lastStep.endLocation
+            };
+        });
+
+    return {
+        tollSections,
+        tollEntryCount: tollSections.length
+    };
+}
+
 // 「※有料未使用かも」表示は、Polyline直接比較方式
 // （isProbablyNoTollRouteByPolylineComparison、「参考：高速利用ルート」欄）
 // に一本化したため無効化。関数自体はisProbablyNoTollRouteByMetricsとともに
@@ -8180,13 +8329,14 @@ async function getHighwayRoute(
                 "X-Goog-Api-Key":
                     CONFIG.GOOGLE_MAPS_API_KEY,
 
-                // 【検証用・一時的】routes.legs.steps.navigationInstruction・
-                // routes.legs.steps.distanceMetersは、steps文言の実用性を
-                // 確認するためだけに追加している。判定ロジックには未使用。
-                // 有効と判断されなければ元に戻す。
+                // 【検証用・一時的】routes.legs.steps関連フィールドは、
+                // 「有料区間」タグによる判定方式の実用性を確認するためだけに
+                // 追加している。判定ロジックには未使用。有効と判断されなければ
+                // 元に戻す。
                 "X-Goog-FieldMask":
                     "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline," +
-                    "routes.legs.steps.navigationInstruction,routes.legs.steps.distanceMeters"
+                    "routes.legs.steps.navigationInstruction,routes.legs.steps.distanceMeters," +
+                    "routes.legs.steps.startLocation,routes.legs.steps.endLocation"
             },
 
             body: JSON.stringify({
@@ -9754,8 +9904,14 @@ async function getHighwayRouteFromGps(
                     "X-Goog-Api-Key":
                         CONFIG.GOOGLE_MAPS_API_KEY,
 
+                    // 【検証用・一時的】routes.legs.steps関連フィールドは、
+                    // 「有料区間」タグによる判定方式をGPS自動更新時にも
+                    // 検証するためだけに追加している。判定ロジックには
+                    // 未使用。有効と判断されなければ元に戻す。
                     "X-Goog-FieldMask":
-                        "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline"
+                        "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline," +
+                        "routes.legs.steps.navigationInstruction,routes.legs.steps.distanceMeters," +
+                        "routes.legs.steps.startLocation,routes.legs.steps.endLocation"
 
                 },
 
@@ -14032,6 +14188,88 @@ function logHighwayRoutePolylineAnalysis(
 
         console.log("steps件数:", highwaySteps.length);
         console.table(highwaySteps);
+
+        console.groupEnd();
+
+        // 【検証用・一時的】「有料区間」タグベースの区間検出（座標ベース
+        // 方式とは独立）。判定ロジックには一切使用していない。有効と
+        // 判断されなければ元に戻す。
+        console.group("[TOLL TAG検証・一時的]");
+
+        const tollTagResult =
+            detectTollSectionsFromSteps(highwayRoute);
+
+        console.log(
+            "新方式（TOLL TAG）区間数（tollEntryCount）:",
+            tollTagResult.tollEntryCount
+        );
+
+        console.log("新方式 検出区間一覧:");
+        console.table(
+            tollTagResult.tollSections.map(section => ({
+                entranceIc: section.entranceIcName,
+                entranceDistanceM:
+                    section.entranceDistanceMeters === null
+                        ? "-"
+                        : Math.round(
+                            section.entranceDistanceMeters
+                        ),
+                exitIc: section.exitIcName,
+                exitDistanceM:
+                    section.exitDistanceMeters === null
+                        ? "-"
+                        : Math.round(
+                            section.exitDistanceMeters
+                        ),
+                stepCount: section.stepCount
+            }))
+        );
+
+        if (tollTagResult.tollSections.length > 0) {
+            console.log(
+                "先頭区間のstartLocation生データ（レスポンス構造確認用）:",
+                tollTagResult.tollSections[0]
+                    .rawFirstStartLocation
+            );
+            console.log(
+                "先頭区間のendLocation生データ（レスポンス構造確認用）:",
+                tollTagResult.tollSections[0]
+                    .rawLastEndLocation
+            );
+        }
+
+        console.log(
+            "--- 座標ベース方式（既存）との比較 ---"
+        );
+        console.log(
+            "旧方式 shutoEntryCount:",
+            shutoEntryCount,
+            " / shutoEntranceIc:",
+            shutoEntranceIc?.displayName || "なし",
+            " / shutoExitIc:",
+            shutoExitIc?.displayName || "なし"
+        );
+        console.log(
+            "旧方式 nexcoEntranceIc:",
+            nexcoEntranceIc?.displayName || "なし",
+            " / nexcoExitIc:",
+            nexcoExitIc?.displayName || "なし"
+        );
+        console.log(
+            "新方式 tollEntryCount:",
+            tollTagResult.tollEntryCount
+        );
+
+        if (
+            tollTagResult.tollEntryCount !== shutoEntryCount
+        ) {
+            console.warn(
+                "新旧方式で区間数が一致していません" +
+                "（旧shutoEntryCount=" + shutoEntryCount +
+                " / 新tollEntryCount=" +
+                tollTagResult.tollEntryCount + "）。"
+            );
+        }
 
         console.groupEnd();
 

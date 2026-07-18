@@ -491,10 +491,40 @@ function detectTollSectionsFromSteps(highwayRoute) {
                     )
                     .join(" / ");
 
+            // 区間の首都高/NEXCO判定。entranceIc/exitIcのいずれかが
+            // 首都高であれば首都高区間とする。両方ともIC不明（未登録・
+            // 座標精度不足等）でICから判定できない場合のみ、区間内steps.
+            // navigationInstruction.instructionsに「首都高」という文言が
+            // 含まれるかどうかにフォールバックする。
+            const icBasedIsShuto =
+                isShutoIcForRouteAnalysis(
+                    entranceLabel.ic || {}
+                ) ||
+                isShutoIcForRouteAnalysis(
+                    exitLabel.ic || {}
+                );
+
+            let isShutoSection = icBasedIsShuto;
+            let shutoDeterminedBy = "ic";
+
+            if (
+                !icBasedIsShuto &&
+                !entranceLabel.ic &&
+                !exitLabel.ic
+            ) {
+                isShutoSection =
+                    combinedInstructions.includes(
+                        TOLL_SECTION_SHUTO_INSTRUCTION_TEXT
+                    );
+                shutoDeterminedBy = "instructionsFallback";
+            }
+
             return {
                 stepCount: run.steps.length,
                 totalDistanceMeters,
                 combinedInstructions,
+                isShutoSection,
+                shutoDeterminedBy,
                 entranceLatLng:
                     extractLatLngFromRouteLocation(
                         firstStep.startLocation
@@ -529,13 +559,15 @@ function detectTollSectionsFromSteps(highwayRoute) {
 }
 
 // tollSections（「有料区間」タグベース）を使った料金計算。
-// 区間ごとに、対応付けられたIC（entranceIc/exitIc）のroadTypeで
-// 「首都高」か「NEXCO」かを判定する。いずれかの境界ICが首都高であれば
-// 区間全体を首都高（定額課金）として扱う簡略化を採用している
-// （首都高からNEXCOへ乗り継ぎなしで連続する区間では、NEXCO側の距離比例分が
-// 計上されない制約が残るが、初期実装として許容する）。NEXCO区間は、
-// 区間内のsteps.distanceMetersの合計（実測、追加API呼び出し不要）に
-// 24円/km（既存の距離ベース概算と同じ単価）を乗じて算出する。
+// 区間ごとの首都高/NEXCO判定（section.isShutoSection）はdetectToll
+// SectionsFromSteps側で既に計算済みのため、ここではその値をそのまま
+// 使う（検索条件パネル等、他の呼び出し元とも判定結果を共有するため）。
+// いずれかの境界ICが首都高であれば区間全体を首都高（定額課金）として
+// 扱う簡略化を採用している（首都高からNEXCOへ乗り継ぎなしで連続する
+// 区間では、NEXCO側の距離比例分が計上されない制約が残るが、初期実装
+// として許容する）。NEXCO区間は、区間内のsteps.distanceMetersの合計
+// （実測、追加API呼び出し不要）に24円/km（既存の距離ベース概算と
+// 同じ単価）を乗じて算出する。
 function estimateMainHighwayTollFromTollSections(
     tollTagResult
 ) {
@@ -543,37 +575,7 @@ function estimateMainHighwayTollFromTollSections(
     let nexcoToll = 0;
 
     tollTagResult.tollSections.forEach(section => {
-        const icBasedIsShuto =
-            isShutoIcForRouteAnalysis(
-                section.entranceIc || {}
-            ) ||
-            isShutoIcForRouteAnalysis(
-                section.exitIc || {}
-            );
-
-        let isShutoSection = icBasedIsShuto;
-        let shutoDeterminedBy = "ic";
-
-        // entranceIc/exitIcが両方ともIC不明（未登録・座標精度不足等）で、
-        // ICから首都高/NEXCOを判定できない場合のみ、区間内steps.
-        // navigationInstruction.instructionsに「首都高」という文言が
-        // 含まれるかどうかにフォールバックする。片方でもICが判明して
-        // いる場合はこれまで通りICでの判定を優先する。
-        if (
-            !icBasedIsShuto &&
-            !section.entranceIc &&
-            !section.exitIc
-        ) {
-            isShutoSection =
-                String(section.combinedInstructions || "")
-                    .includes(
-                        TOLL_SECTION_SHUTO_INSTRUCTION_TEXT
-                    );
-            shutoDeterminedBy = "instructionsFallback";
-        }
-
-        section.isShutoSection = isShutoSection;
-        section.shutoDeterminedBy = shutoDeterminedBy;
+        const isShutoSection = section.isShutoSection;
 
         if (isShutoSection) {
             shutoToll += SHUTO_TOLL_ESTIMATE_YEN;

@@ -8180,8 +8180,13 @@ async function getHighwayRoute(
                 "X-Goog-Api-Key":
                     CONFIG.GOOGLE_MAPS_API_KEY,
 
+                // 【検証用・一時的】routes.legs.steps.navigationInstruction・
+                // routes.legs.steps.distanceMetersは、steps文言の実用性を
+                // 確認するためだけに追加している。判定ロジックには未使用。
+                // 有効と判断されなければ元に戻す。
                 "X-Goog-FieldMask":
-                    "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline"
+                    "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline," +
+                    "routes.legs.steps.navigationInstruction,routes.legs.steps.distanceMeters"
             },
 
             body: JSON.stringify({
@@ -13998,6 +14003,37 @@ function logHighwayRoutePolylineAnalysis(
     });
 
     try {
+
+        // 【検証用・一時的】Google Routes APIのlegs.steps.navigationInstruction
+        // （maneuver/instructions）とdistanceMetersが、実用に耐えるデータか
+        // どうかを目視確認するためだけのログ。shutoSegments・料金計算・
+        // 表示等の判定ロジックには一切使用していない。有効と判断されなければ
+        // 元に戻す。
+        console.group("[STEPS検証・一時的]");
+
+        const highwaySteps =
+            (highwayRoute?.legs || []).flatMap(
+                (leg, legIndex) =>
+                    (leg.steps || []).map(
+                        (step, stepIndex) => ({
+                            legIndex,
+                            stepIndex,
+                            maneuver:
+                                step.navigationInstruction
+                                    ?.maneuver || "なし",
+                            instructions:
+                                step.navigationInstruction
+                                    ?.instructions || "なし",
+                            distanceMeters:
+                                step.distanceMeters ?? "-"
+                        })
+                    )
+            );
+
+        console.log("steps件数:", highwaySteps.length);
+        console.table(highwaySteps);
+
+        console.groupEnd();
 
         console.group(
             "[ROUTE POLYLINE調査] " +

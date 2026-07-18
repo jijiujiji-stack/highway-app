@@ -11706,6 +11706,86 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             );
         };
 
+        // 診断用（ログ出力のみに使用）。isRouteTransitionValidatedが
+        // falseを返した理由（boundaryExitが見つからなかったのか、
+        // 見つかったがconnectedRoadsに前後どちらかのidentityが
+        // 含まれていなかったのか）を、判定結果を変えずに調べ直すだけの
+        // 関数。isRouteTransitionValidated自体の判定ロジックには影響しない。
+        const getRouteTransitionFailureDetail = (
+            previousItem,
+            currentItem
+        ) => {
+            const previousIdentity =
+                getRouteIdentity(previousItem.exit);
+            const currentIdentity =
+                getRouteIdentity(currentItem.exit);
+
+            const boundaryExit =
+                previousItem.exit?.connection === true
+                    ? previousItem.exit
+                    : currentItem.exit?.connection === true
+                        ? currentItem.exit
+                        : null;
+
+            let reason;
+
+            if (!boundaryExit) {
+                reason =
+                    "connection:trueのJCTエントリが" +
+                    "前後どちらにも見つからない";
+            }
+            else if (!Array.isArray(boundaryExit.connectedRoads)) {
+                reason =
+                    "JCTエントリ（" +
+                    (boundaryExit.displayName || "不明") +
+                    "）にconnectedRoadsが無い";
+            }
+            else {
+                const missingSides = [];
+
+                if (
+                    !boundaryExit.connectedRoads.includes(
+                        previousIdentity
+                    )
+                ) {
+                    missingSides.push(
+                        "前(" + previousIdentity + ")"
+                    );
+                }
+
+                if (
+                    !boundaryExit.connectedRoads.includes(
+                        currentIdentity
+                    )
+                ) {
+                    missingSides.push(
+                        "後(" + currentIdentity + ")"
+                    );
+                }
+
+                reason =
+                    missingSides.length > 0
+                        ? "JCTエントリ（" +
+                            (boundaryExit.displayName || "不明") +
+                            "）のconnectedRoadsに" +
+                            missingSides.join("・") +
+                            "が含まれない"
+                        : "不明";
+            }
+
+            return {
+                previousIcName:
+                    previousItem.exit?.displayName || "なし",
+                currentIcName:
+                    currentItem.exit?.displayName || "なし",
+                previousIdentity,
+                currentIdentity,
+                boundaryExitName:
+                    boundaryExit?.displayName || "なし",
+                reason
+            };
+        };
+
         const checkOrderContinuity = traceItems => {
             let direction = 0;
             let violations = 0;
@@ -11715,10 +11795,11 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             // 自体には一切影響しない、棄却理由の内訳集計。
             let routeTransitionViolationCount = 0;
             let orderDirectionViolationCount = 0;
+            const violationDetails = [];
 
             let previousItem = null;
 
-            traceItems.forEach(item => {
+            traceItems.forEach((item, index) => {
                 if (
                     previousItem &&
                     !isRouteTransitionValidated(previousItem, item)
@@ -11726,6 +11807,28 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                     violations +=
                         SHUTO_SEGMENT_ORDER_TOLERANCE_VIOLATIONS + 1;
                     routeTransitionViolationCount++;
+
+                    const failureDetail =
+                        getRouteTransitionFailureDetail(
+                            previousItem,
+                            item
+                        );
+
+                    violationDetails.push({
+                        type: "route-transition",
+                        traceIndex: index,
+                        previousIcName:
+                            failureDetail.previousIcName,
+                        currentIcName:
+                            failureDetail.currentIcName,
+                        previousIdentity:
+                            failureDetail.previousIdentity,
+                        currentIdentity:
+                            failureDetail.currentIdentity,
+                        boundaryExitName:
+                            failureDetail.boundaryExitName,
+                        reason: failureDetail.reason
+                    });
                 }
 
                 const exit = item.exit;
@@ -11752,6 +11855,27 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                         else if (Math.sign(diff) !== direction) {
                             violations++;
                             orderDirectionViolationCount++;
+
+                            violationDetails.push({
+                                type: "order-direction",
+                                traceIndex: index,
+                                previousIcName:
+                                    previousExit.displayName ||
+                                    "なし",
+                                currentIcName:
+                                    exit.displayName || "なし",
+                                previousIdentity:
+                                    getRouteIdentity(previousExit),
+                                currentIdentity:
+                                    getRouteIdentity(exit),
+                                previousOrder: previousExit.order,
+                                currentOrder: exit.order,
+                                reason:
+                                    "それまでの進行方向(" +
+                                    direction +
+                                    ")に対してorderが逆行" +
+                                    "（差分" + diff + "）"
+                            });
                         }
                     }
                 }
@@ -11764,7 +11888,8 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                     violations <=
                     SHUTO_SEGMENT_ORDER_TOLERANCE_VIOLATIONS,
                 routeTransitionViolationCount,
-                orderDirectionViolationCount
+                orderDirectionViolationCount,
+                violationDetails
             };
         };
 
@@ -11855,7 +11980,12 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                                     reasonParts.join("、") ||
                                     "詳細不明"
                                 ) +
-                                "）"
+                                "）",
+                            // 診断用（ログ出力のみ）。逆行・裏付けなしが
+                            // 発生した各箇所の詳細（IC名・identity・
+                            // order値・boundaryExit等）。
+                            violationDetails:
+                                continuityCheck.violationDetails
                         });
 
                         return null;
@@ -14056,6 +14186,39 @@ function logHighwayRoutePolylineAnalysis(
                 rejectionReason: diagnostic.rejectionReason
             }))
         );
+
+        // 棄却区間ごとの、逆行・裏付けなしが発生した各箇所の詳細
+        // （区間をまたいで一覧化するため、どの区間のものかが分かるよう
+        // segmentStartTraceIndex/segmentEndTraceIndexを併記する）。
+        const shutoSegmentViolationDetails =
+            rejectedShutoSegments.flatMap(diagnostic =>
+                (diagnostic.violationDetails || []).map(
+                    detail => ({
+                        segmentStartTraceIndex:
+                            diagnostic.startTraceIndex,
+                        segmentEndTraceIndex:
+                            diagnostic.endTraceIndex,
+                        type: detail.type,
+                        traceIndex: detail.traceIndex,
+                        previousIcName: detail.previousIcName,
+                        currentIcName: detail.currentIcName,
+                        previousIdentity: detail.previousIdentity,
+                        currentIdentity: detail.currentIdentity,
+                        previousOrder:
+                            detail.previousOrder ?? "-",
+                        currentOrder:
+                            detail.currentOrder ?? "-",
+                        boundaryExitName:
+                            detail.boundaryExitName ?? "-",
+                        reason: detail.reason
+                    })
+                )
+            );
+
+        console.log(
+            "棄却区間の逆行・裏付けなし箇所の詳細:"
+        );
+        console.table(shutoSegmentViolationDetails);
 
         console.groupEnd();
 

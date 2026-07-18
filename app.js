@@ -4238,21 +4238,23 @@ const IC_MASTER = {
                 order: -3,
                 displayName: "堤通（首都高）",
                 googleName: "首都高速6号向島線 堤通出入口",
-                lat: 35.731,
-                lng: 139.817,
+                lat: 35.7357056,
+                lng: 139.8150419,
                 experimental: true,
                 roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.731, entranceLng: 139.817, exitLat: 35.731, exitLng: 139.817
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.7357056, entranceLng: 139.8150419, exitLat: 35.7357056, exitLng: 139.8150419,
+                note: "【2026-07-18同期修正】SHUTO_IC_MASTER本体側（shuto-6-tsutsumidori、MapFan検証済み）の座標に同期。旧座標との誤差約548m。dedupeIcDefinitionsByIdentityによりSHUTO_IC_MASTER側が優先されるため候補選定への実害はなかったが、データ整合性のため修正。"
             },
             {
                 order: -2,
                 displayName: "加平（首都高）",
                 googleName: "首都高速中央環状線 加平出入口",
-                lat: 35.777,
-                lng: 139.820,
+                lat: 35.7776257,
+                lng: 139.8258096,
                 experimental: true,
                 roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.777, entranceLng: 139.820, exitLat: 35.777, exitLng: 139.820
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.7776257, entranceLng: 139.8258096, exitLat: 35.7776257, exitLng: 139.8258096,
+                note: "【2026-07-18同期修正】SHUTO_IC_MASTER本体側（shuto-6-kahira、MapFan検証済み「加平ランプ（６号三郷線）【入口】」）の座標に同期。旧座標との誤差約525m。dedupeIcDefinitionsByIdentityによりSHUTO_IC_MASTER側が優先されるため候補選定への実害はなかったが、データ整合性のため修正。"
             },
             {
                 order: -1,

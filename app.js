@@ -409,13 +409,48 @@ function detectTollSectionsFromSteps(highwayRoute) {
                 return;
             }
 
-            const distanceMeters =
+            // entranceLat/exitLatが離れているIC（NAVITIME等で方向別に
+            // 実測した座標を持つIC、例：八潮南）向けに、入口側・出口側
+            // それぞれの座標への距離を計算し、近い方をこのICとの距離
+            // として採用する。entranceLat/exitLatを持たないIC（従来通り
+            // トップレベルのlat/lngのみ）は、両方ともlat/lngにフォール
+            // バックするため、入口側・出口側の距離は同じ値になり、挙動は
+            // 変わらない。
+            const entranceLat =
+                typeof ic.entranceLat === "number"
+                    ? ic.entranceLat
+                    : ic.lat;
+            const entranceLng =
+                typeof ic.entranceLng === "number"
+                    ? ic.entranceLng
+                    : ic.lng;
+            const exitLat =
+                typeof ic.exitLat === "number"
+                    ? ic.exitLat
+                    : ic.lat;
+            const exitLng =
+                typeof ic.exitLng === "number"
+                    ? ic.exitLng
+                    : ic.lng;
+
+            const distanceToEntrance =
                 calculateDistance(
                     latLng.lat,
                     latLng.lng,
-                    ic.lat,
-                    ic.lng
+                    entranceLat,
+                    entranceLng
                 );
+
+            const distanceToExit =
+                calculateDistance(
+                    latLng.lat,
+                    latLng.lng,
+                    exitLat,
+                    exitLng
+                );
+
+            const distanceMeters =
+                Math.min(distanceToEntrance, distanceToExit);
 
             if (distanceMeters < nearestDistanceMeters) {
                 nearestDistanceMeters = distanceMeters;

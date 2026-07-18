@@ -21207,40 +21207,130 @@ function buildPolylineComparisonSummaryHtml(
         (roadNames.join(" → ") || "なし")
     );
 
-    lines.push(
-        "首都高入口：" +
-        (
-            formatAssumedRouteIcName(
-                polylineAnalysis.shutoEntranceIc
-            ) || "なし"
-        )
-    );
+    // TOLL TAG方式（tollSections）が利用できる場合はこちらを優先する。
+    // hasTollSectionStepsDataがfalseの場合（getHighwayRouteForMultiExit
+    // Comparison経由等、stepsを取得していない呼び出し元）は、既存の
+    // 座標ベース方式（shutoEntranceIc/shutoExitIc/nexcoEntranceIc/
+    // nexcoExitIc）にフォールバックする。座標ベース方式のコード自体は
+    // 削除せず残している。
+    if (polylineAnalysis.hasTollSectionStepsData === true) {
 
-    lines.push(
-        "首都高出口：" +
-        (
-            formatAssumedRouteIcName(
-                polylineAnalysis.shutoExitIc
-            ) || "なし"
-        )
-    );
+        const tollSections =
+            polylineAnalysis.tollSections || [];
 
-    const nexcoEntrance =
-        polylineAnalysis.nexcoEntranceIc;
+        const shutoSections =
+            tollSections.filter(
+                section => section.isShutoSection
+            );
 
-    lines.push(
-        "NEXCO入口：" +
-        (formatAssumedRouteIcName(nexcoEntrance) || "なし")
-    );
+        const nexcoSections =
+            tollSections.filter(
+                section => !section.isShutoSection
+            );
 
-    const nexcoExit =
-        polylineAnalysis.nexcoExitIc;
+        const formatSectionIcText = (section, role) => {
+            if (!section) {
+                return "なし";
+            }
 
-    lines.push(
-        "NEXCO出口：" +
-        (formatAssumedRouteIcName(nexcoExit) || "なし")
-    );
+            const ic =
+                role === "entrance"
+                    ? section.entranceIc
+                    : section.exitIc;
 
+            const icNameFallback =
+                role === "entrance"
+                    ? section.entranceIcName
+                    : section.exitIcName;
+
+            return (
+                formatAssumedRouteIcName(ic) ||
+                icNameFallback ||
+                "なし"
+            );
+        };
+
+        const formatMultiSectionSuffix = sections =>
+            sections.length > 1
+                ? " ほか計" + sections.length + "区間"
+                : "";
+
+        lines.push(
+            "首都高入口：" +
+            formatSectionIcText(
+                shutoSections[0],
+                "entrance"
+            ) +
+            formatMultiSectionSuffix(shutoSections)
+        );
+
+        lines.push(
+            "首都高出口：" +
+            formatSectionIcText(
+                shutoSections[shutoSections.length - 1],
+                "exit"
+            ) +
+            formatMultiSectionSuffix(shutoSections)
+        );
+
+        lines.push(
+            "NEXCO入口：" +
+            formatSectionIcText(
+                nexcoSections[0],
+                "entrance"
+            ) +
+            formatMultiSectionSuffix(nexcoSections)
+        );
+
+        lines.push(
+            "NEXCO出口：" +
+            formatSectionIcText(
+                nexcoSections[nexcoSections.length - 1],
+                "exit"
+            ) +
+            formatMultiSectionSuffix(nexcoSections)
+        );
+    }
+    else {
+
+        lines.push(
+            "首都高入口：" +
+            (
+                formatAssumedRouteIcName(
+                    polylineAnalysis.shutoEntranceIc
+                ) || "なし"
+            )
+        );
+
+        lines.push(
+            "首都高出口：" +
+            (
+                formatAssumedRouteIcName(
+                    polylineAnalysis.shutoExitIc
+                ) || "なし"
+            )
+        );
+
+        const nexcoEntrance =
+            polylineAnalysis.nexcoEntranceIc;
+
+        lines.push(
+            "NEXCO入口：" +
+            (formatAssumedRouteIcName(nexcoEntrance) || "なし")
+        );
+
+        const nexcoExit =
+            polylineAnalysis.nexcoExitIc;
+
+        lines.push(
+            "NEXCO出口：" +
+            (formatAssumedRouteIcName(nexcoExit) || "なし")
+        );
+    }
+
+    // 出口比較候補は、比較候補選定ロジック自体（旧shutoEntranceIc/
+    // nexcoEntranceIc等を参照する設計のまま）が今回のスコープ外のため、
+    // 表示とロジックの整合性を保つべく変更しない。
     const comparisonCandidatePreview =
         buildPolylineBasedComparisonIcCandidates(
             polylineAnalysis

@@ -327,13 +327,18 @@ function isProbablyNoTollRouteByShutoSegments(polylineAnalysis) {
     return !hasShutoSegments && !hasNexcoIc;
 }
 
-// 【検証用・一時的】Google Routes APIのlegs.steps.navigationInstruction.
-// instructionsに含まれる「有料区間」文言を使った、座標ベース方式
-// （shutoSegments等）とは完全に独立した診断用の高速利用区間検出。
-// 判定ロジック（料金計算・表示・候補選定等）には一切使用していない。
-// 有効と判断されなければ元に戻す。
+// Google Routes APIのlegs.steps.navigationInstruction.instructionsに含まれる
+// 「有料区間」文言を使った高速利用区間検出。座標ベース方式（shutoSegments等）
+// とは別系統で、料金計算（estimateMainHighwayToll等）から利用する他、
+// 診断ログ（[TOLL TAG検証・一時的]）にも引き続き使用する。
+// 座標ベース方式のコード自体は削除せず、stepsデータが取得できない
+// 呼び出し元（V2比較候補選定等）向けのフォールバックとして残している。
 const TOLL_SECTION_TAG_TEXT = "有料区間";
 const TOLL_SECTION_IC_MATCH_THRESHOLD_METERS = 500;
+
+// entranceIc/exitIcが両方ともIC不明（未登録・座標精度不足等）だった場合の、
+// 首都高/NEXCO判定フォールバックに使う文言。
+const TOLL_SECTION_SHUTO_INSTRUCTION_TEXT = "首都高";
 
 // stepのstartLocation/endLocationは、他のRoutes APIのLocation型と同様に
 // { latLng: { latitude, longitude } }という構造を想定しているが、実際の
@@ -382,7 +387,8 @@ function detectTollSectionsFromSteps(highwayRoute) {
         if (!latLng) {
             return {
                 icName: "座標取得不可",
-                distanceMeters: null
+                distanceMeters: null,
+                ic: null
             };
         }
 
@@ -390,6 +396,19 @@ function detectTollSectionsFromSteps(highwayRoute) {
         let nearestDistanceMeters = Infinity;
 
         icDefinitions.forEach(ic => {
+            // 座標が欠けている・数値でないICは候補から除外する
+            // （calculateDistanceがNaNを返すと、NaN < Infinityが常に
+            // falseになり、そのICが無言でスキップされ続けてしまうため、
+            // ここで明示的に弾いておく）。
+            if (
+                typeof ic.lat !== "number" ||
+                typeof ic.lng !== "number" ||
+                Number.isNaN(ic.lat) ||
+                Number.isNaN(ic.lng)
+            ) {
+                return;
+            }
+
             const distanceMeters =
                 calculateDistance(
                     latLng.lat,
@@ -411,13 +430,15 @@ function detectTollSectionsFromSteps(highwayRoute) {
         ) {
             return {
                 icName: "IC不明（未登録の可能性）",
-                distanceMeters: nearestDistanceMeters
+                distanceMeters: nearestDistanceMeters,
+                ic: null
             };
         }
 
         return {
             icName: nearestIc.displayName,
-            distanceMeters: nearestDistanceMeters
+            distanceMeters: nearestDistanceMeters,
+            ic: nearestIc
         };
     };
 
@@ -449,8 +470,31 @@ function detectTollSectionsFromSteps(highwayRoute) {
             const exitLabel =
                 findNearestIcLabel(lastStep.endLocation);
 
+            // 区間内の実移動距離（steps.distanceMetersの合計）。
+            // 追加のRoutes API呼び出し無しで、既に取得済みのレスポンス
+            // から直接算出できる。
+            const totalDistanceMeters =
+                run.steps.reduce(
+                    (sum, step) =>
+                        sum + (Number(step.distanceMeters) || 0),
+                    0
+                );
+
+            // 区間内の全stepsのinstructionsを連結したもの。entranceIc/
+            // exitIcが両方ともIC不明の場合の、首都高/NEXCO判定フォール
+            // バックに使う。
+            const combinedInstructions =
+                run.steps
+                    .map(step =>
+                        step.navigationInstruction
+                            ?.instructions || ""
+                    )
+                    .join(" / ");
+
             return {
                 stepCount: run.steps.length,
+                totalDistanceMeters,
+                combinedInstructions,
                 entranceLatLng:
                     extractLatLngFromRouteLocation(
                         firstStep.startLocation
@@ -459,9 +503,11 @@ function detectTollSectionsFromSteps(highwayRoute) {
                     extractLatLngFromRouteLocation(
                         lastStep.endLocation
                     ),
+                entranceIc: entranceLabel.ic,
                 entranceIcName: entranceLabel.icName,
                 entranceDistanceMeters:
                     entranceLabel.distanceMeters,
+                exitIc: exitLabel.ic,
                 exitIcName: exitLabel.icName,
                 exitDistanceMeters: exitLabel.distanceMeters,
                 rawFirstStartLocation:
@@ -471,8 +517,100 @@ function detectTollSectionsFromSteps(highwayRoute) {
         });
 
     return {
+        // legs.steps自体が取得できているかどうか（trueなら、
+        // tollEntryCount:0は「stepsを見た上で有料区間が無かった」という
+        // 正当な結果。falseなら「stepsデータ自体が無く判定不能」という
+        // 全く別の意味であり、呼び出し側はこれを区別してフォールバック
+        // するかどうかを判断する）。
+        hasStepsData: steps.length > 0,
         tollSections,
         tollEntryCount: tollSections.length
+    };
+}
+
+// tollSections（「有料区間」タグベース）を使った料金計算。
+// 区間ごとに、対応付けられたIC（entranceIc/exitIc）のroadTypeで
+// 「首都高」か「NEXCO」かを判定する。いずれかの境界ICが首都高であれば
+// 区間全体を首都高（定額課金）として扱う簡略化を採用している
+// （首都高からNEXCOへ乗り継ぎなしで連続する区間では、NEXCO側の距離比例分が
+// 計上されない制約が残るが、初期実装として許容する）。NEXCO区間は、
+// 区間内のsteps.distanceMetersの合計（実測、追加API呼び出し不要）に
+// 24円/km（既存の距離ベース概算と同じ単価）を乗じて算出する。
+function estimateMainHighwayTollFromTollSections(
+    tollTagResult
+) {
+    let shutoToll = 0;
+    let nexcoToll = 0;
+
+    tollTagResult.tollSections.forEach(section => {
+        const icBasedIsShuto =
+            isShutoIcForRouteAnalysis(
+                section.entranceIc || {}
+            ) ||
+            isShutoIcForRouteAnalysis(
+                section.exitIc || {}
+            );
+
+        let isShutoSection = icBasedIsShuto;
+        let shutoDeterminedBy = "ic";
+
+        // entranceIc/exitIcが両方ともIC不明（未登録・座標精度不足等）で、
+        // ICから首都高/NEXCOを判定できない場合のみ、区間内steps.
+        // navigationInstruction.instructionsに「首都高」という文言が
+        // 含まれるかどうかにフォールバックする。片方でもICが判明して
+        // いる場合はこれまで通りICでの判定を優先する。
+        if (
+            !icBasedIsShuto &&
+            !section.entranceIc &&
+            !section.exitIc
+        ) {
+            isShutoSection =
+                String(section.combinedInstructions || "")
+                    .includes(
+                        TOLL_SECTION_SHUTO_INSTRUCTION_TEXT
+                    );
+            shutoDeterminedBy = "instructionsFallback";
+        }
+
+        section.isShutoSection = isShutoSection;
+        section.shutoDeterminedBy = shutoDeterminedBy;
+
+        if (isShutoSection) {
+            shutoToll += SHUTO_TOLL_ESTIMATE_YEN;
+        }
+        else {
+            nexcoToll +=
+                Math.round(
+                    (section.totalDistanceMeters / 1000) * 24
+                );
+        }
+    });
+
+    const firstSection =
+        tollTagResult.tollSections[0] || null;
+
+    const lastSection =
+        tollTagResult.tollSections[
+            tollTagResult.tollSections.length - 1
+        ] || null;
+
+    return {
+        amount: shutoToll + nexcoToll,
+        highwayToll: nexcoToll,
+        shutoToll,
+        shutoEntryCount: tollTagResult.tollEntryCount,
+        label:
+            tollTagResult.tollEntryCount > 0
+                ? "料金計算：TOLL TAGタグ（有料区間" +
+                    tollTagResult.tollEntryCount + "件）"
+                : "料金計算：TOLL TAGタグ（有料区間なし）",
+        usedTollSections: true,
+        usedPolylineAnalysis: false,
+        usedNexcoPolylineIc: false,
+        startIc: firstSection?.entranceIc || null,
+        endIc: lastSection?.exitIc || null,
+        tollSections: tollTagResult.tollSections,
+        fallbackReason: null
     };
 }
 
@@ -625,7 +763,11 @@ async function estimateComparisonCandidateToll({
         getShutoTollEstimateForIcPair(
             startIc,
             endIc,
-            polylineAnalysis?.shutoEntryCount ??
+            (
+                polylineAnalysis?.hasTollSectionStepsData
+                    ? polylineAnalysis.tollEntryCount
+                    : polylineAnalysis?.shutoEntryCount
+            ) ??
                 (
                     (isShutoIc(startIc) || isShutoIc(endIc))
                         ? 1
@@ -9179,6 +9321,33 @@ async function estimateMainHighwayToll(
     polylineAnalysis = null
 ) {
 
+    // 「有料区間」タグベース（tollSections/tollEntryCount）を優先する。
+    // polylineAnalysisに既に計算済みの結果があれば再利用し（analysis
+    // Highway RoutePolyline側で一度算出済みのため、二重計算を避ける）、
+    // 無ければhighwayRouteから直接算出する。
+    // highwayRouteに実際にlegs.stepsが含まれている場合のみ有効
+    // （getHighwayRoute/getHighwayRouteFromGpsは取得済み。
+    // getHighwayRouteForMultiExitComparison等、steps未取得の呼び出し
+    // 元から渡された場合はhasStepsData:falseとなり、以下に残っている
+    // 既存の座標ベース方式にフォールバックする）。
+    const tollTagResult =
+        polylineAnalysis?.hasTollSectionStepsData !== undefined
+            ? {
+                hasStepsData:
+                    polylineAnalysis.hasTollSectionStepsData,
+                tollSections:
+                    polylineAnalysis.tollSections || [],
+                tollEntryCount:
+                    polylineAnalysis.tollEntryCount || 0
+            }
+            : detectTollSectionsFromSteps(highwayRoute);
+
+    if (tollTagResult.hasStepsData) {
+        return estimateMainHighwayTollFromTollSections(
+            tollTagResult
+        );
+    }
+
     const fallbackKm =
         highwayRoute.distanceMeters / 1000;
 
@@ -12226,6 +12395,9 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
 
         const shutoEntryCount = shutoSegments.length;
 
+        const tollTagResult =
+            detectTollSectionsFromSteps(highwayRoute);
+
         return {
             roadSequence:
                 correctedRoadSummary.roadSequence,
@@ -12245,6 +12417,16 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             // 診断用（ログ出力のみ）。棄却された区間とその理由の一覧。
             // shutoSegments/shutoEntryCountの算出には影響しない。
             shutoSegmentDiagnostics,
+            // 「有料区間」タグベースの区間検出結果。estimateMainHighwayToll
+            // 等の料金計算で、hasTollSectionStepsDataがtrueの場合に
+            // 優先的に使われる（highwayRouteに実際にlegs.stepsが含まれて
+            // いる場合のみtrue。V2比較候補選定等、steps未取得の呼び出し
+            // 元ではfalseのままとなり、既存の座標ベース方式にフォール
+            // バックする）。
+            tollSections: tollTagResult.tollSections,
+            tollEntryCount: tollTagResult.tollEntryCount,
+            hasTollSectionStepsData:
+                tollTagResult.hasStepsData,
             shutoDetail: {
                 startSampleCount:
                     shutoDetailStartSamples.length,
@@ -16489,7 +16671,14 @@ async function searchMultiExitIcComparison() {
                 getShutoTollEstimateForIcPair(
                     highwayStartIc,
                     highwayEndIc,
-                    lastHighwayRoutePolylineAnalysis?.shutoEntryCount ??
+                    (
+                        lastHighwayRoutePolylineAnalysis
+                            ?.hasTollSectionStepsData
+                            ? lastHighwayRoutePolylineAnalysis
+                                .tollEntryCount
+                            : lastHighwayRoutePolylineAnalysis
+                                ?.shutoEntryCount
+                    ) ??
                         (
                             (
                                 isShutoIc(highwayStartIc) ||
@@ -16616,7 +16805,14 @@ async function searchMultiExitIcComparison() {
                         getShutoTollEstimateForIcPair(
                             highwayStartIc,
                             exitIcDefinition,
-                            lastHighwayRoutePolylineAnalysis?.shutoEntryCount ??
+                            (
+                                lastHighwayRoutePolylineAnalysis
+                                    ?.hasTollSectionStepsData
+                                    ? lastHighwayRoutePolylineAnalysis
+                                        .tollEntryCount
+                                    : lastHighwayRoutePolylineAnalysis
+                                        ?.shutoEntryCount
+                            ) ??
                                 (
                                     (
                                         isShutoIc(highwayStartIc) ||
@@ -17182,7 +17378,14 @@ async function searchEntranceIcComparisonV2(options = {}) {
                 getShutoTollEstimateForIcPair(
                     exit,
                     endIc,
-                    lastHighwayRoutePolylineAnalysis?.shutoEntryCount ??
+                    (
+                        lastHighwayRoutePolylineAnalysis
+                            ?.hasTollSectionStepsData
+                            ? lastHighwayRoutePolylineAnalysis
+                                .tollEntryCount
+                            : lastHighwayRoutePolylineAnalysis
+                                ?.shutoEntryCount
+                    ) ??
                         (
                             (
                                 isShutoIc(exit) ||

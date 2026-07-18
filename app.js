@@ -11879,6 +11879,15 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                         }
                     }
                 }
+                else if (!sameRouteIdentity) {
+                    // 路線（routeIdentity）が変わったタイミングでdirectionを
+                    // リセットする。リセットしないと、手前の路線（例：
+                    // 1号上野線やC1）で確定した進行方向が、路線が変わった後の
+                    // 新しい路線（例：4号新宿線）にそのまま引き継がれ、新しい
+                    // 路線内で自然に単調増加/減少しているorderが「それまでの
+                    // 方向と逆」と誤判定されてしまう。
+                    direction = 0;
+                }
 
                 previousItem = item;
             });

@@ -459,8 +459,48 @@ function detectTollSectionsFromSteps(highwayRoute) {
         }
     });
 
+    // 「有料区間」タグは、首都高→NEXCO（東名・新東名等）のように複数の
+    // 道路種別をまたいでも途切れず連続することがある。そのため
+    // tollSectionRun（タグの連続run）をそのまま1区間として扱うと、
+    // 区間全体が入口側の道路種別だけで一括分類され、NEXCO側の距離比例
+    // 課金が計上されなくなってしまう。ここでは各runを、道路種別
+    // （首都高かどうか）の切り替わりでさらにサブ区間に分割する。
+    // 「有料区間」タグ自体の連続性判定（tollSectionRunsの構築）は
+    // 変更しない。
+    const splitRunByRoadType = run => {
+        const subRuns = [];
+        let currentSubRun = null;
+        let currentIsShutoStep = null;
+
+        run.steps.forEach(step => {
+            const isShutoStep =
+                String(
+                    step.navigationInstruction
+                        ?.instructions || ""
+                ).includes(
+                    TOLL_SECTION_SHUTO_INSTRUCTION_TEXT
+                );
+
+            if (
+                !currentSubRun ||
+                isShutoStep !== currentIsShutoStep
+            ) {
+                currentSubRun = { steps: [] };
+                subRuns.push(currentSubRun);
+                currentIsShutoStep = isShutoStep;
+            }
+
+            currentSubRun.steps.push(step);
+        });
+
+        return subRuns;
+    };
+
+    const tollSubRuns =
+        tollSectionRuns.flatMap(splitRunByRoadType);
+
     const tollSections =
-        tollSectionRuns.map(run => {
+        tollSubRuns.map(run => {
             const firstStep = run.steps[0];
             const lastStep =
                 run.steps[run.steps.length - 1];

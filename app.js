@@ -11709,6 +11709,13 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
         const checkOrderContinuity = traceItems => {
             let direction = 0;
             let violations = 0;
+
+            // 診断用（ログ出力のみに使用）。isContinuousの判定条件
+            // （violations <= SHUTO_SEGMENT_ORDER_TOLERANCE_VIOLATIONS）
+            // 自体には一切影響しない、棄却理由の内訳集計。
+            let routeTransitionViolationCount = 0;
+            let orderDirectionViolationCount = 0;
+
             let previousItem = null;
 
             traceItems.forEach(item => {
@@ -11718,6 +11725,7 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 ) {
                     violations +=
                         SHUTO_SEGMENT_ORDER_TOLERANCE_VIOLATIONS + 1;
+                    routeTransitionViolationCount++;
                 }
 
                 const exit = item.exit;
@@ -11743,6 +11751,7 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                         }
                         else if (Math.sign(diff) !== direction) {
                             violations++;
+                            orderDirectionViolationCount++;
                         }
                     }
                 }
@@ -11753,9 +11762,15 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             return {
                 isContinuous:
                     violations <=
-                    SHUTO_SEGMENT_ORDER_TOLERANCE_VIOLATIONS
+                    SHUTO_SEGMENT_ORDER_TOLERANCE_VIOLATIONS,
+                routeTransitionViolationCount,
+                orderDirectionViolationCount
             };
         };
+
+        // 診断用（ログ出力のみに使用）。shutoSegments/shutoEntryCountの
+        // 算出には一切使わない、棄却された区間の理由一覧。
+        const shutoSegmentDiagnostics = [];
 
         const shutoSegments =
             correctedRoadSegments
@@ -11774,6 +11789,17 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                         );
 
                     if (waypoints.length === 0) {
+                        shutoSegmentDiagnostics.push({
+                            startTraceIndex:
+                                segment.startTraceIndex,
+                            endTraceIndex:
+                                segment.endTraceIndex,
+                            accepted: false,
+                            rejectionReason:
+                                "山型判定・候補ウィンドウで" +
+                                "有効なwaypointsが0件"
+                        });
+
                         return null;
                     }
 
@@ -11791,6 +11817,47 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                         );
 
                     if (!continuityCheck.isContinuous) {
+                        const reasonParts = [];
+
+                        if (
+                            continuityCheck
+                                .routeTransitionViolationCount > 0
+                        ) {
+                            reasonParts.push(
+                                "JCT裏付けなしの路線移動" +
+                                continuityCheck
+                                    .routeTransitionViolationCount +
+                                "件"
+                            );
+                        }
+
+                        if (
+                            continuityCheck
+                                .orderDirectionViolationCount > 0
+                        ) {
+                            reasonParts.push(
+                                "order逆行" +
+                                continuityCheck
+                                    .orderDirectionViolationCount +
+                                "件"
+                            );
+                        }
+
+                        shutoSegmentDiagnostics.push({
+                            startTraceIndex:
+                                segment.startTraceIndex,
+                            endTraceIndex:
+                                segment.endTraceIndex,
+                            accepted: false,
+                            rejectionReason:
+                                "order連続性チェック失敗（" +
+                                (
+                                    reasonParts.join("、") ||
+                                    "詳細不明"
+                                ) +
+                                "）"
+                        });
+
                         return null;
                     }
 
@@ -11836,6 +11903,15 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                                 ? "edge"
                                 : "full";
 
+                    shutoSegmentDiagnostics.push({
+                        startTraceIndex:
+                            segment.startTraceIndex,
+                        endTraceIndex:
+                            segment.endTraceIndex,
+                        accepted: true,
+                        rejectionReason: null
+                    });
+
                     return {
                         entranceIc,
                         exitIc,
@@ -11866,6 +11942,9 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 shutoExitAnalysis.selectedIc,
             shutoSegments,
             shutoEntryCount,
+            // 診断用（ログ出力のみ）。棄却された区間とその理由の一覧。
+            // shutoSegments/shutoEntryCountの算出には影響しない。
+            shutoSegmentDiagnostics,
             shutoDetail: {
                 startSampleCount:
                     shutoDetailStartSamples.length,
@@ -13718,6 +13797,9 @@ function logHighwayRoutePolylineAnalysis(
         nexcoExitIc = null,
         shutoEntranceIc = null,
         shutoExitIc = null,
+        shutoSegments = [],
+        shutoEntryCount = 0,
+        shutoSegmentDiagnostics = [],
         shutoDetail = {
             startSampleCount: 0,
             endSampleCount: 0,
@@ -13915,6 +13997,64 @@ function logHighwayRoutePolylineAnalysis(
         console.log(
             "選定首都高出口:",
             shutoExitIc?.displayName || "なし"
+        );
+
+        console.groupEnd();
+
+        console.group("[ROUTE SHUTO SEGMENTS]");
+
+        console.log(
+            "旧方式（shutoEntranceIc/shutoExitIc）:",
+            "入口=" +
+                (shutoEntranceIc?.displayName || "なし") +
+                " / 出口=" +
+                (shutoExitIc?.displayName || "なし")
+        );
+
+        console.log(
+            "新方式（shutoSegments）区間数（shutoEntryCount）:",
+            shutoEntryCount
+        );
+
+        if (
+            shutoEntryCount === 0 &&
+            (shutoEntranceIc || shutoExitIc)
+        ) {
+            console.warn(
+                "旧方式は首都高利用を検出していますが、" +
+                "新方式（shutoSegments）は0件です" +
+                "（新方式による棄却＝偽陰性の可能性）。"
+            );
+        }
+
+        console.log("新方式 採用区間（shutoSegments）:");
+        console.table(
+            shutoSegments.map(segment => ({
+                entranceIc:
+                    segment.entranceIc?.displayName || "なし",
+                exitIc:
+                    segment.exitIc?.displayName || "なし",
+                confidenceLevel: segment.confidenceLevel,
+                startTraceIndex: segment.startTraceIndex,
+                endTraceIndex: segment.endTraceIndex
+            }))
+        );
+
+        const rejectedShutoSegments =
+            shutoSegmentDiagnostics.filter(
+                diagnostic => !diagnostic.accepted
+            );
+
+        console.log(
+            "新方式 棄却区間数:",
+            rejectedShutoSegments.length
+        );
+        console.table(
+            rejectedShutoSegments.map(diagnostic => ({
+                startTraceIndex: diagnostic.startTraceIndex,
+                endTraceIndex: diagnostic.endTraceIndex,
+                rejectionReason: diagnostic.rejectionReason
+            }))
         );
 
         console.groupEnd();

@@ -4270,9 +4270,10 @@ const IC_MASTER = {
                 order: 1,
                 displayName: "三郷IC",
                 googleName: "常磐自動車道 三郷インターチェンジ",
-                lat: 35.842,
-                lng: 139.872,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.842, entranceLng: 139.872, exitLat: 35.842, exitLng: 139.872
+                lat: 35.8389541,
+                lng: 139.8627455,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.8389541, entranceLng: 139.8627455, exitLat: 35.8367537, exitLng: 139.8608378,
+                note: "【2026-07-18調査・座標修正】MapFan「三郷ＩＣ（常磐自動車道）」入口（下り）・出口（上り）座標を採用。Wikipedia代表点（35.8361861,139.859389）・NAVITIME検索結果とも整合。フルIC、方向制限なし。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.842,139.872)から約900m修正。"
             },
             {
                 order: 1.5,
@@ -4434,17 +4435,19 @@ const IC_MASTER = {
                 order: 15,
                 displayName: "日立中央IC",
                 googleName: "常磐自動車道 日立中央インターチェンジ",
-                lat: 36.607,
-                lng: 140.640,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.607, entranceLng: 140.640, exitLat: 36.607, exitLng: 140.640
+                lat: 36.602194,
+                lng: 140.636308,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.602194, entranceLng: 140.636308, exitLat: 36.602194, exitLng: 140.636308,
+                note: "【2026-07-18調査・座標修正（暫定）】Wikipedia代表点を採用（旧座標との誤差約420m）。常磐道本線ではなく日立有料道路経由でのみ流出入する特殊構造のIC。MapFan上「東京方面」「日立市街方面」表記が上り/下りのentrance/exitのどちらに対応するか特定できなかったため、方向別座標は精密化せず代表点を暫定的にentrance/exit両方に使用。entranceSelectable/exitSelectableは変更なし（trueのまま）。方向別の精密化は保留（要追加調査）。"
             },
             {
                 order: 16,
                 displayName: "高萩IC",
                 googleName: "常磐自動車道 高萩インターチェンジ",
-                lat: 36.713,
-                lng: 140.709,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.713, entranceLng: 140.709, exitLat: 36.713, exitLng: 140.709
+                lat: 36.7420698,
+                lng: 140.6887361,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.7420698, entranceLng: 140.6887361, exitLat: 36.7420698, exitLng: 140.6887361,
+                note: "【2026-07-18調査・座標修正】MapFan「高萩ＩＣ（常磐自動車道）」入口座標を採用（旧座標との誤差約3.7km）。Wikipedia代表点・NAVITIMEとおおむね整合。フルIC、方向制限なし。entranceSelectable/exitSelectableは変更なし（trueのまま）。出口（上り出口・下り入口・下り出口）の個別座標は未取得のため、入口座標をフォールバック使用。次回追加確認が望ましい。"
             },
             {
                 order: 17,

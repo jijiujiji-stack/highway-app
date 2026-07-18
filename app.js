@@ -1133,9 +1133,112 @@ function findAssumedRouteRoadRouteDistanceMeters(
         : Infinity;
 }
 
+// buildAssumedRouteHtml用：tollSectionのNEXCO側路線名を、entranceIc/
+// exitIcのsourceAreaKey（IC_MASTER側のエリアキー）からIC_MASTER[key].label
+// を引いて求める。ICが両方とも特定できない場合は、区間内instructions
+// （combinedInstructions）にIC_MASTERのlabelがそのまま含まれていないか
+// 探し、それも見つからなければ汎用的に「NEXCO」とする。
+function resolveTollSectionNexcoRoadLabel(section) {
+    const candidateIc =
+        section.entranceIc || section.exitIc;
+
+    const areaLabel =
+        candidateIc?.sourceAreaKey &&
+        IC_MASTER[candidateIc.sourceAreaKey]?.label;
+
+    if (areaLabel) {
+        return shortenHighwayRoadName(areaLabel);
+    }
+
+    const combinedInstructions =
+        section.combinedInstructions || "";
+
+    const matchedLabel =
+        Object.values(IC_MASTER)
+            .map(area => area.label)
+            .filter(Boolean)
+            .find(label =>
+                combinedInstructions.includes(label)
+            );
+
+    return matchedLabel
+        ? shortenHighwayRoadName(matchedLabel)
+        : "NEXCO";
+}
+
+// buildAssumedRouteHtml用：TOLL TAG方式（tollSections）から表示HTMLを
+// 組み立てる。tollSectionsは既にルート走行順（stepsの並び順）に
+// 揃っているため、既存の座標ベース方式のようなrouteDistanceMetersに
+// よる再ソートは不要。区間ごとに道路名pill（首都高／NEXCO側の実際の
+// 道路名）を先頭に付け、複数区間ある場合は2件目以降の区間にも同様に
+// pillを付けることで、区間の切り替わり・再入場が視覚的に分かるように
+// している。
+function buildAssumedRouteHtmlFromTollSections(tollSections) {
+    if (!tollSections || tollSections.length === 0) {
+        // 旧判定（isProbablyNoTollRouteByPolylineComparison）とTOLL TAG
+        // 方式の結果が食い違い、旧判定が偽（＝有料道路使用ありと判定）に
+        // なった場合でも、tollSectionsが空ならここに到達する。従来は
+        // 空文字列を返しておりトップパネルが空白になり得たため、
+        // 明示的な文言を返すようにする。
+        return (
+            "<span class=\"assumed-route-toll-sections-empty\">" +
+            "有料道路は使用していません" +
+            "</span>" +
+            "<small class=\"assumed-route-no-toll-detail\">" +
+            "※TOLL TAG判定" +
+            "</small>"
+        );
+    }
+
+    return (tollSections || [])
+        .map(section => {
+            const pillLabel =
+                section.isShutoSection
+                    ? "首都高"
+                    : resolveTollSectionNexcoRoadLabel(
+                        section
+                    );
+
+            const entranceText =
+                section.entranceIc
+                    ? formatAssumedRouteIcName(
+                        section.entranceIc
+                    )
+                    : "IC不明";
+
+            const exitText =
+                section.exitIc
+                    ? formatAssumedRouteIcName(
+                        section.exitIc
+                    )
+                    : "IC不明";
+
+            return (
+                createAssumedRouteRoadHtml(pillLabel) +
+                " " +
+                escapeHtml(entranceText) +
+                " → " +
+                escapeHtml(exitText)
+            );
+        })
+        .join(" → ");
+}
+
 function buildAssumedRouteHtml(polylineAnalysis) {
     if (!polylineAnalysis) {
         return "";
+    }
+
+    // TOLL TAG方式（tollSections）が利用できる場合はこちらを優先する。
+    // hasTollSectionStepsDataがfalseの場合（getHighwayRouteForMultiExit
+    // Comparison経由等、stepsを取得していない呼び出し元）は、既存の
+    // 座標ベース方式（shutoEntranceIc/shutoExitIc/nexcoEntranceIc/
+    // nexcoExitIc・routeRoads等）にフォールバックする。座標ベース方式の
+    // コード自体は削除せず、以下にそのまま残している。
+    if (polylineAnalysis.hasTollSectionStepsData === true) {
+        return buildAssumedRouteHtmlFromTollSections(
+            polylineAnalysis.tollSections
+        );
     }
 
     // ノイズ補正済みのrouteTrace/roadSwitchesのみ使用する

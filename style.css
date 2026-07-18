@@ -305,6 +305,10 @@ button {
     white-space: nowrap;
 }
 
+.assumed-route-toll-sections-empty {
+    color: var(--color-info);
+}
+
 .dashboard-toll-breakdown {
     display: block;
     margin-top: 3px;

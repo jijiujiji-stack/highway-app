@@ -467,27 +467,125 @@ function detectTollSectionsFromSteps(highwayRoute) {
     // （首都高かどうか）の切り替わりでさらにサブ区間に分割する。
     // 「有料区間」タグ自体の連続性判定（tollSectionRunsの構築）は
     // 変更しない。
+    //
+    // 首都高の路線名（SHUTO_IC_MASTER.routeName）は「首都高速」接頭辞を
+    // 除いた形（例：「湾岸線」「神奈川1号横羽線」）でGoogleのinstructions
+    // に現れることがあるため、キーワード集として使う。
+    const shutoRouteNameKeywords = [
+        ...new Set(
+            SHUTO_IC_MASTER
+                .map(ic => ic.routeName)
+                .filter(Boolean)
+                .map(routeName =>
+                    routeName.replace(/^首都高速/, "")
+                )
+        )
+    ];
+
+    // NEXCO（本アプリでは首都高以外の高速道路全般をまとめて扱う）側の
+    // 路線名。IC_MASTER各エリアのlabel（例：「東名高速道路」「中央自動車道」）
+    // をそのままキーワードとして使う。
+    const nexcoRouteLabelKeywords = [
+        ...new Set(
+            Object.values(IC_MASTER)
+                .map(area => area.label)
+                .filter(Boolean)
+        )
+    ];
+
+    const hasShutoKeyword = instructions =>
+        instructions.includes(
+            TOLL_SECTION_SHUTO_INSTRUCTION_TEXT
+        ) ||
+        shutoRouteNameKeywords.some(keyword =>
+            instructions.includes(keyword)
+        );
+
+    const hasExplicitNexcoSignal = (instructions, maneuver) =>
+        nexcoRouteLabelKeywords.some(keyword =>
+            instructions.includes(keyword)
+        ) ||
+        maneuver === "NAME_CHANGE";
+
+    // 各stepを"shuto"/"nexco"/null（曖昧、明確なシグナルが無い）に
+    // 分類する。曖昧なstep（「〜方面に進む」等、既存路線の続きを示す
+    // だけの案内）は、直前に確定したstepの分類をそのまま引き継ぐ
+    // （sticky）。先頭側が曖昧な場合は、後から確定した最初の分類を
+    // 遡って適用する。全stepが曖昧なまま確定しなかった場合のみ、
+    // 「有料区間」内という前提でshutoを既定値にする。
+    const classifyStepsByRoadType = stepsToClassify => {
+        const rawCategories =
+            stepsToClassify.map(step => {
+                const instructions =
+                    String(
+                        step.navigationInstruction
+                            ?.instructions || ""
+                    );
+
+                if (hasShutoKeyword(instructions)) {
+                    return "shuto";
+                }
+
+                if (
+                    hasExplicitNexcoSignal(
+                        instructions,
+                        step.navigationInstruction
+                            ?.maneuver
+                    )
+                ) {
+                    return "nexco";
+                }
+
+                return null;
+            });
+
+        const filledCategories = [...rawCategories];
+
+        for (
+            let index = 1;
+            index < filledCategories.length;
+            index++
+        ) {
+            if (filledCategories[index] === null) {
+                filledCategories[index] =
+                    filledCategories[index - 1];
+            }
+        }
+
+        for (
+            let index = filledCategories.length - 2;
+            index >= 0;
+            index--
+        ) {
+            if (filledCategories[index] === null) {
+                filledCategories[index] =
+                    filledCategories[index + 1];
+            }
+        }
+
+        return filledCategories.map(
+            category => category || "shuto"
+        );
+    };
+
     const splitRunByRoadType = run => {
+        const categories =
+            classifyStepsByRoadType(run.steps);
+
         const subRuns = [];
         let currentSubRun = null;
-        let currentIsShutoStep = null;
+        let currentCategory = null;
 
-        run.steps.forEach(step => {
-            const isShutoStep =
-                String(
-                    step.navigationInstruction
-                        ?.instructions || ""
-                ).includes(
-                    TOLL_SECTION_SHUTO_INSTRUCTION_TEXT
-                );
+        run.steps.forEach((step, index) => {
+            const category = categories[index];
 
             if (
                 !currentSubRun ||
-                isShutoStep !== currentIsShutoStep
+                category !== currentCategory
             ) {
                 currentSubRun = { steps: [] };
                 subRuns.push(currentSubRun);
-                currentIsShutoStep = isShutoStep;
+                currentCategory = category;
             }
 
             currentSubRun.steps.push(step);

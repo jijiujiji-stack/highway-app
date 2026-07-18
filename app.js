@@ -6100,8 +6100,9 @@ const IC_MASTER = {
     keiyo: {
         label: "京葉道路方面",
         exits: [
-            { order: -8, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.731, lng: 139.817, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.731, entranceLng: 139.817, exitLat: 35.731, exitLng: 139.817
+            { order: -8, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.7357056, lng: 139.8150419, experimental: true, roadType: "首都高",
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.7357056, entranceLng: 139.8150419, exitLat: 35.7357056, exitLng: 139.8150419,
+                note: "SHUTO_IC_MASTER側の堤通（id: shuto-6-tsutsumidori、MapFanで検証済み、entranceLat/Lng=exitLat/Lng=35.7357056,139.8150419）と座標が不一致だったため、本スタブの座標をSHUTO_IC_MASTER側の検証済み値に同期した。dedupeIcDefinitionsByIdentityによりSHUTO_IC_MASTER側が優先されるため候補選定への実質的な影響はないが、データ不整合を解消するために修正。従来座標(35.731,139.817)から約660m修正。"
             },
             { order: -7, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.712, lng: 139.779, experimental: true, roadType: "首都高",
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.712, entranceLng: 139.779, exitLat: 35.712, exitLng: 139.779
@@ -6179,7 +6180,7 @@ const IC_MASTER = {
                 routeBranch: "keiyo",
                 branchOrder: 4,
                 entranceSelectable: true, exitSelectable: false, entranceLat: 35.6996362, entranceLng: 139.9708625, exitLat: 35.6996411, exitLng: 139.9690933,
-                note: "【未検証】今回、公式サイト・MapFanでの個別確認を実施できなかった。方向限定を示す情報は検索範囲内では見つからなかったが、確認不足のため座標・entranceSelectable/exitSelectableとも変更していない。次回要検証。【2026-07-14再調査・修正】Wikipedia「船橋インターチェンジ」記事で「下り（千葉方面）の出入口と上り（東京方面）入口が設置されているスリークォーターインターチェンジ。上り（東京方面）出口は設置されていない」と確認。別の独立した情報源（f-keiba.com、花輪IC関連記事内の言及「船橋ICの出口が下り線側にしかないハーフICのため」）でも同じ事実を確認し、MapFanでも【出口（上り）】の個別ページは発見できなかった。上り・下りとも入口は存在するためentranceSelectable:trueは維持し、下り方向でのみ出口が存在するためexitSelectableをfalseに修正した。座標はentranceLat/Lngを入口(35.6996362,139.9708625)、exitLat/Lngを出口(下り)(35.6996411,139.9690933)に設定。従来座標(35.693,139.990)から約1,956m修正。"
+                note: "【未検証】今回、公式サイト・MapFanでの個別確認を実施できなかった。方向限定を示す情報は検索範囲内では見つからなかったが、確認不足のため座標・entranceSelectable/exitSelectableとも変更していない。次回要検証。【2026-07-14再調査・修正】Wikipedia「船橋インターチェンジ」記事で「下り（千葉方面）の出入口と上り（東京方面）入口が設置されているスリークォーターインターチェンジ。上り（東京方面）出口は設置されていない」と確認。別の独立した情報源（f-keiba.com、花輪IC関連記事内の言及「船橋ICの出口が下り線側にしかないハーフICのため」）でも同じ事実を確認し、MapFanでも【出口（上り）】の個別ページは発見できなかった。上り・下りとも入口は存在するためentranceSelectable:trueは維持し、下り方向でのみ出口が存在するためexitSelectableをfalseに修正した。座標はentranceLat/Lngを入口(35.6996362,139.9708625)、exitLat/Lngを出口(下り)(35.6996411,139.9690933)に設定。従来座標(35.693,139.990)から約1,956m修正。【2026-07-18外部再照合】Wikipedia「船橋インターチェンジ」記事（https://ja.wikipedia.org/wiki/船橋インターチェンジ）で改めて独立に確認し、「下り（千葉方面）の出入口と上り（東京方面）入口を持つが、上り（東京方面）出口は設置されていない」という上記判断と完全に一致することを確認した。座標・entranceSelectable/exitSelectableとも変更なし。"
             },
             {
                 order: 5,
@@ -6190,7 +6191,7 @@ const IC_MASTER = {
                 routeBranch: "keiyo",
                 branchOrder: 5,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.685038678062, entranceLng: 140.0013387493, exitLat: 35.6868734, exitLng: 139.9999833,
-                note: "【未検証】今回、公式サイト・MapFanでの個別確認を実施できなかった。方向限定を示す情報は検索範囲内では見つからなかったが、確認不足のため座標・entranceSelectable/exitSelectableとも変更していない。次回要検証。【2026-07-14再調査・座標のみ修正】MapFanで4個別ランプページ（入口上り・入口下り・出口上り・出口下り）全てを確認し、フルICと判断（もともと下り線入口がないハーフICだったが1993年10月に下り入口が開通し現在はフルIC）。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(35.685038678062,140.0013387493)、exitLat/Lngを出口(下り)(35.6868734,139.9999833)に設定。従来座標(35.689,140.015)から約1,340m修正。"
+                note: "【未検証】今回、公式サイト・MapFanでの個別確認を実施できなかった。方向限定を示す情報は検索範囲内では見つからなかったが、確認不足のため座標・entranceSelectable/exitSelectableとも変更していない。次回要検証。【2026-07-14再調査・座標のみ修正】MapFanで4個別ランプページ（入口上り・入口下り・出口上り・出口下り）全てを確認し、フルICと判断（もともと下り線入口がないハーフICだったが1993年10月に下り入口が開通し現在はフルIC）。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(35.685038678062,140.0013387493)、exitLat/Lngを出口(下り)(35.6868734,139.9999833)に設定。従来座標(35.689,140.015)から約1,340m修正。【2026-07-18外部再照合】Wikipedia「花輪インターチェンジ」記事（https://ja.wikipedia.org/wiki/花輪インターチェンジ）で改めて独立に確認し、「元・矢那IC、下り入口なしの一方通行だったが1993年10月5日に有料下り入口が供用開始されフルICとなった」という上記判断と完全に一致することを確認した。座標・entranceSelectable/exitSelectableとも変更なし。"
             },
             {
                 order: 6,
@@ -6207,12 +6208,12 @@ const IC_MASTER = {
                 order: 7,
                 displayName: "穴川IC",
                 googleName: "京葉道路 穴川インターチェンジ",
-                lat: 35.643392,
-                lng: 140.111988,
+                lat: 35.6424556,
+                lng: 140.1128819,
                 routeBranch: "keiyo",
                 branchOrder: 7,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.643392, entranceLng: 140.111988, exitLat: 35.643392, exitLng: 140.111988,
-                note: "【確認不可・複雑につき変更保留】検索の結果、穴川ICは「穴川西IC」「穴川中IC」「穴川東IC」という3つの別々のランプの集合体であり、それぞれ入口・出口の方向が異なる可能性があることが分かった（例：西=上り入口、中=下り入口、東=上り出口）。単一のdisplayName「穴川IC」ではこの3分割構造を正確に表現できないため、entranceSelectable/exitSelectableは変更せず現状維持（true/true）とした。座標のみ一般的な位置情報で更新(35.643392,140.111988、従来からの修正量は小さい)。次回、3ランプそれぞれの方向を個別に確認したうえで再検証が必要。"
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.6424556, entranceLng: 140.1128819, exitLat: 35.6431326, exitLng: 140.1128611,
+                note: "【確認不可・複雑につき変更保留】検索の結果、穴川ICは「穴川西IC」「穴川中IC」「穴川東IC」という3つの別々のランプの集合体であり、それぞれ入口・出口の方向が異なる可能性があることが分かった（例：西=上り入口、中=下り入口、東=上り出口）。単一のdisplayName「穴川IC」ではこの3分割構造を正確に表現できないため、entranceSelectable/exitSelectableは変更せず現状維持（true/true）とした。座標のみ一般的な位置情報で更新(35.643392,140.111988、従来からの修正量は小さい)。次回、3ランプそれぞれの方向を個別に確認したうえで再検証が必要。【2026-07-18外部照合・座標のみ修正】Wikipedia・MapFan・NAVITIMEで3ランプそれぞれの個別座標を確認：穴川西＝入口(上り)(35.6424556,140.1128819)・出口(下り)(35.6431326,140.1128611)、穴川中＝入口(下り)(35.635745,140.121738)、穴川東＝出口(上り)(35.629184351449,140.13055220093)。3ランプを合算すると上り入口・上り出口・下り入口・下り出口の4方向すべてが揃っており、entranceSelectable/exitSelectableが現状のtrue/trueであることは妥当と判断（変更なし）。ただし本アプリのデータ構造は1IC=1地点が前提のため、御殿場IC等の複数ランプ構造ICと同様に代表点方式を採用し、entranceLat/Lngを穴川西の入口(上り)、exitLat/Lngを穴川西の出口(下り)に設定した（lat/lngはentranceLat/Lngと同値）。従来座標(35.643392,140.111988)から約130m（entrance）／約85m（exit）修正。穴川中（下り入口、西から約900m）・穴川東（上り出口、西から約1.5km）は今回のレコードには反映されておらず、3ランプの個別分離（mirrorレコード化）は行っていない。将来的に方向別の精度を上げたい場合は、篠崎IC・貝塚ICで採用されているisMirror/mirrorOfパターンを応用した3地点構造への再設計を別途検討する必要がある。"
             },
             {
                 order: 8,

@@ -4905,11 +4905,12 @@ const IC_MASTER = {
                 order: 13,
                 displayName: "圏央鶴ヶ島IC",
                 googleName: "首都圏中央連絡自動車道 圏央鶴ヶ島インターチェンジ",
-                lat: 35.920,
-                lng: 139.389,
+                lat: 35.9213126,
+                lng: 139.3912509,
                 routeBranch: "northwest",
                 branchOrder: 13,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.920, entranceLng: 139.389, exitLat: 35.920, exitLng: 139.389
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.9213126, entranceLng: 139.3912509, exitLat: 35.9213126, exitLng: 139.3912509,
+                note: "【2026-07-18調査・座標修正】MapFan「圏央鶴ヶ島ＩＣ（圏央道）【入口】」座標を採用（旧座標との誤差約150m）。Wikipedia代表点とおおむね整合。フルIC/ハーフIC判定は情報源からは確認できず不明。出口個別座標は未取得のため入口座標をフォールバック使用。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
             {
                 order: 13.5,
@@ -4962,11 +4963,12 @@ const IC_MASTER = {
                 order: 17,
                 displayName: "桶川加納IC",
                 googleName: "首都圏中央連絡自動車道 桶川加納インターチェンジ",
-                lat: 36.022,
-                lng: 139.565,
+                lat: 36.0191258,
+                lng: 139.5643721,
                 routeBranch: "northwest",
                 branchOrder: 17,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.022, entranceLng: 139.565, exitLat: 36.022, exitLng: 139.565
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.0191258, entranceLng: 139.5643721, exitLat: 36.0191258, exitLng: 139.5643721,
+                note: "【2026-07-18調査・座標修正】MapFan「桶川加納ＩＣ（圏央道）【入口】」座標を採用（旧座標との誤差約320m）。Wikipedia代表点とほぼ一致。NAVITIMEで内回り入口の存在は確認できたが、フルIC/ハーフIC判定は断定できず不明。出口個別座標は未取得のため入口座標をフォールバック使用。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
             {
                 order: 18,
@@ -4996,11 +4998,12 @@ const IC_MASTER = {
                 order: 20,
                 displayName: "幸手IC",
                 googleName: "首都圏中央連絡自動車道 幸手インターチェンジ",
-                lat: 36.075,
-                lng: 139.753,
+                lat: 36.0642814,
+                lng: 139.7382357,
                 routeBranch: "northeast",
                 branchOrder: 20,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.075, entranceLng: 139.753, exitLat: 36.075, exitLng: 139.753
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.0642814, entranceLng: 139.7382357, exitLat: 36.0646596, exitLng: 139.7379266,
+                note: "【2026-07-18調査・座標修正】MapFan「幸手ＩＣ（圏央道）」入口（内回り）・出口（外回り）座標を採用（旧座標との誤差約1.3km）。MapFanに入口（内回り）・出口（外回り）・入口（外回り）・出口（内回り）の4方向すべての個別ページが存在することを確認、フルIC・方向制限なしと判定。既知の保留事項「幸手IC外回り側の確認」はこれにより解消。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
             {
                 order: 21,
@@ -5085,31 +5088,34 @@ const IC_MASTER = {
                 order: 28,
                 displayName: "牛久阿見IC",
                 googleName: "首都圏中央連絡自動車道 牛久阿見インターチェンジ",
-                lat: 35.982,
-                lng: 140.170,
+                lat: 35.9909205,
+                lng: 140.1848524,
                 routeBranch: "northeast",
                 branchOrder: 28,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.982, entranceLng: 140.170, exitLat: 35.982, exitLng: 140.170
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.9909205, entranceLng: 140.1848524, exitLat: 35.9909205, exitLng: 140.1848524,
+                note: "【2026-07-18調査・座標修正】MapFan「牛久阿見ＩＣ（圏央道）【出口】」座標を採用（旧座標との誤差約1.6km）。Wikipedia代表点とほぼ一致。フルIC/ハーフIC判定は断定できず不明。入口個別座標は未取得のため出口座標をフォールバック使用。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
             {
                 order: 29,
                 displayName: "阿見東IC",
                 googleName: "首都圏中央連絡自動車道 阿見東インターチェンジ",
-                lat: 35.969,
-                lng: 140.234,
+                lat: 35.9820751,
+                lng: 140.2369995,
                 routeBranch: "northeast",
                 branchOrder: 29,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.969, entranceLng: 140.234, exitLat: 35.969, exitLng: 140.234
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.9820751, entranceLng: 140.2369995, exitLat: 35.9820751, exitLng: 140.2369995,
+                note: "【2026-07-18調査・座標修正】MapFan「阿見東ＩＣ（圏央道）【入口】」座標を採用（旧座標との誤差約1.6km）。Wikipedia代表点とほぼ完全一致。フルIC/ハーフIC判定は断定できず不明（あみプレミアム・アウトレット直結の出口専用ランプが別途存在する可能性あり、要留意）。出口個別座標は未取得のため入口座標をフォールバック使用。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
             {
                 order: 30,
                 displayName: "稲敷IC",
                 googleName: "首都圏中央連絡自動車道 稲敷インターチェンジ",
-                lat: 35.947,
-                lng: 140.323,
+                lat: 35.9551214,
+                lng: 140.3010546,
                 routeBranch: "northeast",
                 branchOrder: 30,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.947, entranceLng: 140.323, exitLat: 35.947, exitLng: 140.323
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.9551214, entranceLng: 140.3010546, exitLat: 35.9551214, exitLng: 140.3010546,
+                note: "【2026-07-18調査・座標修正】MapFan「稲敷ＩＣ（圏央道）【入口】」座標を採用（旧座標との誤差約2.3km、今回検証10件中最大）。Wikipedia代表点座標は未記載のためMapFan単独の値。フルIC/ハーフIC判定は断定できず不明。出口個別座標は未取得のため入口座標をフォールバック使用。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
             {
                 order: 31,
@@ -5172,11 +5178,12 @@ const IC_MASTER = {
                 order: 36,
                 displayName: "山武成東IC",
                 googleName: "首都圏中央連絡自動車道 山武成東インターチェンジ",
-                lat: 35.618,
-                lng: 140.383,
+                lat: 35.6156791,
+                lng: 140.3775018,
                 routeBranch: "southeast",
                 branchOrder: 36,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.618, entranceLng: 140.383, exitLat: 35.618, exitLng: 140.383
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.6156791, entranceLng: 140.3775018, exitLat: 35.6156791, exitLng: 140.3775018,
+                note: "【2026-07-18調査・座標修正】MapFan「山武成東ＩＣ（圏央道（千葉区間））【入口】」座標を採用（旧座標との誤差約620m）。MapFan単独の値で、他情報源との交差検証は未了。フルIC/ハーフIC判定は断定できず不明。出口個別座標は未取得のため入口座標をフォールバック使用。entranceSelectable/exitSelectableは変更なし（trueのまま）。次回、複数情報源での追加確認が望ましい。"
             },
             {
                 order: 37,
@@ -5195,11 +5202,12 @@ const IC_MASTER = {
                 order: 38,
                 displayName: "東金IC",
                 googleName: "首都圏中央連絡自動車道 東金インターチェンジ",
-                lat: 35.571,
-                lng: 140.316,
+                lat: 35.5714996,
+                lng: 140.320354,
                 routeBranch: "southeast",
                 branchOrder: 38,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.571, entranceLng: 140.316, exitLat: 35.571, exitLng: 140.316
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.5714996, entranceLng: 140.320354, exitLat: 35.5714996, exitLng: 140.320354,
+                note: "【2026-07-18調査・座標修正】MapFan「東金ＩＣ（圏央道（千葉区間））【入口】」座標を採用（旧座標との誤差約320m）。フルIC/ハーフIC判定は断定できず不明。出口個別座標は未取得のため入口座標をフォールバック使用。【重要】千葉東金道路にも同名の「東金IC」（第一・第二料金所、IC番号6/101）が別施設として存在し、圏央道側とは約600m離れている（MapFan「東金ＩＣ（千葉東金道路）【入口（上り）】」35.574106,140.3130212）。本エントリは圏央道側を指す。将来的な参照・追加登録時は、道路名を明記し混同しないよう注意。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
             {
                 order: 39,
@@ -5216,11 +5224,12 @@ const IC_MASTER = {
                 order: 40,
                 displayName: "茂原北IC",
                 googleName: "首都圏中央連絡自動車道 茂原北インターチェンジ",
-                lat: 35.487,
-                lng: 140.271,
+                lat: 35.489089,
+                lng: 140.271026,
                 routeBranch: "southeast",
                 branchOrder: 40,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.487, entranceLng: 140.271, exitLat: 35.487, exitLng: 140.271
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.489089, entranceLng: 140.271026, exitLat: 35.489089, exitLng: 140.271026,
+                note: "【2026-07-18調査・座標修正】NAVITIME検索結果集約値を採用（旧座標との誤差約230m）。MapFan個別ページ（入口・出口）には未到達で、単一情報源のみによる暫定値。フルIC/ハーフIC判定は断定できず不明。entranceSelectable/exitSelectableは変更なし（trueのまま）。次回、MapFan個別ページでの追加確認・複数情報源での交差検証が望ましい。"
             },
             {
                 order: 41,
@@ -5259,11 +5268,12 @@ const IC_MASTER = {
                 order: 44,
                 displayName: "木更津東IC",
                 googleName: "首都圏中央連絡自動車道 木更津東インターチェンジ",
-                lat: 35.361,
-                lng: 140.052,
+                lat: 35.3611168,
+                lng: 140.0525383,
                 routeBranch: "southeast",
                 branchOrder: 44,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.361, entranceLng: 140.052, exitLat: 35.361, exitLng: 140.052
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.3611168, entranceLng: 140.0525383, exitLat: 35.3611168, exitLng: 140.0525383,
+                note: "【2026-07-18調査・座標修正】MapFan「木更津東ＩＣ（圏央道（千葉区間））【入口】」座標を採用（旧座標との誤差約60m、今回検証10件中最小）。フルIC/ハーフIC判定は断定できず不明。出口個別座標は未取得のため入口座標をフォールバック使用。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
             {
                 order: 45,

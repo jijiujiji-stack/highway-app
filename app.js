@@ -1695,17 +1695,17 @@ const SHUTO_IC_MASTER = [
         routeCode: "6",
         routeName: "首都高速6号三郷線",
         order: 2,
-        lat: 35.805,
-        lng: 139.842,
-        entranceLat: 35.805,
-        entranceLng: 139.842,
-        exitLat: 35.805,
-        exitLng: 139.842,
+        lat: 35.805792,
+        lng: 139.83513,
+        entranceLat: 35.805792,
+        entranceLng: 139.83513,
+        exitLat: 35.799209,
+        exitLng: 139.827506,
         entranceSelectable: true,
         exitSelectable: true,
         sourceAreaKeys: ["joban"],
         sourceGoogleNames: ["首都高速6号三郷線 八潮南出入口"],
-        note: "既存IC_MASTERから正規化登録。現時点では未参照。"
+        note: "【2026-07-18調査・座標修正】従来は(35.805,139.842)という未検証の暫定座標で、TOLL TAG方式の最近傍検索（500mしきい値）で「IC不明」判定を招いていた。従来座標との誤差は約1.0km（入口・出口中間点基準）。NAVITIME「首都6号三郷線 八潮南出入口 上り/下り」の実測値を使用（上り入口:35.805792,139.83513／下り出口:35.799209,139.827506）。フルインターチェンジ（上下線とも入口・出口設置）であることをWikipedia「八潮南出入口」で確認済み。参考情報として、2026年5月5日より上下線とも入口料金所がETC専用になっている。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
     },
     {
         id: "shuto-6-yashio",
@@ -4223,11 +4223,12 @@ const IC_MASTER = {
                 order: -1,
                 displayName: "八潮南（首都高）",
                 googleName: "首都高速6号三郷線 八潮南出入口",
-                lat: 35.805,
-                lng: 139.842,
+                lat: 35.805792,
+                lng: 139.83513,
                 experimental: true,
                 roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.805, entranceLng: 139.842, exitLat: 35.805, exitLng: 139.842
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.805792, entranceLng: 139.83513, exitLat: 35.799209, exitLng: 139.827506,
+                note: "【2026-07-18調査・座標修正】従来は(35.805,139.842)という未検証の暫定座標だった（SHUTO_IC_MASTER側の同一IC「八潮南」と同じ値。dedupeIcDefinitionsByIdentityではSHUTO_IC_MASTER側が優先されるため、本エントリ単独の修正だけでは候補選定に反映されない点に注意）。従来座標との誤差は約1.0km。NAVITIME「首都6号三郷線 八潮南出入口 上り/下り」の実測値を使用（上り入口:35.805792,139.83513／下り出口:35.799209,139.827506）。フルインターチェンジ（上下線とも入口・出口設置）であることをWikipedia「八潮南出入口」で確認済み。参考情報として、2026年5月5日より上下線とも入口料金所がETC専用になっている。"
             },
 
             {

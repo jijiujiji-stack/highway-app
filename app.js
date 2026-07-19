@@ -14340,6 +14340,40 @@ function buildPolylineBasedComparisonIcCandidates(
     };
 }
 
+// buildPolylineBasedComparisonIcCandidatesの結果を、polylineAnalysis自身に
+// キャッシュするラッパー。同一のpolylineAnalysisに対して複数箇所
+// （候補選定・検索条件パネル表示・診断ログ）から呼ばれるため、二重計算を
+// 避ける。buildPolylineBasedComparisonIcCandidates本体は変更していない。
+function getOrBuildPolylineBasedComparisonIcCandidates(
+    polylineAnalysis
+) {
+
+    if (!polylineAnalysis) {
+        return buildPolylineBasedComparisonIcCandidates(
+            polylineAnalysis
+        );
+    }
+
+    if (
+        polylineAnalysis
+            ._polylineBasedComparisonIcCandidates !==
+            undefined
+    ) {
+        return polylineAnalysis
+            ._polylineBasedComparisonIcCandidates;
+    }
+
+    const result =
+        buildPolylineBasedComparisonIcCandidates(
+            polylineAnalysis
+        );
+
+    polylineAnalysis._polylineBasedComparisonIcCandidates =
+        result;
+
+    return result;
+}
+
 function buildForwardExitComparisonIcCandidates(
     polylineAnalysis,
     getIcIdentity,
@@ -14841,7 +14875,7 @@ function selectPolylineBasedMultiIcCandidates({
 
     if (analysisKeyMatches) {
         polylineCandidatePreview =
-            buildPolylineBasedComparisonIcCandidates(
+            getOrBuildPolylineBasedComparisonIcCandidates(
                 lastHighwayRoutePolylineAnalysis
             );
 
@@ -15099,7 +15133,7 @@ function logHighwayRoutePolylineAnalysis(
     } = result;
 
     const comparisonCandidatePreview =
-        buildPolylineBasedComparisonIcCandidates(result);
+        getOrBuildPolylineBasedComparisonIcCandidates(result);
 
     const comparisonApiCandidateLimit =
         getActiveIcCandidateCount();
@@ -22215,7 +22249,7 @@ function buildPolylineComparisonSummaryHtml(
     // nexcoEntranceIc等を参照する設計のまま）が今回のスコープ外のため、
     // 表示とロジックの整合性を保つべく変更しない。
     const comparisonCandidatePreview =
-        buildPolylineBasedComparisonIcCandidates(
+        getOrBuildPolylineBasedComparisonIcCandidates(
             polylineAnalysis
         );
 

@@ -599,12 +599,20 @@ function detectTollSectionsFromSteps(highwayRoute) {
         ) ||
         maneuver === "NAME_CHANGE";
 
-    // 各stepを"shuto"/"nexco"/null（曖昧、明確なシグナルが無い）に
-    // 分類する。曖昧なstep（「〜方面に進む」等、既存路線の続きを示す
-    // だけの案内）は、直前に確定したstepの分類をそのまま引き継ぐ
+    // 各stepを"shuto"/"aqualine"等/"nexco"/null（曖昧、明確なシグナルが
+    // 無い）に分類する。曖昧なstep（「〜方面に進む」等、既存路線の続きを
+    // 示すだけの案内）は、直前に確定したstepの分類をそのまま引き継ぐ
     // （sticky）。先頭側が曖昧な場合は、後から確定した最初の分類を
     // 遡って適用する。全stepが曖昧なまま確定しなかった場合のみ、
     // 「有料区間」内という前提でshutoを既定値にする。
+    //
+    // 【変更】従来は"shuto"/"nexco"の2値にしか丸めていなかったため、
+    // 区間（run）単位でしか道路カテゴリを見分けられず、1つの区間内に
+    // アクアラインと後続の別道路（館山道等）が混在していても区間全体が
+    // 誤って単一カテゴリ扱いになっていた。TOLL_ROAD_CATEGORY_RULESの
+    // うちkeywordsが空でないルール（shuto・aqualine等）をステップ単位で
+    // 照合するように変更し、splitRunByRoadType（本体は変更していない）
+    // 側で正しく区間分割できるようにする。
     const classifyStepsByRoadType = stepsToClassify => {
         const rawCategories =
             stepsToClassify.map(step => {
@@ -614,8 +622,26 @@ function detectTollSectionsFromSteps(highwayRoute) {
                             ?.instructions || ""
                     );
 
-                if (hasShutoKeyword(instructions)) {
-                    return "shuto";
+                // "shuto"ルールについては、TOLL_ROAD_CATEGORY_RULES自体の
+                // keywordsに加えて、既存のhasShutoKeyword（SHUTO_IC_MASTER
+                // 由来の路線名キーワードを含む、より広い判定）もOR条件で
+                // 維持し、既存の判定精度を落とさないようにする。
+                const matchedCategoryRule =
+                    TOLL_ROAD_CATEGORY_RULES.find(rule =>
+                        rule.keywords.length > 0 &&
+                        (
+                            rule.keywords.some(keyword =>
+                                instructions.includes(keyword)
+                            ) ||
+                            (
+                                rule.id === "shuto" &&
+                                hasShutoKeyword(instructions)
+                            )
+                        )
+                    );
+
+                if (matchedCategoryRule) {
+                    return matchedCategoryRule.id;
                 }
 
                 if (
@@ -1139,6 +1165,13 @@ function getShutoTollEstimateForIcPair(startIc, endIc, shutoEntryCount) {
 // 伝える（呼び出し元の候補ごとのtry/catchで捕捉される想定）。
 // fallbackDistanceMetersは今回の方式では使用しない（Step 3で呼び出し元
 // を調整する際にあわせて整理する）。
+// 【変更】首都高利用回数は、以前は元の検索ルート全体の解析結果
+// （polylineAnalysis.tollEntryCount/shutoEntryCount）を参照していたが、
+// これは「候補区間」ではなく「元のルート全体」の区間数であり、意味的に
+// 噛み合っていなかった（首都高以外の区間まで回数として数えてしまう
+// 誤カウントがあった）。候補IC比較は必ず「首都高側⇔NEXCO側」を1回だけ
+// 跨ぐ構造のため、候補自身の起点・終点ICだけから判定する単純な形に
+// 変更し、polylineAnalysisは参照しない。
 async function estimateComparisonCandidateToll({
     startIc,
     endIc,
@@ -1152,16 +1185,7 @@ async function estimateComparisonCandidateToll({
         getShutoTollEstimateForIcPair(
             startIc,
             endIc,
-            (
-                polylineAnalysis?.hasTollSectionStepsData
-                    ? polylineAnalysis.tollEntryCount
-                    : polylineAnalysis?.shutoEntryCount
-            ) ??
-                (
-                    (isShutoIc(startIc) || isShutoIc(endIc))
-                        ? 1
-                        : 0
-                )
+            (isShutoIc(startIc) || isShutoIc(endIc)) ? 1 : 0
         );
 
     const startIsShuto = isShutoIc(startIc);

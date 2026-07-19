@@ -1613,7 +1613,7 @@ details#searchPanel .origin-row input {
 .v2-exit-main {
     font-size: 18px;
     font-weight: bold;
-    color: var(--color-warning);
+    color: var(--color-good);
     margin-bottom: 6px;
 }
 

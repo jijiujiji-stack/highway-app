@@ -340,6 +340,63 @@ const TOLL_SECTION_IC_MATCH_THRESHOLD_METERS = 500;
 // 首都高/NEXCO判定フォールバックに使う文言。
 const TOLL_SECTION_SHUTO_INSTRUCTION_TEXT = "首都高";
 
+// 【Step A・新規追加のみ、既存のどこからも未呼び出し】
+// 道路カテゴリごとの料金ルール一覧。上から順にkeywordsとの部分一致を試し、
+// 最初に一致したルールを採用する。keywordsが空配列のルールは
+// 「どれにも一致しなかった場合のフォールバック」として扱い、必ず最後に置く。
+// tollType: "fixed"（固定額）または "perKm"（距離比例）。
+// 座標ベースのicBasedIsShuto判定（distanceに上限が無く、アクアラインの
+// ような首都高接続部が近い区間で誤判定を起こす）に代わり、Googleの
+// 案内テキストのみで道路カテゴリを判定する新方式（Step B）の土台。
+// 将来、阪神高速・名古屋高速・本四高速等を追加する場合はこの配列に
+// 要素を追加するだけでよい設計。
+const TOLL_ROAD_CATEGORY_RULES = [
+    {
+        id: "shuto",
+        label: "首都高",
+        keywords: ["首都高速", "首都高"],
+        tollType: "fixed",
+        fixedYen: 1000
+    },
+    {
+        id: "aqualine",
+        label: "アクアライン",
+        keywords: ["東京湾アクアライン", "アクアライン"],
+        tollType: "fixed",
+        fixedYen: 800
+    },
+    {
+        id: "nexco",
+        label: "NEXCO",
+        keywords: [],
+        tollType: "perKm",
+        perKmYen: 24
+    }
+];
+
+// combinedInstructions（有料区間のGoogle案内テキスト連結文字列）から、
+// TOLL_ROAD_CATEGORY_RULESを上から順に照合し、最初に一致したルールを返す。
+// keywordsが空のルール（nexco、フォールバック）は無条件で一致する。
+// 現時点では既存のどの関数からも呼び出さない。
+function determineTollRoadCategory(combinedInstructions) {
+
+    const text = combinedInstructions || "";
+
+    for (const rule of TOLL_ROAD_CATEGORY_RULES) {
+        if (rule.keywords.length === 0) {
+            return rule;
+        }
+
+        if (rule.keywords.some(keyword => text.includes(keyword))) {
+            return rule;
+        }
+    }
+
+    return TOLL_ROAD_CATEGORY_RULES[
+        TOLL_ROAD_CATEGORY_RULES.length - 1
+    ];
+}
+
 // stepのstartLocation/endLocationは、他のRoutes APIのLocation型と同様に
 // { latLng: { latitude, longitude } }という構造を想定しているが、実際の
 // レスポンス構造は未確認のため、想定と異なる形（直接latitude/longitudeを

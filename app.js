@@ -1124,11 +1124,21 @@ function getShutoTollEstimateForIcPair(startIc, endIc, shutoEntryCount) {
     return shutoEntryCount * SHUTO_TOLL_ESTIMATE_YEN;
 }
 
-// 入口比較V2・出口比較V2で共通利用する候補料金概算。
-// 首都高IC同士は固定料金のみとし、首都高⇔非首都高をまたぐ場合は、
-// polylineAnalysisのnexcoEntranceIc/nexcoExitIcを使って首都高区間の
-// 距離ベース概算の二重計上を避ける。取得できない場合は既存の
-// startIc→endIc距離ベース計算にフォールバックする。
+// 【Step 2】入口比較V2・出口比較V2で共通利用する候補料金概算。
+// TOLL TAG方式（detectTollSectionsFromSteps＋estimateMainHighwayToll
+// FromTollSections）に一本化し、距離ベースの手計算（旧24円/km）と
+// そのフォールバックは廃止した。
+// 首都高IC同士は固定料金のみとし（ルールA）、首都高⇔非首都高をまたぐ
+// 場合は、polylineAnalysisのnexcoEntranceIc/nexcoExitIcを使って候補
+// 区間をNEXCO側だけに絞り込む（ルールB/C）。この絞り込みにより候補
+// 区間のルートは意図的に首都高部分を含まないため、区間自体のTOLL TAG
+// 判定結果（tollEstimate.highwayToll、道路カテゴリ別の料金）に、別途
+// 算出した首都高固定料金（shutoToll）を合算して最終金額とする。
+// TOLL TAG方式で判定できない場合（stepsデータ取得不可）はnullを返す。
+// Routes API呼び出し自体が失敗した場合は例外をそのまま呼び出し元へ
+// 伝える（呼び出し元の候補ごとのtry/catchで捕捉される想定）。
+// fallbackDistanceMetersは今回の方式では使用しない（Step 3で呼び出し元
+// を調整する際にあわせて整理する）。
 async function estimateComparisonCandidateToll({
     startIc,
     endIc,
@@ -1157,9 +1167,14 @@ async function estimateComparisonCandidateToll({
     const startIsShuto = isShutoIc(startIc);
     const endIsShuto = isShutoIc(endIc);
 
-    // ルールA：首都高IC同士は距離ベース概算を重ねず、固定料金のみ。
+    // ルールA：首都高IC同士は候補区間のルート取得自体を行わず、
+    // 固定料金のみとする（既存の最適化を維持）。
     if (startIsShuto && endIsShuto) {
-        return shutoToll;
+        return {
+            amount: shutoToll,
+            highwayToll: 0,
+            shutoToll
+        };
     }
 
     let tollFromGoogleName = startGoogleName;
@@ -1168,7 +1183,7 @@ async function estimateComparisonCandidateToll({
     if (startIsShuto && !endIsShuto) {
 
         // ルールB：首都高入口の違いで料金が揺れないよう、
-        // NEXCO側入口〜endIcの区間だけを距離ベース概算の対象にする。
+        // NEXCO側入口〜endIcの区間だけをTOLL TAG方式の対象にする。
         const nexcoEntranceGoogleName =
             polylineAnalysis?.nexcoEntranceIc?.googleName;
 
@@ -1179,7 +1194,7 @@ async function estimateComparisonCandidateToll({
     else if (!startIsShuto && endIsShuto) {
 
         // ルールC：首都高に入る直前のNEXCO側ICまでの区間だけを
-        // 距離ベース概算の対象にする。
+        // TOLL TAG方式の対象にする。
         const nexcoExitGoogleName =
             polylineAnalysis?.nexcoExitIc?.googleName;
 
@@ -1188,46 +1203,47 @@ async function estimateComparisonCandidateToll({
         }
     }
 
-    let tollDistanceMeters = fallbackDistanceMeters;
-
+    // ルールB'：起点と終点が同一ICの場合は区間自体が存在しないため、
+    // API呼び出しをせず固定料金のみとする（既存の最適化を維持）。
     if (
         tollFromGoogleName &&
         tollToGoogleName &&
         tollFromGoogleName === tollToGoogleName
     ) {
-
-        // 起点と終点が同一ICの場合は、距離ベース加算を発生させない。
-        tollDistanceMeters = 0;
-    }
-    else if (
-        tollFromGoogleName &&
-        tollToGoogleName
-    ) {
-
-        try {
-
-            const tollRoute =
-                await getHighwayRouteForTollEstimate(
-                    tollFromGoogleName,
-                    tollToGoogleName
-                );
-
-            tollDistanceMeters =
-                tollRoute.distanceMeters;
-
-        } catch (error) {
-
-            // ルールD：距離取得に失敗した場合は、既存のfallback距離を使う。
-            tollDistanceMeters = fallbackDistanceMeters;
-        }
+        return {
+            amount: shutoToll,
+            highwayToll: 0,
+            shutoToll
+        };
     }
 
-    return (
-        Math.round(
-            (tollDistanceMeters / 1000) * 24
-        ) +
+    if (!tollFromGoogleName || !tollToGoogleName) {
+        return null;
+    }
+
+    const tollRoute =
+        await getHighwayRouteForTollEstimate(
+            tollFromGoogleName,
+            tollToGoogleName
+        );
+
+    const tollTagResult =
+        detectTollSectionsFromSteps(tollRoute);
+
+    if (!tollTagResult.hasStepsData) {
+        return null;
+    }
+
+    const tollEstimate =
+        estimateMainHighwayTollFromTollSections(
+            tollTagResult
+        );
+
+    return {
+        amount: shutoToll + tollEstimate.highwayToll,
+        highwayToll: tollEstimate.highwayToll,
         shutoToll
-    );
+    };
 }
 
 function shortenHighwayRoadName(roadName) {

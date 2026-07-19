@@ -731,6 +731,107 @@ function detectTollSectionsFromSteps(highwayRoute) {
     };
 }
 
+// 【Step 1・新規追加のみ】tollSections（detectTollSectionsFromStepsの
+// 区間情報、走行順）から、通過IC順序リストを組み立てる。区間境界で
+// 前区間のexitIcと次区間のentranceIcが同一IC（buildIcDefinitionIdentity
+// で識別）を指す場合は1件にまとめる。entranceIc/exitIcがnull（IC不明）の
+// 区間は、実ICオブジェクトとは別の「未確定」エントリとしてそのまま残す
+// （厳密な重複判定はせず、直前の未確定エントリと近距離の場合のみまとめる
+// 簡易対応）。現時点では既存のどの関数からも呼び出していない。
+function buildTollSectionBasedIcSequence(tollSections) {
+
+    if (!Array.isArray(tollSections)) {
+        return [];
+    }
+
+    const UNRESOLVED_MERGE_DISTANCE_METERS = 50;
+
+    const sequence = [];
+
+    const getLastEntry = () =>
+        sequence[sequence.length - 1] || null;
+
+    const isSameResolvedIcAsLast = identity => {
+        const last = getLastEntry();
+
+        return (
+            Boolean(identity) &&
+            Boolean(last) &&
+            last.isUnresolved === false &&
+            buildIcDefinitionIdentity(last.ic) === identity
+        );
+    };
+
+    const isNearLastUnresolved = latLng => {
+        const last = getLastEntry();
+
+        if (
+            !latLng ||
+            !last ||
+            last.isUnresolved !== true ||
+            !last.latLng
+        ) {
+            return false;
+        }
+
+        return (
+            calculateDistance(
+                last.latLng.lat,
+                last.latLng.lng,
+                latLng.lat,
+                latLng.lng
+            ) <= UNRESOLVED_MERGE_DISTANCE_METERS
+        );
+    };
+
+    const pushResolvedIc = ic => {
+        const identity = buildIcDefinitionIdentity(ic);
+
+        if (isSameResolvedIcAsLast(identity)) {
+            return;
+        }
+
+        sequence.push({
+            isUnresolved: false,
+            ic
+        });
+    };
+
+    const pushUnresolvedIc = (latLng, label) => {
+        if (isNearLastUnresolved(latLng)) {
+            return;
+        }
+
+        sequence.push({
+            isUnresolved: true,
+            latLng: latLng || null,
+            label: label || "IC不明（未登録の可能性）"
+        });
+    };
+
+    tollSections.forEach(section => {
+        if (section.entranceIc) {
+            pushResolvedIc(section.entranceIc);
+        } else {
+            pushUnresolvedIc(
+                section.entranceLatLng,
+                section.entranceIcName
+            );
+        }
+
+        if (section.exitIc) {
+            pushResolvedIc(section.exitIc);
+        } else {
+            pushUnresolvedIc(
+                section.exitLatLng,
+                section.exitIcName
+            );
+        }
+    });
+
+    return sequence;
+}
+
 // tollSections（「有料区間」タグベース）を使った料金計算。
 // 区間ごとの首都高/NEXCO判定（section.isShutoSection）はdetectToll
 // SectionsFromSteps側で既に計算済みのため、ここではその値をそのまま

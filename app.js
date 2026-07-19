@@ -5352,7 +5352,7 @@ const IC_MASTER = {
             },
             { order: 8, displayName: "大月IC", googleName: "中央自動車道 大月インターチェンジ", lat: 35.6038574, lng: 138.924613,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.6038574, entranceLng: 138.924613, exitLat: 35.603883, exitLng: 138.924718,
-                note: "【2026-07-16調査・座標のみ修正】MapFan「大月ＩＣ【入口】」(35.6038574,138.924613、方向表記なし)「【出口（上り）】」(35.603883,138.924718)を確認。NAVITIME検索で「中央自動車道 大月IC 下り 出口」ページの存在も確認したが、正確な個別座標は未取得（要再確認）。2003年の大月JCT改築で大月ICと一体化した構造。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.616,138.949)から約2.58km南西へ修正。"
+                note: "【2026-07-16調査・座標のみ修正】MapFan「大月ＩＣ【入口】」(35.6038574,138.924613、方向表記なし)「【出口（上り）】」(35.603883,138.924718)を確認。NAVITIME検索で「中央自動車道 大月IC 下り 出口」ページの存在も確認したが、正確な個別座標は未取得（要再確認）。2003年の大月JCT改築で大月ICと一体化した構造。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.616,138.949)から約2.58km南西へ修正。【2026-07-19追加調査】下り出口座標としてNAVITIME経由で35.607253,138.929851という参考値を得たが、WebFetchが403で直接ページ確認できず信頼度は中程度。上り出口（35.603883,138.924718）から北東へ約595mで、大月JCTと一体化した構造上不自然ではないが確定情報ではない。採用は見送り、座標は変更せず。人間による実際のブラウザでの再確認を推奨。"
             },
             { order: 8.6, displayName: "大月JCT", googleName: "中央自動車道 大月ジャンクション", lat: 35.602342, lng: 138.916861,
                 isSelectable: false, connection: true, connectedRoads: ["chuo", "fujiyoshida"],
@@ -5365,11 +5365,11 @@ const IC_MASTER = {
             },
             { order: 10, displayName: "一宮御坂IC", googleName: "中央自動車道 一宮御坂インターチェンジ", lat: 35.6363294, lng: 138.6747078,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.6363294, entranceLng: 138.6747078, exitLat: 35.633734, exitLng: 138.679111,
-                note: "【2026-07-16調査・座標のみ修正】MapFan「一宮御坂ＩＣ【入口】」(35.6363294,138.6747078、方向表記なし)を確認。【出口】個別ページはMapFanで特定できなかったため、NAVITIME「中央自動車道 一宮御坂IC 下り 出口」(35.633734,138.679111)で代替確認（要再確認）。Wikipediaにハーフ等の記載はなく、入口・出口とも料金ブース3基（ETC専用2・一般1）で対称的構成。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.657,138.688)から約2.64km南西へ修正。"
+                note: "【2026-07-16調査・座標のみ修正】MapFan「一宮御坂ＩＣ【入口】」(35.6363294,138.6747078、方向表記なし)を確認。【出口】個別ページはMapFanで特定できなかったため、NAVITIME「中央自動車道 一宮御坂IC 下り 出口」(35.633734,138.679111)で代替確認（要再確認）。Wikipediaにハーフ等の記載はなく、入口・出口とも料金ブース3基（ETC専用2・一般1）で対称的構成。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(35.657,138.688)から約2.64km南西へ修正。【2026-07-19追加調査】出口座標について、MapFan個別ページは今回も発見できず、goo地図は2023年9月にサービス終了済み、Yahoo!マップは施設全体座標のみで方向別情報なし。新情報は得られず、既存のNAVITIME代替値（35.633734,138.679111）を暫定使用継続。"
             },
             { order: 10.5, displayName: "笛吹八代SIC", googleName: "中央自動車道 笛吹八代スマートインターチェンジ", lat: 35.622877, lng: 138.634789,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.622877, entranceLng: 138.634789, exitLat: 35.622877, exitLng: 138.634789,
-                note: "【2026-07-14調査・座標のみ修正】NAVITIMEで上り出口・上り入口・下り出口・下り入口の4方向の存在を確認し、フルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。MapFanでは【出口（上り）】(35.623745,138.6335718)・【入口（下り）】(35.6220085,138.6360058)の2点のみ確認でき、代表座標方式（入口(上り)・出口(下り)）に必要な個別ランプ座標は確認できなかったため、確認できた2点の中間点(35.622877,138.634789)を暫定使用した。従来座標(35.623,138.636)から約235m修正。次回、入口(上り)・出口(下り)の個別座標が確認できた場合は再検証が必要。"
+                note: "【2026-07-14調査・座標のみ修正】NAVITIMEで上り出口・上り入口・下り出口・下り入口の4方向の存在を確認し、フルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。MapFanでは【出口（上り）】(35.623745,138.6335718)・【入口（下り）】(35.6220085,138.6360058)の2点のみ確認でき、代表座標方式（入口(上り)・出口(下り)）に必要な個別ランプ座標は確認できなかったため、確認できた2点の中間点(35.622877,138.634789)を暫定使用した。従来座標(35.623,138.636)から約235m修正。次回、入口(上り)・出口(下り)の個別座標が確認できた場合は再検証が必要。【2026-07-19追加調査】入口(上り)・出口(下り)の個別座標は今回も確認できず。MapFanには出口(上り)・入口(下り)の2ページしか存在しない可能性が高い（2回の検索で同じ結果）。中間点暫定値の継続がおそらく現実的な落とし所だが確定はできず。"
             },
             { order: 11, displayName: "甲府昭和IC", googleName: "中央自動車道 甲府昭和インターチェンジ", lat: 35.6443223, lng: 138.54056,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.6443223, entranceLng: 138.54056, exitLat: 35.6443808, exitLng: 138.5405097,
@@ -5381,7 +5381,7 @@ const IC_MASTER = {
             },
             { order: 13, displayName: "韮崎IC", googleName: "中央自動車道 韮崎インターチェンジ", lat: 35.720358, lng: 138.465114,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.720358, entranceLng: 138.465114, exitLat: 35.722803, exitLng: 138.465125,
-                note: "【2026-07-16調査・座標のみ修正】MapFan「韮崎ＩＣ【出口】」(35.722803,138.465125)を確認。【入口】個別ページはMapFanで404となり直接確認不可のため、Wikipedia所在地座標(35.7203583,138.4651139)を暫定使用（要再確認）。入口2/出口3ブースで方向限定表記なし、フルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
+                note: "【2026-07-16調査・座標のみ修正】MapFan「韮崎ＩＣ【出口】」(35.722803,138.465125)を確認。【入口】個別ページはMapFanで404となり直接確認不可のため、Wikipedia所在地座標(35.7203583,138.4651139)を暫定使用（要再確認）。入口2/出口3ブースで方向限定表記なし、フルICと判断。entranceSelectable/exitSelectableは変更なし（trueのまま）。【2026-07-19追加調査】入口座標について2つの矛盾する候補が判明。候補A：NAVITIME「上り入口」35.719729,138.465625（Wikipedia暫定値から約84m、参考値・WebFetch未確認）。候補B：韮崎ICタクシー料金ページURLパラメータのデコード値「下り入口」35.722955,138.465123（MapFan確認済み出口35.722803,138.465125からわずか約17m、ほぼ同一地点）。出口と候補Bが近接する一方、候補Aは離れた別地点であり、どちらが実態を反映しているか現時点では判断できない。座標は変更せず、既存のWikipedia暫定値を維持。現地写真・NEXCO資料等での追加裏付けが望ましい。要ユーザー判断。"
             },
             { order: 14, displayName: "須玉IC", googleName: "中央自動車道 須玉インターチェンジ", lat: 35.773514, lng: 138.420569,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.773514, entranceLng: 138.420569, exitLat: 35.773448, exitLng: 138.420475,
@@ -5405,7 +5405,7 @@ const IC_MASTER = {
             },
             { order: 18.5, displayName: "諏訪湖SIC", googleName: "中央自動車道 諏訪湖スマートインターチェンジ", lat: 36.026, lng: 138.079,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.026, entranceLng: 138.079, exitLat: 36.026, exitLng: 138.079,
-                note: "【2026-07-14調査】2025年7月27日15時開通の新しいSICで、中央自動車道 諏訪湖サービスエリアに直結、上下線とも全方向・24時間利用可能なフルICであることをNEXCO中日本プレスリリース等で確認。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標は開通から日が浅くMapFan個別ランプページ等で確認できなかったため、既存値を維持（精度未確認、要再確認）。"
+                note: "【2026-07-14調査】2025年7月27日15時開通の新しいSICで、中央自動車道 諏訪湖サービスエリアに直結、上下線とも全方向・24時間利用可能なフルICであることをNEXCO中日本プレスリリース等で確認。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標は開通から日が浅くMapFan個別ランプページ等で確認できなかったため、既存値を維持（精度未確認、要再確認）。【2026-07-19追加調査】座標は今回も確認できず。MapFanに個別ページなし、NAVITIMEはページ存在を確認できたがWebFetch403で座標未取得。フルIC（一旦停止型、上下線とも全方向・24時間利用可能）であることはNEXCO中日本プレスリリース等で確認済み。諏訪ICから北へ約6.0km、岡谷ICから南へ約7.8km、諏訪湖SA（上下線）に直結。2025年7月27日開通と日が浅く、地図サービス側の座標データ整備が追いついていない可能性が高い。数ヶ月後に再調査を推奨。"
             },
             { order: 19, displayName: "岡谷IC", googleName: "長野自動車道 岡谷インターチェンジ", lat: 36.086041, lng: 138.039685,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.086041, entranceLng: 138.039685, exitLat: 36.085700, exitLng: 138.039597,

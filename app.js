@@ -13962,11 +13962,55 @@ function filterEntranceCandidatesByRouteSection({
     return filteredCandidates;
 }
 
+// passedIcEntriesの元になるsampledPointsは出発地からの一般道区間も
+// 含めてルート全体をカバーしており、findNearestIcMasterEntryForRoutePoint
+// に距離上限が無いため、まだ高速に乗っていない地点でも機械的に最寄りIC
+// （例：「入谷」等、実際には使っていないIC）を拾ってしまう（実車確認で
+// 判明）。tollSections[0].entranceIc（TOLL TAG方式で確実に検出された、
+// 実際の入口IC）がpassedIcEntries内で最初に現れる位置を特定し、
+// それ以降のみを候補化の対象にするための起点特定関数。
+// 特定できない場合（tollSectionsが使えない、該当ICがpassedIcEntries内に
+// 見つからない等）は-1を返す。
+function findEntranceStartIndexInPassedIcEntries(
+    polylineAnalysis
+) {
+
+    const tollSections = polylineAnalysis?.tollSections;
+    const passedIcEntries = polylineAnalysis?.passedIcEntries;
+
+    if (
+        !Array.isArray(tollSections) ||
+        tollSections.length === 0 ||
+        !tollSections[0]?.entranceIc ||
+        !Array.isArray(passedIcEntries)
+    ) {
+        return -1;
+    }
+
+    const targetIdentity =
+        buildIcDefinitionIdentity(
+            tollSections[0].entranceIc
+        );
+
+    if (!targetIdentity) {
+        return -1;
+    }
+
+    return passedIcEntries.findIndex(entry =>
+        buildIcDefinitionIdentity(entry.exit) ===
+            targetIdentity
+    );
+}
+
 // 【方針変更】tollSectionsは有料区間の境界（入口・出口）しか拾えず、
 // 沿線上の中間IC（例：堤通〜三郷中央間の加平・八潮南）を候補にできないと
 // 実車確認で判明したため、passedIcEntries（analyzeHighwayRoutePolyline
 // が算出、Polyline全体を500m間隔でサンプリングし各点の最寄りICを求めた、
 // 連続重複除去済みの通過IC列）ベースの候補リストに置き換える。
+// ただし、passedIcEntriesの先頭側には出発地からの一般道走行中のノイズが
+// 含まれるため、findEntranceStartIndexInPassedIcEntriesで特定した
+// 「実際の入口IC以降」の部分配列のみを候補化する（開始位置が特定できない
+// 場合は空配列を返し、呼び出し元のフォールバックに委ねる）。
 // 同一polylineAnalysisに対して複数回呼んでも再計算しないよう、結果を
 // polylineAnalysis自身（_entranceCandidateIcsFromPassedEntries）に
 // キャッシュする。これにより、実際の候補選定（selectPolylineBased
@@ -13992,12 +14036,19 @@ function getOrBuildEntranceCandidateIcsFromPassedEntries(
             ._entranceCandidateIcsFromPassedEntries;
     }
 
+    const entranceStartIndex =
+        findEntranceStartIndexInPassedIcEntries(
+            polylineAnalysis
+        );
+
     const passedIcEntries =
         polylineAnalysis.passedIcEntries;
 
     const resolvedIcs =
+        entranceStartIndex >= 0 &&
         Array.isArray(passedIcEntries)
             ? passedIcEntries
+                .slice(entranceStartIndex)
                 .map(entry => entry.exit)
                 .filter(ic =>
                     ic &&

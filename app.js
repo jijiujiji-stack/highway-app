@@ -721,40 +721,24 @@ function detectTollSectionsFromSteps(highwayRoute) {
                     )
                     .join(" / ");
 
-            // 区間の首都高/NEXCO判定。entranceIc/exitIcのいずれかが
-            // 首都高であれば首都高区間とする。両方ともIC不明（未登録・
-            // 座標精度不足等）でICから判定できない場合のみ、区間内steps.
-            // navigationInstruction.instructionsに「首都高」という文言が
-            // 含まれるかどうかにフォールバックする。
-            const icBasedIsShuto =
-                isShutoIcForRouteAnalysis(
-                    entranceLabel.ic || {}
-                ) ||
-                isShutoIcForRouteAnalysis(
-                    exitLabel.ic || {}
-                );
+            // 【Step B】区間の道路カテゴリ判定。座標ベースのicBasedIsShuto
+            // （最寄りIC判定、距離無制限でアクアラインのような首都高接続部が
+            // 近い区間を誤判定していた）は廃止し、Googleの案内テキストのみで
+            // 判定するdetermineTollRoadCategory（Step Aで追加済み）に一本化。
+            // entranceLabel/exitLabel（IC名前解決）自体は変更していない。
+            const tollRoadCategory =
+                determineTollRoadCategory(combinedInstructions);
 
-            let isShutoSection = icBasedIsShuto;
-            let shutoDeterminedBy = "ic";
+            const tollCategoryId = tollRoadCategory.id;
 
-            if (
-                !icBasedIsShuto &&
-                !entranceLabel.ic &&
-                !exitLabel.ic
-            ) {
-                isShutoSection =
-                    combinedInstructions.includes(
-                        TOLL_SECTION_SHUTO_INSTRUCTION_TEXT
-                    );
-                shutoDeterminedBy = "instructionsFallback";
-            }
+            const isShutoSection = tollCategoryId === "shuto";
 
             return {
                 stepCount: run.steps.length,
                 totalDistanceMeters,
                 combinedInstructions,
                 isShutoSection,
-                shutoDeterminedBy,
+                tollCategoryId,
                 entranceLatLng:
                     extractLatLngFromRouteLocation(
                         firstStep.startLocation
@@ -958,15 +942,25 @@ function estimateMainHighwayTollFromTollSections(
     let nexcoToll = 0;
 
     tollTagResult.tollSections.forEach(section => {
-        const isShutoSection = section.isShutoSection;
+        const rule =
+            TOLL_ROAD_CATEGORY_RULES.find(r =>
+                r.id === section.tollCategoryId
+            ) ||
+            TOLL_ROAD_CATEGORY_RULES[
+                TOLL_ROAD_CATEGORY_RULES.length - 1
+            ];
 
-        if (isShutoSection) {
-            shutoToll += SHUTO_TOLL_ESTIMATE_YEN;
+        if (rule.id === "shuto") {
+            shutoToll += rule.fixedYen;
+        }
+        else if (rule.tollType === "fixed") {
+            nexcoToll += rule.fixedYen;
         }
         else {
             nexcoToll +=
                 Math.round(
-                    (section.totalDistanceMeters / 1000) * 24
+                    (section.totalDistanceMeters / 1000) *
+                    rule.perKmYen
                 );
         }
     });

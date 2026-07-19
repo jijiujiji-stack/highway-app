@@ -20130,6 +20130,72 @@ function formatExitV2TollBreakdownText(allHighwayToll, exitTollEstimate) {
     );
 }
 
+// getOrBuildEntranceIcSequenceWithUnresolvedMarkersが返す完全なシーケンス
+// （実ICと未確定インターチェンジマーカーが混在）を、実際にAPI呼び出しした
+// results（selectedExitsの走行順そのまま）と位置合わせし、候補カードの間に
+// 未確定マーカーを挟み込むための表示アイテム列を組み立てる。
+// resultsは、シーケンス先頭側の実ICエントリと順序・内容が一致する前提
+// （同じキャッシュ済みデータ・同じ順序から導出されているため）。前提が
+// 崩れている場合（件数不一致・シーケンス取得不可等）は安全側に倒し、
+// マーカーなしでresultsをそのままカード化したリストを返す
+// （フォールバック、従来通りの表示）。
+function buildEntranceCandidateDisplayItems(
+    results,
+    polylineAnalysis
+) {
+
+    const fallbackItems =
+        results.map(result => ({
+            type: "card",
+            result
+        }));
+
+    const sequence =
+        polylineAnalysis
+            ? getOrBuildEntranceIcSequenceWithUnresolvedMarkers(
+                polylineAnalysis
+            )
+            : [];
+
+    if (!Array.isArray(sequence) || sequence.length === 0) {
+        return fallbackItems;
+    }
+
+    const items = [];
+    let resultIndex = 0;
+
+    for (const entry of sequence) {
+
+        if (resultIndex >= results.length) {
+            break;
+        }
+
+        if (entry.isUnresolved === true) {
+            if (resultIndex > 0) {
+                items.push({
+                    type: "marker",
+                    label: entry.label
+                });
+            }
+
+            continue;
+        }
+
+        items.push({
+            type: "card",
+            result: results[resultIndex]
+        });
+
+        resultIndex++;
+    }
+
+    if (resultIndex !== results.length) {
+        return fallbackItems;
+    }
+
+    return items;
+}
+
 function displayEntranceIcComparisonV2Results(results) {
 
     const resultArea =
@@ -20152,12 +20218,24 @@ function displayEntranceIcComparisonV2Results(results) {
     // おすすめ判定は別処理のため、この表示順では並べ替えない。
     const roadOrderResults = results.slice();
 
+    const displayItems =
+        buildEntranceCandidateDisplayItems(
+            roadOrderResults,
+            lastHighwayRoutePolylineAnalysis
+        );
+
     resultArea.innerHTML =
         buildBestEntranceIcV2Html(results) +
         "<div class=\"v2-ic-result-list\">" +
-        roadOrderResults
-            .map(result =>
-                buildEntranceIcComparisonV2CardHtml(result)
+        displayItems
+            .map(item =>
+                item.type === "marker"
+                    ? "<div class=\"v2-ic-unresolved-marker\">" +
+                        escapeHtml(item.label) +
+                        "</div>"
+                    : buildEntranceIcComparisonV2CardHtml(
+                        item.result
+                    )
             )
             .join("") +
         "</div>";

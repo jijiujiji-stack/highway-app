@@ -18225,7 +18225,12 @@ async function searchEntranceIcComparisonV2(options = {}) {
                     lastTollEndIcGoogleName
                 );
 
-            const estimatedToll =
+            // 【Step 3】estimateComparisonCandidateToll（Step 2でTOLL TAG
+            // 方式に統一済み）はオブジェクト{amount, highwayToll, shutoToll}
+            // またはnull（TOLL TAG方式で判定できなかった場合）を返す。
+            // nullの場合は例外を投げ、直後のcatch節（既存の「取得失敗」
+            // 候補追加処理）にそのまま合流させる。
+            const tollResult =
                 await estimateComparisonCandidateToll({
                     startIc: exit,
                     endIc: endIc,
@@ -18237,35 +18242,15 @@ async function searchEntranceIcComparisonV2(options = {}) {
                         lastHighwayRoutePolylineAnalysis
                 });
 
-            // 料金目安の内訳表示用。距離計算をやり直さず、
-            // 既知のestimatedToll/shutoTollから他道路分を逆算する。
-            const shutoToll =
-                getShutoTollEstimateForIcPair(
-                    exit,
-                    endIc,
-                    (
-                        lastHighwayRoutePolylineAnalysis
-                            ?.hasTollSectionStepsData
-                            ? lastHighwayRoutePolylineAnalysis
-                                .tollEntryCount
-                            : lastHighwayRoutePolylineAnalysis
-                                ?.shutoEntryCount
-                    ) ??
-                        (
-                            (
-                                isShutoIc(exit) ||
-                                isShutoIc(endIc)
-                            )
-                                ? 1
-                                : 0
-                        )
+            if (tollResult === null) {
+                throw new Error(
+                    "TOLL TAG方式で料金を計算できませんでした"
                 );
+            }
 
-            const nonShutoToll =
-                Math.max(
-                    0,
-                    estimatedToll - shutoToll
-                );
+            const estimatedToll = tollResult.amount;
+            const shutoToll = tollResult.shutoToll;
+            const nonShutoToll = tollResult.highwayToll;
 
             const differenceFromAllLocal =
                 allLocalMinutes === null
@@ -18496,7 +18481,12 @@ async function searchExitIcComparisonV2(options = {}) {
                     lastTollStartIcGoogleName
                 );
 
-            const exitTollEstimate =
+            // 【Step 3】estimateComparisonCandidateToll（Step 2でTOLL TAG
+            // 方式に統一済み）はオブジェクト{amount, highwayToll, shutoToll}
+            // またはnull（TOLL TAG方式で判定できなかった場合）を返す。
+            // nullの場合は例外を投げ、直後のcatch節（既存の「取得失敗」
+            // 候補追加処理）にそのまま合流させる。
+            const exitTollResult =
                 await estimateComparisonCandidateToll({
                     startIc: startIc,
                     endIc: exit,
@@ -18507,6 +18497,14 @@ async function searchExitIcComparisonV2(options = {}) {
                     polylineAnalysis:
                         lastHighwayRoutePolylineAnalysis
                 });
+
+            if (exitTollResult === null) {
+                throw new Error(
+                    "TOLL TAG方式で料金を計算できませんでした"
+                );
+            }
+
+            const exitTollEstimate = exitTollResult.amount;
 
             const savedToll =
                 allHighwayToll === null

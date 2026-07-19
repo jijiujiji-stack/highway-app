@@ -13962,6 +13962,76 @@ function filterEntranceCandidatesByRouteSection({
     return filteredCandidates;
 }
 
+// 【方針変更】tollSectionsは有料区間の境界（入口・出口）しか拾えず、
+// 沿線上の中間IC（例：堤通〜三郷中央間の加平・八潮南）を候補にできないと
+// 実車確認で判明したため、passedIcEntries（analyzeHighwayRoutePolyline
+// が算出、Polyline全体を500m間隔でサンプリングし各点の最寄りICを求めた、
+// 連続重複除去済みの通過IC列）ベースの候補リストに置き換える。
+// 同一polylineAnalysisに対して複数回呼んでも再計算しないよう、結果を
+// polylineAnalysis自身（_entranceCandidateIcsFromPassedEntries）に
+// キャッシュする。これにより、実際の候補選定（selectPolylineBased
+// MultiIcCandidates）と検索条件パネルの「入口比較候補」表示
+// （buildPolylineComparisonSummaryHtml）が、常に同じ計算結果を参照する。
+// 件数制限（maxCount）はここでは行わない。呼び出し側でslice(0, maxCount)
+// すること（表示側は件数制限なしでそのまま使う）。
+function getOrBuildEntranceCandidateIcsFromPassedEntries(
+    polylineAnalysis
+) {
+
+    if (!polylineAnalysis) {
+        return [];
+    }
+
+    if (
+        Array.isArray(
+            polylineAnalysis
+                ._entranceCandidateIcsFromPassedEntries
+        )
+    ) {
+        return polylineAnalysis
+            ._entranceCandidateIcsFromPassedEntries;
+    }
+
+    const passedIcEntries =
+        polylineAnalysis.passedIcEntries;
+
+    const resolvedIcs =
+        Array.isArray(passedIcEntries)
+            ? passedIcEntries
+                .map(entry => entry.exit)
+                .filter(ic =>
+                    ic &&
+                    ic.entranceSelectable !== false
+                )
+            : [];
+
+    // entranceSelectable:falseの除外で、元は隣接していなかった同一ICが
+    // 連続してしまう場合があるため、直前のエントリとのみ比較する
+    // （passedIcEntries自体の重複除去と同じ「連続する同一ICのみ」という
+    // 考え方に揃える）。
+    const dedupedIcs = [];
+
+    resolvedIcs.forEach(ic => {
+        const previousIc =
+            dedupedIcs[dedupedIcs.length - 1] || null;
+
+        if (
+            previousIc &&
+            buildIcDefinitionIdentity(previousIc) ===
+                buildIcDefinitionIdentity(ic)
+        ) {
+            return;
+        }
+
+        dedupedIcs.push(ic);
+    });
+
+    polylineAnalysis._entranceCandidateIcsFromPassedEntries =
+        dedupedIcs;
+
+    return dedupedIcs;
+}
+
 function buildPolylineBasedComparisonIcCandidates(
     polylineAnalysis
 ) {
@@ -14603,12 +14673,14 @@ function selectPolylineBasedMultiIcCandidates({
             ? "NEXCO入口ICなし"
             : "NEXCO出口ICなし";
 
-    // 【Step 2】入口比較（mode==="entrance"）限定・出口比較には一切影響しない。
-    // TOLL TAG方式のtollSectionsが使える場合はこちらを優先する。
-    // 使えない場合（hasTollSectionStepsDataがfalse等）は、直後に続く
-    // 既存のbuildPolylineBasedComparisonIcCandidates／
-    // selectLimitedComparisonIcCandidatesベースの処理へそのままフォール
-    // バックする（既存ロジックは削除・変更していない）。
+    // 【Step 2・無効化】tollSectionsは有料区間の入口・出口の境界しか
+    // 拾えず、沿線上の中間IC（例：堤通〜三郷中央間の加平・八潮南）を
+    // 候補にできないと実車確認で判明したため、末尾の`&& false`で
+    // 無効化した（常にfalseになりこの分岐は使われない）。
+    // selectEntranceCandidatesFromTollSectionSequence・
+    // buildTollSectionBasedIcSequenceの関数定義自体は、将来の基準IC
+    // 特定等での再利用に備えて削除せず残している。
+    // 実際の候補選定は、以降のpassedIcEntriesベースの新方式に置き換えた。
     const hasTollSectionSequenceData =
         mode === "entrance" &&
         analysisKeyMatches &&
@@ -14616,7 +14688,8 @@ function selectPolylineBasedMultiIcCandidates({
             ?.hasTollSectionStepsData === true &&
         Array.isArray(
             lastHighwayRoutePolylineAnalysis?.tollSections
-        );
+        ) &&
+        false;
 
     const tollSectionEntranceCandidates =
         hasTollSectionSequenceData
@@ -14624,6 +14697,26 @@ function selectPolylineBasedMultiIcCandidates({
                 lastHighwayRoutePolylineAnalysis.tollSections,
                 apiCandidateLimit
             )
+            : [];
+
+    // passedIcEntriesベースの入口比較候補（沿線中間ICを含む）。
+    // getOrBuildEntranceCandidateIcsFromPassedEntriesはpolylineAnalysis
+    // 自身に結果をキャッシュするため、検索条件パネルの表示
+    // （buildPolylineComparisonSummaryHtml）が同じpolylineAnalysisに対して
+    // 呼んでも再計算されず、候補選定・表示の内容は常に一致する。
+    const hasPassedEntriesSequenceData =
+        mode === "entrance" &&
+        analysisKeyMatches &&
+        Array.isArray(
+            lastHighwayRoutePolylineAnalysis?.passedIcEntries
+        ) &&
+        lastHighwayRoutePolylineAnalysis.passedIcEntries.length > 0;
+
+    const passedEntriesEntranceCandidates =
+        hasPassedEntriesSequenceData
+            ? getOrBuildEntranceCandidateIcsFromPassedEntries(
+                lastHighwayRoutePolylineAnalysis
+            ).slice(0, apiCandidateLimit)
             : [];
 
     let polylineApiCandidates = [];
@@ -14656,6 +14749,13 @@ function selectPolylineBasedMultiIcCandidates({
     let fallbackReason = "なし";
 
     if (
+        hasPassedEntriesSequenceData &&
+        passedEntriesEntranceCandidates.length > 0
+    ) {
+        selectedExits = passedEntriesEntranceCandidates;
+        candidateSelectionLogic = "Polyline通過IC列（passedIcEntries）候補";
+    }
+    else if (
         hasTollSectionSequenceData &&
         tollSectionEntranceCandidates.length > 0
     ) {
@@ -21876,6 +21976,28 @@ function buildPolylineComparisonSummaryHtml(
             (formatAssumedRouteIcName(nexcoExit) || "なし")
         );
     }
+
+    // 入口比較候補は、getOrBuildEntranceCandidateIcsFromPassedEntriesの
+    // 結果（polylineAnalysis自身にキャッシュ済み）をそのまま参照する。
+    // selectPolylineBasedMultiIcCandidates側と同じ計算結果を使うため、
+    // 表示と実際の候補選定は常に一致する。件数制限はかけず全件表示する。
+    const entranceComparisonCandidateNames = [
+        ...new Set(
+            getOrBuildEntranceCandidateIcsFromPassedEntries(
+                polylineAnalysis
+            )
+                .map(ic => formatAssumedRouteIcName(ic))
+                .filter(Boolean)
+        )
+    ];
+
+    lines.push(
+        "入口比較候補：" +
+        (
+            entranceComparisonCandidateNames.join(" → ") ||
+            "なし"
+        )
+    );
 
     // 出口比較候補は、比較候補選定ロジック自体（旧shutoEntranceIc/
     // nexcoEntranceIc等を参照する設計のまま）が今回のスコープ外のため、

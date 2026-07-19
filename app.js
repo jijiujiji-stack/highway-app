@@ -1541,7 +1541,6 @@ function updateDashboardAssumedRouteForComparisonMode() {
     }
 
     dashboardAssumedRouteValue.innerHTML =
-        "<span class=\"dashboard-assumed-route-label\">参考：高速利用ルート</span>" +
         buildTollUsageSummaryHtml(
             lastHighwayRoutePolylineAnalysis,
             lastProbablyNoTollRouteByPolylineComparison

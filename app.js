@@ -1405,6 +1405,34 @@ function resolveTollSectionNexcoRoadLabel(section) {
         : "NEXCO";
 }
 
+// 区間の道路名ラベルを決定する。tollCategoryId（Step Bで追加）が
+// "shuto"でも汎用"nexco"でもない個別カテゴリ（例："aqualine"）の場合は、
+// TOLL_ROAD_CATEGORY_RULESのlabel（「アクアライン」）を優先する。
+// それ以外（汎用NEXCO＝東名・中央道等）は、既存のresolveTollSection
+// NexcoRoadLabel（IC経由の実際の道路名解決）をそのまま使う。
+// resolveTollSectionNexcoRoadLabel本体は変更していない。
+function resolveTollSectionRoadLabel(section) {
+    if (section.isShutoSection) {
+        return "首都高";
+    }
+
+    if (
+        section.tollCategoryId &&
+        section.tollCategoryId !== "nexco"
+    ) {
+        const rule =
+            TOLL_ROAD_CATEGORY_RULES.find(r =>
+                r.id === section.tollCategoryId
+            );
+
+        if (rule) {
+            return rule.label;
+        }
+    }
+
+    return resolveTollSectionNexcoRoadLabel(section);
+}
+
 // buildAssumedRouteHtml用：TOLL TAG方式（tollSections）から表示HTMLを
 // 組み立てる。tollSectionsは既にルート走行順（stepsの並び順）に
 // 揃っているため、既存の座標ベース方式のようなrouteDistanceMetersに
@@ -1420,11 +1448,7 @@ function buildAssumedRouteHtmlFromTollSections(tollSections) {
     return (tollSections || [])
         .map(section => {
             const pillLabel =
-                section.isShutoSection
-                    ? "首都高"
-                    : resolveTollSectionNexcoRoadLabel(
-                        section
-                    );
+                resolveTollSectionRoadLabel(section);
 
             const entranceText =
                 section.entranceIc

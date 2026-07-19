@@ -9154,8 +9154,15 @@ async function getHighwayRouteForTollEstimate(
                 "X-Goog-Api-Key":
                     CONFIG.GOOGLE_MAPS_API_KEY,
 
+                // 【Step 1】TOLL TAG方式（Step 2以降）の準備のため、既存
+                // フィールドに加えてsteps関連フィールドを追加取得する。
+                // 呼び出し回数・送信先は変更していない。
                 "X-Goog-FieldMask":
-                    "routes.distanceMeters"
+                    "routes.distanceMeters," +
+                    "routes.legs.steps.navigationInstruction," +
+                    "routes.legs.steps.distanceMeters," +
+                    "routes.legs.steps.startLocation," +
+                    "routes.legs.steps.endLocation"
             },
 
             body: JSON.stringify({
@@ -17226,8 +17233,15 @@ async function getHighwayRouteForMultiExitComparison(
                 "X-Goog-Api-Key":
                     CONFIG.GOOGLE_MAPS_API_KEY,
 
+                // 【Step 1】TOLL TAG方式（Step 2以降）の準備のため、既存
+                // フィールドに加えてsteps関連フィールドを追加取得する。
+                // 呼び出し回数・送信先は変更していない。
                 "X-Goog-FieldMask":
-                    "routes.duration,routes.distanceMeters"
+                    "routes.duration,routes.distanceMeters," +
+                    "routes.legs.steps.navigationInstruction," +
+                    "routes.legs.steps.distanceMeters," +
+                    "routes.legs.steps.startLocation," +
+                    "routes.legs.steps.endLocation"
             },
 
             body: JSON.stringify({

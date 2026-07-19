@@ -14003,101 +14003,6 @@ function findEntranceStartIndexInPassedIcEntries(
     );
 }
 
-// findEntranceStartIndexInPassedIcEntriesで特定した「実際の入口IC以降」の
-// passedIcEntriesを走査し、実ICエントリと「未確定インターチェンジ」
-// マーカーが混在した完全なシーケンスを組み立てる。isWithinThreshold:false
-// （最寄りICとの距離がIC_MASTER_NEAREST_THRESHOLD_METERSを超える、実際には
-// 未確定の可能性が高い地点）は{isUnresolved:true, label, distanceMeters}の
-// マーカーとして扱い、連続するマーカーは1件にまとめる。それ以外
-// （isWithinThresholdがtrueまたは未定義）はentranceSelectable:falseの
-// ものを除いて{isUnresolved:false, ic}として追加し、直前と同一IC
-// （buildIcDefinitionIdentityで識別）であれば重複除去する。
-// getOrBuildEntranceCandidateIcsFromPassedEntries（実際の候補選定用、
-// マーカーを含まないICのみの配列）は、この関数の結果からisUnresolved:false
-// のみを抽出して導出する（二重計算を避けるための共通の基礎データ）。
-// 同一polylineAnalysisに対して複数回呼んでも再計算しないよう、結果を
-// polylineAnalysis自身（_entranceIcSequenceWithUnresolvedMarkers）に
-// キャッシュする。
-function getOrBuildEntranceIcSequenceWithUnresolvedMarkers(
-    polylineAnalysis
-) {
-
-    if (!polylineAnalysis) {
-        return [];
-    }
-
-    if (
-        Array.isArray(
-            polylineAnalysis
-                ._entranceIcSequenceWithUnresolvedMarkers
-        )
-    ) {
-        return polylineAnalysis
-            ._entranceIcSequenceWithUnresolvedMarkers;
-    }
-
-    const entranceStartIndex =
-        findEntranceStartIndexInPassedIcEntries(
-            polylineAnalysis
-        );
-
-    const passedIcEntries =
-        polylineAnalysis.passedIcEntries;
-
-    const sequence = [];
-
-    if (
-        entranceStartIndex >= 0 &&
-        Array.isArray(passedIcEntries)
-    ) {
-        passedIcEntries
-            .slice(entranceStartIndex)
-            .forEach(entry => {
-
-                const previous =
-                    sequence[sequence.length - 1] || null;
-
-                if (entry.isWithinThreshold === false) {
-                    if (previous?.isUnresolved === true) {
-                        return;
-                    }
-
-                    sequence.push({
-                        isUnresolved: true,
-                        label: "未確定インターチェンジあり",
-                        distanceMeters: entry.distanceMeters
-                    });
-
-                    return;
-                }
-
-                const ic = entry.exit;
-
-                if (!ic || ic.entranceSelectable === false) {
-                    return;
-                }
-
-                if (
-                    previous?.isUnresolved === false &&
-                    buildIcDefinitionIdentity(previous.ic) ===
-                        buildIcDefinitionIdentity(ic)
-                ) {
-                    return;
-                }
-
-                sequence.push({
-                    isUnresolved: false,
-                    ic
-                });
-            });
-    }
-
-    polylineAnalysis._entranceIcSequenceWithUnresolvedMarkers =
-        sequence;
-
-    return sequence;
-}
-
 // 【方針変更】tollSectionsは有料区間の境界（入口・出口）しか拾えず、
 // 沿線上の中間IC（例：堤通〜三郷中央間の加平・八潮南）を候補にできないと
 // 実車確認で判明したため、passedIcEntries（analyzeHighwayRoutePolyline
@@ -14107,10 +14012,6 @@ function getOrBuildEntranceIcSequenceWithUnresolvedMarkers(
 // 含まれるため、findEntranceStartIndexInPassedIcEntriesで特定した
 // 「実際の入口IC以降」の部分配列のみを候補化する（開始位置が特定できない
 // 場合は空配列を返し、呼び出し元のフォールバックに委ねる）。
-// 最寄りICとの距離がIC_MASTER_NEAREST_THRESHOLD_METERSを超える
-// （＝isWithinThreshold:false、実際には未確定の可能性が高い）地点は、
-// getOrBuildEntranceIcSequenceWithUnresolvedMarkers側で「未確定
-// インターチェンジ」マーカーとして扱われ、実ICとしては候補化されない。
 // 同一polylineAnalysisに対して複数回呼んでも再計算しないよう、結果を
 // polylineAnalysis自身（_entranceCandidateIcsFromPassedEntries）に
 // キャッシュする。これにより、実際の候補選定（selectPolylineBased
@@ -14136,12 +14037,46 @@ function getOrBuildEntranceCandidateIcsFromPassedEntries(
             ._entranceCandidateIcsFromPassedEntries;
     }
 
-    const dedupedIcs =
-        getOrBuildEntranceIcSequenceWithUnresolvedMarkers(
+    const entranceStartIndex =
+        findEntranceStartIndexInPassedIcEntries(
             polylineAnalysis
-        )
-            .filter(entry => entry.isUnresolved === false)
-            .map(entry => entry.ic);
+        );
+
+    const passedIcEntries =
+        polylineAnalysis.passedIcEntries;
+
+    const resolvedIcs =
+        entranceStartIndex >= 0 &&
+        Array.isArray(passedIcEntries)
+            ? passedIcEntries
+                .slice(entranceStartIndex)
+                .map(entry => entry.exit)
+                .filter(ic =>
+                    ic &&
+                    ic.entranceSelectable !== false
+                )
+            : [];
+
+    // entranceSelectable:falseの除外で、元は隣接していなかった同一ICが
+    // 連続してしまう場合があるため、直前のエントリとのみ比較する
+    // （passedIcEntries自体の重複除去と同じ「連続する同一ICのみ」という
+    // 考え方に揃える）。
+    const dedupedIcs = [];
+
+    resolvedIcs.forEach(ic => {
+        const previousIc =
+            dedupedIcs[dedupedIcs.length - 1] || null;
+
+        if (
+            previousIc &&
+            buildIcDefinitionIdentity(previousIc) ===
+                buildIcDefinitionIdentity(ic)
+        ) {
+            return;
+        }
+
+        dedupedIcs.push(ic);
+    });
 
     polylineAnalysis._entranceCandidateIcsFromPassedEntries =
         dedupedIcs;
@@ -20164,72 +20099,6 @@ function formatExitV2TollBreakdownText(allHighwayToll, exitTollEstimate) {
     );
 }
 
-// getOrBuildEntranceIcSequenceWithUnresolvedMarkersが返す完全なシーケンス
-// （実ICと未確定インターチェンジマーカーが混在）を、実際にAPI呼び出しした
-// results（selectedExitsの走行順そのまま）と位置合わせし、候補カードの間に
-// 未確定マーカーを挟み込むための表示アイテム列を組み立てる。
-// resultsは、シーケンス先頭側の実ICエントリと順序・内容が一致する前提
-// （同じキャッシュ済みデータ・同じ順序から導出されているため）。前提が
-// 崩れている場合（件数不一致・シーケンス取得不可等）は安全側に倒し、
-// マーカーなしでresultsをそのままカード化したリストを返す
-// （フォールバック、従来通りの表示）。
-function buildEntranceCandidateDisplayItems(
-    results,
-    polylineAnalysis
-) {
-
-    const fallbackItems =
-        results.map(result => ({
-            type: "card",
-            result
-        }));
-
-    const sequence =
-        polylineAnalysis
-            ? getOrBuildEntranceIcSequenceWithUnresolvedMarkers(
-                polylineAnalysis
-            )
-            : [];
-
-    if (!Array.isArray(sequence) || sequence.length === 0) {
-        return fallbackItems;
-    }
-
-    const items = [];
-    let resultIndex = 0;
-
-    for (const entry of sequence) {
-
-        if (resultIndex >= results.length) {
-            break;
-        }
-
-        if (entry.isUnresolved === true) {
-            if (resultIndex > 0) {
-                items.push({
-                    type: "marker",
-                    label: entry.label
-                });
-            }
-
-            continue;
-        }
-
-        items.push({
-            type: "card",
-            result: results[resultIndex]
-        });
-
-        resultIndex++;
-    }
-
-    if (resultIndex !== results.length) {
-        return fallbackItems;
-    }
-
-    return items;
-}
-
 function displayEntranceIcComparisonV2Results(results) {
 
     const resultArea =
@@ -20252,24 +20121,12 @@ function displayEntranceIcComparisonV2Results(results) {
     // おすすめ判定は別処理のため、この表示順では並べ替えない。
     const roadOrderResults = results.slice();
 
-    const displayItems =
-        buildEntranceCandidateDisplayItems(
-            roadOrderResults,
-            lastHighwayRoutePolylineAnalysis
-        );
-
     resultArea.innerHTML =
         buildBestEntranceIcV2Html(results) +
         "<div class=\"v2-ic-result-list\">" +
-        displayItems
-            .map(item =>
-                item.type === "marker"
-                    ? "<div class=\"v2-ic-unresolved-marker\">" +
-                        escapeHtml(item.label) +
-                        "</div>"
-                    : buildEntranceIcComparisonV2CardHtml(
-                        item.result
-                    )
+        roadOrderResults
+            .map(result =>
+                buildEntranceIcComparisonV2CardHtml(result)
             )
             .join("") +
         "</div>";
@@ -22194,56 +22051,27 @@ function buildPolylineComparisonSummaryHtml(
         );
     }
 
-    // 入口比較候補は、getOrBuildEntranceIcSequenceWithUnresolvedMarkersの
+    // 入口比較候補は、getOrBuildEntranceCandidateIcsFromPassedEntriesの
     // 結果（polylineAnalysis自身にキャッシュ済み）をそのまま参照する。
     // selectPolylineBasedMultiIcCandidates側と同じ計算結果を使うため、
     // 表示と実際の候補選定は常に一致する。件数制限はかけず全件表示する。
-    // 未確定マーカーは黄色のインラインspanとして生HTMLのまま挿入する必要が
-    // あり、他の行のようにlinesへpushして末尾で一括escapeHtmlする対象には
-    // できない（一括escapeHtmlするとspanタグ自体がエスケープされてしまう）。
-    // そのため、この行だけIC名等の動的な値のみを個別にescapeHtmlした上で、
-    // linesの前半（ここまでの行）と後半（出口比較候補等）の間に、
-    // 生HTMLのまま差し込む。
-    const linesBeforeEntranceCandidatesCount = lines.length;
-
-    const seenEntranceCandidateNames = new Set();
-
-    const entranceComparisonCandidateParts =
-        getOrBuildEntranceIcSequenceWithUnresolvedMarkers(
-            polylineAnalysis
+    const entranceComparisonCandidateNames = [
+        ...new Set(
+            getOrBuildEntranceCandidateIcsFromPassedEntries(
+                polylineAnalysis
+            )
+                .map(ic => formatAssumedRouteIcName(ic))
+                .filter(Boolean)
         )
-            .map(entry => {
-                if (entry.isUnresolved === true) {
-                    return (
-                        "<span style=\"color: var(--color-warning);\">" +
-                        escapeHtml(entry.label) +
-                        "</span>"
-                    );
-                }
+    ];
 
-                const name =
-                    formatAssumedRouteIcName(entry.ic);
-
-                if (
-                    !name ||
-                    seenEntranceCandidateNames.has(name)
-                ) {
-                    return "";
-                }
-
-                seenEntranceCandidateNames.add(name);
-
-                return escapeHtml(name);
-            })
-            .filter(Boolean);
-
-    const entranceComparisonCandidateHtml =
-        "<div>入口比較候補：" +
+    lines.push(
+        "入口比較候補：" +
         (
-            entranceComparisonCandidateParts.join(" → ") ||
+            entranceComparisonCandidateNames.join(" → ") ||
             "なし"
-        ) +
-        "</div>";
+        )
+    );
 
     // 出口比較候補は、比較候補選定ロジック自体（旧shutoEntranceIc/
     // nexcoEntranceIc等を参照する設計のまま）が今回のスコープ外のため、
@@ -22279,19 +22107,11 @@ function buildPolylineComparisonSummaryHtml(
         )
     );
 
-    return [
-        ...lines
-            .slice(0, linesBeforeEntranceCandidatesCount)
-            .map(line =>
-                "<div>" + escapeHtml(line) + "</div>"
-            ),
-        entranceComparisonCandidateHtml,
-        ...lines
-            .slice(linesBeforeEntranceCandidatesCount)
-            .map(line =>
-                "<div>" + escapeHtml(line) + "</div>"
-            )
-    ].join("");
+    return lines
+        .map(line =>
+            "<div>" + escapeHtml(line) + "</div>"
+        )
+        .join("");
 }
 
 function updateSearchConditionPolylineAnalysis(

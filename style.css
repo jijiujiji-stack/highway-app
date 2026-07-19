@@ -1547,13 +1547,6 @@ details#searchPanel .origin-row input {
     line-height: 1.6;
 }
 
-.v2-ic-unresolved-marker {
-    font-size: 13px;
-    color: var(--color-warning);
-    text-align: center;
-    padding: 4px 0;
-}
-
 .v2-ic-no-saving {
     opacity: 0.6;
 }

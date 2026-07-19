@@ -832,6 +832,58 @@ function buildTollSectionBasedIcSequence(tollSections) {
     return sequence;
 }
 
+// 【Step 2】buildTollSectionBasedIcSequenceの結果から、入口比較用の
+// 候補IC配列を組み立てる。isUnresolved:true（IC不明区間）のエントリは
+// ここでは除外する（Step 3で別途、表示専用の挟み込み行として扱う予定）。
+// entranceSelectable:falseのICは、CLAUDE.mdのルール通り候補に含めない。
+// 返り値はsearchEntranceIcComparisonV2がそのまま消費できる、
+// {googleName, displayName, roadType, ...} を持つICオブジェクトの配列
+// （既存のselectedExitsと同じ形）。
+function selectEntranceCandidatesFromTollSectionSequence(
+    tollSections,
+    maxCount
+) {
+
+    if (!Array.isArray(tollSections) || maxCount <= 0) {
+        return [];
+    }
+
+    const sequence =
+        buildTollSectionBasedIcSequence(tollSections);
+
+    const resolvedIcs =
+        sequence
+            .filter(entry => entry.isUnresolved === false)
+            .map(entry => entry.ic)
+            .filter(ic =>
+                ic &&
+                ic.entranceSelectable !== false
+            );
+
+    // entranceSelectable:falseの除外でunresolvedIcs間の間隔が詰まり、
+    // 元は隣接していなかった同一ICが連続してしまう場合があるため、
+    // 直前のエントリとのみ比較する（buildTollSectionBasedIcSequence側の
+    // 重複除去と同じ「連続する同一ICのみ」という考え方に揃える）。
+    const dedupedIcs = [];
+
+    resolvedIcs.forEach(ic => {
+        const previousIc =
+            dedupedIcs[dedupedIcs.length - 1] || null;
+
+        if (
+            previousIc &&
+            buildIcDefinitionIdentity(previousIc) ===
+                buildIcDefinitionIdentity(ic)
+        ) {
+            return;
+        }
+
+        dedupedIcs.push(ic);
+    });
+
+    return dedupedIcs.slice(0, maxCount);
+}
+
 // tollSections（「有料区間」タグベース）を使った料金計算。
 // 区間ごとの首都高/NEXCO判定（section.isShutoSection）はdetectToll
 // SectionsFromSteps側で既に計算済みのため、ここではその値をそのまま
@@ -14551,6 +14603,29 @@ function selectPolylineBasedMultiIcCandidates({
             ? "NEXCO入口ICなし"
             : "NEXCO出口ICなし";
 
+    // 【Step 2】入口比較（mode==="entrance"）限定・出口比較には一切影響しない。
+    // TOLL TAG方式のtollSectionsが使える場合はこちらを優先する。
+    // 使えない場合（hasTollSectionStepsDataがfalse等）は、直後に続く
+    // 既存のbuildPolylineBasedComparisonIcCandidates／
+    // selectLimitedComparisonIcCandidatesベースの処理へそのままフォール
+    // バックする（既存ロジックは削除・変更していない）。
+    const hasTollSectionSequenceData =
+        mode === "entrance" &&
+        analysisKeyMatches &&
+        lastHighwayRoutePolylineAnalysis
+            ?.hasTollSectionStepsData === true &&
+        Array.isArray(
+            lastHighwayRoutePolylineAnalysis?.tollSections
+        );
+
+    const tollSectionEntranceCandidates =
+        hasTollSectionSequenceData
+            ? selectEntranceCandidatesFromTollSectionSequence(
+                lastHighwayRoutePolylineAnalysis.tollSections,
+                apiCandidateLimit
+            )
+            : [];
+
     let polylineApiCandidates = [];
     let polylineCandidatePreview = null;
 
@@ -14580,7 +14655,14 @@ function selectPolylineBasedMultiIcCandidates({
     let candidateSelectionLogic = "候補なし";
     let fallbackReason = "なし";
 
-    if (polylineApiCandidates.length > 0) {
+    if (
+        hasTollSectionSequenceData &&
+        tollSectionEntranceCandidates.length > 0
+    ) {
+        selectedExits = tollSectionEntranceCandidates;
+        candidateSelectionLogic = "TOLL TAG通過ICシーケンス候補";
+    }
+    else if (polylineApiCandidates.length > 0) {
         selectedExits =
             polylineApiCandidates.map(candidate =>
                 candidate.exit

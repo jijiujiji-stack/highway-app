@@ -11598,6 +11598,103 @@ function estimateTollFromTollCategorySequence(sequence) {
     };
 }
 
+// 検出漏れ判定用のしきい値（メートル）。Step 2以降のIC境界検出処理と
+// 揃えた桁感（IC_MASTER_NEAREST_THRESHOLD_METERSと同じ2000m）を採用。
+// IC境界ベースの新パイプライン（Step 7）向け。
+const ROUTE_DISTANCE_GAP_THRESHOLD_METERS = 2000;
+
+// buildTollCategorySequenceWithDistance（Step 6、本体は変更していない）
+// の結果に、ルート末尾側の検出漏れ（登録済みICが無く新方式で検出でき
+// なかった区間）を明示的なエントリとして追加する。IC境界ベースの新
+// パイプライン（Step 7）向けの関数。
+//
+// 区間列の最後の要素の終端距離（最後に検出されたICのrouteDistanceMeters）
+// と、totalRouteDistanceMeters（ルート全体の総距離）を比較し、その差が
+// ROUTE_DISTANCE_GAP_THRESHOLD_METERS以上ある場合、tollCategoryId:
+// "nexco"（汎用NEXCO扱い、距離比例24円/km）・isGapEstimate:trueの
+// エントリを区間列末尾に追加する。「本当は何の道路か分からないが、有料
+// 区間である以上、最低限の距離比例料金は計上しておく」という考え方。
+// 現時点では既存のどの処理からも未参照。
+function buildTollCategorySequenceWithGapDetection(
+    icsWithRouteDistance,
+    totalRouteDistanceMeters
+) {
+
+    const sequence =
+        buildTollCategorySequenceWithDistance(
+            icsWithRouteDistance
+        );
+
+    const items = icsWithRouteDistance || [];
+    const lastItem = items[items.length - 1];
+
+    const lastDetectedRouteDistanceMeters =
+        lastItem ? lastItem.routeDistanceMeters : 0;
+
+    const tailGapDistanceMeters =
+        (totalRouteDistanceMeters || 0) -
+        lastDetectedRouteDistanceMeters;
+
+    if (
+        tailGapDistanceMeters >=
+        ROUTE_DISTANCE_GAP_THRESHOLD_METERS
+    ) {
+        sequence.push({
+            tollCategoryId: "nexco",
+            icCount: 0,
+            distanceMeters: tailGapDistanceMeters,
+            isGapEstimate: true,
+            gapStartRouteDistanceMeters:
+                lastDetectedRouteDistanceMeters,
+            gapEndRouteDistanceMeters:
+                totalRouteDistanceMeters
+        });
+    }
+
+    return sequence;
+}
+
+// 走行距離付き走行順ICリスト（attachRouteDistanceToOrderedIcsの結果）
+// の中で、隣り合うIC同士のrouteDistanceMetersの差がthresholdMeters以上
+// 離れている箇所（＝中間の検出漏れ）を診断用に一覧化する。IC境界ベースの
+// 新パイプライン（Step 7）向けの関数。料金計算には使わない、あくまで
+// 診断用の関数。現時点では既存のどの処理からも未参照。
+function findDetectionGapsInOrderedIcs(
+    icsWithRouteDistance,
+    thresholdMeters = ROUTE_DISTANCE_GAP_THRESHOLD_METERS
+) {
+
+    const items = icsWithRouteDistance || [];
+    const gaps = [];
+
+    for (
+        let index = 1;
+        index < items.length;
+        index++
+    ) {
+        const previousItem = items[index - 1];
+        const currentItem = items[index];
+
+        const gapDistanceMeters =
+            currentItem.routeDistanceMeters -
+            previousItem.routeDistanceMeters;
+
+        if (gapDistanceMeters >= thresholdMeters) {
+            gaps.push({
+                afterIcName: previousItem.ic.displayName,
+                beforeIcName: currentItem.ic.displayName,
+                gapStartRouteDistanceMeters:
+                    previousItem.routeDistanceMeters,
+                gapEndRouteDistanceMeters:
+                    currentItem.routeDistanceMeters,
+                gapDistanceMeters
+            });
+        }
+    }
+
+    return gaps;
+}
+
 function decodeRoutesEncodedPolyline(encodedPolyline) {
 
     if (!encodedPolyline) {
@@ -12724,6 +12821,81 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             newPipelineTollEstimate.shutoToll.toLocaleString() +
             "円 + 他道路：約" +
             newPipelineTollEstimate.otherToll.toLocaleString() +
+            "円）"
+        );
+
+        // 【検証用・一時的】検出漏れ（登録済みICが無く新方式で検出でき
+        // なかった区間）の可視化。カバー率・中間の検出漏れ一覧・検出漏れ
+        // 分を含めた再計算額を出す。実際の料金計算・表示ロジックには
+        // 一切接続していない。
+        const totalRouteDistanceMeters =
+            cumulativeDistances[
+                cumulativeDistances.length - 1
+            ] || 0;
+
+        const detectedDistanceMeters =
+            tollCategorySequence.reduce(
+                (sum, section) =>
+                    sum + section.distanceMeters,
+                0
+            );
+
+        const coverageRatioPercent =
+            totalRouteDistanceMeters > 0
+                ? Math.round(
+                    (
+                        detectedDistanceMeters /
+                        totalRouteDistanceMeters
+                    ) * 1000
+                ) / 10
+                : 0;
+
+        console.log(
+            "カバー率：" + coverageRatioPercent +
+            "%（検出" +
+            (Math.round(detectedDistanceMeters / 100) / 10) +
+            "km / 総距離" +
+            (Math.round(totalRouteDistanceMeters / 100) / 10) +
+            "km）"
+        );
+
+        const detectionGaps =
+            findDetectionGapsInOrderedIcs(
+                icsWithRouteDistance
+            );
+
+        console.table(
+            detectionGaps.map(gap => ({
+                afterIcName: gap.afterIcName,
+                beforeIcName: gap.beforeIcName,
+                gapDistanceKm:
+                    Math.round(
+                        gap.gapDistanceMeters / 100
+                    ) / 10
+            }))
+        );
+
+        const tollCategorySequenceWithGap =
+            buildTollCategorySequenceWithGapDetection(
+                icsWithRouteDistance,
+                totalRouteDistanceMeters
+            );
+
+        const newPipelineTollEstimateWithGap =
+            estimateTollFromTollCategorySequence(
+                tollCategorySequenceWithGap
+            );
+
+        console.log(
+            "新方式ETC概算（検出漏れ考慮）：約" +
+            newPipelineTollEstimateWithGap.amount
+                .toLocaleString() +
+            "円（首都高：約" +
+            newPipelineTollEstimateWithGap.shutoToll
+                .toLocaleString() +
+            "円 + 他道路：約" +
+            newPipelineTollEstimateWithGap.otherToll
+                .toLocaleString() +
             "円）"
         );
 

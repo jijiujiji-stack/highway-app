@@ -10960,6 +10960,138 @@ function calculateDistance(
     return R * c;
 }
 
+// 点（pointLat/pointLng）から線分（segStartLat/segStartLng～segEndLat/
+// segEndLng）までの最短距離をメートル単位で返す。IC境界ベースの新パイプ
+// ライン（Step 1）向けの汎用関数。現時点では既存のどの処理からも
+// 未参照。
+//
+// 緯度経度を、線分の中間緯度を基準にメートル換算した平面座標へ変換した
+// 上で、通常の点と線分の幾何学的距離計算を行う近似方式。calculateDistance
+// （Haversine公式、2点間の球面距離）ほどの厳密な精度は不要なため、
+// 数百m～数十km程度の範囲であれば実用上問題ない精度が得られる。
+function calculateDistanceToLineSegment(
+    pointLat,
+    pointLng,
+    segStartLat,
+    segStartLng,
+    segEndLat,
+    segEndLng
+) {
+
+    const METERS_PER_DEGREE_LAT = 111320;
+
+    const referenceLat =
+        (segStartLat + segEndLat) / 2;
+
+    const metersPerDegreeLng =
+        METERS_PER_DEGREE_LAT *
+        Math.cos(referenceLat * Math.PI / 180);
+
+    const toPlaneX = lng =>
+        lng * metersPerDegreeLng;
+
+    const toPlaneY = lat =>
+        lat * METERS_PER_DEGREE_LAT;
+
+    const pointX = toPlaneX(pointLng);
+    const pointY = toPlaneY(pointLat);
+
+    const segStartX = toPlaneX(segStartLng);
+    const segStartY = toPlaneY(segStartLat);
+
+    const segEndX = toPlaneX(segEndLng);
+    const segEndY = toPlaneY(segEndLat);
+
+    const segmentVectorX = segEndX - segStartX;
+    const segmentVectorY = segEndY - segStartY;
+
+    const segmentLengthSquared =
+        segmentVectorX * segmentVectorX +
+        segmentVectorY * segmentVectorY;
+
+    // 線分の始点と終点が同一地点（長さ0）の場合は、始点までの距離を返す。
+    if (segmentLengthSquared === 0) {
+        return Math.sqrt(
+            (pointX - segStartX) * (pointX - segStartX) +
+            (pointY - segStartY) * (pointY - segStartY)
+        );
+    }
+
+    const pointVectorX = pointX - segStartX;
+    const pointVectorY = pointY - segStartY;
+
+    const rawProjectionRatio =
+        (
+            pointVectorX * segmentVectorX +
+            pointVectorY * segmentVectorY
+        ) / segmentLengthSquared;
+
+    // 垂線の足が線分の範囲外に出る場合は、最も近い端点（0または1）に
+    // クランプする。
+    const projectionRatio =
+        Math.max(0, Math.min(1, rawProjectionRatio));
+
+    const closestX =
+        segStartX + projectionRatio * segmentVectorX;
+    const closestY =
+        segStartY + projectionRatio * segmentVectorY;
+
+    const differenceX = pointX - closestX;
+    const differenceY = pointY - closestY;
+
+    return Math.sqrt(
+        differenceX * differenceX +
+        differenceY * differenceY
+    );
+}
+
+// あるIC（icLat/icLng）から、Polyline上の点列（sampledPoints、既存の
+// 500m間隔サンプル点列を線分の骨格として使う想定）までの最短距離を
+// メートル単位で返す。sampledPointsの連続する2点ずつを線分とみなし、
+// 各線分についてcalculateDistanceToLineSegmentで距離を求め、その最小値
+// を返す。IC境界ベースの新パイプライン（Step 1）向けの関数。現時点では
+// 既存のどの処理からも未参照。
+function findShortestDistanceFromIcToPolyline(
+    icLat,
+    icLng,
+    sampledPoints
+) {
+
+    if (
+        !Array.isArray(sampledPoints) ||
+        sampledPoints.length < 2
+    ) {
+        return null;
+    }
+
+    let shortestDistanceMeters = Infinity;
+
+    for (
+        let index = 1;
+        index < sampledPoints.length;
+        index++
+    ) {
+        const segmentStart = sampledPoints[index - 1];
+        const segmentEnd = sampledPoints[index];
+
+        const distanceMeters =
+            calculateDistanceToLineSegment(
+                icLat,
+                icLng,
+                segmentStart.lat,
+                segmentStart.lng,
+                segmentEnd.lat,
+                segmentEnd.lng
+            );
+
+        if (distanceMeters < shortestDistanceMeters) {
+            shortestDistanceMeters = distanceMeters;
+        }
+    }
+
+    return shortestDistanceMeters;
+}
+
 function decodeRoutesEncodedPolyline(encodedPolyline) {
 
     if (!encodedPolyline) {

@@ -11385,6 +11385,80 @@ function buildRoadCategorySequenceFromOrderedIcs(orderedIcs) {
     return sequence;
 }
 
+// sampledPoints（Polyline上の点列）を受け取り、各点が出発地（先頭点）
+// から何メートルの位置にあるかを表す累積距離配列を返す。IC境界ベースの
+// 新パイプライン（Step 5）向けの関数。隣り合う2点間の距離計算には既存の
+// calculateDistance（Haversine公式）をそのまま使う。現時点では既存の
+// どの処理からも未参照。
+//
+// 返り値はsampledPointsと同じ長さの数値配列。cumulativeDistances[0]は
+// 常に0、cumulativeDistances[i]はsampledPoints[0]からsampledPoints[i]
+// までの実距離の合計（メートル）。
+function buildCumulativeDistanceArray(sampledPoints) {
+
+    if (!Array.isArray(sampledPoints)) {
+        return [];
+    }
+
+    const cumulativeDistances = [];
+    let totalDistanceMeters = 0;
+
+    sampledPoints.forEach((point, index) => {
+        if (index === 0) {
+            cumulativeDistances.push(0);
+            return;
+        }
+
+        const previousPoint = sampledPoints[index - 1];
+
+        totalDistanceMeters +=
+            calculateDistance(
+                previousPoint.lat,
+                previousPoint.lng,
+                point.lat,
+                point.lng
+            );
+
+        cumulativeDistances.push(totalDistanceMeters);
+    });
+
+    return cumulativeDistances;
+}
+
+// 走行順ICリスト（detectIcsOrderedAlongPolylineの結果、各要素が
+// segmentIndex・projectionRatioを持つ）と、累積距離配列
+// （buildCumulativeDistanceArrayの結果）を受け取り、各ICに出発地からの
+// 走行距離routeDistanceMeters（メートル）を追加した新しい配列を返す。
+// IC境界ベースの新パイプライン（Step 5）向けの関数。
+// detectIcsOrderedAlongPolyline自体・渡されたorderedIcs配列は変更せず、
+// 各要素を{...item, routeDistanceMeters}の形でコピーした新しい配列を
+// 作って返す。現時点では既存のどの処理からも未参照。
+function attachRouteDistanceToOrderedIcs(
+    orderedIcs,
+    cumulativeDistances
+) {
+
+    return (orderedIcs || []).map(item => {
+        const segmentStartDistanceMeters =
+            cumulativeDistances[item.segmentIndex];
+        const segmentEndDistanceMeters =
+            cumulativeDistances[item.segmentIndex + 1];
+
+        const routeDistanceMeters =
+            segmentStartDistanceMeters +
+            item.projectionRatio *
+                (
+                    segmentEndDistanceMeters -
+                    segmentStartDistanceMeters
+                );
+
+        return {
+            ...item,
+            routeDistanceMeters
+        };
+    });
+}
+
 function decodeRoutesEncodedPolyline(encodedPolyline) {
 
     if (!encodedPolyline) {
@@ -12466,6 +12540,28 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                     )
                     .join(" → ") || "なし"
             )
+        );
+
+        const cumulativeDistances =
+            buildCumulativeDistanceArray(sampledPoints);
+
+        const icsWithRouteDistance =
+            attachRouteDistanceToOrderedIcs(
+                icsOrderedAlongPolyline,
+                cumulativeDistances
+            );
+
+        console.table(
+            icsWithRouteDistance.map(item => ({
+                displayName: item.ic.displayName,
+                routeDistanceKm:
+                    Math.round(
+                        item.routeDistanceMeters / 100
+                    ) / 10,
+                distanceMeters:
+                    Math.round(item.distanceMeters),
+                label: resolveIcCategoryLabel(item.ic)
+            }))
         );
 
         console.groupEnd();

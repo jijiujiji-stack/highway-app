@@ -12828,7 +12828,7 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
         // なかった区間）の可視化。カバー率・中間の検出漏れ一覧・検出漏れ
         // 分を含めた再計算額を出す。実際の料金計算・表示ロジックには
         // 一切接続していない。
-        const totalRouteDistanceMeters =
+        const gapDetectionTotalRouteDistanceMeters =
             cumulativeDistances[
                 cumulativeDistances.length - 1
             ] || 0;
@@ -12841,11 +12841,11 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             );
 
         const coverageRatioPercent =
-            totalRouteDistanceMeters > 0
+            gapDetectionTotalRouteDistanceMeters > 0
                 ? Math.round(
                     (
                         detectedDistanceMeters /
-                        totalRouteDistanceMeters
+                        gapDetectionTotalRouteDistanceMeters
                     ) * 1000
                 ) / 10
                 : 0;
@@ -12855,7 +12855,7 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             "%（検出" +
             (Math.round(detectedDistanceMeters / 100) / 10) +
             "km / 総距離" +
-            (Math.round(totalRouteDistanceMeters / 100) / 10) +
+            (Math.round(gapDetectionTotalRouteDistanceMeters / 100) / 10) +
             "km）"
         );
 
@@ -12878,7 +12878,7 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
         const tollCategorySequenceWithGap =
             buildTollCategorySequenceWithGapDetection(
                 icsWithRouteDistance,
-                totalRouteDistanceMeters
+                gapDetectionTotalRouteDistanceMeters
             );
 
         const newPipelineTollEstimateWithGap =

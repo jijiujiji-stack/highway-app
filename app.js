@@ -363,7 +363,10 @@ const TOLL_ROAD_CATEGORY_RULES = [
         label: "アクアライン",
         keywords: ["東京湾アクアライン", "アクアライン"],
         tollType: "fixed",
-        fixedYen: 800
+        fixedYen: 800,
+        // 【Step 2・新規追加のみ、現時点では未参照】IC境界ベース区間
+        // 再分割（trySplitNexcoSectionByBoundaryCategory）向けの境界IC名。
+        boundaryIcNames: ["浮島IC", "木更津金田IC"]
     },
     {
         id: "nexco",
@@ -814,6 +817,357 @@ function detectTollSectionsFromSteps(highwayRoute) {
         tollSections,
         tollEntryCount: tollSections.length
     };
+}
+
+// 【IC境界ベース区間再分割・Step 2・新規追加のみ、現時点では診断ログ
+// 以外のどこからも未参照】IC名（displayName完全一致）から、IC_MASTER
+// 内の該当ICオブジェクトを検索して返す。IC_MASTER各エリアのexits配列を
+// 走査し、最初に見つかったものを返す（同一IC名が複数エリアに重複登録
+// されている場合があるが、座標はほぼ同一のため先勝ちで問題ない）。
+// 見つからない場合はnullを返す。
+function resolveIcObjectByDisplayName(displayName) {
+    for (const areaDefinition of Object.values(IC_MASTER)) {
+        const exitList = areaDefinition?.exits;
+
+        if (!Array.isArray(exitList)) {
+            continue;
+        }
+
+        const matchedIc = exitList.find(
+            ic => ic.displayName === displayName
+        );
+
+        if (matchedIc) {
+            return matchedIc;
+        }
+    }
+
+    return null;
+}
+
+// 【IC境界ベース区間再分割・Step 2・新規追加のみ、現時点では診断ログ
+// 以外のどこからも未参照】区間の座標列（sectionPolylinePoints）の中で、
+// 指定したIC（icLat/icLng）に最も近い位置を探す。calculateDistance
+// ToLineSegment（Step 1）を、区間内の連続する2点ずつを線分として順に
+// 適用し、最短距離となる線分を採用する。sectionPolylinePointsが2点未満
+// の場合はnullを返す。
+function findIcPositionWithinSectionPolyline(
+    icLat,
+    icLng,
+    sectionPolylinePoints
+) {
+    if (
+        !Array.isArray(sectionPolylinePoints) ||
+        sectionPolylinePoints.length < 2
+    ) {
+        return null;
+    }
+
+    let nearestDistanceMeters = Infinity;
+    let nearestSegmentIndex = null;
+    let nearestProjectionRatio = null;
+
+    for (
+        let pointIndex = 1;
+        pointIndex < sectionPolylinePoints.length;
+        pointIndex++
+    ) {
+        const segmentStartPoint =
+            sectionPolylinePoints[pointIndex - 1];
+        const segmentEndPoint =
+            sectionPolylinePoints[pointIndex];
+
+        const distanceMeters =
+            calculateDistanceToLineSegment(
+                icLat,
+                icLng,
+                segmentStartPoint.lat,
+                segmentStartPoint.lng,
+                segmentEndPoint.lat,
+                segmentEndPoint.lng
+            );
+
+        if (distanceMeters < nearestDistanceMeters) {
+            nearestDistanceMeters = distanceMeters;
+            nearestSegmentIndex = pointIndex;
+            nearestProjectionRatio =
+                calculateProjectionRatioOnLineSegment(
+                    icLat,
+                    icLng,
+                    segmentStartPoint.lat,
+                    segmentStartPoint.lng,
+                    segmentEndPoint.lat,
+                    segmentEndPoint.lng
+                );
+        }
+    }
+
+    if (nearestSegmentIndex === null) {
+        return null;
+    }
+
+    return {
+        distanceMeters: nearestDistanceMeters,
+        segmentIndex: nearestSegmentIndex,
+        projectionRatio: nearestProjectionRatio
+    };
+}
+
+// 【IC境界ベース区間再分割・Step 2・新規追加のみ、現時点では診断ログ
+// 以外のどこからも未参照】findIcPositionWithinSectionPolylineの補助。
+// calculateDistanceToLineSegment（Step 1）内部の垂線の足の計算と同じ
+// 考え方で、線分（segStart→segEnd）上でicに最も近い点の比率（0〜1、
+// 0=segStart側、1=segEnd側にクランプ済み）だけを返す。
+function calculateProjectionRatioOnLineSegment(
+    icLat,
+    icLng,
+    segStartLat,
+    segStartLng,
+    segEndLat,
+    segEndLng
+) {
+    const METERS_PER_DEGREE_LAT = 111320;
+
+    const referenceLat =
+        (segStartLat + segEndLat) / 2;
+
+    const metersPerDegreeLng =
+        METERS_PER_DEGREE_LAT *
+        Math.cos(referenceLat * Math.PI / 180);
+
+    const toPlaneX = lng => lng * metersPerDegreeLng;
+    const toPlaneY = lat => lat * METERS_PER_DEGREE_LAT;
+
+    const icX = toPlaneX(icLng);
+    const icY = toPlaneY(icLat);
+
+    const segStartX = toPlaneX(segStartLng);
+    const segStartY = toPlaneY(segStartLat);
+
+    const segEndX = toPlaneX(segEndLng);
+    const segEndY = toPlaneY(segEndLat);
+
+    const segmentVectorX = segEndX - segStartX;
+    const segmentVectorY = segEndY - segStartY;
+
+    const segmentLengthSquared =
+        segmentVectorX * segmentVectorX +
+        segmentVectorY * segmentVectorY;
+
+    if (segmentLengthSquared === 0) {
+        return 0;
+    }
+
+    const icVectorX = icX - segStartX;
+    const icVectorY = icY - segStartY;
+
+    const rawProjectionRatio =
+        (
+            icVectorX * segmentVectorX +
+            icVectorY * segmentVectorY
+        ) / segmentLengthSquared;
+
+    return Math.max(0, Math.min(1, rawProjectionRatio));
+}
+
+// 【IC境界ベース区間再分割・Step 2・新規追加のみ、現時点では診断ログ
+// 以外のどこからも未参照】区間内の座標列を、指定した位置（segmentIndex/
+// projectionRatio、findIcPositionWithinSectionPolylineの返り値の形式）で
+// 補間した1点の座標を返す。
+function interpolatePointOnSectionPolyline(
+    sectionPolylinePoints,
+    position
+) {
+    const segmentStartPoint =
+        sectionPolylinePoints[position.segmentIndex - 1];
+    const segmentEndPoint =
+        sectionPolylinePoints[position.segmentIndex];
+
+    return {
+        lat:
+            segmentStartPoint.lat +
+            (segmentEndPoint.lat - segmentStartPoint.lat) *
+                position.projectionRatio,
+        lng:
+            segmentStartPoint.lng +
+            (segmentEndPoint.lng - segmentStartPoint.lng) *
+                position.projectionRatio
+    };
+}
+
+// 【IC境界ベース区間再分割・Step 2・新規追加のみ、現時点では診断ログ
+// 以外のどこからも未参照】区間の座標列（連続する点の配列）の総距離を、
+// calculateDistanceの合算で算出する。
+function calculateTotalDistanceOfPolylinePoints(points) {
+    let totalDistanceMeters = 0;
+
+    for (
+        let pointIndex = 1;
+        pointIndex < points.length;
+        pointIndex++
+    ) {
+        totalDistanceMeters += calculateDistance(
+            points[pointIndex - 1].lat,
+            points[pointIndex - 1].lng,
+            points[pointIndex].lat,
+            points[pointIndex].lng
+        );
+    }
+
+    return totalDistanceMeters;
+}
+
+// 【IC境界ベース区間再分割・Step 2・新規追加のみ、現時点では診断ログ
+// 以外のどこからも未参照。detectTollSectionsFromStepsの出力そのものは
+// まだこの関数を経由しない（Step 3で接続予定）】tollCategoryIdが
+// "nexco"の区間1件を、ruleが持つ境界IC（boundaryIcNames）の位置で
+// 最大3分割する。分割できない場合は元の区間だけを含む配列を返す
+// （常に配列を返す。分割前後で呼び出し元の扱いを揃えるため）。
+// 分割で生じる区間は、実際の料金計算・表示に使われている既存の
+// tollSections要素とフィールド構成が完全には一致しない（stepCount・
+// rawFirstStartLocation・rawLastEndLocation・combinedInstructionsの
+// 扱いは簡略化している）。Step 3で実接続する際にあわせて整理する。
+const MIN_MEANINGFUL_SPLIT_SEGMENT_METERS = 10;
+
+function trySplitNexcoSectionByBoundaryCategory(
+    section,
+    rule,
+    thresholdMeters = TOLL_SECTION_IC_MATCH_THRESHOLD_METERS
+) {
+    if (
+        section.tollCategoryId !== "nexco" ||
+        !Array.isArray(rule?.boundaryIcNames) ||
+        rule.boundaryIcNames.length !== 2
+    ) {
+        return [section];
+    }
+
+    const boundaryIcObjects =
+        rule.boundaryIcNames.map(resolveIcObjectByDisplayName);
+
+    if (boundaryIcObjects.some(ic => !ic)) {
+        return [section];
+    }
+
+    const boundaryPositions =
+        boundaryIcObjects.map(ic =>
+            findIcPositionWithinSectionPolyline(
+                ic.lat,
+                ic.lng,
+                section.sectionPolylinePoints
+            )
+        );
+
+    if (
+        boundaryPositions.some(
+            position =>
+                !position ||
+                position.distanceMeters > thresholdMeters
+        )
+    ) {
+        return [section];
+    }
+
+    const alongRoutePositions =
+        boundaryPositions.map(position =>
+            (position.segmentIndex - 1) +
+            position.projectionRatio
+        );
+
+    const entranceIndex =
+        alongRoutePositions[0] <= alongRoutePositions[1]
+            ? 0
+            : 1;
+    const exitIndex = entranceIndex === 0 ? 1 : 0;
+
+    const entranceIc = boundaryIcObjects[entranceIndex];
+    const entrancePosition = boundaryPositions[entranceIndex];
+    const exitIc = boundaryIcObjects[exitIndex];
+    const exitPosition = boundaryPositions[exitIndex];
+
+    const points = section.sectionPolylinePoints;
+
+    const entranceBoundaryPoint =
+        interpolatePointOnSectionPolyline(
+            points,
+            entrancePosition
+        );
+    const exitBoundaryPoint =
+        interpolatePointOnSectionPolyline(
+            points,
+            exitPosition
+        );
+
+    const beforePoints =
+        points
+            .slice(0, entrancePosition.segmentIndex)
+            .concat([entranceBoundaryPoint]);
+
+    const middlePoints =
+        [entranceBoundaryPoint]
+            .concat(
+                points.slice(
+                    entrancePosition.segmentIndex,
+                    exitPosition.segmentIndex
+                )
+            )
+            .concat([exitBoundaryPoint]);
+
+    const afterPoints =
+        [exitBoundaryPoint]
+            .concat(
+                points.slice(exitPosition.segmentIndex)
+            );
+
+    const beforeDistanceMeters =
+        calculateTotalDistanceOfPolylinePoints(beforePoints);
+    const middleDistanceMeters =
+        calculateTotalDistanceOfPolylinePoints(middlePoints);
+    const afterDistanceMeters =
+        calculateTotalDistanceOfPolylinePoints(afterPoints);
+
+    const splitSections = [];
+
+    if (beforeDistanceMeters >= MIN_MEANINGFUL_SPLIT_SEGMENT_METERS) {
+        splitSections.push({
+            ...section,
+            totalDistanceMeters: beforeDistanceMeters,
+            sectionPolylinePoints: beforePoints,
+            exitIc: entranceIc,
+            exitIcName: entranceIc.displayName,
+            exitDistanceMeters: entrancePosition.distanceMeters,
+            stepCount: null
+        });
+    }
+
+    splitSections.push({
+        ...section,
+        tollCategoryId: rule.id,
+        isShutoSection: false,
+        totalDistanceMeters: middleDistanceMeters,
+        sectionPolylinePoints: middlePoints,
+        entranceIc,
+        entranceIcName: entranceIc.displayName,
+        entranceDistanceMeters: entrancePosition.distanceMeters,
+        exitIc,
+        exitIcName: exitIc.displayName,
+        exitDistanceMeters: exitPosition.distanceMeters,
+        stepCount: null
+    });
+
+    if (afterDistanceMeters >= MIN_MEANINGFUL_SPLIT_SEGMENT_METERS) {
+        splitSections.push({
+            ...section,
+            totalDistanceMeters: afterDistanceMeters,
+            sectionPolylinePoints: afterPoints,
+            entranceIc: exitIc,
+            entranceIcName: exitIc.displayName,
+            entranceDistanceMeters: exitPosition.distanceMeters,
+            stepCount: null
+        });
+    }
+
+    return splitSections;
 }
 
 // 【Step 1・新規追加のみ】tollSections（detectTollSectionsFromStepsの
@@ -14001,6 +14355,72 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
 
         const tollTagResult =
             detectTollSectionsFromSteps(highwayRoute);
+
+        // 【境界IC区間再分割検証・一時的】既知の保留事項22の残課題
+        // （アクアライン区間の誤結合）向け、IC境界ベース区間再分割
+        // （Step 2）の動作確認用ログ。tollTagResult.tollSections
+        // （実際の料金計算・表示に使われる値）自体は書き換えず、
+        // 分割結果は目視確認にのみ使う。
+        console.group("[境界IC区間再分割検証・一時的]");
+
+        const aqualineCategoryRule =
+            TOLL_ROAD_CATEGORY_RULES.find(
+                rule => rule.id === "aqualine"
+            );
+
+        tollTagResult.tollSections.forEach((section, sectionIndex) => {
+            if (section.tollCategoryId !== "nexco") {
+                return;
+            }
+
+            const splitResult =
+                trySplitNexcoSectionByBoundaryCategory(
+                    section,
+                    aqualineCategoryRule
+                );
+
+            if (splitResult.length <= 1) {
+                console.log(
+                    "区間" + sectionIndex + "：分割対象なし（NEXCO 距離" +
+                    (Math.round(section.totalDistanceMeters / 100) / 10) +
+                    "km）"
+                );
+                return;
+            }
+
+            const beforeText =
+                "NEXCO(距離" +
+                (Math.round(section.totalDistanceMeters / 100) / 10) +
+                "km)";
+
+            const afterText =
+                splitResult
+                    .map(splitSection => {
+                        const rule =
+                            TOLL_ROAD_CATEGORY_RULES.find(
+                                r => r.id === splitSection.tollCategoryId
+                            );
+
+                        return (
+                            (rule?.label || splitSection.tollCategoryId) +
+                            "(距離" +
+                            (
+                                Math.round(
+                                    splitSection.totalDistanceMeters / 100
+                                ) / 10
+                            ) +
+                            "km)"
+                        );
+                    })
+                    .join(" + ");
+
+            console.log(
+                "区間" + sectionIndex + "：区間分割：" +
+                beforeText + " → " + afterText
+            );
+        });
+
+        console.groupEnd();
 
         return {
             roadSequence:

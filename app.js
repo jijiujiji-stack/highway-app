@@ -424,11 +424,99 @@ function extractLatLngFromRouteLocation(location) {
     };
 }
 
-function detectTollSectionsFromSteps(highwayRoute) {
+// 【sampledPoints統一・2026-07-22】第2引数sampledPointsは省略可能
+// （デフォルトnull）。analyzeHighwayRoutePolyline以外の既存呼び出し元
+// （estimateComparisonCandidateToll・estimateMainHighwayToll等）は、
+// この引数を渡さずに呼び出しても、従来通りstep単位のsectionPolyline
+// Points構築にフォールバックし、挙動は変わらない。
+function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
     const steps =
         (highwayRoute?.legs || []).flatMap(
             leg => leg.steps || []
         );
+
+    // 【sampledPoints統一・2026-07-22】各stepの、ルート全体（highwayRoute
+    // の全legs.steps）先頭からの累積距離（開始距離・終了距離）を記録する。
+    // sampledPoints.routeDistanceMetersと同じ「ルート先頭からの距離」と
+    // いう考え方で、区間（run）の範囲をsampledPoints側から切り出す際に
+    // 使う。既存のtotalDistanceMeters（区間内の距離合計）算出方法は
+    // 変更していない。
+    const stepDistanceRangesByStep = new Map();
+    let cumulativeStepDistanceMeters = 0;
+
+    steps.forEach(step => {
+        const startDistanceMeters = cumulativeStepDistanceMeters;
+
+        cumulativeStepDistanceMeters +=
+            Number(step.distanceMeters) || 0;
+
+        stepDistanceRangesByStep.set(step, {
+            startDistanceMeters,
+            endDistanceMeters: cumulativeStepDistanceMeters
+        });
+    });
+
+    // 【sampledPoints統一・2026-07-22】区間（run）の範囲に対応する
+    // sampledPoints（analyzeHighwayRoutePolyline側で既に生成済みの500m
+    // 間隔の密な座標列、routeDistanceMetersを持つ）を切り出す。マージンは
+    // 前後1000m（サンプル間隔500mの2点分）とし、区間境界付近の点を
+    // 取りこぼさないようにする。sampledPointsが渡されていない場合・
+    // 対応する範囲の点が2点未満しか取れない場合はnullを返し、呼び出し元で
+    // 既存のstep単位の構築方法にフォールバックする。
+    const TOLL_SECTION_SAMPLED_POINTS_MARGIN_METERS = 1000;
+
+    const buildSectionPolylinePointsFromSampledPoints = (
+        firstStep,
+        lastStep
+    ) => {
+        if (
+            !Array.isArray(sampledPoints) ||
+            sampledPoints.length < 2
+        ) {
+            return null;
+        }
+
+        const startRange =
+            stepDistanceRangesByStep.get(firstStep);
+        const endRange =
+            stepDistanceRangesByStep.get(lastStep);
+
+        if (!startRange || !endRange) {
+            return null;
+        }
+
+        const rangeStartDistanceMeters =
+            startRange.startDistanceMeters -
+            TOLL_SECTION_SAMPLED_POINTS_MARGIN_METERS;
+        const rangeEndDistanceMeters =
+            endRange.endDistanceMeters +
+            TOLL_SECTION_SAMPLED_POINTS_MARGIN_METERS;
+
+        const pointsWithinRange =
+            sampledPoints.filter(point =>
+                point.routeDistanceMeters >=
+                    rangeStartDistanceMeters &&
+                point.routeDistanceMeters <=
+                    rangeEndDistanceMeters
+            );
+
+        if (pointsWithinRange.length < 2) {
+            return null;
+        }
+
+        // 両端は正確な区間境界座標（既存のfirstStep.startLocation・
+        // lastStep.endLocation）とし、中間はsampledPointsの密な座標列を
+        // そのまま使う。
+        return [
+            extractLatLngFromRouteLocation(
+                firstStep.startLocation
+            ),
+            ...pointsWithinRange,
+            extractLatLngFromRouteLocation(
+                lastStep.endLocation
+            )
+        ].filter(Boolean);
+    };
 
     const taggedSteps = steps.map(step => ({
         step,
@@ -786,12 +874,21 @@ function detectTollSectionsFromSteps(highwayRoute) {
                 rawFirstStartLocation:
                     firstStep.startLocation,
                 rawLastEndLocation: lastStep.endLocation,
-                // 【Step 1・新規追加のみ、既存のどこからも未参照】
-                // 区間を構成する各stepの開始点を走行順に並べ、最後に
-                // 最終stepの終了点を加えた、区間全体の連続点列。
-                // IC境界ベース区間再分割（次回Step 2）で、境界IC座標との
-                // 距離判定（calculateDistanceToLineSegment）に使う想定。
+                // 区間を構成する連続点列。IC境界ベース区間再分割
+                // （trySplitNexcoSectionByBoundaryCategory）が、境界IC座標
+                // との距離判定（calculateDistanceToLineSegment）に使う。
+                // 【sampledPoints統一・2026-07-22】sampledPoints（500m間隔の
+                // 密な座標列）が利用可能な場合は、区間範囲を切り出した
+                // ものを優先する（案内ステップ単位の粗い点列では、直線的な
+                // 高速区間・JCTのカーブを正しく近似できていなかったため）。
+                // sampledPointsが無い・対応範囲の点が不足する場合は、
+                // 従来通りstep単位（各stepの開始点＋最終stepの終了点）の
+                // 構築にフォールバックする。
                 sectionPolylinePoints:
+                    buildSectionPolylinePointsFromSampledPoints(
+                        firstStep,
+                        lastStep
+                    ) ||
                     run.steps
                         .map(step =>
                             extractLatLngFromRouteLocation(
@@ -11675,6 +11772,12 @@ function detectIcsNearPolyline(
 //   線分を指す
 // - projectionRatio：その線分内での垂線の足の位置（0〜1、始点からの
 //   比率、範囲外はクランプ済み）
+// 【共通化・2026-07-22】距離・投影比率の計算本体は、既存の
+// calculateDistanceToLineSegment・calculateProjectionRatioOnLineSegment
+// （境界IC区間再分割のfindIcPositionWithinSectionPolylineが使っているのと
+// 同一の関数）をそのまま呼び出す形に変更した。以前はここに全く同じ数式が
+// インライン展開で重複していた。segmentIndexの定義（この関数では
+// 「線分の始点側」＝index-1のまま）・戻り値の形は変更していない。
 function findClosestPositionOnPolylineForIc(
     icLat,
     icLng,
@@ -11688,8 +11791,6 @@ function findClosestPositionOnPolylineForIc(
         return null;
     }
 
-    const METERS_PER_DEGREE_LAT = 111320;
-
     let closestDistanceMeters = Infinity;
     let closestSegmentIndex = null;
     let closestProjectionRatio = null;
@@ -11702,78 +11803,28 @@ function findClosestPositionOnPolylineForIc(
         const segmentStart = sampledPoints[index - 1];
         const segmentEnd = sampledPoints[index];
 
-        const referenceLat =
-            (segmentStart.lat + segmentEnd.lat) / 2;
-
-        const metersPerDegreeLng =
-            METERS_PER_DEGREE_LAT *
-            Math.cos(referenceLat * Math.PI / 180);
-
-        const toPlaneX = lng =>
-            lng * metersPerDegreeLng;
-
-        const toPlaneY = lat =>
-            lat * METERS_PER_DEGREE_LAT;
-
-        const pointX = toPlaneX(icLng);
-        const pointY = toPlaneY(icLat);
-
-        const segStartX = toPlaneX(segmentStart.lng);
-        const segStartY = toPlaneY(segmentStart.lat);
-
-        const segEndX = toPlaneX(segmentEnd.lng);
-        const segEndY = toPlaneY(segmentEnd.lat);
-
-        const segmentVectorX = segEndX - segStartX;
-        const segmentVectorY = segEndY - segStartY;
-
-        const segmentLengthSquared =
-            segmentVectorX * segmentVectorX +
-            segmentVectorY * segmentVectorY;
-
-        let projectionRatio;
-        let distanceMeters;
-
-        if (segmentLengthSquared === 0) {
-            projectionRatio = 0;
-            distanceMeters =
-                Math.sqrt(
-                    (pointX - segStartX) * (pointX - segStartX) +
-                    (pointY - segStartY) * (pointY - segStartY)
-                );
-        }
-        else {
-            const pointVectorX = pointX - segStartX;
-            const pointVectorY = pointY - segStartY;
-
-            const rawProjectionRatio =
-                (
-                    pointVectorX * segmentVectorX +
-                    pointVectorY * segmentVectorY
-                ) / segmentLengthSquared;
-
-            projectionRatio =
-                Math.max(0, Math.min(1, rawProjectionRatio));
-
-            const closestX =
-                segStartX + projectionRatio * segmentVectorX;
-            const closestY =
-                segStartY + projectionRatio * segmentVectorY;
-
-            const differenceX = pointX - closestX;
-            const differenceY = pointY - closestY;
-
-            distanceMeters =
-                Math.sqrt(
-                    differenceX * differenceX +
-                    differenceY * differenceY
-                );
-        }
+        const distanceMeters =
+            calculateDistanceToLineSegment(
+                icLat,
+                icLng,
+                segmentStart.lat,
+                segmentStart.lng,
+                segmentEnd.lat,
+                segmentEnd.lng
+            );
 
         if (distanceMeters < closestDistanceMeters) {
             closestDistanceMeters = distanceMeters;
             closestSegmentIndex = index - 1;
-            closestProjectionRatio = projectionRatio;
+            closestProjectionRatio =
+                calculateProjectionRatioOnLineSegment(
+                    icLat,
+                    icLng,
+                    segmentStart.lat,
+                    segmentStart.lng,
+                    segmentEnd.lat,
+                    segmentEnd.lng
+                );
         }
     }
 
@@ -14600,8 +14651,11 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
 
         const shutoEntryCount = shutoSegments.length;
 
+        // 【sampledPoints統一・2026-07-22】このanalyzeHighwayRoutePolyline
+        // 内で既に生成済みのsampledPoints（500m間隔の密な座標列）を渡し、
+        // 境界IC区間再分割の座標精度を改善する。
         const tollTagResult =
-            detectTollSectionsFromSteps(highwayRoute);
+            detectTollSectionsFromSteps(highwayRoute, sampledPoints);
 
         // 【境界IC区間再分割検証・一時的】既知の保留事項22の残課題
         // （アクアライン区間の誤結合）向け、IC境界ベース区間再分割
@@ -16907,8 +16961,13 @@ function logHighwayRoutePolylineAnalysis(
         // 判断されなければ元に戻す。
         console.group("[TOLL TAG検証・一時的]");
 
+        // 【sampledPoints統一・2026-07-22】このログが実際の本番計算（Step3
+        // で接続済みのdetectTollSectionsFromSteps呼び出し）と異なる古い
+        // 挙動を表示し続けると、既知の保留事項24のような混乱の再発に
+        // つながるため、resultから既に取得済みのsampledPointsを渡し、
+        // 本番と同じ精度で分割されるようにする。
         const tollTagResult =
-            detectTollSectionsFromSteps(highwayRoute);
+            detectTollSectionsFromSteps(highwayRoute, sampledPoints);
 
         console.log(
             "新方式（TOLL TAG）区間数（tollEntryCount）:",

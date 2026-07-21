@@ -1371,6 +1371,30 @@ function selectEntranceCandidatesFromTollSectionSequence(
 function estimateMainHighwayTollFromTollSections(
     tollTagResult
 ) {
+    // 【デバッグ用・一時的】境界IC区間再分割の結果がETC概算計算に
+    // 渡っているか確認するためだけのログ。確認が終わったら削除する。
+    console.log(
+        "[DEBUG 一時的] estimateMainHighwayTollFromTollSectionsに渡された" +
+        "tollSections件数：",
+        tollTagResult.tollSections.length
+    );
+    console.log(
+        "[DEBUG 一時的] tollSections内容：",
+        JSON.stringify(
+            tollTagResult.tollSections.map(section => ({
+                tollCategoryId: section.tollCategoryId,
+                totalDistanceKm:
+                    Math.round(
+                        section.totalDistanceMeters / 100
+                    ) / 10,
+                entranceIcName: section.entranceIcName,
+                exitIcName: section.exitIcName
+            })),
+            null,
+            2
+        )
+    );
+
     let shutoToll = 0;
     let nexcoToll = 0;
 

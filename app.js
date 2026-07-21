@@ -11138,6 +11138,188 @@ function detectIcsNearPolyline(
     return nearbyIcs;
 }
 
+// あるIC（icLat/icLng）について、Polyline上の点列（sampledPoints）のうち
+// 最も近い線分と、その線分内での位置（垂線の足の比率）を返す。IC境界
+// ベースの新パイプライン（Step 3）向けの関数。走行順ソート
+// （detectIcsOrderedAlongPolyline）で、そのICがPolyline上のどの位置に
+// 対応するかを求めるために使う。計算ロジック自体はStep 1の
+// calculateDistanceToLineSegmentと同じ考え方（線分の中間緯度を基準に
+// メートル換算した平面座標へ変換する近似方式）を踏襲しつつ、
+// segmentIndex・projectionRatioも合わせて返す形にしている。既存の
+// calculateDistanceToLineSegment・findShortestDistanceFromIcToPolylineは
+// 変更していない。現時点では既存のどの処理からも未参照。
+//
+// 返り値：
+// - distanceMeters：最短距離（メートル）
+// - segmentIndex：最短になった線分のインデックス。
+//   sampledPoints[segmentIndex]とsampledPoints[segmentIndex + 1]を結ぶ
+//   線分を指す
+// - projectionRatio：その線分内での垂線の足の位置（0〜1、始点からの
+//   比率、範囲外はクランプ済み）
+function findClosestPositionOnPolylineForIc(
+    icLat,
+    icLng,
+    sampledPoints
+) {
+
+    if (
+        !Array.isArray(sampledPoints) ||
+        sampledPoints.length < 2
+    ) {
+        return null;
+    }
+
+    const METERS_PER_DEGREE_LAT = 111320;
+
+    let closestDistanceMeters = Infinity;
+    let closestSegmentIndex = null;
+    let closestProjectionRatio = null;
+
+    for (
+        let index = 1;
+        index < sampledPoints.length;
+        index++
+    ) {
+        const segmentStart = sampledPoints[index - 1];
+        const segmentEnd = sampledPoints[index];
+
+        const referenceLat =
+            (segmentStart.lat + segmentEnd.lat) / 2;
+
+        const metersPerDegreeLng =
+            METERS_PER_DEGREE_LAT *
+            Math.cos(referenceLat * Math.PI / 180);
+
+        const toPlaneX = lng =>
+            lng * metersPerDegreeLng;
+
+        const toPlaneY = lat =>
+            lat * METERS_PER_DEGREE_LAT;
+
+        const pointX = toPlaneX(icLng);
+        const pointY = toPlaneY(icLat);
+
+        const segStartX = toPlaneX(segmentStart.lng);
+        const segStartY = toPlaneY(segmentStart.lat);
+
+        const segEndX = toPlaneX(segmentEnd.lng);
+        const segEndY = toPlaneY(segmentEnd.lat);
+
+        const segmentVectorX = segEndX - segStartX;
+        const segmentVectorY = segEndY - segStartY;
+
+        const segmentLengthSquared =
+            segmentVectorX * segmentVectorX +
+            segmentVectorY * segmentVectorY;
+
+        let projectionRatio;
+        let distanceMeters;
+
+        if (segmentLengthSquared === 0) {
+            projectionRatio = 0;
+            distanceMeters =
+                Math.sqrt(
+                    (pointX - segStartX) * (pointX - segStartX) +
+                    (pointY - segStartY) * (pointY - segStartY)
+                );
+        }
+        else {
+            const pointVectorX = pointX - segStartX;
+            const pointVectorY = pointY - segStartY;
+
+            const rawProjectionRatio =
+                (
+                    pointVectorX * segmentVectorX +
+                    pointVectorY * segmentVectorY
+                ) / segmentLengthSquared;
+
+            projectionRatio =
+                Math.max(0, Math.min(1, rawProjectionRatio));
+
+            const closestX =
+                segStartX + projectionRatio * segmentVectorX;
+            const closestY =
+                segStartY + projectionRatio * segmentVectorY;
+
+            const differenceX = pointX - closestX;
+            const differenceY = pointY - closestY;
+
+            distanceMeters =
+                Math.sqrt(
+                    differenceX * differenceX +
+                    differenceY * differenceY
+                );
+        }
+
+        if (distanceMeters < closestDistanceMeters) {
+            closestDistanceMeters = distanceMeters;
+            closestSegmentIndex = index - 1;
+            closestProjectionRatio = projectionRatio;
+        }
+    }
+
+    return {
+        distanceMeters: closestDistanceMeters,
+        segmentIndex: closestSegmentIndex,
+        projectionRatio: closestProjectionRatio
+    };
+}
+
+// 登録済み全IC（getAllRouteAnalysisIcDefinitions、重複除去済み）を走査し、
+// Polyline（sampledPoints）までの最短距離がthresholdMeters以内のICを、
+// findClosestPositionOnPolylineForIcのsegmentIndex昇順・同一segmentIndex
+// 内はprojectionRatio昇順（＝Polyline上の走行順）で並べ替えて返す。IC
+// 境界ベースの新パイプライン（Step 3）向けの関数。現時点では診断ログ
+// （analyzeHighwayRoutePolyline内の一時的なconsole出力）以外のどの処理
+// からも未参照。
+function detectIcsOrderedAlongPolyline(
+    sampledPoints,
+    thresholdMeters = 500
+) {
+
+    const icDefinitions =
+        getAllRouteAnalysisIcDefinitions();
+
+    const orderedIcs = [];
+
+    icDefinitions.forEach(ic => {
+        if (
+            typeof ic.lat !== "number" ||
+            typeof ic.lng !== "number" ||
+            Number.isNaN(ic.lat) ||
+            Number.isNaN(ic.lng)
+        ) {
+            return;
+        }
+
+        const position =
+            findClosestPositionOnPolylineForIc(
+                ic.lat,
+                ic.lng,
+                sampledPoints
+            );
+
+        if (
+            position !== null &&
+            position.distanceMeters <= thresholdMeters
+        ) {
+            orderedIcs.push({
+                ic,
+                distanceMeters: position.distanceMeters,
+                segmentIndex: position.segmentIndex,
+                projectionRatio: position.projectionRatio
+            });
+        }
+    });
+
+    orderedIcs.sort((a, b) =>
+        (a.segmentIndex - b.segmentIndex) ||
+        (a.projectionRatio - b.projectionRatio)
+    );
+
+    return orderedIcs;
+}
+
 function decodeRoutesEncodedPolyline(encodedPolyline) {
 
     if (!encodedPolyline) {
@@ -12190,6 +12372,18 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 .sort((a, b) =>
                     a.distanceMeters - b.distanceMeters
                 )
+        );
+
+        const icsOrderedAlongPolyline =
+            detectIcsOrderedAlongPolyline(sampledPoints, 500);
+
+        console.log(
+            "走行順：" +
+            (
+                icsOrderedAlongPolyline
+                    .map(item => item.ic.displayName)
+                    .join(" → ") || "なし"
+            )
         );
 
         console.groupEnd();

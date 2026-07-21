@@ -782,7 +782,25 @@ function detectTollSectionsFromSteps(highwayRoute) {
                 exitDistanceMeters: exitLabel.distanceMeters,
                 rawFirstStartLocation:
                     firstStep.startLocation,
-                rawLastEndLocation: lastStep.endLocation
+                rawLastEndLocation: lastStep.endLocation,
+                // 【Step 1・新規追加のみ、既存のどこからも未参照】
+                // 区間を構成する各stepの開始点を走行順に並べ、最後に
+                // 最終stepの終了点を加えた、区間全体の連続点列。
+                // IC境界ベース区間再分割（次回Step 2）で、境界IC座標との
+                // 距離判定（calculateDistanceToLineSegment）に使う想定。
+                sectionPolylinePoints:
+                    run.steps
+                        .map(step =>
+                            extractLatLngFromRouteLocation(
+                                step.startLocation
+                            )
+                        )
+                        .concat([
+                            extractLatLngFromRouteLocation(
+                                lastStep.endLocation
+                            )
+                        ])
+                        .filter(Boolean)
             };
         });
 

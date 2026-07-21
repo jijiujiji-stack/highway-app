@@ -969,6 +969,44 @@ candidateAreasに混入しうる。これは入口比較のフォールバック
 
 ---
 
+### 23. IC境界ベース新パイプラインの実装・検証結果と、料金計算の設計方針転換（2026-07-20実施）
+
+既知の保留事項22（料金計算のTOLL TAG方式全面刷新）の続きとして、「IC境界ベースの判定」への転換を実装・検証した。
+
+**実装した内容（Step 1〜7、全て新規追加のみ・既存処理には未接続の診断ログ）：**
+
+- `calculateDistanceToLineSegment`・`findShortestDistanceFromIcToPolyline`：点と線分の最短距離計算（Step 1）
+- `detectIcsNearPolyline`：登録済み全IC×Polyline全体の「IC→線」距離判定による近接IC検出（Step 2）
+- `findClosestPositionOnPolylineForIc`・`detectIcsOrderedAlongPolyline`：検出ICの走行順ソート（Step 3）
+- `resolveIcCategoryLabel`・`buildRoadCategorySequenceFromOrderedIcs`：ICの所属道路（IC_MASTER登録情報）による表示用カテゴリ区間列の組み立て（Step 4）
+- `buildCumulativeDistanceArray`・`attachRouteDistanceToOrderedIcs`：各ICの出発地からの走行距離付与（Step 5）
+- `resolveIcTollCategoryId`・`buildTollCategorySequenceWithDistance`・`estimateTollFromTollCategorySequence`：料金計算用カテゴリ区間列と料金概算（Step 6）
+- `buildTollCategorySequenceWithGapDetection`・`findDetectionGapsInOrderedIcs`：検出漏れ区間の可視化・料金への反映（Step 7）
+
+**実車確認の結果（3ルートで検証）：**
+
+「IC検出→走行順ソート→カテゴリ区間列→料金計算」というパイプラインは、**IC_MASTERの整備が進んだ関東近郊のルート（joban・aqualine等）では非常に高精度**だった（スパリゾートハワイアンズ：新方式5,021円 vs 実際5,036円、鴨川シーワールド：新方式1,978円 vs 実際1,800円、いずれも旧方式の大きな誤差を大幅に改善）。
+
+一方、**IC_MASTERの登録が薄い長距離ルート（名古屋城、東名の御殿場〜浜松〜名古屋間）では、カバー率が31.2%まで低下し、検出漏れの扱いが料金精度を大きく左右する**ことが判明した。検出漏れ区間を一律「汎用NEXCO距離比例料金」で補う実装（Step 7）を試したところ、名古屋城のケースでは（偶然）実際の金額に近づいたが、鴨川シーワールドのケースでは、**アクアライン区間内部で発生した検出漏れまで汎用NEXCO料金として計算してしまい、逆に精度が悪化した**（新方式2,839円 vs 実際1,800円）。
+
+**根本原因の分析：**
+
+「実際に通った道が、どのICの近くを通っているか」を全区間にわたって突き止め、その積み上げで距離を計算しようとしたことが、失敗の本質的な原因と判断した。IC間隔が疎な区間では検出漏れが避けられず、検出漏れをどのカテゴリとして補うかの判断（特にアクアラインのような特別カテゴリの内部で発生した検出漏れ）で新たな誤差が生まれる。
+
+**次回の設計方針（合意済み、未実装）：**
+
+料金計算と表示を、明確に別の仕組みに分離する。
+
+- **表示用**：今回実装したIC境界ベースパイプライン（Step 1〜7）をそのまま使う。「想定道路：首都高→東名→...」等の表示は、このパイプラインの結果から作る。検出漏れ（カバー率・検出漏れ一覧）もこちらの文脈でのみ意味を持つ診断情報として扱う
+- **料金計算用**：「全区間を検出する」のではなく、「特別料金カテゴリ（首都高・アクアライン等）の境界だけを確実に特定し、ルート全体の距離からその特別区間の距離を差し引いた残りを、汎用NEXCO距離比例料金として一括計算する」という、引き算方式に変更する
+  - 首都高の境界：既存のTOLL TAG方式（`detectTollSectionsFromSteps`）で既に高精度に検出できている
+  - アクアライン等の特別カテゴリの境界：「近くのICを何個も検出する」方式ではなく、「決まった入口・出口IC（例：アクアラインなら浮島IC・木更津金田IC）を、ルート上でピンポイントに探す」方式に変更する
+  - この設計により、特別カテゴリ区間の内部・汎用NEXCO区間のどこに検出漏れがあっても、料金計算には一切影響しなくなる（「検出漏れ」という概念自体が料金計算から無くなる）
+- この転換により、Step 1〜7で実装した関数群のうち、`buildTollCategorySequenceWithGapDetection`・`findDetectionGapsInOrderedIcs`・`estimateTollFromTollCategorySequence`（Step 6・7の料金計算関連）は、次回の引き算方式実装後は不要になる可能性が高い。ただし削除は次回、新方式の実装・検証が完了してから判断する（CLAUDE.mdの「通常検索パイプライン統合プロジェクトにおける例外」に基づく）
+- Step 1〜5（IC検出・走行順ソート・カテゴリ区間列・距離付与）は、表示用途としてそのまま活用する見込み
+
+---
+
 ## GitHub Pages / デプロイ
 
 現在の運用：

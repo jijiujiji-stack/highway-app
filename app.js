@@ -11459,6 +11459,145 @@ function attachRouteDistanceToOrderedIcs(
     });
 }
 
+// あるIC（getAllRouteAnalysisIcDefinitions由来のICオブジェクト）の
+// 料金カテゴリID（TOLL_ROAD_CATEGORY_RULESのid）を返す。IC境界ベースの
+// 新パイプライン（Step 6）向けの関数。resolveIcCategoryLabel（Step 4、
+// 表示用の細かい道路名ラベル）とは異なり、料金計算上意味のある区分
+// （"shuto"／"aqualine"等の特別カテゴリ／それ以外は汎用"nexco"）を返す。
+// 現時点では既存のどの処理からも未参照。
+function resolveIcTollCategoryId(ic) {
+
+    if (!ic) {
+        return "nexco";
+    }
+
+    if (ic.source === "SHUTO_IC_MASTER") {
+        return "shuto";
+    }
+
+    const areaKey =
+        ic.sourceAreaKey || ic.sourceAreaKeys?.[0];
+
+    const matchedRule =
+        TOLL_ROAD_CATEGORY_RULES.find(rule =>
+            rule.id === areaKey
+        );
+
+    return matchedRule
+        ? matchedRule.id
+        : "nexco";
+}
+
+// 走行距離付き走行順ICリスト（attachRouteDistanceToOrderedIcsの結果）
+// から、resolveIcTollCategoryIdで連続する同じ料金カテゴリIDをまとめた
+// 区間列を作り、各区間の距離（メートル）も付与して返す。IC境界ベースの
+// 新パイプライン（Step 6）向けの関数。
+//
+// 各区間の距離は、その区間の最初のICのrouteDistanceMetersから、次の
+// 区間の最初のICのrouteDistanceMetersまでの差分。最後の区間だけ、
+// その区間の最後のICのrouteDistanceMetersまでを使う。現時点では既存の
+// どの処理からも未参照。
+function buildTollCategorySequenceWithDistance(
+    icsWithRouteDistance
+) {
+
+    const items = icsWithRouteDistance || [];
+
+    const sequence = [];
+
+    items.forEach(item => {
+        const tollCategoryId =
+            resolveIcTollCategoryId(item.ic);
+
+        const currentSection =
+            sequence[sequence.length - 1];
+
+        if (
+            currentSection &&
+            currentSection.tollCategoryId === tollCategoryId
+        ) {
+            currentSection.icCount++;
+            currentSection.lastRouteDistanceMeters =
+                item.routeDistanceMeters;
+        }
+        else {
+            sequence.push({
+                tollCategoryId,
+                icCount: 1,
+                firstRouteDistanceMeters:
+                    item.routeDistanceMeters,
+                lastRouteDistanceMeters:
+                    item.routeDistanceMeters
+            });
+        }
+    });
+
+    sequence.forEach((section, index) => {
+        const nextSection = sequence[index + 1];
+
+        const endDistanceMeters =
+            nextSection
+                ? nextSection.firstRouteDistanceMeters
+                : section.lastRouteDistanceMeters;
+
+        section.distanceMeters =
+            endDistanceMeters -
+            section.firstRouteDistanceMeters;
+
+        delete section.firstRouteDistanceMeters;
+        delete section.lastRouteDistanceMeters;
+    });
+
+    return sequence;
+}
+
+// 料金カテゴリ区間列（buildTollCategorySequenceWithDistanceの結果）から、
+// TOLL_ROAD_CATEGORY_RULESを使って区間ごとに固定額または距離比例額を
+// 計算し、合計金額を返す。IC境界ベースの新パイプライン（Step 6）向けの
+// 関数。計算方法は既存のestimateMainHighwayTollFromTollSections
+// （tollType==="fixed"ならrule.fixedYen、"perKm"ならdistanceMeters / 1000
+// * rule.perKmYen）と同じロジックを踏襲しているが、
+// estimateMainHighwayTollFromTollSections本体は変更せず、tollSections
+// （TOLL TAG方式の区間）ではなく本パイプラインの料金カテゴリ区間列を
+// 受け取る新しい関数として追加している。現時点では既存のどの処理からも
+// 未参照。
+function estimateTollFromTollCategorySequence(sequence) {
+
+    let shutoToll = 0;
+    let otherToll = 0;
+
+    (sequence || []).forEach(section => {
+        const rule =
+            TOLL_ROAD_CATEGORY_RULES.find(r =>
+                r.id === section.tollCategoryId
+            ) ||
+            TOLL_ROAD_CATEGORY_RULES[
+                TOLL_ROAD_CATEGORY_RULES.length - 1
+            ];
+
+        const tollYen =
+            rule.tollType === "fixed"
+                ? rule.fixedYen
+                : Math.round(
+                    (section.distanceMeters / 1000) *
+                    rule.perKmYen
+                );
+
+        if (rule.id === "shuto") {
+            shutoToll += tollYen;
+        }
+        else {
+            otherToll += tollYen;
+        }
+    });
+
+    return {
+        amount: shutoToll + otherToll,
+        shutoToll,
+        otherToll
+    };
+}
+
 function decodeRoutesEncodedPolyline(encodedPolyline) {
 
     if (!encodedPolyline) {
@@ -12562,6 +12701,30 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                     Math.round(item.distanceMeters),
                 label: resolveIcCategoryLabel(item.ic)
             }))
+        );
+
+        // 【検証用・一時的】新方式（IC境界ベース）の料金概算。既存の
+        // [ETC概算 料金計算]ログが出す実際のTOLL TAG方式の金額と、
+        // 目視で見比べるためだけのもの。実際の料金計算・表示ロジックには
+        // 一切接続していない。
+        const tollCategorySequence =
+            buildTollCategorySequenceWithDistance(
+                icsWithRouteDistance
+            );
+
+        const newPipelineTollEstimate =
+            estimateTollFromTollCategorySequence(
+                tollCategorySequence
+            );
+
+        console.log(
+            "新方式ETC概算：約" +
+            newPipelineTollEstimate.amount.toLocaleString() +
+            "円（首都高：約" +
+            newPipelineTollEstimate.shutoToll.toLocaleString() +
+            "円 + 他道路：約" +
+            newPipelineTollEstimate.otherToll.toLocaleString() +
+            "円）"
         );
 
         console.groupEnd();

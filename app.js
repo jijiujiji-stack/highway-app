@@ -11320,6 +11320,71 @@ function detectIcsOrderedAlongPolyline(
     return orderedIcs;
 }
 
+// あるIC（getAllRouteAnalysisIcDefinitions由来のICオブジェクト）の所属
+// 道路の表示ラベルを返す。IC境界ベースの新パイプライン（Step 4）向けの
+// 関数。テキストのキーワード判定は行わず、IC_MASTER/SHUTO_IC_MASTER上の
+// 登録情報（ic.source・ic.sourceAreaKey）をそのまま使う。
+//
+// 首都高ICはic.source === "SHUTO_IC_MASTER"で判定し「首都高」を返す。
+// NEXCO系ICはic.sourceAreaKey（無ければic.sourceAreaKeys?.[0]）から
+// IC_MASTER[エリアキー].labelを引く。この解決方法自体は既存の
+// resolveTollSectionNexcoRoadLabelと同じ考え方（IC経由のエリアキーから
+// IC_MASTER側のlabelを引く）を踏襲しているが、resolveTollSectionNexco
+// RoadLabelはtollSectionオブジェクト（entranceIc/exitIc・
+// combinedInstructions）を受け取る設計のため、ICオブジェクト単体を
+// 受け取る本関数とは引数の形が異なり、resolveTollSectionNexcoRoadLabel
+// 本体は変更せず新しい関数として追加している。現時点では既存のどの
+// 処理からも未参照。
+function resolveIcCategoryLabel(ic) {
+
+    if (!ic) {
+        return "不明";
+    }
+
+    if (ic.source === "SHUTO_IC_MASTER") {
+        return "首都高";
+    }
+
+    const areaKey =
+        ic.sourceAreaKey || ic.sourceAreaKeys?.[0];
+
+    const areaLabel =
+        areaKey && IC_MASTER[areaKey]?.label;
+
+    return areaLabel
+        ? shortenHighwayRoadName(areaLabel)
+        : "不明";
+}
+
+// 走行順に並んだICリスト（detectIcsOrderedAlongPolylineの結果）から、
+// 各ICのカテゴリラベル（resolveIcCategoryLabel）を求め、連続する同じ
+// ラベルをひとまとめにした区間列を返す。IC境界ベースの新パイプライン
+// （Step 4）向けの関数。現時点では診断ログ（analyzeHighwayRoutePolyline
+// 内の一時的なconsole出力）以外のどの処理からも未参照。
+function buildRoadCategorySequenceFromOrderedIcs(orderedIcs) {
+
+    const sequence = [];
+
+    (orderedIcs || []).forEach(item => {
+        const label = resolveIcCategoryLabel(item.ic);
+
+        const currentSection =
+            sequence[sequence.length - 1];
+
+        if (currentSection && currentSection.label === label) {
+            currentSection.icCount++;
+        }
+        else {
+            sequence.push({
+                label,
+                icCount: 1
+            });
+        }
+    });
+
+    return sequence;
+}
+
 function decodeRoutesEncodedPolyline(encodedPolyline) {
 
     if (!encodedPolyline) {
@@ -12382,6 +12447,23 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             (
                 icsOrderedAlongPolyline
                     .map(item => item.ic.displayName)
+                    .join(" → ") || "なし"
+            )
+        );
+
+        const roadCategorySequence =
+            buildRoadCategorySequenceFromOrderedIcs(
+                icsOrderedAlongPolyline
+            );
+
+        console.log(
+            "新方式想定道路順：" +
+            (
+                roadCategorySequence
+                    .map(section =>
+                        section.label +
+                        "(" + section.icCount + "件)"
+                    )
                     .join(" → ") || "なし"
             )
         );

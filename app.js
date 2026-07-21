@@ -1073,6 +1073,40 @@ function trySplitNexcoSectionByBoundaryCategory(
             )
         );
 
+    // 【DEBUG3 一時的・境界IC距離確認】各境界ICが、この区間のpolyline
+    // からどれだけ離れて検出されたかを確認するための一時ログ。原因特定
+    // 後、削除してよい。
+    console.log(
+        "[DEBUG3 一時的・境界IC距離確認] rule.id：" + rule.id +
+        "、区間entranceIcName：" + (section.entranceIcName || "不明") +
+        "、区間exitIcName：" + (section.exitIcName || "不明") +
+        "、しきい値(thresholdMeters)：" + thresholdMeters + "m"
+    );
+    rule.boundaryIcNames.forEach((icName, icIndex) => {
+        const position = boundaryPositions[icIndex];
+        console.log(
+            "[DEBUG3 一時的・境界IC距離確認]   境界IC「" + icName +
+            "」：" +
+            (
+                position
+                    ? "distanceMeters=" +
+                        Math.round(position.distanceMeters) + "m"
+                    : "見つからず（sectionPolylinePointsが2点未満）"
+            )
+        );
+    });
+
+    const willSplit =
+        !boundaryPositions.some(
+            position =>
+                !position ||
+                position.distanceMeters > thresholdMeters
+        );
+    console.log(
+        "[DEBUG3 一時的・境界IC距離確認] 判定結果：" +
+        (willSplit ? "分割する" : "分割しない（しきい値超過または未検出）")
+    );
+
     if (
         boundaryPositions.some(
             position =>
@@ -1181,6 +1215,29 @@ function trySplitNexcoSectionByBoundaryCategory(
             stepCount: null
         });
     }
+
+    // 【DEBUG3 一時的・境界IC距離確認】分割が発動した場合、生成された
+    // サブ区間ごとのtollCategoryId・距離・entrance/exitIc名を確認する
+    // ための一時ログ。tollCategoryIdの再判定ロジック自体は変更していない
+    // （既存のまま、before/after区間はsectionのtollCategoryIdを引き継ぐ）。
+    // 原因特定後、削除してよい。
+    console.log(
+        "[DEBUG3 一時的・境界IC距離確認] 分割発動：サブ区間数：" +
+        splitSections.length,
+        JSON.stringify(
+            splitSections.map(splitSection => ({
+                tollCategoryId: splitSection.tollCategoryId,
+                totalDistanceKm:
+                    Math.round(
+                        splitSection.totalDistanceMeters / 100
+                    ) / 10,
+                entranceIcName: splitSection.entranceIcName,
+                exitIcName: splitSection.exitIcName
+            })),
+            null,
+            2
+        )
+    );
 
     return splitSections;
 }

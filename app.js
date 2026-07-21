@@ -1084,13 +1084,35 @@ function trySplitNexcoSectionByBoundaryCategory(
     );
     rule.boundaryIcNames.forEach((icName, icIndex) => {
         const position = boundaryPositions[icIndex];
+        const registeredIc = boundaryIcObjects[icIndex];
+
+        // 【DEBUG3 一時的・境界IC距離確認】positionはfindIcPositionWithin
+        // SectionPolylineの戻り値（segmentIndex/projectionRatio）であり、
+        // 緯度経度自体は含まれていない。同じ形式を受け取れる既存の
+        // interpolatePointOnSectionPolyline（分割処理内で境界点座標を
+        // 求める際に使っているものと同一関数）をログ目的だけに流用し、
+        // findIcPositionWithinSectionPolyline自体は変更していない。
+        const nearestPointOnPolyline =
+            position
+                ? interpolatePointOnSectionPolyline(
+                    section.sectionPolylinePoints,
+                    position
+                )
+                : null;
+
         console.log(
             "[DEBUG3 一時的・境界IC距離確認]   境界IC「" + icName +
             "」：" +
             (
                 position
                     ? "distanceMeters=" +
-                        Math.round(position.distanceMeters) + "m"
+                        Math.round(position.distanceMeters) + "m" +
+                        "、登録座標(" +
+                        registeredIc.lat.toFixed(6) + ", " +
+                        registeredIc.lng.toFixed(6) + ")" +
+                        "、polyline最短地点(" +
+                        nearestPointOnPolyline.lat.toFixed(6) + ", " +
+                        nearestPointOnPolyline.lng.toFixed(6) + ")"
                     : "見つからず（sectionPolylinePointsが2点未満）"
             )
         );

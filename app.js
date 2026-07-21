@@ -807,6 +807,12 @@ function detectTollSectionsFromSteps(highwayRoute) {
             };
         });
 
+    // 【IC境界ベース区間再分割・Step 3】組み立てが完了した区間配列
+    // （tollSections、判定ロジック自体は変更していない）に対して、
+    // 境界ICベースの再分割（アクアライン等）を適用してから返す。
+    const tollSectionsWithBoundarySplits =
+        applyBoundaryCategorySplitsToTollSections(tollSections);
+
     return {
         // legs.steps自体が取得できているかどうか（trueなら、
         // tollEntryCount:0は「stepsを見た上で有料区間が無かった」という
@@ -814,8 +820,8 @@ function detectTollSectionsFromSteps(highwayRoute) {
         // 全く別の意味であり、呼び出し側はこれを区別してフォールバック
         // するかどうかを判断する）。
         hasStepsData: steps.length > 0,
-        tollSections,
-        tollEntryCount: tollSections.length
+        tollSections: tollSectionsWithBoundarySplits,
+        tollEntryCount: tollSectionsWithBoundarySplits.length
     };
 }
 
@@ -1168,6 +1174,35 @@ function trySplitNexcoSectionByBoundaryCategory(
     }
 
     return splitSections;
+}
+
+// 【IC境界ベース区間再分割・Step 3】TOLL_ROAD_CATEGORY_RULESの中から
+// boundaryIcNamesを持つルール（現時点ではアクアラインのみ）を全て取り出し、
+// 区間配列に対して順番にtrySplitNexcoSectionByBoundaryCategoryを適用する。
+// 対象ルールが1つもない場合は、元の区間配列をそのまま返す。
+// detectTollSectionsFromStepsの返り値組み立てに接続済み（本番の
+// tollSectionsは、この関数を通した後の区間配列になる）。
+function applyBoundaryCategorySplitsToTollSections(sections) {
+    const boundaryCategoryRules =
+        TOLL_ROAD_CATEGORY_RULES.filter(rule =>
+            Array.isArray(rule.boundaryIcNames) &&
+            rule.boundaryIcNames.length > 0
+        );
+
+    if (boundaryCategoryRules.length === 0) {
+        return sections;
+    }
+
+    return boundaryCategoryRules.reduce(
+        (currentSections, rule) =>
+            currentSections.flatMap(section =>
+                trySplitNexcoSectionByBoundaryCategory(
+                    section,
+                    rule
+                )
+            ),
+        sections
+    );
 }
 
 // 【Step 1・新規追加のみ】tollSections（detectTollSectionsFromStepsの
@@ -14358,9 +14393,14 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
 
         // 【境界IC区間再分割検証・一時的】既知の保留事項22の残課題
         // （アクアライン区間の誤結合）向け、IC境界ベース区間再分割
-        // （Step 2）の動作確認用ログ。tollTagResult.tollSections
-        // （実際の料金計算・表示に使われる値）自体は書き換えず、
-        // 分割結果は目視確認にのみ使う。
+        // （Step 2）の動作確認用ログ。
+        // 【Step 3で追記】本番の区間分割は、detectTollSectionsFromSteps
+        // 側（applyBoundaryCategorySplitsToTollSections）で既に反映済み。
+        // そのため、ここでのtollTagResult.tollSectionsは既に分割済みの
+        // 状態であり、このログは「分割前と分割後を比較する」ものではなく、
+        // 「既に分割済みのデータに対して再度分割を試し、意図せず二重分割
+        // が起きていないか（＝毎回「分割対象なし」になるはずか）を確認する」
+        // 動作再確認用ログに役割が変わっている。
         console.group("[境界IC区間再分割検証・一時的]");
 
         const aqualineCategoryRule =

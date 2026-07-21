@@ -11092,6 +11092,52 @@ function findShortestDistanceFromIcToPolyline(
     return shortestDistanceMeters;
 }
 
+// 登録済み全IC（getAllRouteAnalysisIcDefinitions、重複除去済み）を走査し、
+// Polyline（sampledPoints）までの最短距離がthresholdMeters以内のICだけを
+// 抽出する。IC境界ベースの新パイプライン（Step 2）向けの関数。現時点では
+// 診断ログ（analyzeHighwayRoutePolyline内の一時的なconsole出力）以外の
+// どの処理からも未参照。
+function detectIcsNearPolyline(
+    sampledPoints,
+    thresholdMeters = 500
+) {
+
+    const icDefinitions =
+        getAllRouteAnalysisIcDefinitions();
+
+    const nearbyIcs = [];
+
+    icDefinitions.forEach(ic => {
+        if (
+            typeof ic.lat !== "number" ||
+            typeof ic.lng !== "number" ||
+            Number.isNaN(ic.lat) ||
+            Number.isNaN(ic.lng)
+        ) {
+            return;
+        }
+
+        const distanceMeters =
+            findShortestDistanceFromIcToPolyline(
+                ic.lat,
+                ic.lng,
+                sampledPoints
+            );
+
+        if (
+            distanceMeters !== null &&
+            distanceMeters <= thresholdMeters
+        ) {
+            nearbyIcs.push({
+                ic,
+                distanceMeters
+            });
+        }
+    });
+
+    return nearbyIcs;
+}
+
 function decodeRoutesEncodedPolyline(encodedPolyline) {
 
     if (!encodedPolyline) {
@@ -12113,6 +12159,40 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
 
         const sampledPoints =
             sampleRoutePointsByDistance(routePoints, 500);
+
+        // 【検証用・一時的】IC境界ベースの新パイプライン（Step 2）向け、
+        // 「IC→Polyline全体への最短距離」方式で検出されるICの一覧を
+        // 目視確認するためだけのログ。analyzeHighwayRoutePolylineの
+        // 返り値・後続処理には一切接続していない。有効と判断されなければ
+        // 元に戻す。
+        console.group("[IC境界検出検証・一時的]");
+
+        const icsNearPolyline =
+            detectIcsNearPolyline(sampledPoints, 500);
+
+        console.log(
+            "検出IC件数（閾値500m以内）:",
+            icsNearPolyline.length
+        );
+
+        console.table(
+            icsNearPolyline
+                .map(item => ({
+                    displayName: item.ic.displayName,
+                    distanceMeters:
+                        Math.round(item.distanceMeters),
+                    source: item.ic.source,
+                    sourceAreaKey:
+                        item.ic.sourceAreaKey ||
+                        item.ic.sourceAreaKeys?.[0] ||
+                        ""
+                }))
+                .sort((a, b) =>
+                    a.distanceMeters - b.distanceMeters
+                )
+        );
+
+        console.groupEnd();
 
         const icDefinitions =
             getAllRouteAnalysisIcDefinitions();

@@ -424,6 +424,156 @@ function extractLatLngFromRouteLocation(location) {
     };
 }
 
+// 【既知の保留事項26・IC判定方式比較実験】方式A（点と点）の核となる
+// 「1つの座標と、登録済み全ICの座標を1つずつ比較し、最も近いICを探す」
+// ロジックを、detectTollSectionsFromSteps内のfindNearestIcLabelから
+// 独立関数として切り出したもの。findNearestIcLabelは、この関数を
+// （従来と同じicDefinitions・同じデフォルト閾値で）呼び出すように変更
+// しただけで、findNearestIcLabel自体の挙動（区間境界でのIC名解決）は
+// 変更していない。任意の座標について方式Aの最近傍IC探索を行いたい
+// 場面（比較実験ログ等）から再利用できるように独立させた。
+function findNearestIcByPointToPoint(
+    latLng,
+    icDefinitions,
+    thresholdMeters = TOLL_SECTION_IC_MATCH_THRESHOLD_METERS
+) {
+    let nearestIc = null;
+    let nearestDistanceMeters = Infinity;
+
+    icDefinitions.forEach(ic => {
+        // 座標が欠けている・数値でないICは候補から除外する
+        // （calculateDistanceがNaNを返すと、NaN < Infinityが常に
+        // falseになり、そのICが無言でスキップされ続けてしまうため、
+        // ここで明示的に弾いておく）。
+        if (
+            typeof ic.lat !== "number" ||
+            typeof ic.lng !== "number" ||
+            Number.isNaN(ic.lat) ||
+            Number.isNaN(ic.lng)
+        ) {
+            return;
+        }
+
+        // entranceLat/exitLatが離れているIC（NAVITIME等で方向別に
+        // 実測した座標を持つIC、例：八潮南）向けに、入口側・出口側
+        // それぞれの座標への距離を計算し、近い方をこのICとの距離
+        // として採用する。entranceLat/exitLatを持たないIC（従来通り
+        // トップレベルのlat/lngのみ）は、両方ともlat/lngにフォール
+        // バックするため、入口側・出口側の距離は同じ値になり、挙動は
+        // 変わらない。
+        const entranceLat =
+            typeof ic.entranceLat === "number"
+                ? ic.entranceLat
+                : ic.lat;
+        const entranceLng =
+            typeof ic.entranceLng === "number"
+                ? ic.entranceLng
+                : ic.lng;
+        const exitLat =
+            typeof ic.exitLat === "number"
+                ? ic.exitLat
+                : ic.lat;
+        const exitLng =
+            typeof ic.exitLng === "number"
+                ? ic.exitLng
+                : ic.lng;
+
+        const distanceToEntrance =
+            calculateDistance(
+                latLng.lat,
+                latLng.lng,
+                entranceLat,
+                entranceLng
+            );
+
+        const distanceToExit =
+            calculateDistance(
+                latLng.lat,
+                latLng.lng,
+                exitLat,
+                exitLng
+            );
+
+        const distanceMeters =
+            Math.min(distanceToEntrance, distanceToExit);
+
+        if (distanceMeters < nearestDistanceMeters) {
+            nearestDistanceMeters = distanceMeters;
+            nearestIc = ic;
+        }
+    });
+
+    if (
+        !nearestIc ||
+        nearestDistanceMeters > thresholdMeters
+    ) {
+        return {
+            icName: "IC不明（未登録の可能性）",
+            distanceMeters: nearestDistanceMeters,
+            ic: null
+        };
+    }
+
+    return {
+        icName: nearestIc.displayName,
+        distanceMeters: nearestDistanceMeters,
+        ic: nearestIc
+    };
+}
+
+// 【既知の保留事項26・IC判定方式比較実験】方式A的な「点と点」の距離感覚を
+// 再現するため、IC1件の登録座標から、sampledPoints（500m間隔の密な座標列）
+// の中で最も近い1点までの距離だけを計算する（線分への垂線距離ではなく、
+// 点同士の単純な最近傍探索）。既存のcalculateDistanceを流用するのみで、
+// 新しい距離計算式は追加していない。
+function findNearestSampledPointDistanceMeters(
+    icLat,
+    icLng,
+    sampledPoints
+) {
+    let nearestDistanceMeters = Infinity;
+
+    (sampledPoints || []).forEach(point => {
+        const distanceMeters =
+            calculateDistance(icLat, icLng, point.lat, point.lng);
+
+        if (distanceMeters < nearestDistanceMeters) {
+            nearestDistanceMeters = distanceMeters;
+        }
+    });
+
+    return nearestDistanceMeters;
+}
+
+// 【既知の保留事項26・IC判定方式比較実験】detectIcsOrderedAlongPolyline・
+// findClosestPositionOnPolylineForIcのsegmentIndex（線分の始点側インデックス、
+// sampledPoints[segmentIndex]とsampledPoints[segmentIndex + 1]を結ぶ線分を
+// 指す）とprojectionRatioから、ルート上の投影点の緯度経度を復元する。
+// attachRouteDistanceToOrderedIcsが同じsegmentIndex規約で累積距離を
+// 補間しているのと同じ考え方（interpolatePointOnSectionPolylineとは
+// segmentIndexの意味が異なるため、別関数として用意した）。
+function interpolateLatLngOnSampledPoints(
+    sampledPoints,
+    segmentIndex,
+    projectionRatio
+) {
+    const segmentStart = sampledPoints[segmentIndex];
+    const segmentEnd = sampledPoints[segmentIndex + 1];
+
+    if (!segmentStart || !segmentEnd) {
+        return null;
+    }
+
+    return {
+        lat:
+            segmentStart.lat +
+            (segmentEnd.lat - segmentStart.lat) * projectionRatio,
+        lng:
+            segmentStart.lng +
+            (segmentEnd.lng - segmentStart.lng) * projectionRatio
+    };
+}
+
 // 【sampledPoints統一・2026-07-22】第2引数sampledPointsは省略可能
 // （デフォルトnull）。analyzeHighwayRoutePolyline以外の既存呼び出し元
 // （estimateComparisonCandidateToll・estimateMainHighwayToll等）は、
@@ -528,6 +678,11 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
 
     const icDefinitions = getAllRouteAnalysisIcDefinitions();
 
+    // 【既知の保留事項26・IC判定方式比較実験】核となる最近傍IC探索
+    // ロジックは、独立関数findNearestIcByPointToPointへ切り出した。
+    // ここではlocationからの座標抽出のみを行い、探索自体は従来と同じ
+    // icDefinitions・同じデフォルト閾値でfindNearestIcByPointToPointに
+    // 委譲する（挙動は変更していない）。
     const findNearestIcLabel = location => {
         const latLng =
             extractLatLngFromRouteLocation(location);
@@ -540,89 +695,7 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
             };
         }
 
-        let nearestIc = null;
-        let nearestDistanceMeters = Infinity;
-
-        icDefinitions.forEach(ic => {
-            // 座標が欠けている・数値でないICは候補から除外する
-            // （calculateDistanceがNaNを返すと、NaN < Infinityが常に
-            // falseになり、そのICが無言でスキップされ続けてしまうため、
-            // ここで明示的に弾いておく）。
-            if (
-                typeof ic.lat !== "number" ||
-                typeof ic.lng !== "number" ||
-                Number.isNaN(ic.lat) ||
-                Number.isNaN(ic.lng)
-            ) {
-                return;
-            }
-
-            // entranceLat/exitLatが離れているIC（NAVITIME等で方向別に
-            // 実測した座標を持つIC、例：八潮南）向けに、入口側・出口側
-            // それぞれの座標への距離を計算し、近い方をこのICとの距離
-            // として採用する。entranceLat/exitLatを持たないIC（従来通り
-            // トップレベルのlat/lngのみ）は、両方ともlat/lngにフォール
-            // バックするため、入口側・出口側の距離は同じ値になり、挙動は
-            // 変わらない。
-            const entranceLat =
-                typeof ic.entranceLat === "number"
-                    ? ic.entranceLat
-                    : ic.lat;
-            const entranceLng =
-                typeof ic.entranceLng === "number"
-                    ? ic.entranceLng
-                    : ic.lng;
-            const exitLat =
-                typeof ic.exitLat === "number"
-                    ? ic.exitLat
-                    : ic.lat;
-            const exitLng =
-                typeof ic.exitLng === "number"
-                    ? ic.exitLng
-                    : ic.lng;
-
-            const distanceToEntrance =
-                calculateDistance(
-                    latLng.lat,
-                    latLng.lng,
-                    entranceLat,
-                    entranceLng
-                );
-
-            const distanceToExit =
-                calculateDistance(
-                    latLng.lat,
-                    latLng.lng,
-                    exitLat,
-                    exitLng
-                );
-
-            const distanceMeters =
-                Math.min(distanceToEntrance, distanceToExit);
-
-            if (distanceMeters < nearestDistanceMeters) {
-                nearestDistanceMeters = distanceMeters;
-                nearestIc = ic;
-            }
-        });
-
-        if (
-            !nearestIc ||
-            nearestDistanceMeters >
-                TOLL_SECTION_IC_MATCH_THRESHOLD_METERS
-        ) {
-            return {
-                icName: "IC不明（未登録の可能性）",
-                distanceMeters: nearestDistanceMeters,
-                ic: null
-            };
-        }
-
-        return {
-            icName: nearestIc.displayName,
-            distanceMeters: nearestDistanceMeters,
-            ic: nearestIc
-        };
+        return findNearestIcByPointToPoint(latLng, icDefinitions);
     };
 
     const tollSectionRuns = [];
@@ -14594,52 +14667,125 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
         const tollTagResult =
             detectTollSectionsFromSteps(highwayRoute, sampledPoints);
 
-        // 【既知の保留事項26・IC判定方式比較実験】方式A（点と点、
-        // detectTollSectionsFromSteps内のfindNearestIcLabel、区間の
-        // entranceIcName/exitIcName）と方式B（点と線、この関数内で既に
-        // 計算済みのicsNearPolyline、detectIcsNearPolylineの結果）の
-        // 判定結果を突き合わせ、一致・不一致を目視確認するためのログ。
-        // 追加のAPI呼び出し・追加の距離計算は行わず、既に計算済みの
-        // tollTagResult.tollSections・icsNearPolylineを再利用するだけ。
+        // 【既知の保留事項26・IC判定方式比較実験・網羅版】ルート上で検出
+        // された全IC（icsNearPolyline、方式B）について、(a)距離の比較
+        // （方式A的な点と点の最近傍sampledPoint距離 vs 方式Bの点と線の
+        // 距離）と、(b)名前の一致確認（そのICのルート上投影座標から、
+        // 改めて方式Aで最も近いICを探索し直した場合に同じ名前が返るか、
+        // 首都高のようにICが密集するエリアで取り違えていないか）を、
+        // 1つの比較表にまとめる。既存の計算結果（icsNearPolyline・
+        // icsOrderedAlongPolyline・sampledPoints）を再利用するだけで、
+        // 追加のRoutes API呼び出しは発生しない。ただし、検出IC数×登録
+        // 済み全IC数の距離計算（findNearestIcByPointToPointによる方式A
+        // の再探索）が新たに発生する（Step2のdetectIcsNearPolylineと
+        // 同程度かそれ以下のオーダー）。
         // analyzeHighwayRoutePolylineの返り値・後続処理には一切接続して
         // いない。
-        console.group("[IC判定方式比較実験]");
+        console.group("[IC判定方式比較実験・網羅版]");
 
-        const methodAIcNames =
-            [
-                ...new Set(
-                    tollTagResult.tollSections
-                        .flatMap(section => [
-                            section.entranceIcName,
-                            section.exitIcName
-                        ])
-                        .filter(icName =>
-                            icName &&
-                            icName !== "IC不明（未登録の可能性）" &&
-                            icName !== "座標取得不可"
-                        )
-                )
-            ];
+        const icDefinitionsForNameMatchRecheck =
+            getAllRouteAnalysisIcDefinitions();
 
-        console.table(
-            methodAIcNames.map(icName => {
-                const methodBMatch =
-                    icsNearPolyline.find(item =>
-                        item.ic.displayName === icName
+        const orderedPositionByIcName = new Map();
+
+        icsOrderedAlongPolyline.forEach(item => {
+            orderedPositionByIcName.set(
+                item.ic.displayName,
+                item
+            );
+        });
+
+        const methodComparisonRows =
+            icsNearPolyline.map(item => {
+                const icName = item.ic.displayName;
+                const methodBDistanceMeters = item.distanceMeters;
+
+                const methodADistanceMeters =
+                    findNearestSampledPointDistanceMeters(
+                        item.ic.lat,
+                        item.ic.lng,
+                        sampledPoints
                     );
+
+                const orderedPosition =
+                    orderedPositionByIcName.get(icName);
+
+                const projectedLatLng =
+                    orderedPosition
+                        ? interpolateLatLngOnSampledPoints(
+                            sampledPoints,
+                            orderedPosition.segmentIndex,
+                            orderedPosition.projectionRatio
+                        )
+                        : null;
+
+                const nameMatchResult =
+                    projectedLatLng
+                        ? findNearestIcByPointToPoint(
+                            projectedLatLng,
+                            icDefinitionsForNameMatchRecheck
+                        )
+                        : null;
+
+                const nameMatchText =
+                    !nameMatchResult
+                        ? "投影座標なし"
+                        : nameMatchResult.icName === icName
+                            ? "一致"
+                            : "不一致：" + nameMatchResult.icName;
 
                 return {
                     icName,
-                    方式B検出距離m:
-                        methodBMatch
-                            ? Math.round(methodBMatch.distanceMeters)
-                            : "方式Bでは未検出",
-                    判定:
-                        methodBMatch
-                            ? "一致"
-                            : "不一致"
+                    方式B距離m: Math.round(methodBDistanceMeters),
+                    方式A距離m: Math.round(methodADistanceMeters),
+                    距離差m:
+                        Math.round(
+                            methodADistanceMeters - methodBDistanceMeters
+                        ),
+                    名前一致確認: nameMatchText
                 };
-            })
+            });
+
+        console.table(methodComparisonRows);
+
+        const nameMatchCount =
+            methodComparisonRows.filter(
+                row => row.名前一致確認 === "一致"
+            ).length;
+
+        const distanceDiffs =
+            methodComparisonRows.map(row => row.距離差m);
+
+        const averageDistanceDiffMeters =
+            distanceDiffs.length > 0
+                ? Math.round(
+                    distanceDiffs.reduce(
+                        (sum, diff) => sum + diff,
+                        0
+                    ) / distanceDiffs.length
+                )
+                : 0;
+
+        const maxDistanceDiffMeters =
+            distanceDiffs.length > 0
+                ? Math.max(...distanceDiffs)
+                : 0;
+
+        console.log(
+            "名前一致：" + nameMatchCount + "/" +
+            methodComparisonRows.length + "件（一致率" +
+            (
+                methodComparisonRows.length > 0
+                    ? Math.round(
+                        (nameMatchCount / methodComparisonRows.length) *
+                        1000
+                    ) / 10
+                    : 0
+            ) + "%）"
+        );
+        console.log(
+            "距離差：平均" + averageDistanceDiffMeters + "m、最大" +
+            maxDistanceDiffMeters + "m"
         );
 
         console.groupEnd();

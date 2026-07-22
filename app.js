@@ -1136,11 +1136,30 @@ function calculateTotalDistanceOfPolylinePoints(points) {
 // ならないため分割条件を満たせず、素通りしていた。ここでは
 // tollCategoryIdによるガードを外し、区間の現在のカテゴリに関わらず、
 // 境界IC座標がその区間のpolyline範囲内に見つかれば分割を試みるように
-// 変更した。分割後の各サブ区間のtollCategoryId等の再判定ロジックは
-// 変更していない（before/after区間は元のsection.tollCategoryIdを
-// そのまま引き継ぐ。これは次回、カテゴリ確定方法自体をIC名テーブル
-// 参照に置き換える際に合わせて見直す）。
+// 変更した。分割後の各サブ区間のtollCategoryIdは、
+// resolveSubSectionTollCategoryId（IC名からresolveIcObjectByDisplayName
+// でIC定義を取得し、resolveIcTollCategoryIdで再判定）により、before/after
+// 区間それぞれの「境界ICではない側」のIC名を基準に再判定する。境界IC自身が
+// 定義するmiddle区間（rule.idに対応する区間、例：アクアライン800円）は、
+// 従来通りrule.idをそのまま使う。
 const MIN_MEANINGFUL_SPLIT_SEGMENT_METERS = 10;
+
+// 【既知の保留事項24対応】分割後のサブ区間（before/after）が、元区間の
+// tollCategoryIdをそのまま引き継いでしまう問題への対応。サブ区間の
+// entranceIcName／exitIcNameのうち、境界ICではない側（元区間から引き継いだ
+// 側）のIC名からIC定義オブジェクトを取得し、resolveIcTollCategoryId
+// （IC_MASTER登録情報からのカテゴリ判定）で再判定する。IC定義オブジェクトが
+// 見つからない場合は、元のtollCategoryId（fallbackTollCategoryId）を
+// そのまま使う。
+function resolveSubSectionTollCategoryId(icName, fallbackTollCategoryId) {
+    const ic = resolveIcObjectByDisplayName(icName);
+
+    if (!ic) {
+        return fallbackTollCategoryId;
+    }
+
+    return resolveIcTollCategoryId(ic);
+}
 
 function trySplitNexcoSectionByBoundaryCategory(
     section,
@@ -1161,14 +1180,55 @@ function trySplitNexcoSectionByBoundaryCategory(
         return [section];
     }
 
+    const sectionPoints = section.sectionPolylinePoints;
+    const hasEnoughSectionPoints =
+        Array.isArray(sectionPoints) && sectionPoints.length >= 2;
+
+    // 【既知の保留事項24対応】境界IC名が、この区間の入口・出口名
+    // （section.entranceIcName／section.exitIcName）と完全一致する場合は、
+    // findIcPositionWithinSectionPolylineによる座標再探索を行わず、区間の
+    // 該当する端（入口側ならsectionPolylinePointsの先頭、出口側なら末尾）を
+    // そのまま境界位置として採用する。これは、既に分かっている区間境界と、
+    // 境界IC探索結果がわずかにズレて無意味な極小区間（例：「浮島IC→浮島IC」）
+    // が生まれることを防ぐための対応。
+    const boundaryMatches =
+        rule.boundaryIcNames.map((icName, icIndex) => {
+            const ic = boundaryIcObjects[icIndex];
+
+            if (hasEnoughSectionPoints && icName === section.entranceIcName) {
+                return {
+                    matchedKnownBoundary: true,
+                    position: {
+                        distanceMeters: 0,
+                        segmentIndex: 1,
+                        projectionRatio: 0
+                    }
+                };
+            }
+
+            if (hasEnoughSectionPoints && icName === section.exitIcName) {
+                return {
+                    matchedKnownBoundary: true,
+                    position: {
+                        distanceMeters: 0,
+                        segmentIndex: sectionPoints.length - 1,
+                        projectionRatio: 1
+                    }
+                };
+            }
+
+            return {
+                matchedKnownBoundary: false,
+                position: findIcPositionWithinSectionPolyline(
+                    ic.lat,
+                    ic.lng,
+                    sectionPoints
+                )
+            };
+        });
+
     const boundaryPositions =
-        boundaryIcObjects.map(ic =>
-            findIcPositionWithinSectionPolyline(
-                ic.lat,
-                ic.lng,
-                section.sectionPolylinePoints
-            )
-        );
+        boundaryMatches.map(match => match.position);
 
     // 【DEBUG3 一時的・境界IC距離確認】各境界ICが、この区間のpolyline
     // からどれだけ離れて検出されたかを確認するための一時ログ。原因特定
@@ -1182,6 +1242,8 @@ function trySplitNexcoSectionByBoundaryCategory(
     rule.boundaryIcNames.forEach((icName, icIndex) => {
         const position = boundaryPositions[icIndex];
         const registeredIc = boundaryIcObjects[icIndex];
+        const matchedKnownBoundary =
+            boundaryMatches[icIndex].matchedKnownBoundary;
 
         // 【DEBUG3 一時的・境界IC距離確認】positionはfindIcPositionWithin
         // SectionPolylineの戻り値（segmentIndex/projectionRatio）であり、
@@ -1209,7 +1271,12 @@ function trySplitNexcoSectionByBoundaryCategory(
                         registeredIc.lng.toFixed(6) + ")" +
                         "、polyline最短地点(" +
                         nearestPointOnPolyline.lat.toFixed(6) + ", " +
-                        nearestPointOnPolyline.lng.toFixed(6) + ")"
+                        nearestPointOnPolyline.lng.toFixed(6) + ")" +
+                        (
+                            matchedKnownBoundary
+                                ? "（区間の入口・出口名と一致のため座標探索をスキップ）"
+                                : ""
+                        )
                     : "見つからず（sectionPolylinePointsが2点未満）"
             )
         );
@@ -1299,6 +1366,10 @@ function trySplitNexcoSectionByBoundaryCategory(
     if (beforeDistanceMeters >= MIN_MEANINGFUL_SPLIT_SEGMENT_METERS) {
         splitSections.push({
             ...section,
+            tollCategoryId: resolveSubSectionTollCategoryId(
+                section.entranceIcName,
+                section.tollCategoryId
+            ),
             totalDistanceMeters: beforeDistanceMeters,
             sectionPolylinePoints: beforePoints,
             exitIc: entranceIc,
@@ -1326,6 +1397,10 @@ function trySplitNexcoSectionByBoundaryCategory(
     if (afterDistanceMeters >= MIN_MEANINGFUL_SPLIT_SEGMENT_METERS) {
         splitSections.push({
             ...section,
+            tollCategoryId: resolveSubSectionTollCategoryId(
+                section.exitIcName,
+                section.tollCategoryId
+            ),
             totalDistanceMeters: afterDistanceMeters,
             sectionPolylinePoints: afterPoints,
             entranceIc: exitIc,
@@ -1337,9 +1412,9 @@ function trySplitNexcoSectionByBoundaryCategory(
 
     // 【DEBUG3 一時的・境界IC距離確認】分割が発動した場合、生成された
     // サブ区間ごとのtollCategoryId・距離・entrance/exitIc名を確認する
-    // ための一時ログ。tollCategoryIdの再判定ロジック自体は変更していない
-    // （既存のまま、before/after区間はsectionのtollCategoryIdを引き継ぐ）。
-    // 原因特定後、削除してよい。
+    // ための一時ログ。tollCategoryIdはresolveSubSectionTollCategoryId
+    // により再判定済みの値（before/after区間はIC名テーブル参照、middle
+    // 区間はrule.idそのまま）。原因特定後、削除してよい。
     console.log(
         "[DEBUG3 一時的・境界IC距離確認] 分割発動：サブ区間数：" +
         splitSections.length,
@@ -12034,7 +12109,8 @@ function attachRouteDistanceToOrderedIcs(
 // 新パイプライン（Step 6）向けの関数。resolveIcCategoryLabel（Step 4、
 // 表示用の細かい道路名ラベル）とは異なり、料金計算上意味のある区分
 // （"shuto"／"aqualine"等の特別カテゴリ／それ以外は汎用"nexco"）を返す。
-// 現時点では既存のどの処理からも未参照。
+// 【既知の保留事項24対応】trySplitNexcoSectionByBoundaryCategoryから
+// resolveSubSectionTollCategoryId経由で参照される。
 function resolveIcTollCategoryId(ic) {
 
     if (!ic) {

@@ -574,6 +574,98 @@ function interpolateLatLngOnSampledPoints(
     };
 }
 
+// 【既知の保留事項26対応・方式B統一】方式B（点と線）ベースで、問い合わせ
+// 座標（Googleのstep境界点等）に最も近いICを、ルート先頭からの累積距離
+// （routeDistanceMeters）の近さで判定する。detectIcsOrderedAlongPolyline・
+// attachRouteDistanceToOrderedIcs・buildCumulativeDistanceArray・
+// findClosestPositionOnPolylineForIc（いずれもStep1〜7の既存関数）を
+// 呼び出すだけで、新しい距離計算式は追加していない。
+// routeDistanceCandidateIcsは、呼び出し元（detectTollSectionsFromSteps）
+// 側で1回だけ計算済みの候補IC一覧（attachRouteDistanceToOrderedIcsの
+// 結果）を渡すこと（区間ごとの重複計算を避けるため）。sampledPoints・
+// cumulativeDistances・候補が無い場合、または最も近い候補との累積距離差
+// がthresholdMetersを超える場合はnullを返す（呼び出し元は方式A
+// （findNearestIcByPointToPoint）へフォールバックすること）。
+function findNearestIcByRouteDistance(
+    latLng,
+    sampledPoints,
+    cumulativeDistances,
+    routeDistanceCandidateIcs,
+    thresholdMeters = TOLL_SECTION_IC_MATCH_THRESHOLD_METERS
+) {
+    if (
+        !Array.isArray(routeDistanceCandidateIcs) ||
+        routeDistanceCandidateIcs.length === 0 ||
+        !Array.isArray(cumulativeDistances)
+    ) {
+        return null;
+    }
+
+    const queryPosition =
+        findClosestPositionOnPolylineForIc(
+            latLng.lat,
+            latLng.lng,
+            sampledPoints
+        );
+
+    if (!queryPosition) {
+        return null;
+    }
+
+    // 問い合わせ座標自体の累積距離も、候補IC側と全く同じ補間関数
+    // （attachRouteDistanceToOrderedIcs）に、segmentIndex/projectionRatio
+    // だけを持つ1件だけの配列を渡して計算する（新しい補間式を追加しない
+    // ための工夫。同関数はicフィールドを要求せず、渡された要素に
+    // routeDistanceMetersを追加して返すだけのため、この用途にそのまま
+    // 使い回せる）。
+    const [queryWithRouteDistance] =
+        attachRouteDistanceToOrderedIcs(
+            [
+                {
+                    segmentIndex: queryPosition.segmentIndex,
+                    projectionRatio: queryPosition.projectionRatio
+                }
+            ],
+            cumulativeDistances
+        );
+
+    const queryRouteDistanceMeters =
+        queryWithRouteDistance.routeDistanceMeters;
+
+    let nearestCandidate = null;
+    let nearestRouteDistanceDiffMeters = Infinity;
+
+    routeDistanceCandidateIcs.forEach(candidate => {
+        const routeDistanceDiffMeters =
+            Math.abs(
+                candidate.routeDistanceMeters -
+                queryRouteDistanceMeters
+            );
+
+        if (
+            routeDistanceDiffMeters <
+            nearestRouteDistanceDiffMeters
+        ) {
+            nearestRouteDistanceDiffMeters =
+                routeDistanceDiffMeters;
+            nearestCandidate = candidate;
+        }
+    });
+
+    if (
+        !nearestCandidate ||
+        nearestRouteDistanceDiffMeters > thresholdMeters
+    ) {
+        return null;
+    }
+
+    return {
+        icName: nearestCandidate.ic.displayName,
+        distanceMeters: nearestRouteDistanceDiffMeters,
+        ic: nearestCandidate.ic
+    };
+}
+
 // 【sampledPoints統一・2026-07-22】第2引数sampledPointsは省略可能
 // （デフォルトnull）。analyzeHighwayRoutePolyline以外の既存呼び出し元
 // （estimateComparisonCandidateToll・estimateMainHighwayToll等）は、
@@ -678,11 +770,41 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
 
     const icDefinitions = getAllRouteAnalysisIcDefinitions();
 
-    // 【既知の保留事項26・IC判定方式比較実験】核となる最近傍IC探索
-    // ロジックは、独立関数findNearestIcByPointToPointへ切り出した。
-    // ここではlocationからの座標抽出のみを行い、探索自体は従来と同じ
-    // icDefinitions・同じデフォルト閾値でfindNearestIcByPointToPointに
-    // 委譲する（挙動は変更していない）。
+    // 【既知の保留事項26対応・方式B統一】sampledPointsが利用できる場合、
+    // Step1〜7の既存関数（detectIcsOrderedAlongPolyline・
+    // attachRouteDistanceToOrderedIcs・buildCumulativeDistanceArray、
+    // いずれも呼び出すだけでロジックは変更していない）を使い、このルート
+    // で実際に検出された候補IC一覧を、ルート先頭からの累積距離
+    // （routeDistanceMeters）付きで1回だけ計算しておく。findNearestIcLabel
+    // は区間ごとに複数回呼ばれるため、ここで1回だけ計算して使い回すことで、
+    // 区間数に比例した重複計算を避ける（analyzeHighwayRoutePolyline側の
+    // 診断ログが行っている計算と同程度のコストに収まる）。sampledPointsが
+    // 渡されない呼び出し元（estimateComparisonCandidateToll・
+    // estimateMainHighwayToll等）ではnullのままとなり、findNearestIcLabel
+    // は後述の通り自動的に方式Aへフォールバックする。
+    const cumulativeDistances =
+        Array.isArray(sampledPoints) && sampledPoints.length >= 2
+            ? buildCumulativeDistanceArray(sampledPoints)
+            : null;
+
+    const routeDistanceCandidateIcs =
+        cumulativeDistances
+            ? attachRouteDistanceToOrderedIcs(
+                detectIcsOrderedAlongPolyline(
+                    sampledPoints,
+                    TOLL_SECTION_IC_MATCH_THRESHOLD_METERS
+                ),
+                cumulativeDistances
+            )
+            : null;
+
+    // 【既知の保留事項26対応・方式B統一】区間の入口・出口IC名は、方式B
+    // （点と線、findNearestIcByRouteDistance）を優先する。首都高のように
+    // ICが密集するエリアで、方式A（点と点）が近接する別ICと取り違える
+    // リスクを減らすため。sampledPointsが無い場合や、方式Bで十分近い
+    // 候補が見つからない場合（nullが返った場合）は、従来の方式A
+    // （findNearestIcByPointToPoint）にフォールバックする。特定の道路
+    // （アクアライン等）を個別に判定する分岐は設けていない。
     const findNearestIcLabel = location => {
         const latLng =
             extractLatLngFromRouteLocation(location);
@@ -695,7 +817,18 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
             };
         }
 
-        return findNearestIcByPointToPoint(latLng, icDefinitions);
+        const methodBResult =
+            findNearestIcByRouteDistance(
+                latLng,
+                sampledPoints,
+                cumulativeDistances,
+                routeDistanceCandidateIcs
+            );
+
+        return (
+            methodBResult ||
+            findNearestIcByPointToPoint(latLng, icDefinitions)
+        );
     };
 
     const tollSectionRuns = [];
@@ -11872,7 +12005,9 @@ function detectIcsNearPolyline(
 // メートル換算した平面座標へ変換する近似方式）を踏襲しつつ、
 // segmentIndex・projectionRatioも合わせて返す形にしている。既存の
 // calculateDistanceToLineSegment・findShortestDistanceFromIcToPolylineは
-// 変更していない。現時点では既存のどの処理からも未参照。
+// 変更していない。【既知の保留事項26対応】findNearestIcByRouteDistance
+// （detectTollSectionsFromSteps内、区間の入口・出口IC名の方式B判定）から
+// 参照される。
 //
 // 返り値：
 // - distanceMeters：最短距離（メートル）
@@ -11948,9 +12083,10 @@ function findClosestPositionOnPolylineForIc(
 // Polyline（sampledPoints）までの最短距離がthresholdMeters以内のICを、
 // findClosestPositionOnPolylineForIcのsegmentIndex昇順・同一segmentIndex
 // 内はprojectionRatio昇順（＝Polyline上の走行順）で並べ替えて返す。IC
-// 境界ベースの新パイプライン（Step 3）向けの関数。現時点では診断ログ
-// （analyzeHighwayRoutePolyline内の一時的なconsole出力）以外のどの処理
-// からも未参照。
+// 境界ベースの新パイプライン（Step 3）向けの関数。診断ログ
+// （analyzeHighwayRoutePolyline内の一時的なconsole出力）に加え、
+// 【既知の保留事項26対応】detectTollSectionsFromSteps側（区間の入口・
+// 出口IC名の方式B判定）からも参照される。
 function detectIcsOrderedAlongPolyline(
     sampledPoints,
     thresholdMeters = 500
@@ -12067,8 +12203,9 @@ function buildRoadCategorySequenceFromOrderedIcs(orderedIcs) {
 // sampledPoints（Polyline上の点列）を受け取り、各点が出発地（先頭点）
 // から何メートルの位置にあるかを表す累積距離配列を返す。IC境界ベースの
 // 新パイプライン（Step 5）向けの関数。隣り合う2点間の距離計算には既存の
-// calculateDistance（Haversine公式）をそのまま使う。現時点では既存の
-// どの処理からも未参照。
+// calculateDistance（Haversine公式）をそのまま使う。
+// 【既知の保留事項26対応】detectTollSectionsFromSteps側（区間の入口・
+// 出口IC名の方式B判定）からも参照される。
 //
 // 返り値はsampledPointsと同じ長さの数値配列。cumulativeDistances[0]は
 // 常に0、cumulativeDistances[i]はsampledPoints[0]からsampledPoints[i]
@@ -12111,7 +12248,10 @@ function buildCumulativeDistanceArray(sampledPoints) {
 // IC境界ベースの新パイプライン（Step 5）向けの関数。
 // detectIcsOrderedAlongPolyline自体・渡されたorderedIcs配列は変更せず、
 // 各要素を{...item, routeDistanceMeters}の形でコピーした新しい配列を
-// 作って返す。現時点では既存のどの処理からも未参照。
+// 作って返す。
+// 【既知の保留事項26対応】detectTollSectionsFromSteps側（区間の入口・
+// 出口IC名の方式B判定）から、候補IC一覧・問い合わせ座標双方の累積距離
+// 算出に参照される。
 function attachRouteDistanceToOrderedIcs(
     orderedIcs,
     cumulativeDistances

@@ -2469,21 +2469,92 @@ function buildTollUsageSummaryHtml(
     );
 }
 
+// 【トップパネルETC概算・カテゴリ内訳の汎用化】tollEstimate.tollSections
+// （境界IC区間再分割済み、estimateMainHighwayTollFromTollSectionsが返す
+// もの）を、TOLL_ROAD_CATEGORY_RULESのカテゴリごとにグルーピングして
+// 金額を合算する。金額の算出方法自体はestimateMainHighwayTollFrom
+// TollSectionsと同じ（tollType:"fixed"なら固定額、"perKm"なら距離比例）。
+// id==="nexco"（圏央道・館山道等をまとめた汎用の距離課金区分）だけは、
+// 個別の道路名ではなく従来通り「高速」という汎用ラベルを使う。それ以外
+// （"shuto"・"aqualine"等、boundaryIcNamesを持つ特別カテゴリを含む）は
+// rule.labelをそのまま使う。将来、明石海峡大橋等をTOLL_ROAD_CATEGORY_RULES
+// に追加登録すれば、この内訳表示にも自動的に反映される。
+// tollSectionsが無い場合（フォールバック計算経路）はnullを返す。
+function buildTollCategoryBreakdownItems(tollSections) {
+    if (!Array.isArray(tollSections) || tollSections.length === 0) {
+        return null;
+    }
+
+    const amountByRuleId = new Map();
+
+    tollSections.forEach(section => {
+        const rule =
+            TOLL_ROAD_CATEGORY_RULES.find(r =>
+                r.id === section.tollCategoryId
+            ) ||
+            TOLL_ROAD_CATEGORY_RULES.find(r =>
+                r.id === "nexco"
+            );
+
+        const sectionAmount =
+            rule.tollType === "fixed"
+                ? rule.fixedYen
+                : Math.round(
+                    (section.totalDistanceMeters / 1000) *
+                    rule.perKmYen
+                );
+
+        amountByRuleId.set(
+            rule.id,
+            (amountByRuleId.get(rule.id) || 0) + sectionAmount
+        );
+    });
+
+    return TOLL_ROAD_CATEGORY_RULES
+        .map(rule => ({
+            label: rule.id === "nexco" ? "高速" : rule.label,
+            amount: amountByRuleId.get(rule.id) || 0
+        }))
+        .filter(item => item.amount > 0);
+}
+
+function formatTollCategoryBreakdownText(breakdownItems) {
+    return breakdownItems
+        .map(item =>
+            item.label + item.amount.toLocaleString()
+        )
+        .join(" + ");
+}
+
 function createMainTollEstimateHtml(tollEstimate) {
     const amount = Number(tollEstimate?.amount) || 0;
-    const shutoToll = Number(tollEstimate?.shutoToll) || 0;
-    const highwayToll =
-        Number(tollEstimate?.highwayToll) || 0;
 
     let html =
         "約" + amount.toLocaleString() + "円";
 
-    if (shutoToll > 0) {
+    const breakdownItems =
+        buildTollCategoryBreakdownItems(
+            tollEstimate?.tollSections
+        );
+
+    if (breakdownItems && breakdownItems.length > 1) {
         html +=
             "<small class=\"dashboard-toll-breakdown\">" +
-            "首都高" + shutoToll.toLocaleString() +
-            " + 高速" + highwayToll.toLocaleString() +
+            formatTollCategoryBreakdownText(breakdownItems) +
             "</small>";
+    }
+    else if (!breakdownItems) {
+        const shutoToll = Number(tollEstimate?.shutoToll) || 0;
+        const highwayToll =
+            Number(tollEstimate?.highwayToll) || 0;
+
+        if (shutoToll > 0) {
+            html +=
+                "<small class=\"dashboard-toll-breakdown\">" +
+                "首都高" + shutoToll.toLocaleString() +
+                " + 高速" + highwayToll.toLocaleString() +
+                "</small>";
+        }
     }
 
     return html;

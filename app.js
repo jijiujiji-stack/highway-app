@@ -5900,14 +5900,15 @@ const IC_MASTER = {
                 order: 1,
                 displayName: "海老名JCT",
                 googleName: "首都圏中央連絡自動車道 海老名ジャンクション",
-                lat: 35.422,
-                lng: 139.375,
+                lat: 35.4217642,
+                lng: 139.3742716,
                 isSelectable: false,
                 connection: true,
                 connectedRoads: ["keno", "tomei"],
                 routeBranch: "west",
                 branchOrder: 1,
-                entranceSelectable: false, exitSelectable: false, entranceLat: 35.422, entranceLng: 139.375, exitLat: 35.422, exitLng: 139.375
+                entranceSelectable: false, exitSelectable: false, entranceLat: 35.4217642, entranceLng: 139.3742716, exitLat: 35.4217642, exitLng: 139.3742716,
+                note: "【2026-07-22調査・座標修正】既知の保留事項18対応。Wikipedia「海老名ジャンクション」記載の北緯35度25分21秒 東経139度22分40秒（10進変換35.4225,139.377778）、MapFan「海老名ＪＣＴ（圏央道）【東京方面】」(35.423325,139.3841556)・「【小田原方面】」(35.4194677,139.3608811)の3点を確認。3点は互いに半径500m程度に収まっており、平均値を代表点として採用（35.4217642,139.3742716）。従来座標(35.422,139.375)からの修正は約72mと小さい。東名高速道路と圏央道を接続するJCT（2010年2月27日供用開始）。海老名JCTとは別施設の「海老名南JCT」（新東名・中央道方面）が別途未登録であることに注意（既知の保留事項18参照）。isSelectable/entranceSelectable/exitSelectableは変更なし（falseのまま）。Google Maps上での目視確認は今回未実施（AIに地図閲覧手段がないため）。実車確認時に方式Bの距離を確認いただきたい。"
             },
             {
                 order: 2,
@@ -5979,14 +5980,15 @@ const IC_MASTER = {
                 order: 7,
                 displayName: "八王子JCT",
                 googleName: "首都圏中央連絡自動車道 八王子ジャンクション",
-                lat: 35.640,
-                lng: 139.254,
+                lat: 35.6423547,
+                lng: 139.2569767,
                 isSelectable: false,
                 connection: true,
                 connectedRoads: ["keno", "chuo"],
                 routeBranch: "west",
                 branchOrder: 7,
-                entranceSelectable: false, exitSelectable: false, entranceLat: 35.640, entranceLng: 139.254, exitLat: 35.640, exitLng: 139.254
+                entranceSelectable: false, exitSelectable: false, entranceLat: 35.6423547, entranceLng: 139.2569767, exitLat: 35.6423547, exitLng: 139.2569767,
+                note: "【2026-07-22調査・座標修正】既知の保留事項18対応。Wikipedia「八王子ジャンクション」記載の北緯35度38分26.13秒 東経139度15分16.23秒（10進変換35.640592,139.254508）、MapFan「八王子ＪＣＴ（圏央道）【東京方面】」(35.642502817229,139.263766551)・「【関越道方面】」(35.643969,139.2526548)の3点を確認。3点は互いに半径450m程度に収まっており、平均値を代表点として採用（35.6423547,139.2569767）。従来座標(35.640,139.254)から約372m修正。中央自動車道と圏央道を接続するJCT（2007年6月23日供用開始）。既存の八王子西IC(35.6820928,139.2541464)・高尾山IC(35.6230676,139.2632221)との緯度順とも整合。isSelectable/entranceSelectable/exitSelectableは変更なし（falseのまま）。Google Maps上での目視確認は今回未実施（AIに地図閲覧手段がないため）。実車確認時に方式Bの距離を確認いただきたい。"
             },
             {
                 order: 8,
@@ -6127,14 +6129,15 @@ const IC_MASTER = {
                 order: 19,
                 displayName: "久喜白岡JCT",
                 googleName: "首都圏中央連絡自動車道 久喜白岡ジャンクション",
-                lat: 36.049,
-                lng: 139.658,
+                lat: 36.0464207,
+                lng: 139.6618215,
                 isSelectable: false,
                 connection: true,
                 connectedRoads: ["keno", "tohoku"],
                 routeBranch: "northwest",
                 branchOrder: 19,
-                entranceSelectable: false, exitSelectable: false, entranceLat: 36.049, entranceLng: 139.658, exitLat: 36.049, exitLng: 139.658
+                entranceSelectable: false, exitSelectable: false, entranceLat: 36.0464207, entranceLng: 139.6618215, exitLat: 36.0464207, exitLng: 139.6618215,
+                note: "【2026-07-22調査・座標修正】既知の保留事項18対応。Wikipedia「久喜白岡ジャンクション」記載の北緯36度02分58秒 東経139度39分29秒（10進変換36.049444,139.658056）、MapFan「久喜白岡ＪＣＴ（圏央道）【東京方面】」(36.043379,139.6600941)・「【茨城方面】」(36.0464391,139.6673144)の3点を確認。3点は互いに半径450〜700m程度に収まっており、平均値を代表点として採用（36.0464207,139.6618215）。従来座標(36.049,139.658)から約448m修正。東北自動車道と圏央道を接続するJCT（2011年5月29日供用開始）。既存の白岡菖蒲IC(36.044179147597,139.62599272778)・幸手IC(36.0642814,139.7382357)との緯度順とも整合。isSelectable/entranceSelectable/exitSelectableは変更なし（falseのまま）。Google Maps上での目視確認は今回未実施（AIに地図閲覧手段がないため）。実車確認時に方式Bの距離を確認いただきたい。"
             },
             {
                 order: 20,
@@ -6206,14 +6209,15 @@ const IC_MASTER = {
                 order: 26,
                 displayName: "つくばJCT",
                 googleName: "首都圏中央連絡自動車道 つくばジャンクション",
-                lat: 36.091,
-                lng: 140.111,
+                lat: 36.033171,
+                lng: 140.1288072,
                 isSelectable: false,
                 connection: true,
                 connectedRoads: ["keno", "joban"],
                 routeBranch: "northeast",
                 branchOrder: 26,
-                entranceSelectable: false, exitSelectable: false, entranceLat: 36.091, entranceLng: 140.111, exitLat: 36.091, exitLng: 140.111
+                entranceSelectable: false, exitSelectable: false, entranceLat: 36.033171, entranceLng: 140.1288072, exitLat: 36.033171, exitLng: 140.1288072,
+                note: "【2026-07-22調査・座標修正】既知の保留事項18対応。従来座標(36.091,140.111)は、隣接する検証済みIC（つくば中央IC 36.0567693,140.0843141・つくば牛久IC 36.0267196,140.1344449）の緯度経度範囲から大きく外れており、誤登録の疑いが強かった。Wikipedia「つくばジャンクション」の地図ウィジェット座標(36.03447,140.12781)、MapFan「つくばＪＣＴ（常磐自動車道）【牛久方面】」(36.0297772,140.1283811)・「つくばＪＣＴ（圏央道）【水戸方面】」(36.0352659,140.1302304)の3点を確認。3点は互いに半径600m程度に収まり、隣接IC間の位置関係とも整合する。平均値を代表点として採用（36.033171,140.1288072）。従来座標から約6.6km修正（今回7件中最大）。常磐自動車道と圏央道を接続するJCT（2010年4月24日全面供用開始）。isSelectable/entranceSelectable/exitSelectableは変更なし（falseのまま）。Google Maps上での目視確認は今回未実施（AIに地図閲覧手段がないため）。修正幅が大きいため、実車確認時に方式Bの距離を最優先で確認いただきたい。"
             },
             {
                 order: 27,
@@ -6296,14 +6300,15 @@ const IC_MASTER = {
                 order: 34,
                 displayName: "大栄JCT",
                 googleName: "首都圏中央連絡自動車道 大栄ジャンクション",
-                lat: 35.851,
-                lng: 140.468,
+                lat: 35.8100738,
+                lng: 140.3895541,
                 isSelectable: false,
                 connection: true,
                 connectedRoads: ["keno", "tokan"],
                 routeBranch: "northeast",
                 branchOrder: 34,
-                entranceSelectable: false, exitSelectable: false, entranceLat: 35.851, entranceLng: 140.468, exitLat: 35.851, exitLng: 140.468
+                entranceSelectable: false, exitSelectable: false, entranceLat: 35.8100738, entranceLng: 140.3895541, exitLat: 35.8100738, exitLng: 140.3895541,
+                note: "【2026-07-22調査・座標修正・要再検討】既知の保留事項18対応。従来座標(35.851,140.468)は、隣接する検証済みIC（下総IC 35.862493,140.3888525）との位置関係から見て東寄りに大きくずれており、誤登録の疑いが強かった。Wikipedia「大栄ジャンクション」の地図ウィジェット座標(35.81039,140.39233)、MapFan「大栄ＪＣＴ（東関東自動車道）【東京方面】」(35.8097576,140.3867782)の2点を確認（圏央道側の個別ランプページは今回発見できず）。2点は約500m差で近接しており、平均値を代表点として採用（35.8100738,140.3895541）。従来座標から約8.4km修正（今回7件中最大級）。東関東自動車道と圏央道を接続するJCT（2015年6月7日供用開始、神崎IC～大栄JCT間開通に伴う）。圏央道側ランプの個別座標が未確認のため確信度は中程度で、要再検討として残す。isSelectable/entranceSelectable/exitSelectableは変更なし（falseのまま）。Google Maps上での目視確認は今回未実施（AIに地図閲覧手段がないため）。修正幅が大きいため、実車確認時に方式Bの距離を最優先で確認いただきたい。次回、圏央道側ランプのMapFan個別ページでの追加確認が望ましい。"
             },
             {
                 order: 35,
@@ -6331,14 +6336,15 @@ const IC_MASTER = {
                 order: 37,
                 displayName: "東金JCT",
                 googleName: "首都圏中央連絡自動車道 東金ジャンクション",
-                lat: 35.574,
-                lng: 140.316,
+                lat: 35.5754233,
+                lng: 140.3132049,
                 isSelectable: false,
                 connection: true,
                 connectedRoads: ["keno"],
                 routeBranch: "southeast",
                 branchOrder: 37,
-                entranceSelectable: false, exitSelectable: false, entranceLat: 35.574, entranceLng: 140.316, exitLat: 35.574, exitLng: 140.316
+                entranceSelectable: false, exitSelectable: false, entranceLat: 35.5754233, entranceLng: 140.3132049, exitLat: 35.5754233, exitLng: 140.3132049,
+                note: "【2026-07-22調査・座標修正】既知の保留事項18対応。Wikipedia「東金インターチェンジ」（東金ジャンクションから転送、JCT単独記事なし）の地図座標(35.57375,140.31189)、MapFan「東金ＪＣＴ（圏央道（千葉区間））【銚子方面】」(35.5790785,140.315111)・「【千葉市方面】」(35.5734413,140.3126136)の3点を確認。3点は互いに半径800m程度に収まっており、平均値を代表点として採用（35.5754233,140.3132049）。従来座標(35.574,140.316)から約298mの小さい修正。千葉東金道路と圏央道を接続するJCTで、圏央道側の東金IC（既存登録35.5714996,140.320354、2026-07-18検証済み）とは同一インターチェンジ複合施設内の別地点にあたり、両者は約784m離れている（大月JCT/IC間の約1.5km separationと同種の構造）。なお東金インターチェンジの記事はJCTとIC双方を同一記事で扱っており、Wikipedia側の座標がJCT・IC複合施設のどちらを指すかは厳密には区別できない点に留意。isSelectable/entranceSelectable/exitSelectableは変更なし（falseのまま）。Google Maps上での目視確認は今回未実施（AIに地図閲覧手段がないため）。実車確認時に方式Bの距離を確認いただきたい。"
             },
             {
                 order: 38,
@@ -6421,14 +6427,15 @@ const IC_MASTER = {
                 order: 45,
                 displayName: "木更津JCT",
                 googleName: "首都圏中央連絡自動車道 木更津ジャンクション",
-                lat: 35.372,
-                lng: 139.974,
+                lat: 35.3737854,
+                lng: 139.9815932,
                 isSelectable: false,
                 connection: true,
                 connectedRoads: ["keno", "tateyama", "aqualine"],
                 routeBranch: "southeast",
                 branchOrder: 45,
-                entranceSelectable: false, exitSelectable: false, entranceLat: 35.372, entranceLng: 139.974, exitLat: 35.372, exitLng: 139.974
+                entranceSelectable: false, exitSelectable: false, entranceLat: 35.3737854, entranceLng: 139.9815932, exitLat: 35.3737854, exitLng: 139.9815932,
+                note: "【2026-07-22調査・座標修正】既知の保留事項18対応。Wikipedia「木更津ジャンクション」の地図ウィジェット座標(35.376525,139.979939)、MapFan「木更津ＪＣＴ（東京湾アクアライン連絡道）【東金方面】」および「木更津ＪＣＴ（圏央道（千葉区間））【東金方面】」（いずれも35.3710457,139.9832473で座標が完全一致するため実質1点として扱う）を確認。2点は約717m差で近接しており、平均値を代表点として採用（35.3737854,139.9815932）。従来座標(35.372,139.974)から約717m修正。館山自動車道・東京湾アクアライン連絡道・圏央道の3路線を接続するJCT。isSelectable/entranceSelectable/exitSelectableは変更なし（falseのまま）。Google Maps上での目視確認は今回未実施（AIに地図閲覧手段がないため）。実車確認時に方式Bの距離を確認いただきたい。"
             }
         ]
     },

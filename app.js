@@ -13615,6 +13615,58 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
         const sampledPoints =
             sampleRoutePointsByDistance(routePoints, 500);
 
+        // 【DEBUG6 一時的・浮島IC複数通過確認】浮島IC付近のJCT構造で、
+        // ルートのpolylineが「地図上は近いが道のりの位置としては離れた
+        // 複数箇所」を通っている可能性を確認するための一時ログ。
+        // 判定ロジック・返り値には一切接続していない。調査完了後、
+        // 元に戻す。
+        console.group("[DEBUG6 一時的・浮島IC複数通過確認]");
+
+        const logNearbySampledPoints = (label, targetLat, targetLng) => {
+            const nearbyPoints =
+                sampledPoints
+                    .map(point => ({
+                        routeDistanceMeters:
+                            Math.round(point.routeDistanceMeters),
+                        distanceMeters:
+                            Math.round(
+                                calculateDistance(
+                                    targetLat,
+                                    targetLng,
+                                    point.lat,
+                                    point.lng
+                                )
+                            )
+                    }))
+                    .filter(point => point.distanceMeters <= 1000)
+                    .sort(
+                        (a, b) =>
+                            a.routeDistanceMeters - b.routeDistanceMeters
+                    );
+
+            console.log(
+                label +
+                    "（lat:" + targetLat + ", lng:" + targetLng +
+                    "）から1000m以内のsampledPoints件数:",
+                nearbyPoints.length
+            );
+            console.table(nearbyPoints);
+        };
+
+        logNearbySampledPoints(
+            "浮島IC登録座標",
+            35.520593,
+            139.787833
+        );
+
+        logNearbySampledPoints(
+            "Google境界座標",
+            35.5184054,
+            139.7920848
+        );
+
+        console.groupEnd();
+
         // 【検証用・一時的】IC境界ベースの新パイプライン（Step 2）向け、
         // 「IC→Polyline全体への最短距離」方式で検出されるICの一覧を
         // 目視確認するためだけのログ。analyzeHighwayRoutePolylineの

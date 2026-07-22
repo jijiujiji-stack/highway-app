@@ -593,11 +593,31 @@ function findNearestIcByRouteDistance(
     routeDistanceCandidateIcs,
     thresholdMeters = TOLL_SECTION_IC_MATCH_THRESHOLD_METERS
 ) {
+    // 【DEBUG4 一時的・方式B長距離ルート調査】荒川区役所→松本城（約238km、
+    // 外環→関越→上信越→中央）で、区間の入口・出口IC名が「IC不明」＋
+    // 数km〜百数十kmという異常な距離になる事象の原因調査用ログ。
+    // 原因特定後、削除してよい。
+    console.log(
+        "[DEBUG4 一時的・方式B長距離ルート調査] 呼び出し：" +
+        "問い合わせ座標(" + latLng.lat + ", " + latLng.lng + ")、" +
+        "routeDistanceCandidateIcs件数：" +
+        (
+            Array.isArray(routeDistanceCandidateIcs)
+                ? routeDistanceCandidateIcs.length
+                : "配列でない(" + routeDistanceCandidateIcs + ")"
+        )
+    );
+
     if (
         !Array.isArray(routeDistanceCandidateIcs) ||
         routeDistanceCandidateIcs.length === 0 ||
         !Array.isArray(cumulativeDistances)
     ) {
+        console.log(
+            "[DEBUG4 一時的・方式B長距離ルート調査] 早期リターン：" +
+            "候補一覧またはcumulativeDistancesが無い"
+        );
+
         return null;
     }
 
@@ -608,7 +628,17 @@ function findNearestIcByRouteDistance(
             sampledPoints
         );
 
+    console.log(
+        "[DEBUG4 一時的・方式B長距離ルート調査] queryPosition：",
+        queryPosition
+    );
+
     if (!queryPosition) {
+        console.log(
+            "[DEBUG4 一時的・方式B長距離ルート調査] 早期リターン：" +
+            "queryPositionがnull（sampledPointsが2点未満？）"
+        );
+
         return null;
     }
 
@@ -632,6 +662,11 @@ function findNearestIcByRouteDistance(
     const queryRouteDistanceMeters =
         queryWithRouteDistance.routeDistanceMeters;
 
+    console.log(
+        "[DEBUG4 一時的・方式B長距離ルート調査] queryRouteDistanceMeters：" +
+        queryRouteDistanceMeters
+    );
+
     let nearestCandidate = null;
     let nearestRouteDistanceDiffMeters = Infinity;
 
@@ -652,12 +687,35 @@ function findNearestIcByRouteDistance(
         }
     });
 
+    console.log(
+        "[DEBUG4 一時的・方式B長距離ルート調査] 最も近い候補：",
+        nearestCandidate
+            ? {
+                icName: nearestCandidate.ic?.displayName,
+                routeDistanceMeters:
+                    nearestCandidate.routeDistanceMeters
+            }
+            : "候補なし",
+        "、累積距離差：" + nearestRouteDistanceDiffMeters + "m",
+        "、しきい値：" + thresholdMeters + "m"
+    );
+
     if (
         !nearestCandidate ||
         nearestRouteDistanceDiffMeters > thresholdMeters
     ) {
+        console.log(
+            "[DEBUG4 一時的・方式B長距離ルート調査] 方式Aへフォールバック" +
+            "（しきい値超過または候補なし）"
+        );
+
         return null;
     }
+
+    console.log(
+        "[DEBUG4 一時的・方式B長距離ルート調査] 方式Bで確定：" +
+        nearestCandidate.ic.displayName
+    );
 
     return {
         icName: nearestCandidate.ic.displayName,
@@ -797,6 +855,41 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
                 cumulativeDistances
             )
             : null;
+
+    // 【DEBUG4 一時的・方式B長距離ルート調査】routeDistanceCandidateIcsが
+    // ルート全長をどこまでカバーしているか（候補のrouteDistanceMetersの
+    // 最大値が、ルート総距離＝cumulativeDistances末尾の値に近いか）を
+    // 確認するためのログ。長距離ルートの後半で候補が欠落していないかを
+    // 見るためのもの。原因特定後、削除してよい。
+    if (routeDistanceCandidateIcs) {
+        const candidateRouteDistances =
+            routeDistanceCandidateIcs.map(
+                candidate => candidate.routeDistanceMeters
+            );
+
+        console.log(
+            "[DEBUG4 一時的・方式B長距離ルート調査] " +
+            "routeDistanceCandidateIcs件数：" +
+            routeDistanceCandidateIcs.length +
+            "、routeDistanceMeters範囲：" +
+            (
+                candidateRouteDistances.length > 0
+                    ? Math.round(
+                        Math.min(...candidateRouteDistances)
+                    ) + "m 〜 " +
+                        Math.round(
+                            Math.max(...candidateRouteDistances)
+                        ) + "m"
+                    : "該当なし"
+            ) +
+            "、sampledPoints件数：" +
+            (Array.isArray(sampledPoints) ? sampledPoints.length : 0) +
+            "、ルート総距離：" +
+            Math.round(
+                cumulativeDistances[cumulativeDistances.length - 1] || 0
+            ) + "m"
+        );
+    }
 
     // 【既知の保留事項26対応・方式B統一】区間の入口・出口IC名は、方式B
     // （点と線、findNearestIcByRouteDistance）を優先する。首都高のように

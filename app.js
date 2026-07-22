@@ -582,10 +582,16 @@ function interpolateLatLngOnSampledPoints(
 // 呼び出すだけで、新しい距離計算式は追加していない。
 // routeDistanceCandidateIcsは、呼び出し元（detectTollSectionsFromSteps）
 // 側で1回だけ計算済みの候補IC一覧（attachRouteDistanceToOrderedIcsの
-// 結果）を渡すこと（区間ごとの重複計算を避けるため）。sampledPoints・
-// cumulativeDistances・候補が無い場合、または最も近い候補との累積距離差
-// がthresholdMetersを超える場合はnullを返す（呼び出し元は方式A
-// （findNearestIcByPointToPoint）へフォールバックすること）。
+// 結果）を渡すこと（区間ごとの重複計算を避けるため）。
+// 【2026-07-22追記・既知の保留事項19・20関連調査】方式Bを試行できる
+// （sampledPointsがある）状況で候補が見つからない・しきい値超過だった
+// 場合、これは主に松本IC等、IC境界検出パイプライン（Step2）の検出網に
+// そもそも登録座標が引っかかっていないことに起因すると判明した
+// （chuoエリアの座標検証未完了。詳細はPROJECT_HANDOFF.md既知の保留事項
+// 19・20参照）。そのため、方式Aへの取り繕いフォールバックはせず、
+// findNearestIcByPointToPointと同じ形の「IC不明」結果をそのまま返す
+// （呼び出し元detectTollSectionsFromSteps側で、sampledPoints自体が
+// 無い場合にのみ方式Aへフォールバックする）。
 function findNearestIcByRouteDistance(
     latLng,
     sampledPoints,
@@ -593,32 +599,18 @@ function findNearestIcByRouteDistance(
     routeDistanceCandidateIcs,
     thresholdMeters = TOLL_SECTION_IC_MATCH_THRESHOLD_METERS
 ) {
-    // 【DEBUG4 一時的・方式B長距離ルート調査】荒川区役所→松本城（約238km、
-    // 外環→関越→上信越→中央）で、区間の入口・出口IC名が「IC不明」＋
-    // 数km〜百数十kmという異常な距離になる事象の原因調査用ログ。
-    // 原因特定後、削除してよい。
-    console.log(
-        "[DEBUG4 一時的・方式B長距離ルート調査] 呼び出し：" +
-        "問い合わせ座標(" + latLng.lat + ", " + latLng.lng + ")、" +
-        "routeDistanceCandidateIcs件数：" +
-        (
-            Array.isArray(routeDistanceCandidateIcs)
-                ? routeDistanceCandidateIcs.length
-                : "配列でない(" + routeDistanceCandidateIcs + ")"
-        )
-    );
+    const buildUnmatchedResult = distanceMeters => ({
+        icName: "IC不明（未登録の可能性）",
+        distanceMeters,
+        ic: null
+    });
 
     if (
         !Array.isArray(routeDistanceCandidateIcs) ||
         routeDistanceCandidateIcs.length === 0 ||
         !Array.isArray(cumulativeDistances)
     ) {
-        console.log(
-            "[DEBUG4 一時的・方式B長距離ルート調査] 早期リターン：" +
-            "候補一覧またはcumulativeDistancesが無い"
-        );
-
-        return null;
+        return buildUnmatchedResult(Infinity);
     }
 
     const queryPosition =
@@ -628,18 +620,8 @@ function findNearestIcByRouteDistance(
             sampledPoints
         );
 
-    console.log(
-        "[DEBUG4 一時的・方式B長距離ルート調査] queryPosition：",
-        queryPosition
-    );
-
     if (!queryPosition) {
-        console.log(
-            "[DEBUG4 一時的・方式B長距離ルート調査] 早期リターン：" +
-            "queryPositionがnull（sampledPointsが2点未満？）"
-        );
-
-        return null;
+        return buildUnmatchedResult(Infinity);
     }
 
     // 問い合わせ座標自体の累積距離も、候補IC側と全く同じ補間関数
@@ -662,11 +644,6 @@ function findNearestIcByRouteDistance(
     const queryRouteDistanceMeters =
         queryWithRouteDistance.routeDistanceMeters;
 
-    console.log(
-        "[DEBUG4 一時的・方式B長距離ルート調査] queryRouteDistanceMeters：" +
-        queryRouteDistanceMeters
-    );
-
     let nearestCandidate = null;
     let nearestRouteDistanceDiffMeters = Infinity;
 
@@ -687,35 +664,12 @@ function findNearestIcByRouteDistance(
         }
     });
 
-    console.log(
-        "[DEBUG4 一時的・方式B長距離ルート調査] 最も近い候補：",
-        nearestCandidate
-            ? {
-                icName: nearestCandidate.ic?.displayName,
-                routeDistanceMeters:
-                    nearestCandidate.routeDistanceMeters
-            }
-            : "候補なし",
-        "、累積距離差：" + nearestRouteDistanceDiffMeters + "m",
-        "、しきい値：" + thresholdMeters + "m"
-    );
-
     if (
         !nearestCandidate ||
         nearestRouteDistanceDiffMeters > thresholdMeters
     ) {
-        console.log(
-            "[DEBUG4 一時的・方式B長距離ルート調査] 方式Aへフォールバック" +
-            "（しきい値超過または候補なし）"
-        );
-
-        return null;
+        return buildUnmatchedResult(nearestRouteDistanceDiffMeters);
     }
-
-    console.log(
-        "[DEBUG4 一時的・方式B長距離ルート調査] 方式Bで確定：" +
-        nearestCandidate.ic.displayName
-    );
 
     return {
         icName: nearestCandidate.ic.displayName,
@@ -839,7 +793,7 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
     // 診断ログが行っている計算と同程度のコストに収まる）。sampledPointsが
     // 渡されない呼び出し元（estimateComparisonCandidateToll・
     // estimateMainHighwayToll等）ではnullのままとなり、findNearestIcLabel
-    // は後述の通り自動的に方式Aへフォールバックする。
+    // は後述の通り方式Aへフォールバックする。
     const cumulativeDistances =
         Array.isArray(sampledPoints) && sampledPoints.length >= 2
             ? buildCumulativeDistanceArray(sampledPoints)
@@ -856,48 +810,20 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
             )
             : null;
 
-    // 【DEBUG4 一時的・方式B長距離ルート調査】routeDistanceCandidateIcsが
-    // ルート全長をどこまでカバーしているか（候補のrouteDistanceMetersの
-    // 最大値が、ルート総距離＝cumulativeDistances末尾の値に近いか）を
-    // 確認するためのログ。長距離ルートの後半で候補が欠落していないかを
-    // 見るためのもの。原因特定後、削除してよい。
-    if (routeDistanceCandidateIcs) {
-        const candidateRouteDistances =
-            routeDistanceCandidateIcs.map(
-                candidate => candidate.routeDistanceMeters
-            );
-
-        console.log(
-            "[DEBUG4 一時的・方式B長距離ルート調査] " +
-            "routeDistanceCandidateIcs件数：" +
-            routeDistanceCandidateIcs.length +
-            "、routeDistanceMeters範囲：" +
-            (
-                candidateRouteDistances.length > 0
-                    ? Math.round(
-                        Math.min(...candidateRouteDistances)
-                    ) + "m 〜 " +
-                        Math.round(
-                            Math.max(...candidateRouteDistances)
-                        ) + "m"
-                    : "該当なし"
-            ) +
-            "、sampledPoints件数：" +
-            (Array.isArray(sampledPoints) ? sampledPoints.length : 0) +
-            "、ルート総距離：" +
-            Math.round(
-                cumulativeDistances[cumulativeDistances.length - 1] || 0
-            ) + "m"
-        );
-    }
-
-    // 【既知の保留事項26対応・方式B統一】区間の入口・出口IC名は、方式B
-    // （点と線、findNearestIcByRouteDistance）を優先する。首都高のように
-    // ICが密集するエリアで、方式A（点と点）が近接する別ICと取り違える
-    // リスクを減らすため。sampledPointsが無い場合や、方式Bで十分近い
-    // 候補が見つからない場合（nullが返った場合）は、従来の方式A
-    // （findNearestIcByPointToPoint）にフォールバックする。特定の道路
-    // （アクアライン等）を個別に判定する分岐は設けていない。
+    // 【既知の保留事項26対応・方式B統一、2026-07-22追記】区間の入口・
+    // 出口IC名は、sampledPointsが利用できる場合は方式B（点と線、
+    // findNearestIcByRouteDistance）のみを使う。首都高のようにICが
+    // 密集するエリアで、方式A（点と点）が近接する別ICと取り違えるリスク
+    // を減らすため。特定の道路（アクアライン等）を個別に判定する分岐は
+    // 設けていない。
+    // 【2026-07-22追記・既知の保留事項19・20関連調査】方式Bが候補を
+    // 見つけられなかった場合（松本IC等、Step2のIC境界検出パイプラインの
+    // 検出網にそもそも登録座標が引っかかっていないケースがあると判明）、
+    // 方式Aへは取り繕いフォールバックせず、方式Bの「IC不明」結果を
+    // そのまま返す。これは、方式Bを試験導入している箇所で、方式Bが実際
+    // にどの程度正しく機能しているかを正確に観測できるようにするため。
+    // sampledPointsが無い呼び出し元（方式Bをそもそも試行できない場合）
+    // に限り、従来通り方式A（findNearestIcByPointToPoint）を使う。
     const findNearestIcLabel = location => {
         const latLng =
             extractLatLngFromRouteLocation(location);
@@ -910,17 +836,15 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
             };
         }
 
-        const methodBResult =
-            findNearestIcByRouteDistance(
-                latLng,
-                sampledPoints,
-                cumulativeDistances,
-                routeDistanceCandidateIcs
-            );
+        if (!cumulativeDistances) {
+            return findNearestIcByPointToPoint(latLng, icDefinitions);
+        }
 
-        return (
-            methodBResult ||
-            findNearestIcByPointToPoint(latLng, icDefinitions)
+        return findNearestIcByRouteDistance(
+            latLng,
+            sampledPoints,
+            cumulativeDistances,
+            routeDistanceCandidateIcs
         );
     };
 

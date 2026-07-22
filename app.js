@@ -13622,7 +13622,12 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
         // 元に戻す。
         console.group("[DEBUG6 一時的・浮島IC複数通過確認]");
 
-        const logNearbySampledPoints = (label, targetLat, targetLng) => {
+        const logNearbySampledPoints = (
+            label,
+            targetLat,
+            targetLng,
+            averageDistanceTarget = null
+        ) => {
             const nearbyPoints =
                 sampledPoints
                     .map(point => ({
@@ -13636,7 +13641,9 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                                     point.lat,
                                     point.lng
                                 )
-                            )
+                            ),
+                        lat: point.lat,
+                        lng: point.lng
                     }))
                     .filter(point => point.distanceMeters <= 1000)
                     .sort(
@@ -13651,12 +13658,42 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 nearbyPoints.length
             );
             console.table(nearbyPoints);
+
+            if (averageDistanceTarget && nearbyPoints.length > 0) {
+                const averageLat =
+                    nearbyPoints.reduce(
+                        (sum, point) => sum + point.lat,
+                        0
+                    ) / nearbyPoints.length;
+                const averageLng =
+                    nearbyPoints.reduce(
+                        (sum, point) => sum + point.lng,
+                        0
+                    ) / nearbyPoints.length;
+
+                const distanceToTargetMeters =
+                    calculateDistance(
+                        averageLat,
+                        averageLng,
+                        averageDistanceTarget.lat,
+                        averageDistanceTarget.lng
+                    );
+
+                console.log(
+                    label + "の近傍点(" + nearbyPoints.length +
+                        "件)の平均座標:",
+                    { lat: averageLat, lng: averageLng },
+                    " / 平均座標からGoogle境界座標までの距離(m):",
+                    Math.round(distanceToTargetMeters)
+                );
+            }
         };
 
         logNearbySampledPoints(
             "浮島IC登録座標",
             35.520593,
-            139.787833
+            139.787833,
+            { lat: 35.5184054, lng: 139.7920848 }
         );
 
         logNearbySampledPoints(

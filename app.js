@@ -664,6 +664,60 @@ function findNearestIcByRouteDistance(
         }
     });
 
+    // 【DEBUG5 一時的・境界点IC名解決調査】方式Bが「浮島IC」を境界点で
+    // 見つけられない原因を調べるための一時ログ。判定ロジック自体は
+    // 変更していない（既存の計算結果をそのまま出力するだけ）。
+    // 調査完了後、元に戻す。
+    console.group("[DEBUG5 一時的・境界点IC名解決調査]");
+    console.log("問い合わせ座標(latLng):", latLng);
+    console.log("queryPosition:", queryPosition);
+    console.log("queryRouteDistanceMeters:", queryRouteDistanceMeters);
+
+    const ukishimaCandidate =
+        routeDistanceCandidateIcs.find(candidate =>
+            candidate.ic?.displayName === "浮島IC"
+        );
+
+    if (ukishimaCandidate) {
+        console.log(
+            "浮島ICはrouteDistanceCandidateIcsに含まれています。" +
+                "routeDistanceMeters:",
+            ukishimaCandidate.routeDistanceMeters,
+            " / 問い合わせ地点との差(m):",
+            Math.abs(
+                ukishimaCandidate.routeDistanceMeters -
+                queryRouteDistanceMeters
+            )
+        );
+    }
+    else {
+        console.log(
+            "浮島ICはrouteDistanceCandidateIcsに含まれていません" +
+                "（Step2の検出網から漏れている可能性）。"
+        );
+    }
+
+    console.log(
+        "最も近いと判定された候補:",
+        nearestCandidate
+            ? nearestCandidate.ic?.displayName
+            : "候補なし",
+        " / 差分(m):",
+        nearestRouteDistanceDiffMeters,
+        " / しきい値(m):",
+        thresholdMeters
+    );
+
+    const isMatchSuccessful =
+        Boolean(nearestCandidate) &&
+        nearestRouteDistanceDiffMeters <= thresholdMeters;
+
+    console.log(
+        "しきい値判定結果:",
+        isMatchSuccessful ? "成功（マッチ）" : "失敗（IC不明）"
+    );
+    console.groupEnd();
+
     if (
         !nearestCandidate ||
         nearestRouteDistanceDiffMeters > thresholdMeters

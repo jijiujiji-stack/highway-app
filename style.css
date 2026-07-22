@@ -796,6 +796,21 @@ button {
     margin-bottom: 6px;
 }
 
+/* 「出口比較の判断時間（分）」の説明文とPolyline解析結果の間が
+   詰まりすぎていたため、#icAreaReasonにだけ上余白を追加する。 */
+#icAreaReason {
+    margin-top: 10px;
+}
+
+.ic-area-reason-new-pipeline {
+    color: var(--color-info);
+}
+
+.ic-area-reason-new-pipeline-legend {
+    color: var(--color-info);
+    font-size: 11px;
+}
+
 .multi-best {
     padding: 16px;
     border-radius: 12px;

@@ -23758,6 +23758,21 @@ function shortenIcName(name) {
         .replace("スマートインターチェンジ", "SIC");
 }
 
+// 【検索条件パネル・新旧方式の視覚区別】値の部分だけを、必要なら
+// dashboard側の道路名pill（.assumed-route-road）と同じ配色
+// （--color-info）で強調するヘルパー。isNewPipeline:trueのときだけ
+// 色付きspanで包む。escapeHtmlはどちらの場合も必ず通す（この関数の
+// 呼び出し側では、以後lines配列の要素を二重エスケープしないこと）。
+function wrapIcAreaReasonValue(text, isNewPipeline) {
+    const escapedText = escapeHtml(text);
+
+    return isNewPipeline
+        ? "<span class=\"ic-area-reason-new-pipeline\">" +
+            escapedText +
+            "</span>"
+        : escapedText;
+}
+
 function buildPolylineComparisonSummaryHtml(
     polylineAnalysis
 ) {
@@ -23766,37 +23781,65 @@ function buildPolylineComparisonSummaryHtml(
         return "Polyline解析結果：未取得";
     }
 
+    // TOLL TAG方式（tollSections）が利用できる場合はこちらを優先する。
+    // hasTollSectionStepsDataがfalseの場合（getHighwayRouteForMultiExit
+    // Comparison経由等、stepsを取得していない呼び出し元）は、既存の
+    // 座標ベース方式（roadSequence/shutoEntranceIc/nexcoEntranceIc等）に
+    // フォールバックする。座標ベース方式のコード自体は削除せず残している。
+    const isTollSectionBased =
+        polylineAnalysis.hasTollSectionStepsData === true;
+
+    const tollSections =
+        polylineAnalysis.tollSections || [];
+
     const lines = [
         "Polyline解析結果：取得済み"
     ];
 
-    const roadNames = [
-        ...new Set(
-            (
-                polylineAnalysis.displayRoadSequence ||
-                polylineAnalysis.roadSequence ||
-                []
-            )
-                .map(shortenHighwayRoadName)
-                .filter(Boolean)
-        )
-    ];
+    if (isTollSectionBased) {
+        lines.push(
+            "<span class=\"ic-area-reason-new-pipeline-legend\">" +
+            "※紫色の項目はTOLL TAG区間ベース（新方式）の結果です" +
+            "</span>"
+        );
+    }
+
+    // 【既知の保留事項26棚卸し対応】「想定道路：」は、tollSectionsが
+    // 利用できる場合、既存実装済みだが未使用だったbuildTollSection
+    // BasedIcSequence（の考え方）に揃え、resolveTollSectionRoadLabel
+    // （dashboard側の「参考：高速利用ルート」pillと同じ道路名解決）から
+    // 組み立てる。利用できない場合は、従来通りroadSequence/
+    // displayRoadSequence（座標ベース）にフォールバックする。
+    const roadNames =
+        isTollSectionBased
+            ? [
+                ...new Set(
+                    tollSections
+                        .map(resolveTollSectionRoadLabel)
+                        .filter(Boolean)
+                )
+            ]
+            : [
+                ...new Set(
+                    (
+                        polylineAnalysis.displayRoadSequence ||
+                        polylineAnalysis.roadSequence ||
+                        []
+                    )
+                        .map(shortenHighwayRoadName)
+                        .filter(Boolean)
+                )
+            ];
 
     lines.push(
         "想定道路：" +
-        (roadNames.join(" → ") || "なし")
+        wrapIcAreaReasonValue(
+            roadNames.join(" → ") || "なし",
+            isTollSectionBased
+        )
     );
 
-    // TOLL TAG方式（tollSections）が利用できる場合はこちらを優先する。
-    // hasTollSectionStepsDataがfalseの場合（getHighwayRouteForMultiExit
-    // Comparison経由等、stepsを取得していない呼び出し元）は、既存の
-    // 座標ベース方式（shutoEntranceIc/shutoExitIc/nexcoEntranceIc/
-    // nexcoExitIc）にフォールバックする。座標ベース方式のコード自体は
-    // 削除せず残している。
-    if (polylineAnalysis.hasTollSectionStepsData === true) {
-
-        const tollSections =
-            polylineAnalysis.tollSections || [];
+    if (isTollSectionBased) {
 
         const shutoSections =
             tollSections.filter(
@@ -23837,57 +23880,71 @@ function buildPolylineComparisonSummaryHtml(
 
         lines.push(
             "首都高入口：" +
-            formatSectionIcText(
-                shutoSections[0],
-                "entrance"
-            ) +
-            formatMultiSectionSuffix(shutoSections)
+            wrapIcAreaReasonValue(
+                formatSectionIcText(
+                    shutoSections[0],
+                    "entrance"
+                ) +
+                formatMultiSectionSuffix(shutoSections),
+                true
+            )
         );
 
         lines.push(
             "首都高出口：" +
-            formatSectionIcText(
-                shutoSections[shutoSections.length - 1],
-                "exit"
-            ) +
-            formatMultiSectionSuffix(shutoSections)
+            wrapIcAreaReasonValue(
+                formatSectionIcText(
+                    shutoSections[shutoSections.length - 1],
+                    "exit"
+                ) +
+                formatMultiSectionSuffix(shutoSections),
+                true
+            )
         );
 
         lines.push(
             "NEXCO入口：" +
-            formatSectionIcText(
-                nexcoSections[0],
-                "entrance"
-            ) +
-            formatMultiSectionSuffix(nexcoSections)
+            wrapIcAreaReasonValue(
+                formatSectionIcText(
+                    nexcoSections[0],
+                    "entrance"
+                ) +
+                formatMultiSectionSuffix(nexcoSections),
+                true
+            )
         );
 
         lines.push(
             "NEXCO出口：" +
-            formatSectionIcText(
-                nexcoSections[nexcoSections.length - 1],
-                "exit"
-            ) +
-            formatMultiSectionSuffix(nexcoSections)
+            wrapIcAreaReasonValue(
+                formatSectionIcText(
+                    nexcoSections[nexcoSections.length - 1],
+                    "exit"
+                ) +
+                formatMultiSectionSuffix(nexcoSections),
+                true
+            )
         );
     }
     else {
 
         lines.push(
             "首都高入口：" +
-            (
+            wrapIcAreaReasonValue(
                 formatAssumedRouteIcName(
                     polylineAnalysis.shutoEntranceIc
-                ) || "なし"
+                ) || "なし",
+                false
             )
         );
 
         lines.push(
             "首都高出口：" +
-            (
+            wrapIcAreaReasonValue(
                 formatAssumedRouteIcName(
                     polylineAnalysis.shutoExitIc
-                ) || "なし"
+                ) || "なし",
+                false
             )
         );
 
@@ -23896,7 +23953,10 @@ function buildPolylineComparisonSummaryHtml(
 
         lines.push(
             "NEXCO入口：" +
-            (formatAssumedRouteIcName(nexcoEntrance) || "なし")
+            wrapIcAreaReasonValue(
+                formatAssumedRouteIcName(nexcoEntrance) || "なし",
+                false
+            )
         );
 
         const nexcoExit =
@@ -23904,7 +23964,10 @@ function buildPolylineComparisonSummaryHtml(
 
         lines.push(
             "NEXCO出口：" +
-            (formatAssumedRouteIcName(nexcoExit) || "なし")
+            wrapIcAreaReasonValue(
+                formatAssumedRouteIcName(nexcoExit) || "なし",
+                false
+            )
         );
     }
 
@@ -23912,6 +23975,16 @@ function buildPolylineComparisonSummaryHtml(
     // 結果（polylineAnalysis自身にキャッシュ済み）をそのまま参照する。
     // selectPolylineBasedMultiIcCandidates側と同じ計算結果を使うため、
     // 表示と実際の候補選定は常に一致する。件数制限はかけず全件表示する。
+    // 【既知の保留事項26棚卸し対応・検討結果】tollSectionsベース
+    // （buildTollSectionBasedIcSequence）への切り替えを検討したが、
+    // getOrBuildEntranceCandidateIcsFromPassedEntries側のコメントに
+    // ある通り、tollSectionsは沿線上の中間IC（堤通〜三郷中央間の
+    // 加平・八潮南等）を拾えないことが実車確認で判明し、意図的に
+    // passedIcEntriesベースへ置き換えられた経緯がある。表示だけを
+    // tollSectionsベースに戻すと、実際の候補選定（passedIcEntries
+    // ベース）と表示内容が食い違ってしまうため、ここは新方式へ
+    // 切り替えず、従来通りのpassedIcEntriesベースのままとする
+    // （色分けも付与しない）。
     const entranceComparisonCandidateNames = [
         ...new Set(
             getOrBuildEntranceCandidateIcsFromPassedEntries(
@@ -23924,9 +23997,10 @@ function buildPolylineComparisonSummaryHtml(
 
     lines.push(
         "入口比較候補：" +
-        (
+        wrapIcAreaReasonValue(
             entranceComparisonCandidateNames.join(" → ") ||
-            "なし"
+                "なし",
+            false
         )
     );
 
@@ -23958,15 +24032,16 @@ function buildPolylineComparisonSummaryHtml(
 
     lines.push(
         "出口比較候補：" +
-        (
+        wrapIcAreaReasonValue(
             exitComparisonCandidateNames.join(" → ") ||
-            "なし"
+                "なし",
+            false
         )
     );
 
     return lines
         .map(line =>
-            "<div>" + escapeHtml(line) + "</div>"
+            "<div>" + line + "</div>"
         )
         .join("");
 }

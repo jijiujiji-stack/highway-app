@@ -1230,69 +1230,6 @@ function trySplitNexcoSectionByBoundaryCategory(
     const boundaryPositions =
         boundaryMatches.map(match => match.position);
 
-    // 【DEBUG3 一時的・境界IC距離確認】各境界ICが、この区間のpolyline
-    // からどれだけ離れて検出されたかを確認するための一時ログ。原因特定
-    // 後、削除してよい。
-    console.log(
-        "[DEBUG3 一時的・境界IC距離確認] rule.id：" + rule.id +
-        "、区間entranceIcName：" + (section.entranceIcName || "不明") +
-        "、区間exitIcName：" + (section.exitIcName || "不明") +
-        "、しきい値(thresholdMeters)：" + thresholdMeters + "m"
-    );
-    rule.boundaryIcNames.forEach((icName, icIndex) => {
-        const position = boundaryPositions[icIndex];
-        const registeredIc = boundaryIcObjects[icIndex];
-        const matchedKnownBoundary =
-            boundaryMatches[icIndex].matchedKnownBoundary;
-
-        // 【DEBUG3 一時的・境界IC距離確認】positionはfindIcPositionWithin
-        // SectionPolylineの戻り値（segmentIndex/projectionRatio）であり、
-        // 緯度経度自体は含まれていない。同じ形式を受け取れる既存の
-        // interpolatePointOnSectionPolyline（分割処理内で境界点座標を
-        // 求める際に使っているものと同一関数）をログ目的だけに流用し、
-        // findIcPositionWithinSectionPolyline自体は変更していない。
-        const nearestPointOnPolyline =
-            position
-                ? interpolatePointOnSectionPolyline(
-                    section.sectionPolylinePoints,
-                    position
-                )
-                : null;
-
-        console.log(
-            "[DEBUG3 一時的・境界IC距離確認]   境界IC「" + icName +
-            "」：" +
-            (
-                position
-                    ? "distanceMeters=" +
-                        Math.round(position.distanceMeters) + "m" +
-                        "、登録座標(" +
-                        registeredIc.lat.toFixed(6) + ", " +
-                        registeredIc.lng.toFixed(6) + ")" +
-                        "、polyline最短地点(" +
-                        nearestPointOnPolyline.lat.toFixed(6) + ", " +
-                        nearestPointOnPolyline.lng.toFixed(6) + ")" +
-                        (
-                            matchedKnownBoundary
-                                ? "（区間の入口・出口名と一致のため座標探索をスキップ）"
-                                : ""
-                        )
-                    : "見つからず（sectionPolylinePointsが2点未満）"
-            )
-        );
-    });
-
-    const willSplit =
-        !boundaryPositions.some(
-            position =>
-                !position ||
-                position.distanceMeters > thresholdMeters
-        );
-    console.log(
-        "[DEBUG3 一時的・境界IC距離確認] 判定結果：" +
-        (willSplit ? "分割する" : "分割しない（しきい値超過または未検出）")
-    );
-
     if (
         boundaryPositions.some(
             position =>
@@ -1409,29 +1346,6 @@ function trySplitNexcoSectionByBoundaryCategory(
             stepCount: null
         });
     }
-
-    // 【DEBUG3 一時的・境界IC距離確認】分割が発動した場合、生成された
-    // サブ区間ごとのtollCategoryId・距離・entrance/exitIc名を確認する
-    // ための一時ログ。tollCategoryIdはresolveSubSectionTollCategoryId
-    // により再判定済みの値（before/after区間はIC名テーブル参照、middle
-    // 区間はrule.idそのまま）。原因特定後、削除してよい。
-    console.log(
-        "[DEBUG3 一時的・境界IC距離確認] 分割発動：サブ区間数：" +
-        splitSections.length,
-        JSON.stringify(
-            splitSections.map(splitSection => ({
-                tollCategoryId: splitSection.tollCategoryId,
-                totalDistanceKm:
-                    Math.round(
-                        splitSection.totalDistanceMeters / 100
-                    ) / 10,
-                entranceIcName: splitSection.entranceIcName,
-                exitIcName: splitSection.exitIcName
-            })),
-            null,
-            2
-        )
-    );
 
     return splitSections;
 }
@@ -1631,30 +1545,6 @@ function selectEntranceCandidatesFromTollSectionSequence(
 function estimateMainHighwayTollFromTollSections(
     tollTagResult
 ) {
-    // 【デバッグ用・一時的】境界IC区間再分割の結果がETC概算計算に
-    // 渡っているか確認するためだけのログ。確認が終わったら削除する。
-    console.log(
-        "[DEBUG 一時的] estimateMainHighwayTollFromTollSectionsに渡された" +
-        "tollSections件数：",
-        tollTagResult.tollSections.length
-    );
-    console.log(
-        "[DEBUG 一時的] tollSections内容：",
-        JSON.stringify(
-            tollTagResult.tollSections.map(section => ({
-                tollCategoryId: section.tollCategoryId,
-                totalDistanceKm:
-                    Math.round(
-                        section.totalDistanceMeters / 100
-                    ) / 10,
-                entranceIcName: section.entranceIcName,
-                exitIcName: section.exitIcName
-            })),
-            null,
-            2
-        )
-    );
-
     let shutoToll = 0;
     let nexcoToll = 0;
 
@@ -13466,13 +13356,6 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                 )
         );
 
-        // 【DEBUG2 一時的・既知の保留事項24調査】detectIcsNearPolyline
-        // （Step 2）が実際に呼ばれ、件数が0件でないかを明示する。
-        console.log(
-            "[DEBUG2 一時的] detectIcsNearPolyline 呼び出し済み、件数：" +
-            icsNearPolyline.length
-        );
-
         const icsOrderedAlongPolyline =
             detectIcsOrderedAlongPolyline(sampledPoints, 500);
 
@@ -13483,13 +13366,6 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                     .map(item => item.ic.displayName)
                     .join(" → ") || "なし"
             )
-        );
-
-        // 【DEBUG2 一時的・既知の保留事項24調査】detectIcsOrderedAlongPolyline
-        // （Step 3）の呼び出し状況・件数。
-        console.log(
-            "[DEBUG2 一時的] detectIcsOrderedAlongPolyline 呼び出し済み、" +
-            "件数：" + icsOrderedAlongPolyline.length
         );
 
         const roadCategorySequence =
@@ -13506,20 +13382,6 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                         "(" + section.icCount + "件)"
                     )
                     .join(" → ") || "なし"
-            )
-        );
-
-        // 【DEBUG2 一時的・既知の保留事項24調査】
-        // buildRoadCategorySequenceFromOrderedIcs（Step 4）の呼び出し状況・
-        // 件数・要約（区間ラベル・IC件数）。
-        console.log(
-            "[DEBUG2 一時的] buildRoadCategorySequenceFromOrderedIcs " +
-            "呼び出し済み、区間数：" + roadCategorySequence.length,
-            JSON.stringify(
-                roadCategorySequence.map(section => ({
-                    label: section.label,
-                    icCount: section.icCount
-                }))
             )
         );
 
@@ -13545,13 +13407,6 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             }))
         );
 
-        // 【DEBUG2 一時的・既知の保留事項24調査】
-        // attachRouteDistanceToOrderedIcs（Step 5）の呼び出し状況・件数。
-        console.log(
-            "[DEBUG2 一時的] attachRouteDistanceToOrderedIcs 呼び出し済み、" +
-            "件数：" + icsWithRouteDistance.length
-        );
-
         // 【検証用・一時的】新方式（IC境界ベース）の料金概算。既存の
         // [ETC概算 料金計算]ログが出す実際のTOLL TAG方式の金額と、
         // 目視で見比べるためだけのもの。実際の料金計算・表示ロジックには
@@ -13574,29 +13429,6 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             "円 + 他道路：約" +
             newPipelineTollEstimate.otherToll.toLocaleString() +
             "円）"
-        );
-
-        // 【DEBUG2 一時的・既知の保留事項24調査】
-        // buildTollCategorySequenceWithDistance・
-        // estimateTollFromTollCategorySequence（Step 6）の呼び出し状況・
-        // 件数・区間ごとのカテゴリID・距離(km)。この配列を、
-        // estimateMainHighwayTollFromTollSections先頭の[DEBUG 一時的]
-        // ログ（tollSections）と目視で見比べる。
-        console.log(
-            "[DEBUG2 一時的] buildTollCategorySequenceWithDistance " +
-            "呼び出し済み、区間数：" + tollCategorySequence.length,
-            JSON.stringify(
-                tollCategorySequence.map(section => ({
-                    tollCategoryId: section.tollCategoryId,
-                    distanceKm:
-                        Math.round(
-                            section.distanceMeters / 100
-                        ) / 10,
-                    icCount: section.icCount
-                })),
-                null,
-                2
-            )
         );
 
         // 【検証用・一時的】検出漏れ（登録済みICが無く新方式で検出でき
@@ -13650,13 +13482,6 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             }))
         );
 
-        // 【DEBUG2 一時的・既知の保留事項24調査】
-        // findDetectionGapsInOrderedIcs（Step 7）の呼び出し状況・件数。
-        console.log(
-            "[DEBUG2 一時的] findDetectionGapsInOrderedIcs 呼び出し済み、" +
-            "検出漏れ件数：" + detectionGaps.length
-        );
-
         const tollCategorySequenceWithGap =
             buildTollCategorySequenceWithGapDetection(
                 icsWithRouteDistance,
@@ -13679,41 +13504,6 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             newPipelineTollEstimateWithGap.otherToll
                 .toLocaleString() +
             "円）"
-        );
-
-        // 【DEBUG2 一時的・既知の保留事項24調査】
-        // buildTollCategorySequenceWithGapDetection（Step 7）の呼び出し
-        // 状況・件数・最終的な「区間ごとのカテゴリ・距離の配列」全文。
-        // このすぐ下に出るはずの、estimateMainHighwayTollFromTollSections
-        // 先頭の[DEBUG 一時的]ログ（実際にETC概算計算に渡るtollSections）
-        // と、目視で並べて見比べる。
-        // 【重要な注記】このtollCategorySequenceWithGapは、Step1〜7の
-        // 独自パイプライン（sampledPoints・IC_MASTER最寄り判定ベース）の
-        // 結果であり、detectTollSectionsFromSteps／
-        // applyBoundaryCategorySplitsToTollSections（境界IC区間再分割・
-        // 今回接続したtollSections側パイプライン）とはコード上まったく
-        // 別系統。両者は変数もロジックも共有しておらず、
-        // estimateMainHighwayTollFromTollSectionsはこちら
-        // （tollCategorySequenceWithGap）を一切参照しない。そのため、
-        // 件数・金額が食い違っていても、それ自体は既知の保留事項24の
-        // バグの直接証拠にはならない（あくまで別パイプライン同士の
-        // 参考比較用ログ）。
-        console.log(
-            "[DEBUG2 一時的] buildTollCategorySequenceWithGapDetection " +
-            "呼び出し済み、区間数：" + tollCategorySequenceWithGap.length,
-            JSON.stringify(
-                tollCategorySequenceWithGap.map(section => ({
-                    tollCategoryId: section.tollCategoryId,
-                    distanceKm:
-                        Math.round(
-                            section.distanceMeters / 100
-                        ) / 10,
-                    icCount: section.icCount,
-                    isGapEstimate: section.isGapEstimate || false
-                })),
-                null,
-                2
-            )
         );
 
         console.groupEnd();
@@ -14804,114 +14594,55 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
         const tollTagResult =
             detectTollSectionsFromSteps(highwayRoute, sampledPoints);
 
-        // 【境界IC区間再分割検証・一時的】既知の保留事項22の残課題
-        // （アクアライン区間の誤結合）向け、IC境界ベース区間再分割
-        // （Step 2）の動作確認用ログ。
-        // 【Step 3で追記】本番の区間分割は、detectTollSectionsFromSteps
-        // 側（applyBoundaryCategorySplitsToTollSections）で既に反映済み。
-        // そのため、ここでのtollTagResult.tollSectionsは既に分割済みの
-        // 状態であり、このログは「分割前と分割後を比較する」ものではなく、
-        // 「既に分割済みのデータに対して再度分割を試し、意図せず二重分割
-        // が起きていないか（＝毎回「分割対象なし」になるはずか）を確認する」
-        // 動作再確認用ログに役割が変わっている。
-        // 【既知の保留事項24調査・2026-07-21】console.groupが折りたたまれた
-        // ままだと中身が見えづらいため、フラットなconsole.logに変更した。
-        console.log(
-            "[境界IC区間再分割検証・一時的] tollTagResult.tollSections " +
-            "件数：" + tollTagResult.tollSections.length
+        // 【既知の保留事項26・IC判定方式比較実験】方式A（点と点、
+        // detectTollSectionsFromSteps内のfindNearestIcLabel、区間の
+        // entranceIcName/exitIcName）と方式B（点と線、この関数内で既に
+        // 計算済みのicsNearPolyline、detectIcsNearPolylineの結果）の
+        // 判定結果を突き合わせ、一致・不一致を目視確認するためのログ。
+        // 追加のAPI呼び出し・追加の距離計算は行わず、既に計算済みの
+        // tollTagResult.tollSections・icsNearPolylineを再利用するだけ。
+        // analyzeHighwayRoutePolylineの返り値・後続処理には一切接続して
+        // いない。
+        console.group("[IC判定方式比較実験]");
+
+        const methodAIcNames =
+            [
+                ...new Set(
+                    tollTagResult.tollSections
+                        .flatMap(section => [
+                            section.entranceIcName,
+                            section.exitIcName
+                        ])
+                        .filter(icName =>
+                            icName &&
+                            icName !== "IC不明（未登録の可能性）" &&
+                            icName !== "座標取得不可"
+                        )
+                )
+            ];
+
+        console.table(
+            methodAIcNames.map(icName => {
+                const methodBMatch =
+                    icsNearPolyline.find(item =>
+                        item.ic.displayName === icName
+                    );
+
+                return {
+                    icName,
+                    方式B検出距離m:
+                        methodBMatch
+                            ? Math.round(methodBMatch.distanceMeters)
+                            : "方式Bでは未検出",
+                    判定:
+                        methodBMatch
+                            ? "一致"
+                            : "不一致"
+                };
+            })
         );
 
-        console.log(
-            "[境界IC区間再分割検証・一時的] 区間一覧（分割対象フィルタ前）：" +
-            (
-                tollTagResult.tollSections
-                    .map((section, sectionIndex) =>
-                        sectionIndex + ":" + section.tollCategoryId +
-                        "(距離" +
-                        (
-                            Math.round(
-                                section.totalDistanceMeters / 100
-                            ) / 10
-                        ) +
-                        "km)"
-                    )
-                    .join(" → ") || "なし"
-            )
-        );
-
-        // 【既知の保留事項24調査メモ・2026-07-21】この下のforEachは
-        // section.tollCategoryId === "nexco" の区間しか
-        // trySplitNexcoSectionByBoundaryCategoryに渡していない。
-        // もし木更津JCT以降のsticky継承バグにより、区間全体が最初から
-        // "aqualine"のまま分類されている（"nexco"に一度も戻らない）場合、
-        // このforEachは一度もconsole.logを呼ばずに終わり、結果として
-        // ここより下のログが「何も出ない」ように見える可能性がある。
-        // 実際にどちらなのかは、上のログ（区間一覧（分割対象フィルタ前））
-        // でtollCategoryIdの値を見れば切り分けられる。ロジック自体は
-        // 今回変更していない。
-        const aqualineCategoryRule =
-            TOLL_ROAD_CATEGORY_RULES.find(
-                rule => rule.id === "aqualine"
-            );
-
-        tollTagResult.tollSections.forEach((section, sectionIndex) => {
-            if (section.tollCategoryId !== "nexco") {
-                console.log(
-                    "[境界IC区間再分割検証・一時的] 区間" + sectionIndex +
-                    "：tollCategoryIdが" + section.tollCategoryId +
-                    "のため分割対象外（nexcoのみ対象）"
-                );
-                return;
-            }
-
-            const splitResult =
-                trySplitNexcoSectionByBoundaryCategory(
-                    section,
-                    aqualineCategoryRule
-                );
-
-            if (splitResult.length <= 1) {
-                console.log(
-                    "[境界IC区間再分割検証・一時的] 区間" + sectionIndex +
-                    "：分割対象なし（NEXCO 距離" +
-                    (Math.round(section.totalDistanceMeters / 100) / 10) +
-                    "km）"
-                );
-                return;
-            }
-
-            const beforeText =
-                "NEXCO(距離" +
-                (Math.round(section.totalDistanceMeters / 100) / 10) +
-                "km)";
-
-            const afterText =
-                splitResult
-                    .map(splitSection => {
-                        const rule =
-                            TOLL_ROAD_CATEGORY_RULES.find(
-                                r => r.id === splitSection.tollCategoryId
-                            );
-
-                        return (
-                            (rule?.label || splitSection.tollCategoryId) +
-                            "(距離" +
-                            (
-                                Math.round(
-                                    splitSection.totalDistanceMeters / 100
-                                ) / 10
-                            ) +
-                            "km)"
-                        );
-                    })
-                    .join(" + ");
-
-            console.log(
-                "[境界IC区間再分割検証・一時的] 区間" + sectionIndex +
-                "：区間分割：" +
-                beforeText + " → " + afterText
-            );
-        });
+        console.groupEnd();
 
         return {
             roadSequence:

@@ -13686,6 +13686,62 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
                     " / 平均座標からGoogle境界座標までの距離(m):",
                     Math.round(distanceToTargetMeters)
                 );
+
+                // 【DEBUG6 一時的・追加】平均座標を、本番のfindNearestIcByRouteDistance
+                // と同じ手順（findClosestPositionOnPolylineForIc→
+                // attachRouteDistanceToOrderedIcs）でルート先頭からの
+                // 累積距離に変換し、Google境界座標の累積距離
+                // （DEBUG5ログで確認済みの30925.0461248835m地点）との差が
+                // しきい値（500m）以内に収まるか確認する。
+                const averageQueryPosition =
+                    findClosestPositionOnPolylineForIc(
+                        averageLat,
+                        averageLng,
+                        sampledPoints
+                    );
+
+                if (averageQueryPosition) {
+                    const cumulativeDistancesForAverage =
+                        buildCumulativeDistanceArray(sampledPoints);
+
+                    const [averageWithRouteDistance] =
+                        attachRouteDistanceToOrderedIcs(
+                            [
+                                {
+                                    segmentIndex:
+                                        averageQueryPosition.segmentIndex,
+                                    projectionRatio:
+                                        averageQueryPosition.projectionRatio
+                                }
+                            ],
+                            cumulativeDistancesForAverage
+                        );
+
+                    const GOOGLE_BOUNDARY_ROUTE_DISTANCE_METERS =
+                        30925.0461248835;
+
+                    const routeDistanceDiffMeters =
+                        Math.abs(
+                            averageWithRouteDistance.routeDistanceMeters -
+                            GOOGLE_BOUNDARY_ROUTE_DISTANCE_METERS
+                        );
+
+                    console.log(
+                        label + "の平均座標のルート先頭からの累積距離(m):",
+                        averageWithRouteDistance.routeDistanceMeters,
+                        " / Google境界座標の累積距離(m):",
+                        GOOGLE_BOUNDARY_ROUTE_DISTANCE_METERS,
+                        " / 差(m):",
+                        Math.round(routeDistanceDiffMeters)
+                    );
+
+                    console.log(
+                        "しきい値(500m)判定:",
+                        routeDistanceDiffMeters <= 500
+                            ? "しきい値内（マッチするはず）"
+                            : "しきい値超過（IC不明になる）"
+                    );
+                }
             }
         };
 

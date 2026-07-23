@@ -344,19 +344,28 @@ const TOLL_SECTION_SHUTO_INSTRUCTION_TEXT = "首都高";
 // 道路カテゴリごとの料金ルール一覧。上から順にkeywordsとの部分一致を試し、
 // 最初に一致したルールを採用する。keywordsが空配列のルールは
 // 「どれにも一致しなかった場合のフォールバック」として扱い、必ず最後に置く。
-// tollType: "fixed"（固定額）または "perKm"（距離比例）。
+// tollType: "fixed"（固定額）・"perKm"（距離比例、税・端数処理なし）・
+// "distanceFormula"（基本料金＋距離比例＋税、roundToYen単位で4捨5入、
+// minYen/maxYenがあればクランプ）のいずれか。calculateTollAmountForRule
+// が計算する。
 // 座標ベースのicBasedIsShuto判定（distanceに上限が無く、アクアラインの
 // ような首都高接続部が近い区間で誤判定を起こす）に代わり、Googleの
 // 案内テキストのみで道路カテゴリを判定する新方式（Step B）の土台。
 // 将来、阪神高速・名古屋高速・本四高速等を追加する場合はこの配列に
 // 要素を追加するだけでよい設計。
+// 【2026年7月時点の現行料金・深夜割引等の特殊割引は考慮しない】
 const TOLL_ROAD_CATEGORY_RULES = [
     {
         id: "shuto",
         label: "首都高",
         keywords: ["首都高速", "首都高"],
-        tollType: "fixed",
-        fixedYen: 1000
+        tollType: "distanceFormula",
+        baseYen: 150,
+        perKmYen: 29.52,
+        taxRate: 1.1,
+        roundToYen: 10,
+        minYen: 300,
+        maxYen: 1950
     },
     {
         id: "aqualine",
@@ -372,10 +381,49 @@ const TOLL_ROAD_CATEGORY_RULES = [
         id: "nexco",
         label: "NEXCO",
         keywords: [],
-        tollType: "perKm",
-        perKmYen: 24
+        tollType: "distanceFormula",
+        baseYen: 150,
+        perKmYen: 24.6,
+        taxRate: 1.1,
+        roundToYen: 10
     }
 ];
+
+// TOLL_ROAD_CATEGORY_RULESの1ルール分の距離（メートル）から、料金
+// （円）を算出する共通ヘルパー。tollType別の計算ロジックを1箇所に
+// まとめ、estimateMainHighwayTollFromTollSections・buildTollCategory
+// BreakdownItems・estimateComparisonCandidateToll（首都高側）で共通
+// 利用する。
+function calculateTollAmountForRule(rule, totalDistanceMeters) {
+    if (rule.tollType === "fixed") {
+        return rule.fixedYen;
+    }
+
+    if (rule.tollType === "perKm") {
+        return Math.round(
+            (totalDistanceMeters / 1000) * rule.perKmYen
+        );
+    }
+
+    const rawYen =
+        (
+            rule.baseYen +
+            (totalDistanceMeters / 1000) * rule.perKmYen
+        ) * rule.taxRate;
+
+    let roundedYen =
+        Math.round(rawYen / rule.roundToYen) * rule.roundToYen;
+
+    if (typeof rule.minYen === "number") {
+        roundedYen = Math.max(roundedYen, rule.minYen);
+    }
+
+    if (typeof rule.maxYen === "number") {
+        roundedYen = Math.min(roundedYen, rule.maxYen);
+    }
+
+    return roundedYen;
+}
 
 // combinedInstructions（有料区間のGoogle案内テキスト連結文字列）から、
 // TOLL_ROAD_CATEGORY_RULESを上から順に照合し、最初に一致したルールを返す。
@@ -1803,12 +1851,12 @@ function selectEntranceCandidatesFromTollSectionSequence(
 // 区間ごとの首都高/NEXCO判定（section.isShutoSection）はdetectToll
 // SectionsFromSteps側で既に計算済みのため、ここではその値をそのまま
 // 使う（検索条件パネル等、他の呼び出し元とも判定結果を共有するため）。
-// いずれかの境界ICが首都高であれば区間全体を首都高（定額課金）として
-// 扱う簡略化を採用している（首都高からNEXCOへ乗り継ぎなしで連続する
-// 区間では、NEXCO側の距離比例分が計上されない制約が残るが、初期実装
-// として許容する）。NEXCO区間は、区間内のsteps.distanceMetersの合計
-// （実測、追加API呼び出し不要）に24円/km（既存の距離ベース概算と
-// 同じ単価）を乗じて算出する。
+// いずれかの境界ICが首都高であれば区間全体を首都高として扱う簡略化を
+// 採用している（首都高からNEXCOへ乗り継ぎなしで連続する区間では、
+// NEXCO側の距離比例分が計上されない制約が残るが、初期実装として許容
+// する）。各区間の金額は、区間内のsteps.distanceMetersの合計（実測、
+// 追加API呼び出し不要）から、calculateTollAmountForRule（距離制料金式・
+// 4捨5入・上限下限）で算出する。
 function estimateMainHighwayTollFromTollSections(
     tollTagResult
 ) {
@@ -1824,18 +1872,17 @@ function estimateMainHighwayTollFromTollSections(
                 TOLL_ROAD_CATEGORY_RULES.length - 1
             ];
 
+        const sectionToll =
+            calculateTollAmountForRule(
+                rule,
+                section.totalDistanceMeters
+            );
+
         if (rule.id === "shuto") {
-            shutoToll += rule.fixedYen;
-        }
-        else if (rule.tollType === "fixed") {
-            nexcoToll += rule.fixedYen;
+            shutoToll += sectionToll;
         }
         else {
-            nexcoToll +=
-                Math.round(
-                    (section.totalDistanceMeters / 1000) *
-                    rule.perKmYen
-                );
+            nexcoToll += sectionToll;
         }
     });
 
@@ -1990,12 +2037,57 @@ function formatTollRouteLabel(startIc, endIc) {
     );
 }
 
-// shutoEntryCountは、ルート中で首都高に乗った回数（polylineAnalysis.shutoEntryCount、
-// analyzeHighwayRoutePolyline側のshutoSegments.lengthから算出）。呼び出し側で
-// polylineAnalysisが無い場合は、isShutoIc(startIc)||isShutoIc(endIc)による
-// 従来の二値判定（1回分）をフォールバックとして渡すこと。
-function getShutoTollEstimateForIcPair(startIc, endIc, shutoEntryCount) {
-    return shutoEntryCount * SHUTO_TOLL_ESTIMATE_YEN;
+// polylineAnalysis.tollSections（元の検索ルート全体のTOLL TAG区間検出
+// 結果）から、tollCategoryId==="shuto"の区間のtotalDistanceMetersを
+// 合算し、首都高利用距離（メートル）を返す。tollSectionsが無い・該当
+// 区間が無い場合は、距離不明としてnullを返す（0mへのフォールバックは
+// しない。0mと「不明」は意味が違うため）。
+function getShutoUsageDistanceMeters(polylineAnalysis) {
+    const shutoSections =
+        (polylineAnalysis?.tollSections || [])
+            .filter(section =>
+                section.tollCategoryId === "shuto"
+            );
+
+    if (shutoSections.length === 0) {
+        return null;
+    }
+
+    return shutoSections.reduce(
+        (sum, section) =>
+            sum + (section.totalDistanceMeters || 0),
+        0
+    );
+}
+
+// isShutoUsedは、候補区間が首都高を使うかどうかの判定
+// （isShutoIc(startIc)||isShutoIc(endIc)、判定方法自体は変更していない）。
+// shutoDistanceMetersは、getShutoUsageDistanceMetersで求めた首都高利用
+// 距離。首都高を使うのに距離が不明（null）な場合、SHUTO_TOLL_ESTIMATE_YEN
+// 等の固定値へフォールバックはせず、算出不可としてnullを返す（呼び出し
+// 元estimateComparisonCandidateToll側で、既存の「TOLL TAG方式で判定
+// できなかった場合」と同じnull規約に合流させる）。
+function getShutoTollEstimateForIcPair(
+    isShutoUsed,
+    shutoDistanceMeters
+) {
+    if (!isShutoUsed) {
+        return 0;
+    }
+
+    if (shutoDistanceMeters === null) {
+        return null;
+    }
+
+    const shutoRule =
+        TOLL_ROAD_CATEGORY_RULES.find(rule =>
+            rule.id === "shuto"
+        );
+
+    return calculateTollAmountForRule(
+        shutoRule,
+        shutoDistanceMeters
+    );
 }
 
 // 【Step 2】入口比較V2・出口比較V2で共通利用する候補料金概算。
@@ -2013,13 +2105,20 @@ function getShutoTollEstimateForIcPair(startIc, endIc, shutoEntryCount) {
 // 伝える（呼び出し元の候補ごとのtry/catchで捕捉される想定）。
 // fallbackDistanceMetersは今回の方式では使用しない（Step 3で呼び出し元
 // を調整する際にあわせて整理する）。
-// 【変更】首都高利用回数は、以前は元の検索ルート全体の解析結果
-// （polylineAnalysis.tollEntryCount/shutoEntryCount）を参照していたが、
-// これは「候補区間」ではなく「元のルート全体」の区間数であり、意味的に
-// 噛み合っていなかった（首都高以外の区間まで回数として数えてしまう
-// 誤カウントがあった）。候補IC比較は必ず「首都高側⇔NEXCO側」を1回だけ
-// 跨ぐ構造のため、候補自身の起点・終点ICだけから判定する単純な形に
-// 変更し、polylineAnalysisは参照しない。
+// 【変更】首都高を使うかどうかの判定は、以前は元の検索ルート全体の
+// 解析結果（polylineAnalysis.tollEntryCount/shutoEntryCount）を参照
+// していたが、これは「候補区間」ではなく「元のルート全体」の区間数で
+// あり、意味的に噛み合っていなかった（首都高以外の区間まで回数として
+// 数えてしまう誤カウントがあった）。候補IC比較は必ず「首都高側⇔NEXCO
+// 側」を1回だけ跨ぐ構造のため、候補自身の起点・終点ICだけから判定する
+// 単純な形のまま変更していない。
+// 【距離制料金式対応】首都高を使う場合の料金は、距離制料金式
+// （calculateTollAmountForRule）で算出する。距離は、元の検索ルート
+// 全体のtollSections（polylineAnalysis経由）から求める
+// （getShutoUsageDistanceMeters）。候補ごとに首都高側のルートを別途
+// 取得することはしない（既存の「首都高側の乗り方は候補間で共通」という
+// 設計のまま、追加のRoutes API呼び出しは発生しない）。距離が不明な
+// 場合は固定値へのフォールバックはせず、算出不可としてnullを返す。
 async function estimateComparisonCandidateToll({
     startIc,
     endIc,
@@ -2029,15 +2128,21 @@ async function estimateComparisonCandidateToll({
     polylineAnalysis = null
 }) {
 
-    const shutoToll =
-        getShutoTollEstimateForIcPair(
-            startIc,
-            endIc,
-            (isShutoIc(startIc) || isShutoIc(endIc)) ? 1 : 0
-        );
-
     const startIsShuto = isShutoIc(startIc);
     const endIsShuto = isShutoIc(endIc);
+    const isShutoUsed = startIsShuto || endIsShuto;
+
+    const shutoToll =
+        getShutoTollEstimateForIcPair(
+            isShutoUsed,
+            isShutoUsed
+                ? getShutoUsageDistanceMeters(polylineAnalysis)
+                : 0
+        );
+
+    if (shutoToll === null) {
+        return null;
+    }
 
     // ルールA：首都高IC同士は候補区間のルート取得自体を行わず、
     // 固定料金のみとする（既存の最適化を維持）。
@@ -2630,7 +2735,7 @@ function buildTollUsageSummaryHtml(
 // （境界IC区間再分割済み、estimateMainHighwayTollFromTollSectionsが返す
 // もの）を、TOLL_ROAD_CATEGORY_RULESのカテゴリごとにグルーピングして
 // 金額を合算する。金額の算出方法自体はestimateMainHighwayTollFrom
-// TollSectionsと同じ（tollType:"fixed"なら固定額、"perKm"なら距離比例）。
+// TollSectionsと同じ（calculateTollAmountForRuleを共通利用）。
 // id==="nexco"（圏央道・館山道等をまとめた汎用の距離課金区分）だけは、
 // 個別の道路名ではなく従来通り「高速」という汎用ラベルを使う。それ以外
 // （"shuto"・"aqualine"等、boundaryIcNamesを持つ特別カテゴリを含む）は
@@ -2654,12 +2759,10 @@ function buildTollCategoryBreakdownItems(tollSections) {
             );
 
         const sectionAmount =
-            rule.tollType === "fixed"
-                ? rule.fixedYen
-                : Math.round(
-                    (section.totalDistanceMeters / 1000) *
-                    rule.perKmYen
-                );
+            calculateTollAmountForRule(
+                rule,
+                section.totalDistanceMeters
+            );
 
         amountByRuleId.set(
             rule.id,

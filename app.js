@@ -718,6 +718,85 @@ function findNearestIcByRouteDistance(
     );
     console.groupEnd();
 
+    // 【DEBUG7 一時的・投影後直線距離フォールバック検証】道のり位置での
+    // 比較が失敗した場合に、投影後の座標同士を直線距離で比較する
+    // フォールバックが安定して有効かを検証するための一時ログ。判定
+    // ロジック自体は変更していない（既存の計算結果に、追加の直線距離を
+    // 添えて出力するだけ）。検証完了後、元に戻す。
+    console.group(
+        "[DEBUG7 一時的・投影後直線距離フォールバック検証]"
+    );
+
+    const queryProjectedLatLng =
+        interpolateLatLngOnSampledPoints(
+            sampledPoints,
+            queryPosition.segmentIndex,
+            queryPosition.projectionRatio
+        );
+
+    console.log(
+        "問い合わせ地点の投影後座標(queryProjectedLatLng):",
+        queryProjectedLatLng
+    );
+
+    routeDistanceCandidateIcs.forEach(candidate => {
+        const hasSegmentInfo =
+            typeof candidate.segmentIndex === "number" &&
+            typeof candidate.projectionRatio === "number";
+
+        const routeDistanceDiffMeters =
+            Math.abs(
+                candidate.routeDistanceMeters -
+                queryRouteDistanceMeters
+            );
+
+        const exceedsThreshold =
+            routeDistanceDiffMeters > thresholdMeters;
+
+        if (!hasSegmentInfo || !queryProjectedLatLng) {
+            console.log(
+                (exceedsThreshold ? "★しきい値超過★ " : "") +
+                    (candidate.ic?.displayName || "IC名不明"),
+                ": segmentIndex/projectionRatioを保持していないか、" +
+                    "問い合わせ地点の投影に失敗したため、直線距離は" +
+                    "計算できません。",
+                " / 道のり位置の差(m):",
+                routeDistanceDiffMeters
+            );
+            return;
+        }
+
+        const candidateProjectedLatLng =
+            interpolateLatLngOnSampledPoints(
+                sampledPoints,
+                candidate.segmentIndex,
+                candidate.projectionRatio
+            );
+
+        const straightLineDistanceMeters =
+            candidateProjectedLatLng
+                ? calculateDistance(
+                      candidateProjectedLatLng.lat,
+                      candidateProjectedLatLng.lng,
+                      queryProjectedLatLng.lat,
+                      queryProjectedLatLng.lng
+                  )
+                : null;
+
+        console.log(
+            (exceedsThreshold ? "★しきい値超過★ " : "") +
+                (candidate.ic?.displayName || "IC名不明"),
+            " / 道のり位置の差(m):",
+            routeDistanceDiffMeters,
+            " / 投影後座標同士の直線距離(m):",
+            straightLineDistanceMeters,
+            " / 候補の投影後座標:",
+            candidateProjectedLatLng
+        );
+    });
+
+    console.groupEnd();
+
     if (
         !nearestCandidate ||
         nearestRouteDistanceDiffMeters > thresholdMeters

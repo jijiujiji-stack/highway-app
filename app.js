@@ -797,18 +797,55 @@ function findNearestIcByRouteDistance(
 
     console.groupEnd();
 
-    if (
-        !nearestCandidate ||
-        nearestRouteDistanceDiffMeters > thresholdMeters
-    ) {
-        return buildUnmatchedResult(nearestRouteDistanceDiffMeters);
+    const isRouteDistanceMatchSuccessful =
+        Boolean(nearestCandidate) &&
+        nearestRouteDistanceDiffMeters <= thresholdMeters;
+
+    if (isRouteDistanceMatchSuccessful) {
+        return {
+            icName: nearestCandidate.ic.displayName,
+            distanceMeters: nearestRouteDistanceDiffMeters,
+            ic: nearestCandidate.ic
+        };
     }
 
-    return {
-        icName: nearestCandidate.ic.displayName,
-        distanceMeters: nearestRouteDistanceDiffMeters,
-        ic: nearestCandidate.ic
-    };
+    // 道のり位置ベースの判定が失敗した場合のみ、投影後座標同士の直線距離で
+    // フォールバック確認する（浮島IC周辺のような、道のり位置への投影が
+    // 不安定になりやすい構造への対処。既知の保留事項24参照）。
+    // 対象は道のり位置ベースで最も近かった候補（nearestCandidate）1件のみとし、
+    // 他の候補を新たに探索することはしない。
+    if (
+        nearestCandidate &&
+        queryProjectedLatLng &&
+        typeof nearestCandidate.segmentIndex === "number" &&
+        typeof nearestCandidate.projectionRatio === "number"
+    ) {
+        const candidateProjectedLatLng =
+            interpolateLatLngOnSampledPoints(
+                sampledPoints,
+                nearestCandidate.segmentIndex,
+                nearestCandidate.projectionRatio
+            );
+
+        if (candidateProjectedLatLng) {
+            const straightLineDistanceMeters = calculateDistance(
+                candidateProjectedLatLng.lat,
+                candidateProjectedLatLng.lng,
+                queryProjectedLatLng.lat,
+                queryProjectedLatLng.lng
+            );
+
+            if (straightLineDistanceMeters <= thresholdMeters) {
+                return {
+                    icName: nearestCandidate.ic.displayName,
+                    distanceMeters: straightLineDistanceMeters,
+                    ic: nearestCandidate.ic
+                };
+            }
+        }
+    }
+
+    return buildUnmatchedResult(nearestRouteDistanceDiffMeters);
 }
 
 // 【sampledPoints統一・2026-07-22】第2引数sampledPointsは省略可能

@@ -336,6 +336,19 @@ function isProbablyNoTollRouteByShutoSegments(polylineAnalysis) {
 const TOLL_SECTION_TAG_TEXT = "有料区間";
 const TOLL_SECTION_IC_MATCH_THRESHOLD_METERS = 500;
 
+// 【既知の保留事項24・27・28調査対応】findNearestIcByRouteDistance（区間
+// 境界のIC名判定、方式B）専用のしきい値。実車確認で乖離が確認された
+// 高井戸IC・京葉市川IC・湾岸習志野IC（551〜605m程度）を許容できるよう、
+// TOLL_SECTION_IC_MATCH_THRESHOLD_METERS（500m）より広い700mとした。
+// 方式Bのフォールバックは、道のり位置ベースで最も近かった候補
+// （nearestCandidate）1件のみを直線距離で再確認する設計のため、しきい値を
+// 広げても新たな候補探索は発生せず、別ICへの取り違えリスクは無い。
+// 一方、findNearestIcByPointToPoint（方式A）・detectIcsOrderedAlongPolyline
+// （候補IC検出）・trySplitNexcoSectionByBoundaryCategory（アクアライン境界
+// 分割）は、今回の調査・実車確認の対象外であり、リスク特性も異なるため、
+// TOLL_SECTION_IC_MATCH_THRESHOLD_METERS（500m）のまま変更していない。
+const TOLL_SECTION_ROUTE_DISTANCE_MATCH_THRESHOLD_METERS = 700;
+
 // entranceIc/exitIcが両方ともIC不明（未登録・座標精度不足等）だった場合の、
 // 首都高/NEXCO判定フォールバックに使う文言。
 const TOLL_SECTION_SHUTO_INSTRUCTION_TEXT = "首都高";
@@ -645,7 +658,7 @@ function findNearestIcByRouteDistance(
     sampledPoints,
     cumulativeDistances,
     routeDistanceCandidateIcs,
-    thresholdMeters = TOLL_SECTION_IC_MATCH_THRESHOLD_METERS
+    thresholdMeters = TOLL_SECTION_ROUTE_DISTANCE_MATCH_THRESHOLD_METERS
 ) {
     const buildUnmatchedResult = distanceMeters => ({
         icName: "IC不明（未登録の可能性）",

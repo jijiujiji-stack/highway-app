@@ -2667,11 +2667,16 @@ function buildTollCategoryBreakdownItems(tollSections) {
         );
     });
 
-    return TOLL_ROAD_CATEGORY_RULES
-        .map(rule => ({
-            label: rule.id === "nexco" ? "高速" : rule.label,
-            amount: amountByRuleId.get(rule.id) || 0
-        }))
+    return Array.from(amountByRuleId.entries())
+        .map(([ruleId, amount]) => {
+            const rule =
+                TOLL_ROAD_CATEGORY_RULES.find(r => r.id === ruleId);
+
+            return {
+                label: ruleId === "nexco" ? "高速" : rule.label,
+                amount
+            };
+        })
         .filter(item => item.amount > 0);
 }
 

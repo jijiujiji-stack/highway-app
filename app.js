@@ -1345,7 +1345,12 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
         // するかどうかを判断する）。
         hasStepsData: steps.length > 0,
         tollSections: tollSectionsWithBoundarySplits,
-        tollEntryCount: tollSectionsWithBoundarySplits.length
+        tollEntryCount: tollSectionsWithBoundarySplits.length,
+        // 【全通過IC表示機能】呼び出し元（buildFullPassedIcSequence
+        // FromTollSectionRange）が、tollSectionsの範囲内にある候補ICを
+        // 道のり順に抽出するために必要。ここでは既に計算済みの値を
+        // そのまま返すだけで、新しい計算は追加していない。
+        routeDistanceCandidateIcs
     };
 }
 
@@ -1902,6 +1907,114 @@ function buildTollSectionBasedIcSequence(tollSections) {
                 section.exitIcName
             );
         }
+    });
+
+    return sequence;
+}
+
+// 【全通過IC表示機能】tollSections（区間境界のICのみ）とrouteDistance
+// CandidateIcs（500m/700mしきい値を通過済みの、道のり距離付き候補IC
+// 一覧、detectTollSectionsFromSteps側で計算済み）を組み合わせ、実際に
+// 高速に乗っていた道のり範囲（tollSectionsの最初の区間のentranceIcから
+// 最後の区間のexitIcまで）にある候補ICを、道のり順に全て抽出する。
+// 沿線を単に通過しただけのIC（tollSections単体では拾えない）も含められる
+// 一方、候補プールに登録されていないIC・500m/700mを超えるICは、無理に
+// 推測せずそのまま表示されない。
+// 候補IC選定ロジック（detectIcsOrderedAlongPolyline等）・API呼び出し数
+// には一切影響しない（既に計算済みのrouteDistanceCandidateIcsを読むだけ）。
+// logHighwayRoutePolylineAnalysis（コンソール診断ログ）と
+// buildPolylineComparisonSummaryHtml（検索条件パネル）の両方から呼べる、
+// 共通の関数として用意する。
+// 戻り値：道のり順・重複除去済みのICオブジェクト配列（buildTollSection
+// BasedIcSequenceと異なり、routeDistanceCandidateIcs由来のエントリは
+// 常に解決済みのため、isUnresolvedのようなラッパーは持たせていない）。
+function buildFullPassedIcSequenceFromTollSectionRange(
+    polylineAnalysis
+) {
+    const tollSections = polylineAnalysis?.tollSections;
+    const routeDistanceCandidateIcs =
+        polylineAnalysis?.routeDistanceCandidateIcs;
+
+    if (
+        !Array.isArray(tollSections) ||
+        tollSections.length === 0 ||
+        !Array.isArray(routeDistanceCandidateIcs) ||
+        routeDistanceCandidateIcs.length === 0
+    ) {
+        return [];
+    }
+
+    const firstSection = tollSections[0];
+    const lastSection =
+        tollSections[tollSections.length - 1];
+
+    // entranceIc/exitIcは、routeDistanceCandidateIcs（findNearestIcBy
+    // RouteDistanceが選ぶ候補と同じ配列）由来のICオブジェクトのため、
+    // identityが一致する候補を探すだけで、そのICの道のり距離
+    // （routeDistanceMeters）が新たな距離計算なしで求まる。
+    const findCandidateRouteDistanceMeters = ic => {
+        const identity = buildIcDefinitionIdentity(ic);
+
+        if (!identity) {
+            return null;
+        }
+
+        const matchedCandidate =
+            routeDistanceCandidateIcs.find(candidate =>
+                buildIcDefinitionIdentity(candidate.ic) ===
+                identity
+            );
+
+        return matchedCandidate
+            ? matchedCandidate.routeDistanceMeters
+            : null;
+    };
+
+    const rangeStartDistanceMeters =
+        findCandidateRouteDistanceMeters(
+            firstSection?.entranceIc
+        );
+    const rangeEndDistanceMeters =
+        findCandidateRouteDistanceMeters(lastSection?.exitIc);
+
+    // 区間境界のIC自体が候補プールから求まらない場合（IC不明等）は、
+    // 範囲を無理に推測せず空配列を返す。
+    if (
+        rangeStartDistanceMeters === null ||
+        rangeEndDistanceMeters === null
+    ) {
+        return [];
+    }
+
+    const candidatesInRange = routeDistanceCandidateIcs
+        .filter(candidate =>
+            candidate.routeDistanceMeters >=
+                rangeStartDistanceMeters &&
+            candidate.routeDistanceMeters <=
+                rangeEndDistanceMeters
+        )
+        .sort((a, b) =>
+            a.routeDistanceMeters - b.routeDistanceMeters
+        );
+
+    // buildTollSectionBasedIcSequenceと同じ考え方：直前の確定ICと
+    // 同一identityのICが連続する場合は1件にまとめる（篠崎IC・貝塚IC等の
+    // 方向別ミラーレコードが、同一座標のまま隣接して重複表示されるのを防ぐ）。
+    const sequence = [];
+
+    candidatesInRange.forEach(candidate => {
+        const identity = buildIcDefinitionIdentity(candidate.ic);
+        const previousIc =
+            sequence[sequence.length - 1] || null;
+
+        if (
+            previousIc &&
+            buildIcDefinitionIdentity(previousIc) === identity
+        ) {
+            return;
+        }
+
+        sequence.push(candidate.ic);
     });
 
     return sequence;
@@ -15319,6 +15432,12 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             tollEntryCount: tollTagResult.tollEntryCount,
             hasTollSectionStepsData:
                 tollTagResult.hasStepsData,
+            // 【全通過IC表示機能】buildFullPassedIcSequenceFromTollSection
+            // Rangeが、tollSectionsの範囲内にある候補ICを道のり順に
+            // 抽出するために使う。detectTollSectionsFromSteps側で
+            // 既に計算済みの値をそのまま中継するだけ。
+            routeDistanceCandidateIcs:
+                tollTagResult.routeDistanceCandidateIcs,
             shutoDetail: {
                 startSampleCount:
                     shutoDetailStartSamples.length,
@@ -17816,6 +17935,12 @@ function logHighwayRoutePolylineAnalysis(
                         : entry.ic.displayName
                 )
                 .join(" → ")
+        );
+        console.log(
+            "全通過IC（候補プール範囲内）:",
+            buildFullPassedIcSequenceFromTollSectionRange(result)
+                .map(ic => ic.displayName)
+                .join(" → ") || "なし"
         );
         console.log(
             "料金計算用NEXCO入口:",
@@ -24477,6 +24602,29 @@ function buildPolylineComparisonSummaryHtml(
             wrapIcAreaReasonValue(
                 formatAssumedRouteIcName(nexcoExit) || "なし",
                 false
+            )
+        );
+    }
+
+    // 【全通過IC表示機能】tollSectionsが使える場合にのみ、実際に高速に
+    // 乗っていた道のり範囲（tollSectionsの最初のentranceIc〜最後の
+    // exitIc）にある候補IC（routeDistanceCandidateIcs、500m/700mしきい値
+    // 通過済み）を、沿線を単に通過しただけのICも含めて道のり順に表示する。
+    // このデータソース自体がtollSectionsに依存するため、フォールバック時
+    // （isTollSectionBased === false）は表示しない。
+    if (isTollSectionBased) {
+        const fullPassedIcNames =
+            buildFullPassedIcSequenceFromTollSectionRange(
+                polylineAnalysis
+            )
+                .map(ic => formatAssumedRouteIcName(ic))
+                .filter(Boolean);
+
+        lines.push(
+            "通過IC：" +
+            wrapIcAreaReasonValue(
+                fullPassedIcNames.join(" → ") || "なし",
+                true
             )
         );
     }

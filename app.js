@@ -635,6 +635,26 @@ function interpolateLatLngOnSampledPoints(
     };
 }
 
+// 【IC不明時のヒント表示】Googleの案内文（navigationInstruction.
+// instructions）から、「〇〇IC」のようなIC名らしき文字列を抜き出す。
+// 「幕張IC 出口から 千葉街道/国道14号 に入り...」のように、IC名の直後に
+// 空白・読点等の区切りが来るパターンを想定。区切り文字を含まない
+// 1〜20文字＋「IC」で終わる部分を1箇所だけ抜き出す（最初に見つかった
+// ものを採用。案内文中に複数箇所「IC」が現れることは通常想定しない）。
+// 該当パターンが無い場合（京葉市川ICのように地名だけで案内される等）は
+// nullを返し、呼び出し元は何も追記しない（無理に推測しない）。
+// あくまで人間が読むための手がかり文字列を作るだけで、IC名判定・料金
+// 計算には一切使わない。
+const IC_NAME_HINT_PATTERN =
+    /[^\s　、。，,．.「」『』()（）\[\]【】]{1,20}IC(?=[\s　、。,．.]|$)/;
+
+function extractIcNameHintFromInstructions(instructionsText) {
+    const text = String(instructionsText || "");
+    const match = text.match(IC_NAME_HINT_PATTERN);
+
+    return match ? match[0] : null;
+}
+
 // 【既知の保留事項26対応・方式B統一】方式B（点と線）ベースで、問い合わせ
 // 座標（Googleのstep境界点等）に最も近いICを、ルート先頭からの累積距離
 // （routeDistanceMeters）の近さで判定する。detectIcsOrderedAlongPolyline・
@@ -658,13 +678,33 @@ function findNearestIcByRouteDistance(
     sampledPoints,
     cumulativeDistances,
     routeDistanceCandidateIcs,
-    thresholdMeters = TOLL_SECTION_ROUTE_DISTANCE_MATCH_THRESHOLD_METERS
+    thresholdMeters = TOLL_SECTION_ROUTE_DISTANCE_MATCH_THRESHOLD_METERS,
+    // 【IC不明時のヒント表示】この境界の元になったstepの案内文
+    // （navigationInstruction.instructions）。「IC不明」になった場合のみ、
+    // extractIcNameHintFromInstructionsで手がかり文字列を抜き出して
+    // icNameに追記する。しきい値判定・2段階フォールバック自体には
+    // 一切関与しない（表示用の追記のみ）。
+    instructionsHintText = null
 ) {
-    const buildUnmatchedResult = distanceMeters => ({
-        icName: "IC不明（未登録の可能性）",
-        distanceMeters,
-        ic: null
-    });
+    const buildUnmatchedResult = distanceMeters => {
+        const icNameHint =
+            extractIcNameHintFromInstructions(
+                instructionsHintText
+            );
+
+        return {
+            icName:
+                "IC不明（未登録の可能性）" +
+                (
+                    icNameHint
+                        ? "　※Googleの案内では「" +
+                            icNameHint + "」"
+                        : ""
+                ),
+            distanceMeters,
+            ic: null
+        };
+    };
 
     if (
         !Array.isArray(routeDistanceCandidateIcs) ||
@@ -1028,7 +1068,10 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
     // にどの程度正しく機能しているかを正確に観測できるようにするため。
     // sampledPointsが無い呼び出し元（方式Bをそもそも試行できない場合）
     // に限り、従来通り方式A（findNearestIcByPointToPoint）を使う。
-    const findNearestIcLabel = location => {
+    // instructionsHintTextは、この境界の元になったstepのnavigation
+    // Instruction.instructions。IC不明時のヒント表示（findNearestIcBy
+    // RouteDistance側）にのみ使う、表示用の追加情報。
+    const findNearestIcLabel = (location, instructionsHintText) => {
         const latLng =
             extractLatLngFromRouteLocation(location);
 
@@ -1048,7 +1091,9 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
             latLng,
             sampledPoints,
             cumulativeDistances,
-            routeDistanceCandidateIcs
+            routeDistanceCandidateIcs,
+            undefined,
+            instructionsHintText
         );
     };
 
@@ -1240,9 +1285,17 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
                 run.steps[run.steps.length - 1];
 
             const entranceLabel =
-                findNearestIcLabel(firstStep.startLocation);
+                findNearestIcLabel(
+                    firstStep.startLocation,
+                    firstStep.navigationInstruction
+                        ?.instructions
+                );
             const exitLabel =
-                findNearestIcLabel(lastStep.endLocation);
+                findNearestIcLabel(
+                    lastStep.endLocation,
+                    lastStep.navigationInstruction
+                        ?.instructions
+                );
 
             // 区間内の実移動距離（steps.distanceMetersの合計）。
             // 追加のRoutes API呼び出し無しで、既に取得済みのレスポンス

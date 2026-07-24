@@ -7632,6 +7632,17 @@ const IC_MASTER = {
                 note: "【未検証】今回、公式サイト・MapFanでの個別確認を実施できなかった。方向限定を示す情報は検索範囲内では見つからなかったが、確認不足のため座標・entranceSelectable/exitSelectableとも変更していない。次回要検証。【2026-07-14再調査・座標のみ修正】MapFanで4個別ランプページ（入口上り・入口下り・出口上り・出口下り）全てを確認し、フルICと判断（もともと下り線入口がないハーフICだったが1993年10月に下り入口が開通し現在はフルIC）。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(35.685038678062,140.0013387493)、exitLat/Lngを出口(下り)(35.6868734,139.9999833)に設定。従来座標(35.689,140.015)から約1,340m修正。【2026-07-18外部再照合】Wikipedia「花輪インターチェンジ」記事（https://ja.wikipedia.org/wiki/花輪インターチェンジ）で改めて独立に確認し、「元・矢那IC、下り入口なしの一方通行だったが1993年10月5日に有料下り入口が供用開始されフルICとなった」という上記判断と完全に一致することを確認した。座標・entranceSelectable/exitSelectableとも変更なし。"
             },
             {
+                order: 5.5,
+                displayName: "幕張IC",
+                googleName: "京葉道路 幕張インターチェンジ",
+                lat: 35.669384,
+                lng: 140.033977,
+                routeBranch: "keiyo",
+                branchOrder: 5.5,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.669384, entranceLng: 140.033977, exitLat: 35.669384, exitLng: 140.033977,
+                note: "【新規追加・未検証、荒川区役所→幕張メッセ実車確認で「幕張IC 出口から」という案内文が確認されたにもかかわらずIC_MASTER未登録だったための追加】花輪IC（order:5）と武石IC（order:6）の間に位置する京葉道路のICだが、従来IC_MASTERに一切登録がなく、実車確認時に「IC不明」（乖離34,001m）の原因になっていた。MapFan「幕張ＩＣ（京葉道路）【入口（上り）】」個別ページで座標(35.669384,140.033977)を確認したが、【入口（下り）】【出口（上り）】【出口（下り）】の各個別ページは今回確認していない。フルIC・ハーフICいずれの構造かも未確認のため、他の未検証ICと同様、入口・出口どちらにも使える単一の代表点としてentranceSelectable/exitSelectableともtrueとし、exitLat/Lngは入口(上り)の座標をそのまま暫定使用した（出口側の正確な座標ではない可能性がある）。次回、残り3方向のMapFan個別ページ確認、または実車確認での方向限定の有無の確認が必要。"
+            },
+            {
                 order: 6,
                 displayName: "武石IC",
                 googleName: "京葉道路 武石インターチェンジ",
@@ -12401,6 +12412,67 @@ function detectIcsOrderedAlongPolyline(
                 ic.lng,
                 sampledPoints
             );
+
+        // 【DEBUG-POINT-TO-LINE 一時的・500mしきい値の妥当性検証用】
+        // 湾岸習志野IC・湾岸千葉IC（候補プールから外れているIC）と、
+        // 篠崎IC（候補プールに入っているIC）について、「点と線」の
+        // 実際の距離を比較確認するための一時ログ。position自体は
+        // このforEachループの中で全IC分すでに計算されているため、
+        // ここではその値をそのままログ出力するだけで、新しい距離計算は
+        // 追加していない。検証が終わったらこのブロックごと削除すること。
+        if (
+            [
+                "湾岸習志野IC",
+                "湾岸千葉IC",
+                "篠崎IC"
+            ].includes(ic.displayName)
+        ) {
+            const closestPointOnPolyline =
+                position &&
+                typeof position.segmentIndex === "number" &&
+                typeof position.projectionRatio === "number"
+                    ? interpolateLatLngOnSampledPoints(
+                        sampledPoints,
+                        position.segmentIndex,
+                        position.projectionRatio
+                    )
+                    : null;
+
+            console.group("[DEBUG-POINT-TO-LINE 一時的]");
+            console.log(
+                ic.displayName,
+                "／テーブル座標:",
+                ic.lat,
+                ic.lng
+            );
+            console.log(
+                "点と線の最短距離(m):",
+                position ? position.distanceMeters : "position計算不可",
+                "／しきい値(m):",
+                thresholdMeters,
+                "／しきい値超過:",
+                position
+                    ? (
+                        position.distanceMeters > thresholdMeters
+                            ? "超過（超過量" +
+                                (
+                                    position.distanceMeters -
+                                    thresholdMeters
+                                ).toFixed(1) +
+                                "m）"
+                            : "しきい値以内"
+                    )
+                    : "-"
+            );
+            console.log(
+                "ポリライン上の最近接点:",
+                closestPointOnPolyline
+                    ? closestPointOnPolyline.lat + ", " +
+                        closestPointOnPolyline.lng
+                    : "算出不可"
+            );
+            console.groupEnd();
+        }
 
         if (
             position !== null &&

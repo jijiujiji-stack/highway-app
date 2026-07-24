@@ -736,6 +736,105 @@ function findNearestIcByRouteDistance(
         Boolean(nearestCandidate) &&
         nearestRouteDistanceDiffMeters <= thresholdMeters;
 
+    // 【DEBUG-NEIGHBOR-DISTANCE 一時的・しきい値700m動的化の検証用】
+    // nearestCandidateの前後の候補ICとの道のり距離間隔を確認するための
+    // 一時ログ。routeDistanceCandidateIcsは呼び出し元
+    // （detectTollSectionsFromSteps）でdetectIcsOrderedAlongPolylineの
+    // segmentIndex・projectionRatio順（＝走行順）のまま渡ってくるため
+    // 実質的にrouteDistanceMeters順のはずだが、ここでは念のため
+    // routeDistanceMetersで明示的にソートし直した配列から前後を求める。
+    // 検証が終わったらこのブロックごと削除すること。
+    if (nearestCandidate) {
+        const sortedCandidates =
+            [...routeDistanceCandidateIcs].sort(
+                (a, b) =>
+                    a.routeDistanceMeters - b.routeDistanceMeters
+            );
+
+        const nearestIndex =
+            sortedCandidates.indexOf(nearestCandidate);
+        const previousCandidate =
+            nearestIndex > 0
+                ? sortedCandidates[nearestIndex - 1]
+                : null;
+        const nextCandidate =
+            nearestIndex >= 0 &&
+            nearestIndex < sortedCandidates.length - 1
+                ? sortedCandidates[nearestIndex + 1]
+                : null;
+
+        console.group("[DEBUG-NEIGHBOR-DISTANCE 一時的]");
+        console.log(
+            "問い合わせ座標の道のり距離(m):",
+            queryRouteDistanceMeters,
+            "／緯度経度(Google生座標):",
+            latLng.lat,
+            latLng.lng
+        );
+        console.log(
+            "nearestCandidate:",
+            nearestCandidate.ic?.displayName,
+            "道のり距離(m):",
+            nearestCandidate.routeDistanceMeters,
+            "／テーブル座標:",
+            nearestCandidate.ic?.lat,
+            nearestCandidate.ic?.lng
+        );
+        if (previousCandidate) {
+            console.log(
+                "1つ手前の候補:",
+                previousCandidate.ic?.displayName,
+                "道のり距離(m):",
+                previousCandidate.routeDistanceMeters,
+                "／nearestCandidateとの差(km):",
+                (
+                    (
+                        nearestCandidate.routeDistanceMeters -
+                        previousCandidate.routeDistanceMeters
+                    ) / 1000
+                ).toFixed(3),
+                "／テーブル座標:",
+                previousCandidate.ic?.lat,
+                previousCandidate.ic?.lng
+            );
+        }
+        else {
+            console.log("1つ手前の候補: なし（先頭）");
+        }
+        if (nextCandidate) {
+            console.log(
+                "1つ先の候補:",
+                nextCandidate.ic?.displayName,
+                "道のり距離(m):",
+                nextCandidate.routeDistanceMeters,
+                "／nearestCandidateとの差(km):",
+                (
+                    (
+                        nextCandidate.routeDistanceMeters -
+                        nearestCandidate.routeDistanceMeters
+                    ) / 1000
+                ).toFixed(3),
+                "／テーブル座標:",
+                nextCandidate.ic?.lat,
+                nextCandidate.ic?.lng
+            );
+        }
+        else {
+            console.log("1つ先の候補: なし（末尾）");
+        }
+        console.log(
+            "境界判定:",
+            isRouteDistanceMatchSuccessful ? "成功" : "失敗",
+            "／nearestRouteDistanceDiffMeters:",
+            nearestRouteDistanceDiffMeters,
+            "／しきい値(m):",
+            thresholdMeters,
+            "／しきい値との差(m):",
+            nearestRouteDistanceDiffMeters - thresholdMeters
+        );
+        console.groupEnd();
+    }
+
     if (isRouteDistanceMatchSuccessful) {
         return {
             icName: nearestCandidate.ic.displayName,

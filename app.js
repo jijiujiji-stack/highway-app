@@ -17801,10 +17801,20 @@ function logHighwayRoutePolylineAnalysis(
 
         console.group("[ROUTE TOLL IC DETAIL]");
 
+        // 【tollSectionsベースへの表示切り替え】通常検索のトップパネル
+        // （buildAssumedRouteHtmlFromTollSections等）は既にtollSections
+        // ベースへ移行済みのため、このログもそれに合わせてbuildTollSection
+        // BasedIcSequence（app.js内、既存・未使用だった関数）を使う形に
+        // 変更した。passedIcEntries自体・他のログ・V2側のロジックは
+        // 変更していない。
         console.log(
-            "通過IC順:",
-            passedIcEntries
-                .map(item => item.exit.displayName)
+            "通過IC順（tollSectionsベース）:",
+            buildTollSectionBasedIcSequence(result.tollSections)
+                .map(entry =>
+                    entry.isUnresolved
+                        ? entry.label
+                        : entry.ic.displayName
+                )
                 .join(" → ")
         );
         console.log(

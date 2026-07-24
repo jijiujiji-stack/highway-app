@@ -2050,6 +2050,14 @@ function buildFullPassedIcSequenceFromTollSectionRange(
             : null;
     };
 
+    // 区間境界（entranceIc/exitIc）が実際に未解決（null）の場合のみ、
+    // 対応するicName（ヒント込みの場合がある）をpushUnresolvedMarkerへの
+    // labelとして使う。ic自体は解決しているがroute DistanceCandidateIcs
+    // 側でたまたま一致が取れなかった場合（理論上のみ）に、実在するIC名を
+    // 誤って「IC不明」として表示しないためのガード。
+    const getUnresolvedBoundaryLabel = (ic, icName) =>
+        ic ? null : icName;
+
     // 区間境界地点（entranceIc/exitIcが解決できなかった場合の、
     // Googleが実際に示した生の緯度経度）自体の道のり距離を求める。
     // findNearestIcByRouteDistance（app.js内、既存・未変更）が問い合わせ
@@ -2087,9 +2095,9 @@ function buildFullPassedIcSequenceFromTollSectionRange(
         return withRouteDistance.routeDistanceMeters;
     };
 
-    // 結果配列。identity（重複除去用、「IC不明」はnullで統一）とname
-    // （表示名）を持つエントリの配列として組み立て、最後に文字列配列へ
-    // 変換する。
+    // 結果配列。identity（重複除去用。解決済みICはbuildIcDefinition
+    // Identityの値、「IC不明」は"unresolved:"+表示名）とname（表示名）を
+    // 持つエントリの配列として組み立て、最後に文字列配列へ変換する。
     const entries = [];
 
     const pushResolvedIc = ic => {
@@ -2106,17 +2114,29 @@ function buildFullPassedIcSequenceFromTollSectionRange(
         });
     };
 
-    const pushUnresolvedMarker = () => {
+    // 【IC不明時のヒント表示・再利用】labelには、section.entranceIcName/
+    // exitIcNameをそのまま渡す想定。この2つは、findNearestIcLabel経由で
+    // findNearestIcByRouteDistanceが既に計算済みの値であり、未解決の
+    // 場合は前回実装したextractIcNameHintFromInstructionsによる
+    // ヒント（「IC不明（未登録の可能性）　※Googleの案内では「〇〇IC」」）を
+    // 既に含んでいる。ここで案内文から改めてヒントを抜き出す処理は
+    // 行わない（同じ計算の重複を避けるため）。
+    // 重複除去は、ヒントの有無・内容を区別して行う。同じ内容（ヒント込み）
+    // のIC不明が連続する場合のみ1件にまとめ、ヒントの内容が異なる場合
+    // （例：1つの区間でentranceIc・exitIcが別々のヒントを持つ場合）は
+    // 別々の情報としてどちらも残す。
+    const pushUnresolvedMarker = label => {
+        const resolvedLabel = label || UNRESOLVED_IC_LABEL;
+        const identity = "unresolved:" + resolvedLabel;
         const lastEntry = entries[entries.length - 1] || null;
 
-        // 「IC不明」の連続除去。identity:nullを専用の印として扱う。
-        if (lastEntry && lastEntry.identity === null) {
+        if (lastEntry && lastEntry.identity === identity) {
             return;
         }
 
         entries.push({
-            identity: null,
-            name: UNRESOLVED_IC_LABEL
+            identity,
+            name: resolvedLabel
         });
     };
 
@@ -2172,7 +2192,12 @@ function buildFullPassedIcSequenceFromTollSectionRange(
                     section?.entranceLatLng
                 );
 
-            pushUnresolvedMarker();
+            pushUnresolvedMarker(
+                getUnresolvedBoundaryLabel(
+                    section?.entranceIc,
+                    section?.entranceIcName
+                )
+            );
             pushCandidatesInRange(
                 boundaryStartDistanceMeters,
                 exitResolvedDistanceMeters
@@ -2193,13 +2218,32 @@ function buildFullPassedIcSequenceFromTollSectionRange(
                 entranceResolvedDistanceMeters,
                 boundaryEndDistanceMeters
             );
-            pushUnresolvedMarker();
+            pushUnresolvedMarker(
+                getUnresolvedBoundaryLabel(
+                    section?.exitIc,
+                    section?.exitIcName
+                )
+            );
             return;
         }
 
         // entranceIc/exitIcが両方解決できない：範囲を推測せず
-        // 「IC不明」のみを追加する。
-        pushUnresolvedMarker();
+        // 「IC不明」のみを追加する。entrance側・exit側でそれぞれ別の
+        // ヒントが取れている場合は、両方を個別に追加する（内容が同じ
+        // ・またはどちらもヒントが無い場合は、pushUnresolvedMarker内の
+        // 重複除去で自然に1件へまとまる）。
+        pushUnresolvedMarker(
+            getUnresolvedBoundaryLabel(
+                section?.entranceIc,
+                section?.entranceIcName
+            )
+        );
+        pushUnresolvedMarker(
+            getUnresolvedBoundaryLabel(
+                section?.exitIc,
+                section?.exitIcName
+            )
+        );
     });
 
     return entries.map(entry => entry.name);

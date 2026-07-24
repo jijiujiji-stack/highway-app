@@ -1350,7 +1350,13 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
         // FromTollSectionRange）が、tollSectionsの範囲内にある候補ICを
         // 道のり順に抽出するために必要。ここでは既に計算済みの値を
         // そのまま返すだけで、新しい計算は追加していない。
-        routeDistanceCandidateIcs
+        routeDistanceCandidateIcs,
+        // 【全通過IC表示機能・IC不明区間対応】buildFullPassedIcSequence
+        // FromTollSectionRangeが、entranceIc/exitIcが解決できなかった
+        // 区間について、Googleが実際に示した境界地点（entranceLatLng/
+        // exitLatLng）自体の道のり距離を求める際に使う。ここでも
+        // 既に計算済みの値をそのまま返すだけ。
+        cumulativeDistances
     };
 }
 
@@ -1912,28 +1918,51 @@ function buildTollSectionBasedIcSequence(tollSections) {
     return sequence;
 }
 
-// 【全通過IC表示機能】tollSections（区間境界のICのみ）とrouteDistance
-// CandidateIcs（500m/700mしきい値を通過済みの、道のり距離付き候補IC
-// 一覧、detectTollSectionsFromSteps側で計算済み）を組み合わせ、実際に
-// 高速に乗っていた道のり範囲（tollSectionsの最初の区間のentranceIcから
-// 最後の区間のexitIcまで）にある候補ICを、道のり順に全て抽出する。
+// 【全通過IC表示機能・IC不明区間対応】tollSections（区間境界のICのみ）と
+// routeDistanceCandidateIcs（500m/700mしきい値を通過済みの、道のり距離
+// 付き候補IC一覧、detectTollSectionsFromSteps側で計算済み）を組み合わせ、
+// 実際に高速に乗っていた道のり範囲にある候補ICを、道のり順に全て抽出する。
 // 沿線を単に通過しただけのIC（tollSections単体では拾えない）も含められる
 // 一方、候補プールに登録されていないIC・500m/700mを超えるICは、無理に
 // 推測せずそのまま表示されない。
+//
+// tollSectionsは1区間ずつ完全に独立して処理する（ある区間のentranceIc/
+// exitIcが解決できなくても、他の区間の判定・範囲計算には一切影響しない。
+// 各区間の処理はその区間自身のentranceIc/exitIc/entranceLatLng/
+// exitLatLngだけを参照しており、前後の区間の状態を読み書きしない）。
+// 区間ごとに以下のいずれかを行う。
+// - entranceIc/exitIcが両方解決できる：範囲内の候補ICをそのまま抽出
+// - entranceIcが解決できない：区間自身のentranceLatLng（Googleが実際に
+//   示した境界地点、IC名は不明）からexitIcの位置までの範囲で拾えるだけ
+//   拾い、「IC不明」を前置する
+// - exitIcが解決できない：entranceIcの位置から、区間自身のexitLatLng
+//   （Googleが実際に示した境界地点）までの範囲で拾えるだけ拾い、
+//   「IC不明」を後置する
+// - 両方解決できない：範囲を推測せず「IC不明」のみを追加する
+// entranceLatLng/exitLatLngからの道のり距離算出は、findNearestIcBy
+// RouteDistance内部で問い合わせ座標の道のり距離を求めているのと全く同じ
+// 計算（findClosestPositionOnPolylineForIc + attachRouteDistanceTo
+// OrderedIcsによる補間）を、同じ既存関数の組み合わせで再現するだけで、
+// 新しい距離計算式は追加していない。
+//
 // 候補IC選定ロジック（detectIcsOrderedAlongPolyline等）・API呼び出し数
-// には一切影響しない（既に計算済みのrouteDistanceCandidateIcsを読むだけ）。
+// には一切影響しない（既に計算済みのrouteDistanceCandidateIcs・
+// cumulativeDistancesを読むだけ）。
 // logHighwayRoutePolylineAnalysis（コンソール診断ログ）と
 // buildPolylineComparisonSummaryHtml（検索条件パネル）の両方から呼べる、
 // 共通の関数として用意する。
-// 戻り値：道のり順・重複除去済みのICオブジェクト配列（buildTollSection
-// BasedIcSequenceと異なり、routeDistanceCandidateIcs由来のエントリは
-// 常に解決済みのため、isUnresolvedのようなラッパーは持たせていない）。
+// 戻り値：IC名（解決できない区間境界は「IC不明（未登録の可能性）」）を
+// 道のり順に並べた文字列配列。重複除去済み（直前の確定ICと同一identity
+// のICが連続する場合、および「IC不明」が連続する場合は1件にまとめる）。
 function buildFullPassedIcSequenceFromTollSectionRange(
     polylineAnalysis
 ) {
     const tollSections = polylineAnalysis?.tollSections;
     const routeDistanceCandidateIcs =
         polylineAnalysis?.routeDistanceCandidateIcs;
+    const sampledPoints = polylineAnalysis?.sampledPoints;
+    const cumulativeDistances =
+        polylineAnalysis?.cumulativeDistances;
 
     if (
         !Array.isArray(tollSections) ||
@@ -1944,15 +1973,13 @@ function buildFullPassedIcSequenceFromTollSectionRange(
         return [];
     }
 
-    const firstSection = tollSections[0];
-    const lastSection =
-        tollSections[tollSections.length - 1];
+    const UNRESOLVED_IC_LABEL = "IC不明（未登録の可能性）";
 
     // entranceIc/exitIcは、routeDistanceCandidateIcs（findNearestIcBy
     // RouteDistanceが選ぶ候補と同じ配列）由来のICオブジェクトのため、
     // identityが一致する候補を探すだけで、そのICの道のり距離
     // （routeDistanceMeters）が新たな距離計算なしで求まる。
-    const findCandidateRouteDistanceMeters = ic => {
+    const findResolvedRouteDistanceMeters = ic => {
         const identity = buildIcDefinitionIdentity(ic);
 
         if (!identity) {
@@ -1970,54 +1997,159 @@ function buildFullPassedIcSequenceFromTollSectionRange(
             : null;
     };
 
-    const rangeStartDistanceMeters =
-        findCandidateRouteDistanceMeters(
-            firstSection?.entranceIc
-        );
-    const rangeEndDistanceMeters =
-        findCandidateRouteDistanceMeters(lastSection?.exitIc);
-
-    // 区間境界のIC自体が候補プールから求まらない場合（IC不明等）は、
-    // 範囲を無理に推測せず空配列を返す。
-    if (
-        rangeStartDistanceMeters === null ||
-        rangeEndDistanceMeters === null
-    ) {
-        return [];
-    }
-
-    const candidatesInRange = routeDistanceCandidateIcs
-        .filter(candidate =>
-            candidate.routeDistanceMeters >=
-                rangeStartDistanceMeters &&
-            candidate.routeDistanceMeters <=
-                rangeEndDistanceMeters
-        )
-        .sort((a, b) =>
-            a.routeDistanceMeters - b.routeDistanceMeters
-        );
-
-    // buildTollSectionBasedIcSequenceと同じ考え方：直前の確定ICと
-    // 同一identityのICが連続する場合は1件にまとめる（篠崎IC・貝塚IC等の
-    // 方向別ミラーレコードが、同一座標のまま隣接して重複表示されるのを防ぐ）。
-    const sequence = [];
-
-    candidatesInRange.forEach(candidate => {
-        const identity = buildIcDefinitionIdentity(candidate.ic);
-        const previousIc =
-            sequence[sequence.length - 1] || null;
-
+    // 区間境界地点（entranceIc/exitIcが解決できなかった場合の、
+    // Googleが実際に示した生の緯度経度）自体の道のり距離を求める。
+    // findNearestIcByRouteDistance（app.js内、既存・未変更）が問い合わせ
+    // 座標の道のり距離を求めているのと同じ関数の組み合わせを再利用する。
+    const findBoundaryRouteDistanceMeters = latLng => {
         if (
-            previousIc &&
-            buildIcDefinitionIdentity(previousIc) === identity
+            !latLng ||
+            !Array.isArray(sampledPoints) ||
+            !Array.isArray(cumulativeDistances)
+        ) {
+            return null;
+        }
+
+        const position = findClosestPositionOnPolylineForIc(
+            latLng.lat,
+            latLng.lng,
+            sampledPoints
+        );
+
+        if (!position) {
+            return null;
+        }
+
+        const [withRouteDistance] =
+            attachRouteDistanceToOrderedIcs(
+                [
+                    {
+                        segmentIndex: position.segmentIndex,
+                        projectionRatio: position.projectionRatio
+                    }
+                ],
+                cumulativeDistances
+            );
+
+        return withRouteDistance.routeDistanceMeters;
+    };
+
+    // 結果配列。identity（重複除去用、「IC不明」はnullで統一）とname
+    // （表示名）を持つエントリの配列として組み立て、最後に文字列配列へ
+    // 変換する。
+    const entries = [];
+
+    const pushResolvedIc = ic => {
+        const identity = buildIcDefinitionIdentity(ic);
+        const lastEntry = entries[entries.length - 1] || null;
+
+        if (lastEntry && lastEntry.identity === identity) {
+            return;
+        }
+
+        entries.push({
+            identity,
+            name: formatAssumedRouteIcName(ic) || ic.displayName
+        });
+    };
+
+    const pushUnresolvedMarker = () => {
+        const lastEntry = entries[entries.length - 1] || null;
+
+        // 「IC不明」の連続除去。identity:nullを専用の印として扱う。
+        if (lastEntry && lastEntry.identity === null) {
+            return;
+        }
+
+        entries.push({
+            identity: null,
+            name: UNRESOLVED_IC_LABEL
+        });
+    };
+
+    const pushCandidatesInRange = (
+        startDistanceMeters,
+        endDistanceMeters
+    ) => {
+        if (
+            startDistanceMeters === null ||
+            endDistanceMeters === null
         ) {
             return;
         }
 
-        sequence.push(candidate.ic);
+        routeDistanceCandidateIcs
+            .filter(candidate =>
+                candidate.routeDistanceMeters >=
+                    startDistanceMeters &&
+                candidate.routeDistanceMeters <=
+                    endDistanceMeters
+            )
+            .sort((a, b) =>
+                a.routeDistanceMeters - b.routeDistanceMeters
+            )
+            .forEach(candidate => pushResolvedIc(candidate.ic));
+    };
+
+    // 区間ごとに完全に独立して処理する（前の区間の成功・失敗状態を
+    // 参照する変数は、このforEachの外に一切持たない）。
+    tollSections.forEach(section => {
+        const entranceResolvedDistanceMeters =
+            findResolvedRouteDistanceMeters(section?.entranceIc);
+        const exitResolvedDistanceMeters =
+            findResolvedRouteDistanceMeters(section?.exitIc);
+
+        if (
+            entranceResolvedDistanceMeters !== null &&
+            exitResolvedDistanceMeters !== null
+        ) {
+            pushCandidatesInRange(
+                entranceResolvedDistanceMeters,
+                exitResolvedDistanceMeters
+            );
+            return;
+        }
+
+        if (
+            entranceResolvedDistanceMeters === null &&
+            exitResolvedDistanceMeters !== null
+        ) {
+            const boundaryStartDistanceMeters =
+                findBoundaryRouteDistanceMeters(
+                    section?.entranceLatLng
+                );
+
+            pushUnresolvedMarker();
+            pushCandidatesInRange(
+                boundaryStartDistanceMeters,
+                exitResolvedDistanceMeters
+            );
+            return;
+        }
+
+        if (
+            entranceResolvedDistanceMeters !== null &&
+            exitResolvedDistanceMeters === null
+        ) {
+            const boundaryEndDistanceMeters =
+                findBoundaryRouteDistanceMeters(
+                    section?.exitLatLng
+                );
+
+            pushCandidatesInRange(
+                entranceResolvedDistanceMeters,
+                boundaryEndDistanceMeters
+            );
+            pushUnresolvedMarker();
+            return;
+        }
+
+        // entranceIc/exitIcが両方解決できない：範囲を推測せず
+        // 「IC不明」のみを追加する。
+        pushUnresolvedMarker();
     });
 
-    return sequence;
+    return entries.map(entry => entry.name);
 }
 
 // 【Step 2】buildTollSectionBasedIcSequenceの結果から、入口比較用の
@@ -15438,6 +15570,13 @@ function analyzeHighwayRoutePolyline(highwayRoute) {
             // 既に計算済みの値をそのまま中継するだけ。
             routeDistanceCandidateIcs:
                 tollTagResult.routeDistanceCandidateIcs,
+            // 【全通過IC表示機能・IC不明区間対応】buildFullPassedIcSequence
+            // FromTollSectionRangeが、entranceIc/exitIcが解決できなかった
+            // 区間境界（entranceLatLng/exitLatLng）の道のり距離を求める
+            // 際に使う。detectTollSectionsFromSteps側で既に計算済みの
+            // 値をそのまま中継するだけ。
+            cumulativeDistances:
+                tollTagResult.cumulativeDistances,
             shutoDetail: {
                 startSampleCount:
                     shutoDetailStartSamples.length,
@@ -17939,7 +18078,6 @@ function logHighwayRoutePolylineAnalysis(
         console.log(
             "全通過IC（候補プール範囲内）:",
             buildFullPassedIcSequenceFromTollSectionRange(result)
-                .map(ic => ic.displayName)
                 .join(" → ") || "なし"
         );
         console.log(
@@ -24606,19 +24744,19 @@ function buildPolylineComparisonSummaryHtml(
         );
     }
 
-    // 【全通過IC表示機能】tollSectionsが使える場合にのみ、実際に高速に
-    // 乗っていた道のり範囲（tollSectionsの最初のentranceIc〜最後の
-    // exitIc）にある候補IC（routeDistanceCandidateIcs、500m/700mしきい値
-    // 通過済み）を、沿線を単に通過しただけのICも含めて道のり順に表示する。
-    // このデータソース自体がtollSectionsに依存するため、フォールバック時
-    // （isTollSectionBased === false）は表示しない。
+    // 【全通過IC表示機能・IC不明区間対応】tollSectionsが使える場合にのみ、
+    // 実際に高速に乗っていた道のり範囲にある候補IC（routeDistance
+    // CandidateIcs、500m/700mしきい値通過済み）を、沿線を単に通過した
+    // だけのICも含めて区間ごとに道のり順で表示する。区間境界のIC名が
+    // 解決できない場合は「IC不明」を明示し、そこで分かる範囲までの
+    // 表示を打ち切らない（buildFullPassedIcSequenceFromTollSectionRange
+    // 側の実装を参照）。このデータソース自体がtollSectionsに依存する
+    // ため、フォールバック時（isTollSectionBased === false）は表示しない。
     if (isTollSectionBased) {
         const fullPassedIcNames =
             buildFullPassedIcSequenceFromTollSectionRange(
                 polylineAnalysis
-            )
-                .map(ic => formatAssumedRouteIcName(ic))
-                .filter(Boolean);
+            );
 
         lines.push(
             "通過IC：" +

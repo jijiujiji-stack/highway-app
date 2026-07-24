@@ -899,6 +899,71 @@ function findNearestIcByRouteDistance(
         console.groupEnd();
     }
 
+    // 【DEBUG-IRIYA調査・一時的】入谷IC境界判定調査用。既存の
+    // DEBUG-NEIGHBOR-DISTANCEは前後1件のみを見るため、「1つ先の候補：
+    // なし」が候補プール自体の枯渇なのか、同名重複候補等に隠れている
+    // だけなのかを区別できない。ここではnearestCandidateが入谷の場合に
+    // 限り、候補プール全体のうち道のり距離が問い合わせ地点から±5000m
+    // 以内のものを全て列挙し、あわせて候補プール全体で道のり距離が
+    // 最大の候補（＝本当の「末尾」）も出力する。判定ロジックは変更
+    // していない（既存の値をそのまま出力するだけ）。調査完了後、この
+    // ブロックごと削除すること。
+    if (
+        nearestCandidate &&
+        nearestCandidate.ic?.displayName === "入谷"
+    ) {
+        console.group(
+            "[DEBUG-IRIYA調査・一時的] 候補プール全体（±5000m）"
+        );
+        console.log(
+            "候補プール総数:",
+            routeDistanceCandidateIcs.length,
+            "／問い合わせ道のり距離(m):",
+            queryRouteDistanceMeters
+        );
+        [...routeDistanceCandidateIcs]
+            .filter(candidate =>
+                Math.abs(
+                    candidate.routeDistanceMeters -
+                    queryRouteDistanceMeters
+                ) <= 5000
+            )
+            .sort(
+                (a, b) =>
+                    a.routeDistanceMeters - b.routeDistanceMeters
+            )
+            .forEach(candidate => {
+                console.log(
+                    candidate.ic?.displayName,
+                    "／source:",
+                    candidate.ic?.source,
+                    "／sourceAreaKey:",
+                    candidate.ic?.sourceAreaKey,
+                    "／テーブル座標:",
+                    candidate.ic?.lat,
+                    candidate.ic?.lng,
+                    "／道のり距離(m):",
+                    candidate.routeDistanceMeters,
+                    "／点と線の距離(m):",
+                    candidate.distanceMeters
+                );
+            });
+        const lastOverallCandidate =
+            [...routeDistanceCandidateIcs].sort(
+                (a, b) =>
+                    b.routeDistanceMeters - a.routeDistanceMeters
+            )[0];
+        console.log(
+            "候補プール全体で道のり距離が最大の候補:",
+            lastOverallCandidate?.ic?.displayName,
+            "／source:",
+            lastOverallCandidate?.ic?.source,
+            "／道のり距離(m):",
+            lastOverallCandidate?.routeDistanceMeters
+        );
+        console.groupEnd();
+    }
+
     if (isRouteDistanceMatchSuccessful) {
         return {
             icName: nearestCandidate.ic.displayName,
@@ -941,6 +1006,82 @@ function findNearestIcByRouteDistance(
                 };
             }
         }
+    }
+
+    // 【DEBUG-IRIYA調査・一時的・旧DEBUG7相当】直線距離フォールバック
+    // （第2段階）が入谷の判定でどう動いているかを確認するための一時ログ。
+    // 上の実際の判定ロジックとは独立に、同じ値を再計算してログ出力する
+    // だけで、判定ロジック自体・返り値には一切影響しない。旧DEBUG7ログは
+    // 2026-07-23に削除済みだが、今回の調査のため入谷に限定して復元する。
+    // 調査完了後、このブロックごと削除すること。
+    if (
+        nearestCandidate &&
+        nearestCandidate.ic?.displayName === "入谷"
+    ) {
+        console.group(
+            "[DEBUG-IRIYA調査・一時的] 直線距離フォールバック（第2段階）診断"
+        );
+
+        const fallbackEntryConditionMet =
+            Boolean(queryProjectedLatLng) &&
+            typeof nearestCandidate.segmentIndex === "number" &&
+            typeof nearestCandidate.projectionRatio === "number";
+
+        console.log(
+            "queryProjectedLatLng:",
+            queryProjectedLatLng,
+            "／nearestCandidate.segmentIndex:",
+            nearestCandidate.segmentIndex,
+            "(" + typeof nearestCandidate.segmentIndex + ")",
+            "／nearestCandidate.projectionRatio:",
+            nearestCandidate.projectionRatio,
+            "(" + typeof nearestCandidate.projectionRatio + ")",
+            "／フォールバック実行条件を満たすか:",
+            fallbackEntryConditionMet
+        );
+
+        if (fallbackEntryConditionMet) {
+            const debugCandidateProjectedLatLng =
+                interpolateLatLngOnSampledPoints(
+                    sampledPoints,
+                    nearestCandidate.segmentIndex,
+                    nearestCandidate.projectionRatio
+                );
+
+            console.log(
+                "候補側の投影後座標(candidateProjectedLatLng):",
+                debugCandidateProjectedLatLng
+            );
+
+            if (debugCandidateProjectedLatLng) {
+                const debugStraightLineDistanceMeters =
+                    calculateDistance(
+                        debugCandidateProjectedLatLng.lat,
+                        debugCandidateProjectedLatLng.lng,
+                        queryProjectedLatLng.lat,
+                        queryProjectedLatLng.lng
+                    );
+
+                console.log(
+                    "投影後座標同士の直線距離(m):",
+                    debugStraightLineDistanceMeters,
+                    "／しきい値(m):",
+                    thresholdMeters,
+                    "／フォールバック判定:",
+                    debugStraightLineDistanceMeters <= thresholdMeters
+                        ? "成功"
+                        : "失敗"
+                );
+            }
+            else {
+                console.log(
+                    "候補側の投影後座標が算出できませんでした" +
+                        "（interpolateLatLngOnSampledPointsがnullを返した）。"
+                );
+            }
+        }
+
+        console.groupEnd();
     }
 
     return buildUnmatchedResult(nearestRouteDistanceDiffMeters);
@@ -12890,6 +13031,38 @@ function detectIcsOrderedAlongPolyline(
                     ? closestPointOnPolyline.lat + ", " +
                         closestPointOnPolyline.lng
                     : "算出不可"
+            );
+            console.groupEnd();
+        }
+
+        // 【DEBUG-IRIYA調査・一時的】getAllRouteAnalysisIcDefinitions内に
+        // 「入谷」という表示名を持つ定義が複数存在しないか（SHUTO_IC_MASTER
+        // 本体と、IC_MASTER内のshuto1UenoUchimawari逆方向ミラーで、lat/lng
+        // が微妙に異なるため重複除去identityが別扱いになり、両方が別個の
+        // 候補として残る可能性がある）、また各定義がこのルートの
+        // Polyline上でしきい値を通過しているかを確認するための一時ログ。
+        // 上のDEBUG-POINT-TO-LINEと同様、既存のposition計算結果をそのまま
+        // 出力するだけで、候補選定ロジックには一切影響しない。調査完了後、
+        // このブロックごと削除すること。
+        if (ic.displayName === "入谷") {
+            console.group("[DEBUG-IRIYA調査・一時的] IC定義走査");
+            console.log(
+                "source:", ic.source,
+                "／sourceAreaKey:", ic.sourceAreaKey,
+                "／isMirror:", ic.isMirror,
+                "／テーブル座標:", ic.lat, ic.lng,
+                "／entranceSelectable:", ic.entranceSelectable,
+                "／exitSelectable:", ic.exitSelectable
+            );
+            console.log(
+                "点と線の最短距離(m):",
+                position ? position.distanceMeters : "position計算不可",
+                "／しきい値(m):", thresholdMeters,
+                "／候補プールに採用されるか:",
+                Boolean(
+                    position &&
+                    position.distanceMeters <= thresholdMeters
+                )
             );
             console.groupEnd();
         }

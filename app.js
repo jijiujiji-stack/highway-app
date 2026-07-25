@@ -5347,11 +5347,11 @@ const SHUTO_IC_MASTER = [
         entranceLng: 139.795,
         exitLat: 35.634,
         exitLng: 139.795,
-        entranceSelectable: true,
+        entranceSelectable: false,
         exitSelectable: true,
         sourceAreaKeys: ["aqualine", "keiyo", "tokan"],
         sourceGoogleNames: ["首都高速湾岸線 有明出入口"],
-        note: "既存IC_MASTERから正規化登録。現時点では未参照。【2026-07-25情報引き継ぎ】NEXCO側keiyoエリアの重複コピー削除（21件削除、commit d2894e1）に伴い、削除前に記録されていた以下の留保情報を引き継ぐ：【方向制限確認・selectableは変更保留】Wikipedia「有明出入口」記事で「西行き出口・東行き入口のみ設置されているハーフインターチェンジ」（東京都江東区有明二丁目、1981年5月19日供用開始）と高確信度で確認した。西行き入口・東行き出口は存在しない。ただし、entranceSelectable/exitSelectableの変更（貝塚IC・篠崎IC等で採用しているmirrorレコード方式の要否を含む）は当時の実装指示の対象外のため、true/trueのまま変更していない。座標もMapFan等一次情報に到達できず未確認のため、既存値(35.634,139.795)から変更していない。次回、entranceSelectable/exitSelectableの扱いをユーザー確認のうえで再検討する必要がある。"
+        note: "既存IC_MASTERから正規化登録。現時点では未参照。【2026-07-25情報引き継ぎ】NEXCO側keiyoエリアの重複コピー削除（21件削除、commit d2894e1）に伴い、削除前に記録されていた以下の留保情報を引き継ぐ：【方向制限確認・selectableは変更保留】Wikipedia「有明出入口」記事で「西行き出口・東行き入口のみ設置されているハーフインターチェンジ」（東京都江東区有明二丁目、1981年5月19日供用開始）と高確信度で確認した。西行き入口・東行き出口は存在しない。ただし、entranceSelectable/exitSelectableの変更（貝塚IC・篠崎IC等で採用しているmirrorレコード方式の要否を含む）は当時の実装指示の対象外のため、true/trueのまま変更していない。座標もMapFan等一次情報に到達できず未確認のため、既存値(35.634,139.795)から変更していない。次回、entranceSelectable/exitSelectableの扱いをユーザー確認のうえで再検討する必要がある。【2026-07-25属性修正】貝塚IC・篠崎IC・湾岸習志野IC・湾岸千葉IC等の既存方針（本アプリが主に扱う下り方向で実際に使える役割を優先する）に倣い、entranceSelectableをfalseに変更した。有明出入口は東行き（都心方面）が入口のみ・西行き（お台場・湾岸方面）が出口のみのハーフICであり、本アプリの主な利用方向（下り＝西行き）で実際に使えるのは出口機能のみのため。東行き（都心方面）の入口機能は、本アプリの構造上（走行方向を区別しない設計）では表現されておらず、この片方向のみの制約は今回のfalse化には反映されていない点に留意。"
     },
     {
         id: "shuto-b-oi-minami",

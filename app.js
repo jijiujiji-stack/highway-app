@@ -6707,9 +6707,9 @@ const IC_MASTER = {
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.3146133, entranceLng: 138.7722971, exitLat: 36.3145362, exitLng: 138.7723227,
                 note: "【2026-07-17調査・座標のみ修正】MapFan「松井田妙義ＩＣ【入口】」(36.3146133,138.7722971)「【出口】」(36.3145362,138.7723227)を確認。未確認（推定フル）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.309,138.733)から約3.6km修正。"
             },
-            { order: 6, displayName: "碓氷軽井沢IC", googleName: "上信越自動車道 碓氷軽井沢インターチェンジ", lat: 36.2989419, lng: 138.6703012,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.2989419, entranceLng: 138.6703012, exitLat: 36.2989419, exitLng: 138.670181,
-                note: "【2026-07-17調査・座標のみ修正】MapFan「碓氷軽井沢ＩＣ【入口】」(36.2989419,138.6703012)「【出口】」(36.2989419,138.670181)を確認。未確認（推定フル）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.338,138.640)から約5.1km修正。"
+            { order: 6, displayName: "碓氷軽井沢IC", googleName: "上信越自動車道 碓氷軽井沢インターチェンジ", lat: 36.292576, lng: 138.671403,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.292576, entranceLng: 138.671403, exitLat: 36.294437, exitLng: 138.671949,
+                note: "【2026-07-25再照合・座標修正】従来のMapFan由来の座標（entrance 36.2989419,138.6703012／exit 36.2989419,138.670181）について、Wikipedia座標テンプレート（換算36.293944,138.671833）・Yahoo!地図（36.29439,138.6711525）・NAVITIME下り入口（36.292576,138.671403）・NAVITIME下り出口（36.294437,138.671949）という4つの独立ソースが、いずれも従来座標から約500〜700m離れた位置で互いに50〜150m程度の範囲にまとまって一致していることを確認した。Wikipediaによれば「群馬県と長野県との県境付近、トンネルの狭間に位置する」複雑な地形であり、MapFan側のピンがこの地形の影響で実際の位置からずれて登録されていた可能性がある。座標はNAVITIMEの方向別の値（下り入口・下り出口）に修正した。上り（軽井沢→高崎方面）側の個別座標は確認できていないため、他IC（三芳SIC等）と同様のフォールバック方式に倣い、entranceLat/Lng・exitLat/Lngとも確認できた下り側の値をそのまま暫定使用した。entranceSelectable/exitSelectableは変更なし（trueのまま）。次回、上り側の個別座標が確認できた場合は再検証が必要。"
             },
             { order: 7, displayName: "佐久IC", googleName: "上信越自動車道 佐久インターチェンジ", lat: 36.2851623, lng: 138.4804773,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.2851623, entranceLng: 138.4804773, exitLat: 36.2849406, exitLng: 138.4808629,

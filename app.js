@@ -8389,12 +8389,13 @@ const IC_MASTER = {
             {
                 order: 0.2,
                 displayName: "湾岸市川IC",
-                googleName: "首都高速湾岸線 湾岸市川出入口",
-                lat: 35.672,
-                lng: 139.938,
+                googleName: "東関東自動車道 湾岸市川インターチェンジ",
+                lat: 35.692086,
+                lng: 139.955341,
                 routeBranch: "tokan",
                 branchOrder: 2,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.672, entranceLng: 139.938, exitLat: 35.672, exitLng: 139.938
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.692086, entranceLng: 139.955341, exitLat: 35.692187, exitLng: 139.957033,
+                note: "【2026-07-25再照合・座標修正】従来の登録座標（35.672,139.938）は、同エリア内の「湾岸市川（首都高）」スタブ（首都高速湾岸線側の施設）と完全に同一であり、東関東自動車道の実在施設ではなく別路線の施設が誤って登録されていたことが判明した。NAVITIME・MapFan・Wikipedia・Yahoo!地図の4ソースが東関東道側の実施設（下り入口35.692086,139.955341／上り出口35.692187,139.957033付近）で一致していることを確認し、修正した。なお、京葉道路側に別途「京葉市川IC」（35.708〜35.710,139.925〜139.930付近）という似た名称の別施設が存在するが、これとの混同ではないことも確認済み。ハーフIC（下り線への流入・上り線からの流出のみ）。entranceSelectable/exitSelectableは変更なし。"
             },
             {
                 order: 0,
@@ -8446,71 +8447,78 @@ const IC_MASTER = {
                 order: 4,
                 displayName: "四街道IC",
                 googleName: "東関東自動車道 四街道インターチェンジ",
-                lat: 35.664,
-                lng: 140.187,
+                lat: 35.6841,
+                lng: 140.1790,
                 routeBranch: "tokan",
                 branchOrder: 6,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.664, entranceLng: 140.187, exitLat: 35.664, exitLng: 140.187
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.6841, entranceLng: 140.1790, exitLat: 35.6841, exitLng: 140.1790,
+                note: "【2026-07-25座標新規確定】従来noteフィールドが無く、精密な座標確認が行われていなかった（従来値35.664,140.187はWikipedia・Yahoo!地図から約2,394m離れていた）。Wikipedia座標テンプレート（換算35.684481,140.178939）・Yahoo!地図（35.6840919,140.1790098）が約44mで近接一致しており、この値で新規確定した。entranceSelectable/exitSelectableは変更なし。"
             },
             {
                 order: 5,
                 displayName: "佐倉IC",
                 googleName: "東関東自動車道 佐倉インターチェンジ",
-                lat: 35.694,
-                lng: 140.248,
+                lat: 35.6871,
+                lng: 140.2378,
                 routeBranch: "tokan",
                 branchOrder: 7,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.694, entranceLng: 140.248, exitLat: 35.694, exitLng: 140.248
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.6871, entranceLng: 140.2378, exitLat: 35.6871, exitLng: 140.2378,
+                note: "【2026-07-25座標新規確定】従来noteフィールドが無く、精密な座標確認が行われていなかった（従来値35.694,140.248はWikipedia・Yahoo!地図から約1,150m以上離れていた）。Wikipedia座標テンプレート（換算35.687261,140.238344）・Yahoo!地図（35.6871353,140.2378322）が約48mで近接一致しており、この値で新規確定した。entranceSelectable/exitSelectableは変更なし。"
             },
             {
                 order: 6,
                 displayName: "酒々井IC",
                 googleName: "東関東自動車道 酒々井インターチェンジ",
-                lat: 35.718,
-                lng: 140.300,
+                lat: 35.7257,
+                lng: 140.2938,
                 routeBranch: "tokan",
                 branchOrder: 8,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.718, entranceLng: 140.300, exitLat: 35.718, exitLng: 140.300
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.7257, entranceLng: 140.2938, exitLat: 35.7257, exitLng: 140.2938,
+                note: "【2026-07-25座標新規確定】従来noteフィールドが無く、精密な座標確認が行われていなかった（従来値35.718,140.300はWikipedia・Yahoo!地図から約900〜1,150m離れていた）。Wikipedia座標テンプレート（換算35.724778,140.294639）・Yahoo!地図（35.726624,140.2928384）は約260mとやや広めの一致だが、中間値で新規確定した。他ICと比べて一致度がやや低いため、次回MapFan等でさらに絞り込みが望ましい。entranceSelectable/exitSelectableは変更なし。"
             },
             {
                 order: 7,
                 displayName: "富里IC",
                 googleName: "東関東自動車道 富里インターチェンジ",
-                lat: 35.729,
-                lng: 140.343,
+                lat: 35.7444,
+                lng: 140.3114,
                 routeBranch: "tokan",
                 branchOrder: 9,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.729, entranceLng: 140.343, exitLat: 35.729, exitLng: 140.343
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.7444, entranceLng: 140.3114, exitLat: 35.7444, exitLng: 140.3114,
+                note: "【2026-07-25座標新規確定】従来noteフィールドが無く、精密な座標確認が行われていなかった（従来値35.729,140.343はWikipedia・Yahoo!地図から約3.3km離れていた、今回調査中最大の乖離）。Wikipedia座標テンプレート（換算35.744075,140.311492）・Yahoo!地図（35.7444634,140.3114244）が約44mで近接一致しており、この値で新規確定した。entranceSelectable/exitSelectableは変更なし。"
             },
             {
                 order: 8,
                 displayName: "成田IC",
                 googleName: "東関東自動車道 成田インターチェンジ",
-                lat: 35.779,
-                lng: 140.365,
+                lat: 35.7824,
+                lng: 140.3487,
                 routeBranch: "tokan",
                 branchOrder: 10,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.779, entranceLng: 140.365, exitLat: 35.779, exitLng: 140.365
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.7824, entranceLng: 140.3487, exitLat: 35.7824, exitLng: 140.3487,
+                note: "【2026-07-25座標新規確定】従来noteフィールドが無く、精密な座標確認が行われていなかった（従来値35.779,140.365はWikipedia・Yahoo!地図から約1,100〜1,900m離れていた）。東関東道の通常IC機能と、新空港自動車道への入口専用・ETC専用のクォーターIC機能を併せ持つ複合施設であり、Wikipedia座標テンプレート（換算35.782850,140.344547）・Yahoo!地図（35.7818576,140.3527826、「成田IC(JCT)」表記ページ）は約749mとやや一致度が低い（複合構造のため地点の指す場所がソースにより異なる可能性）。両者のおおよその中間値で暫定確定した。次回MapFan等で東関東道側代表点をさらに絞り込む必要がある。entranceSelectable/exitSelectableは変更なし。"
             },
             {
                 order: 9,
                 displayName: "大栄IC",
                 googleName: "東関東自動車道 大栄インターチェンジ",
-                lat: 35.842,
-                lng: 140.470,
+                lat: 35.8388,
+                lng: 140.4489,
                 routeBranch: "tokan",
                 branchOrder: 11,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.842, entranceLng: 140.470, exitLat: 35.842, exitLng: 140.470
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.8388, entranceLng: 140.4489, exitLat: 35.8388, exitLng: 140.4489,
+                note: "【2026-07-25座標新規確定】従来noteフィールドが無く、精密な座標確認が行われていなかった（従来値35.842,140.470はWikipedia・Yahoo!地図から約1,850〜2,030m離れていた）。Wikipedia座標テンプレート（換算35.837489,140.450206）・Yahoo!地図（35.8401382,140.447571）は約379mとやや広めの一致だが、中間値で新規確定した。次回さらに絞り込みが望ましい。entranceSelectable/exitSelectableは変更なし。"
             },
             {
                 order: 10,
                 displayName: "佐原香取IC",
                 googleName: "東関東自動車道 佐原香取インターチェンジ",
-                lat: 35.884,
-                lng: 140.548,
+                lat: 35.8746,
+                lng: 140.5358,
                 routeBranch: "tokan",
                 branchOrder: 12,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.884, entranceLng: 140.548, exitLat: 35.884, exitLng: 140.548
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.8746, entranceLng: 140.5358, exitLat: 35.8746, exitLng: 140.5358,
+                note: "【2026-07-25座標新規確定】従来noteフィールドが無く、精密な座標確認が行われていなかった（従来値35.884,140.548はWikipedia・Yahoo!地図から約1,500m離れていた）。Wikipedia座標テンプレート（換算35.874081,140.536789）・Yahoo!地図（35.8752077,140.5348896）が約212mで一致しており、中間値で新規確定した。entranceSelectable/exitSelectableは変更なし。"
             },
             {
                 order: 11,

@@ -6182,17 +6182,6 @@ const IC_MASTER = {
         exits: [
 
             {
-                order: -2,
-                displayName: "加平（首都高）",
-                googleName: "首都高速中央環状線 加平出入口",
-                lat: 35.7776257,
-                lng: 139.8258096,
-                experimental: true,
-                roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.7776257, entranceLng: 139.8258096, exitLat: 35.7776257, exitLng: 139.8258096,
-                note: "【2026-07-18同期修正】SHUTO_IC_MASTER本体側（shuto-6-kahira、MapFan検証済み「加平ランプ（６号三郷線）【入口】」）の座標に同期。旧座標との誤差約525m。dedupeIcDefinitionsByIdentityによりSHUTO_IC_MASTER側が優先されるため候補選定への実害はなかったが、データ整合性のため修正。"
-            },
-            {
                 order: -1,
                 displayName: "八潮南（首都高）",
                 googleName: "首都高速6号三郷線 八潮南出入口",
@@ -7241,15 +7230,6 @@ const IC_MASTER = {
             { order: -4, displayName: "高井戸（首都高）", googleName: "首都高速4号新宿線 高井戸出入口", lat: 35.684, lng: 139.615, experimental: true, roadType: "首都高",
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.684, entranceLng: 139.615, exitLat: 35.684, exitLng: 139.615
             },
-            { order: -3, displayName: "外苑（首都高）", googleName: "首都高速4号新宿線 外苑出入口", lat: 35.677, lng: 139.718, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.677, entranceLng: 139.718, exitLat: 35.677, exitLng: 139.718
-            },
-            { order: -2, displayName: "代官町（首都高）", googleName: "首都高速都心環状線 代官町出入口", lat: 35.688, lng: 139.754, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.688, entranceLng: 139.754, exitLat: 35.688, exitLng: 139.754
-            },
-            { order: -1, displayName: "一ツ橋（首都高）", googleName: "首都高速都心環状線 一ツ橋出入口", lat: 35.692, lng: 139.758, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.692, entranceLng: 139.758, exitLat: 35.692, exitLng: 139.758
-            },
             { order: 1, displayName: "高井戸IC", googleName: "中央自動車道 高井戸インターチェンジ", lat: 35.6794482, lng: 139.6090794,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.6794482, entranceLng: 139.6090794, exitLat: 35.6794482, exitLng: 139.6090794,
                 note: "【2026-07-16調査・構造修正】Wikipedia「高井戸インターチェンジ」、乗りものニュース(trafficnews.jp/post/119263)、Merkmal(merkmal-biz.jp/post/57540)の複数情報源で、下り線入口は開通以来一度も建設されていない（住民反対のため半世紀近く未着工）クオーターICであることを確認。上り線（都心方面）への出口のみが存在するため、entranceSelectable:falseに修正（従来はtrueだったが誤り）。2022年6月に杉並区が下り入口建設支援の方針を表明しているが、2026年7月現在も着工・開通の一次情報はなく、将来開通の可能性がある（開通ニュースが出た時点で再確認要）。座標はMapFan「高井戸ＩＣ（中央自動車道）【出口（上り）】」(35.6794482,139.6090794)で確認。従来座標(35.684,139.611)から約536m南西へ修正。"
@@ -7394,15 +7374,6 @@ const IC_MASTER = {
             },
             { order: -5, displayName: "霞が関（首都高）", googleName: "首都高速都心環状線 霞が関出入口", lat: 35.671, lng: 139.751, experimental: true, roadType: "首都高",
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.671, entranceLng: 139.751, exitLat: 35.671, exitLng: 139.751
-            },
-            { order: -4, displayName: "外苑（首都高）", googleName: "首都高速4号新宿線 外苑出入口", lat: 35.677, lng: 139.718, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.677, entranceLng: 139.718, exitLat: 35.677, exitLng: 139.718
-            },
-            { order: -3, displayName: "代官町（首都高）", googleName: "首都高速都心環状線 代官町出入口", lat: 35.688, lng: 139.754, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.688, entranceLng: 139.754, exitLat: 35.688, exitLng: 139.754
-            },
-            { order: -2, displayName: "一ツ橋（首都高）", googleName: "首都高速都心環状線 一ツ橋出入口", lat: 35.692, lng: 139.758, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.692, entranceLng: 139.758, exitLat: 35.692, exitLng: 139.758
             },
             { order: -1, displayName: "戸越（首都高）", googleName: "首都高速2号目黒線 戸越出入口", lat: 35.615, lng: 139.716, experimental: true, roadType: "首都高",
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.615, entranceLng: 139.716, exitLat: 35.615, exitLng: 139.716

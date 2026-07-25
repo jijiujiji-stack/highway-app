@@ -7524,9 +7524,9 @@ const IC_MASTER = {
                 entranceSelectable: true, exitSelectable: true, entranceLat: 34.9591911, entranceLng: 138.4245705, exitLat: 34.9597322, exitLng: 138.4244571,
                 note: "【2026-07-14調査・座標のみ修正】2019年9月14日開通。WebSearchで「本線へ直接接続するETC専用IC、上り・下りとも入口・出口があり、バスや大型トラックも利用可能なフルインター形式」と確認（静岡市公式サイトも確認）。MapFanでは方向表記のない【入口】【出口】の2ページ（約60m差、実質同一地点）を確認。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(34.9591911,138.4245705)、exitLat/Lngを出口(34.9597322,138.4244571)に設定。従来座標(34.962,138.422)から約391m修正。"
             },
-            { order: 14, displayName: "静岡IC", googleName: "東名高速道路 静岡インターチェンジ", lat: 34.948088, lng: 138.390443,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 34.948088, entranceLng: 138.390443, exitLat: 34.947308, exitLng: 138.391065,
-                note: "【2026-07-16調査・座標のみ修正】NEXCO中日本公式・WikipediaにフルIC/ハーフICの明示的な記載は見つからなかったが、MapFanの入口・出口とも方向表記がなく、料金所は双方向対応構成であることから、フルICと推定（断定はできず、状況証拠による判断）。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はMapFan「静岡ＩＣ（東名高速道路）【入口】」(34.948088,138.390443)「【出口】」(34.947308,138.391065)で確認。従来座標(34.944,138.395)から約550m修正。"
+            { order: 14, displayName: "静岡IC", googleName: "東名高速道路 静岡インターチェンジ", lat: 34.945453, lng: 138.390548,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 34.945453, entranceLng: 138.390548, exitLat: 34.948443, exitLng: 138.397263,
+                note: "【2026-07-25再照合・座標修正】Wikipedia座標テンプレート（34.947169,138.393819）・Yahoo!地図（34.9475905,138.3937868）は、NAVITIMEの下り入口・下り出口2点の中点（34.946948,138.393906）とほぼ一致（Wikipedia差約26m、Yahoo差約36m）しており、これらが「入口・出口をまとめた代表点」を示していたことが判明した。従来のMapFan由来の座標（entrance 34.948088,138.390443／exit 34.947308,138.391065）はこれらから約300〜600m離れていたため、NAVITIMEの方向別の値（下り入口・下り出口）に修正した。上記の代表点はあくまで「下り」方向の値であり、本アプリのentranceLat/Lng・exitLat/Lngの2点構成では方向区分を持てないため、上り側が別位置にある場合はそちらを表現できていない点に留意。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
             { order: 15, displayName: "焼津IC", googleName: "東名高速道路 焼津インターチェンジ", lat: 34.881388, lng: 138.301920,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 34.881388, entranceLng: 138.301920, exitLat: 34.881533, exitLng: 138.301740,
@@ -7536,17 +7536,17 @@ const IC_MASTER = {
                 entranceSelectable: true, exitSelectable: true, entranceLat: 34.8191127, entranceLng: 138.2623882, exitLat: 34.8159419, exitLng: 138.2668815,
                 note: "【2026-07-14調査・座標のみ修正】2016年3月12日開通、東名高速道路で最初の本線直結型スマートIC。WebSearchで「両方向で24時間利用可能」と確認。MapFanで入口（上り・下り）・出口（上り・下り）の4個別ページの存在を確認したが、出口(下り)の座標は複数回の検索でも取得できなかったため、exitLat/Lngは入口(下り)(34.8159419,138.2668815)の座標を暫定使用した。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(34.8191127,138.2623882)に設定。従来座標(34.821,138.269)から約640m修正。次回、出口(下り)の個別座標が確認できた場合は再検証が必要。"
             },
-            { order: 16, displayName: "吉田IC", googleName: "東名高速道路 吉田インターチェンジ", lat: 34.791556, lng: 138.238301,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 34.791556, entranceLng: 138.238301, exitLat: 34.791556, exitLng: 138.238301,
-                note: "【2026-07-16調査・座標のみ修正】Wikipedia「吉田インターチェンジ」で入口3・出口4ブースを備えるフルICであることを確認。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はMapFan「吉田ＩＣ（東名高速道路）【入口】」(34.791556,138.238301)で確認したが、出口側のMapFan個別ページは検索で特定できなかったため、entranceLat/Lngと同一値をexitLat/Lngにも暫定使用した（新保土ヶ谷IC等と同じフォールバック方式）。従来座標(34.781,138.252)から約1.7km修正。次回、出口側の個別座標が確認できた場合は再検証が必要。"
+            { order: 16, displayName: "吉田IC", googleName: "東名高速道路 吉田インターチェンジ", lat: 34.7918, lng: 138.2348,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 34.7918, entranceLng: 138.2348, exitLat: 34.7918, exitLng: 138.2348,
+                note: "【2026-07-25再照合・座標修正】Wikipedia座標テンプレート（換算34.791833,138.234617）・Yahoo!地図（34.7918858,138.2349501）が互いに約31mで近接一致していることを確認した。従来のMapFan由来の座標（34.791556,138.238301）はこれらから約309〜338m離れていたため、収束点付近の値（34.7918,138.2348）に修正した。出口側のMapFan個別ページは引き続き未特定のため、entranceLat/Lng・exitLat/Lngとも同一値の暫定扱いを継続する。entranceSelectable/exitSelectableは変更なし（trueのまま）。次回、出口側の個別座標が確認できた場合は再検証が必要。"
             },
-            { order: 17, displayName: "相良牧之原IC", googleName: "東名高速道路 相良牧之原インターチェンジ", lat: 34.759116, lng: 138.141403,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 34.759116, entranceLng: 138.141403, exitLat: 34.759116, exitLng: 138.141403,
-                note: "【2026-07-16調査・座標のみ修正】NEXCO中日本公式・WikipediaにフルIC/ハーフICの明示的な記載は見つからなかったが、NAVITIMEで上り入口・下り入口とも存在を確認し、MapFanも方向表記がないことから、フルICと推定（断定はできず、状況証拠による判断）。座標はMapFan「相良牧之原ＩＣ（東名高速道路）【出口】」(34.759116,138.141403)で確認したが、入口側のMapFan個別ページは検索で特定できなかったため、exitLat/Lngと同一値をentranceLat/Lngにも暫定使用した（新保土ヶ谷IC等と同じフォールバック方式）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(34.735,138.179)から約4.3kmという、今回調査中で最大級の修正。次回、入口側の個別座標が確認できた場合は再検証が必要。"
+            { order: 17, displayName: "相良牧之原IC", googleName: "東名高速道路 相良牧之原インターチェンジ", lat: 34.7618, lng: 138.1391,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 34.7618, entranceLng: 138.1391, exitLat: 34.7618, exitLng: 138.1391,
+                note: "【2026-07-25再照合・座標修正】Wikipedia座標テンプレート（換算34.762028,138.138742）・Yahoo!地図（34.761563,138.1394154）が互いに約81mで近接一致していることを確認した。従来のMapFan由来の座標（34.759116,138.141403）はこれらから約328〜405m離れていたため、収束点付近の値（34.7618,138.1391）に修正した。入口側のMapFan個別ページは引き続き未特定のため、entranceLat/Lng・exitLat/Lngとも同一値の暫定扱いを継続する。entranceSelectable/exitSelectableは変更なし（trueのまま）。次回、入口側の個別座標が確認できた場合は再検証が必要。"
             },
-            { order: 18, displayName: "菊川IC", googleName: "東名高速道路 菊川インターチェンジ", lat: 34.746543, lng: 138.088569,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 34.746543, entranceLng: 138.088569, exitLat: 34.746879, exitLng: 138.088003,
-                note: "【2026-07-16調査・座標のみ修正】NEXCO中日本公式・WikipediaにフルIC/ハーフICの明示的な記載は見つからなかったが、NAVITIMEで上り出口・下り出口・下り入口の存在を確認し、MapFanも方向表記がないことから、フルICと推定（断定はできず、状況証拠による判断。なお2025年1月に下り線出口の夜間閉鎖工事の実施を確認したが恒常的な構造制限ではない）。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はMapFan「菊川ＩＣ（東名高速道路）【入口】」(34.746543,138.088569)「【出口】」(34.746879,138.088003)で確認。従来座標(34.748,138.086)から約250m修正。"
+            { order: 18, displayName: "菊川IC", googleName: "東名高速道路 菊川インターチェンジ", lat: 34.750744, lng: 138.082672,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 34.750744, entranceLng: 138.082672, exitLat: 34.748957, exitLng: 138.085843,
+                note: "【2026-07-25再照合・座標修正】NAVITIME（下り入口34.750744,138.082672／下り出口34.748957,138.085843）・Wikipedia座標テンプレート（換算34.750094,138.085947）・Yahoo!地図（34.7490394,138.0860579）の3ソースが出口付近で近接一致（互いに数十〜130m程度）していることを確認した。従来のMapFan由来の座標（entrance 34.746543,138.088569／exit 34.746879,138.088003）はこれらから約300〜462m離れていたため、NAVITIMEの方向別の値（下り入口・下り出口）に修正した。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
             { order: 19, displayName: "掛川IC", googleName: "東名高速道路 掛川インターチェンジ", lat: 34.761578, lng: 138.024610,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 34.761578, entranceLng: 138.024610, exitLat: 34.761231, exitLng: 138.024617,

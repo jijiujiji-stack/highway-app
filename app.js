@@ -3930,17 +3930,17 @@ const SHUTO_IC_MASTER = [
         routeCode: "1",
         routeName: "首都高速1号上野線",
         order: 2,
-        lat: 35.712,
-        lng: 139.779,
-        entranceLat: 35.712,
-        entranceLng: 139.779,
-        exitLat: 35.712,
-        exitLng: 139.779,
+        lat: 35.708561,
+        lng: 139.776389,
+        entranceLat: 35.708561,
+        entranceLng: 139.776389,
+        exitLat: 35.708561,
+        exitLng: 139.776389,
         entranceSelectable: true,
         exitSelectable: true,
         sourceAreaKeys: ["chuo", "tomei", "aqualine", "keiyo", "tokan"],
         sourceGoogleNames: ["首都高速1号上野線 上野出入口"],
-        note: "既存IC_MASTERから正規化登録。現時点では未参照。"
+        note: "【2026-07-25再照合・座標修正】従来の座標（35.712,139.779）は未検証の値だった。keiyoエリア側の重複コピーが2026-07-18に二次情報源で35.708561,139.776389を確認済みだったが、確信度は中程度（一次情報未到達）との留保付きだった。今回、NAVITIME「首都高速1号上野線 上野出入口」で同一の35.708561,139.776389を確認し、独立した2ソース（keiyo側の二次情報源＋NAVITIME）が一致したため、確信度を高いと判断し本体側の座標を修正した。"
     },
     {
         id: "shuto-1-honcho",
@@ -5372,7 +5372,7 @@ const SHUTO_IC_MASTER = [
         exitSelectable: true,
         sourceAreaKeys: ["aqualine", "keiyo", "tokan"],
         sourceGoogleNames: ["首都高速湾岸線 大井南出入口"],
-        note: "既存IC_MASTERから正規化登録。現時点では未参照。"
+        note: "既存IC_MASTERから正規化登録。現時点では未参照。【2026-07-25情報引き継ぎ】NEXCO側keiyoエリアの重複コピー削除に伴い、以下の留保情報を引き継ぐ：【構造変更確認・selectableは変更保留】首都高速道路株式会社プレスリリース（2018年）およびWikipedia「大井南出入口」記事で、2018年4月15日の湾岸線本線料金所（東行き）撤去に伴い、東行きの「大井南入口」は「中央環状線大井南入口」に名称変更され、湾岸線への流入はできなくなり中央環状線・羽田線専用になったことを確認した（湾岸線東行きを使う場合は約1.3km先の「大井入口」を利用）。西行きの出口・入口は存続。この構造変更が現在のgoogleName「首都高速湾岸線 大井南出入口」の登録内容と整合しているか要再確認だが、entranceSelectable/exitSelectableの変更は対象外のためtrue/trueのまま変更していない。座標もMapFan等一次情報に到達できず未確認のため、既存値(35.589,139.756)から変更していない。"
     },
     {
         id: "shuto-b-kuko-chuo",
@@ -6181,17 +6181,6 @@ const IC_MASTER = {
         label: "常磐道方面",
         exits: [
 
-            {
-                order: -3,
-                displayName: "堤通（首都高）",
-                googleName: "首都高速6号向島線 堤通出入口",
-                lat: 35.7357056,
-                lng: 139.8150419,
-                experimental: true,
-                roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.7357056, entranceLng: 139.8150419, exitLat: 35.7357056, exitLng: 139.8150419,
-                note: "【2026-07-18同期修正】SHUTO_IC_MASTER本体側（shuto-6-tsutsumidori、MapFan検証済み）の座標に同期。旧座標との誤差約548m。dedupeIcDefinitionsByIdentityによりSHUTO_IC_MASTER側が優先されるため候補選定への実害はなかったが、データ整合性のため修正。"
-            },
             {
                 order: -2,
                 displayName: "加平（首都高）",
@@ -7249,13 +7238,6 @@ const IC_MASTER = {
     chuo: {
         label: "中央道方面",
         exits: [
-            { order: -6, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.7357056, lng: 139.8150419, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.7357056, entranceLng: 139.8150419, exitLat: 35.7357056, exitLng: 139.8150419,
-                note: "【2026-07-19同期修正】SHUTO_IC_MASTER本体側（shuto-6-tsutsumidori、MapFan検証済み）の座標に同期。旧座標との誤差約548m。dedupeIcDefinitionsByIdentityによりSHUTO_IC_MASTER側が優先されるため候補選定への実害はなかったが、データ整合性のため修正。"
-            },
-            { order: -5, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.712, lng: 139.779, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.712, entranceLng: 139.779, exitLat: 35.712, exitLng: 139.779
-            },
             { order: -4, displayName: "高井戸（首都高）", googleName: "首都高速4号新宿線 高井戸出入口", lat: 35.684, lng: 139.615, experimental: true, roadType: "首都高",
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.684, entranceLng: 139.615, exitLat: 35.684, exitLng: 139.615
             },
@@ -7407,13 +7389,6 @@ const IC_MASTER = {
     tomei: {
         label: "東名道方面",
         exits: [
-            { order: -8, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.7357056, lng: 139.8150419, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.7357056, entranceLng: 139.8150419, exitLat: 35.7357056, exitLng: 139.8150419,
-                note: "【2026-07-19同期修正】SHUTO_IC_MASTER本体側（shuto-6-tsutsumidori、MapFan検証済み）の座標に同期。旧座標との誤差約548m。dedupeIcDefinitionsByIdentityによりSHUTO_IC_MASTER側が優先されるため候補選定への実害はなかったが、データ整合性のため修正。"
-            },
-            { order: -7, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.712, lng: 139.779, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.712, entranceLng: 139.779, exitLat: 35.712, exitLng: 139.779
-            },
             { order: -6, displayName: "用賀（首都高）", googleName: "首都高速3号渋谷線 用賀出入口", lat: 35.626, lng: 139.633, experimental: true, roadType: "首都高",
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.626, entranceLng: 139.633, exitLat: 35.626, exitLng: 139.633
             },
@@ -7778,28 +7753,6 @@ const IC_MASTER = {
     aqualine: {
         label: "アクアライン方面",
         exits: [
-            { order: -8, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.7357056, lng: 139.8150419, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.7357056, entranceLng: 139.8150419, exitLat: 35.7357056, exitLng: 139.8150419,
-                note: "【2026-07-19同期修正】SHUTO_IC_MASTER本体側（shuto-6-tsutsumidori、MapFan検証済み）の座標に同期。旧座標との誤差約548m。dedupeIcDefinitionsByIdentityによりSHUTO_IC_MASTER側が優先されるため候補選定への実害はなかったが、データ整合性のため修正。"
-            },
-            { order: -7, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.712, lng: 139.779, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.712, entranceLng: 139.779, exitLat: 35.712, exitLng: 139.779
-            },
-            { order: -6, displayName: "葛西（首都高）", googleName: "首都高速湾岸線 葛西出入口", lat: 35.652, lng: 139.870, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.652, entranceLng: 139.870, exitLat: 35.652, exitLng: 139.870
-            },
-            { order: -4, displayName: "新木場（首都高）", googleName: "首都高速湾岸線 新木場出入口", lat: 35.645, lng: 139.827, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.645, entranceLng: 139.827, exitLat: 35.645, exitLng: 139.827
-            },
-            { order: -3, displayName: "有明（首都高）", googleName: "首都高速湾岸線 有明出入口", lat: 35.634, lng: 139.795, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.634, entranceLng: 139.795, exitLat: 35.634, exitLng: 139.795
-            },
-            { order: -2, displayName: "大井南（首都高）", googleName: "首都高速湾岸線 大井南出入口", lat: 35.589, lng: 139.756, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.589, entranceLng: 139.756, exitLat: 35.589, exitLng: 139.756
-            },
-            { order: -1, displayName: "空港中央（首都高）", googleName: "首都高速湾岸線 空港中央出入口", lat: 35.553, lng: 139.787, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.553, entranceLng: 139.787, exitLat: 35.553, exitLng: 139.787
-            },
             {
                 order: 1,
                 displayName: "浮島IC",
@@ -8069,34 +8022,6 @@ const IC_MASTER = {
     keiyo: {
         label: "京葉道路方面",
         exits: [
-            { order: -8, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.7357056, lng: 139.8150419, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.7357056, entranceLng: 139.8150419, exitLat: 35.7357056, exitLng: 139.8150419,
-                note: "SHUTO_IC_MASTER側の堤通（id: shuto-6-tsutsumidori、MapFanで検証済み、entranceLat/Lng=exitLat/Lng=35.7357056,139.8150419）と座標が不一致だったため、本スタブの座標をSHUTO_IC_MASTER側の検証済み値に同期した。dedupeIcDefinitionsByIdentityによりSHUTO_IC_MASTER側が優先されるため候補選定への実質的な影響はないが、データ不整合を解消するために修正。従来座標(35.731,139.817)から約660m修正。"
-            },
-            { order: -7, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.708561, lng: 139.776389, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.708561, entranceLng: 139.776389, exitLat: 35.708561, exitLng: 139.776389,
-                note: "首都高ドライバーズサイト（shutoko.jp）の「上野」ページで入口・出口の両方が存在すること、上り方向料金所がETC専用（現金車利用不可）であることを確認したが、これは支払い方法の制約であり通行可否（entranceSelectable/exitSelectable）には影響しないためtrue/trueを維持。座標は二次情報源（検索エンジン経由の集約値）でのみ35.708561,139.776389を確認でき、MapFan・NAVITIME等の一次情報の個別ページには今回到達できなかったため確信度は中程度。従来座標(35.712,139.779)から約440m修正。次回、MapFan等一次情報での再確認が望ましい。"
-            },
-            { order: -6, displayName: "葛西（首都高）", googleName: "首都高速湾岸線 葛西出入口", lat: 35.652, lng: 139.870, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.652, entranceLng: 139.870, exitLat: 35.652, exitLng: 139.870,
-                note: "首都高ドライバーズサイト（shutoko.jp）の「葛西」ページおよびWikipedia「葛西出入口」記事で、西行き・東行きとも入口・出口が存在するフルインターチェンジであることを確認した。entranceSelectable/exitSelectableは現状のtrue/trueのまま変更なし。座標はMapFan等一次情報の個別ページに今回到達できず未確認のため、既存値(35.652,139.870)を変更していない。"
-            },
-            { order: -4, displayName: "新木場（首都高）", googleName: "首都高速湾岸線 新木場出入口", lat: 35.645, lng: 139.827, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.645, entranceLng: 139.827, exitLat: 35.645, exitLng: 139.827,
-                note: "Wikipedia「新木場出入口」記事および首都高ドライバーズサイトで、西行き・東行きとも入口・出口が存在するフルインターチェンジであること（2022年4月から両方向とも入口ETC専用）を確認した。entranceSelectable/exitSelectableは現状のtrue/trueのまま変更なし。座標はMapFan等一次情報の個別ページに今回到達できず未確認のため、既存値(35.645,139.827)を変更していない。"
-            },
-            { order: -3, displayName: "有明（首都高）", googleName: "首都高速湾岸線 有明出入口", lat: 35.634, lng: 139.795, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.634, entranceLng: 139.795, exitLat: 35.634, exitLng: 139.795,
-                note: "【方向制限確認・selectableは変更保留】Wikipedia「有明出入口」記事で「西行き出口・東行き入口のみ設置されているハーフインターチェンジ」（東京都江東区有明二丁目、1981年5月19日供用開始）と高確信度で確認した。西行き入口・東行き出口は存在しない。ただし、entranceSelectable/exitSelectableの変更（貝塚IC・篠崎IC等で採用しているmirrorレコード方式の要否を含む）は今回の実装指示の対象外のため、true/trueのまま変更していない。座標はMapFan等一次情報に今回到達できず未確認のため、既存値(35.634,139.795)も変更していない。次回、entranceSelectable/exitSelectableの扱いをユーザー確認のうえで再検討する必要がある。"
-            },
-            { order: -2, displayName: "大井南（首都高）", googleName: "首都高速湾岸線 大井南出入口", lat: 35.589, lng: 139.756, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.589, entranceLng: 139.756, exitLat: 35.589, exitLng: 139.756,
-                note: "【構造変更確認・selectableは変更保留】首都高速道路株式会社プレスリリース（2018年）およびWikipedia「大井南出入口」記事で、2018年4月15日の湾岸線本線料金所（東行き）撤去に伴い、東行きの「大井南入口」は「中央環状線大井南入口」に名称変更され、湾岸線への流入はできなくなり中央環状線・羽田線専用になったことを確認した（湾岸線東行きを使う場合は約1.3km先の「大井入口」を利用）。西行きの出口・入口は存続。この構造変更が現在のgoogleName「首都高速湾岸線 大井南出入口」の登録内容と整合しているか要再確認だが、entranceSelectable/exitSelectableの変更は今回の実装指示の対象外のためtrue/trueのまま変更していない。座標はMapFan等一次情報に今回到達できず未確認のため、既存値(35.589,139.756)も変更していない。"
-            },
-            { order: -1, displayName: "空港中央（首都高）", googleName: "首都高速湾岸線 空港中央出入口", lat: 35.553, lng: 139.787, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.553, entranceLng: 139.787, exitLat: 35.553, exitLng: 139.787,
-                note: "首都高ドライバーズサイト（shutoko.jp）の「空港中央」ページおよびWikipedia「空港中央出入口」記事で、東行き・西行きとも入口・出口が存在するフルインターチェンジ（1993年9月開通、羽田空港最寄り）であることを確認した。entranceSelectable/exitSelectableは現状のtrue/trueのまま変更なし。座標はMapFan等一次情報の個別ページに今回到達できず未確認のため、既存値(35.553,139.787)を変更していない。"
-            },
             {
                 order: 1,
                 displayName: "篠崎IC",
@@ -8324,28 +8249,6 @@ const IC_MASTER = {
     tokan: {
         label: "東関東道方面",
         exits: [
-            { order: -8, displayName: "堤通（首都高）", googleName: "首都高速6号向島線 堤通出入口", lat: 35.7357056, lng: 139.8150419, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.7357056, entranceLng: 139.8150419, exitLat: 35.7357056, exitLng: 139.8150419,
-                note: "【2026-07-19同期修正】SHUTO_IC_MASTER本体側（shuto-6-tsutsumidori、MapFan検証済み）の座標に同期。旧座標との誤差約548m。dedupeIcDefinitionsByIdentityによりSHUTO_IC_MASTER側が優先されるため候補選定への実害はなかったが、データ整合性のため修正。"
-            },
-            { order: -7, displayName: "上野（首都高）", googleName: "首都高速1号上野線 上野出入口", lat: 35.712, lng: 139.779, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.712, entranceLng: 139.779, exitLat: 35.712, exitLng: 139.779
-            },
-            { order: -6, displayName: "葛西（首都高）", googleName: "首都高速湾岸線 葛西出入口", lat: 35.652, lng: 139.870, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.652, entranceLng: 139.870, exitLat: 35.652, exitLng: 139.870
-            },
-            { order: -4, displayName: "新木場（首都高）", googleName: "首都高速湾岸線 新木場出入口", lat: 35.645, lng: 139.827, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.645, entranceLng: 139.827, exitLat: 35.645, exitLng: 139.827
-            },
-            { order: -3, displayName: "有明（首都高）", googleName: "首都高速湾岸線 有明出入口", lat: 35.634, lng: 139.795, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.634, entranceLng: 139.795, exitLat: 35.634, exitLng: 139.795
-            },
-            { order: -2, displayName: "大井南（首都高）", googleName: "首都高速湾岸線 大井南出入口", lat: 35.589, lng: 139.756, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.589, entranceLng: 139.756, exitLat: 35.589, exitLng: 139.756
-            },
-            { order: -1, displayName: "空港中央（首都高）", googleName: "首都高速湾岸線 空港中央出入口", lat: 35.553, lng: 139.787, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.553, entranceLng: 139.787, exitLat: 35.553, exitLng: 139.787
-            },
             {
                 order: 0.1,
                 displayName: "葛西IC",

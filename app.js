@@ -7808,9 +7808,6 @@ const IC_MASTER = {
             { order: -6, displayName: "葛西（首都高）", googleName: "首都高速湾岸線 葛西出入口", lat: 35.652, lng: 139.870, experimental: true, roadType: "首都高",
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.652, entranceLng: 139.870, exitLat: 35.652, exitLng: 139.870
             },
-            { order: -5, displayName: "湾岸市川（首都高）", googleName: "首都高速湾岸線 湾岸市川出入口", lat: 35.672, lng: 139.938, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.672, entranceLng: 139.938, exitLat: 35.672, exitLng: 139.938
-            },
             { order: -4, displayName: "新木場（首都高）", googleName: "首都高速湾岸線 新木場出入口", lat: 35.645, lng: 139.827, experimental: true, roadType: "首都高",
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.645, entranceLng: 139.827, exitLat: 35.645, exitLng: 139.827
             },
@@ -8104,10 +8101,6 @@ const IC_MASTER = {
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.652, entranceLng: 139.870, exitLat: 35.652, exitLng: 139.870,
                 note: "首都高ドライバーズサイト（shutoko.jp）の「葛西」ページおよびWikipedia「葛西出入口」記事で、西行き・東行きとも入口・出口が存在するフルインターチェンジであることを確認した。entranceSelectable/exitSelectableは現状のtrue/trueのまま変更なし。座標はMapFan等一次情報の個別ページに今回到達できず未確認のため、既存値(35.652,139.870)を変更していない。"
             },
-            { order: -5, displayName: "湾岸市川（首都高）", googleName: "首都高速湾岸線 湾岸市川出入口", lat: 35.672, lng: 139.938, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.672, entranceLng: 139.938, exitLat: 35.672, exitLng: 139.938,
-                note: "【留保・要確認】Wikipedia「湾岸市川インターチェンジ」記事で「この『湾岸市川IC』と首都高速湾岸線の出入口は異なる別の施設であり、混同されやすい」と明記されているのを発見した。本エントリのgoogleName「首都高速湾岸線 湾岸市川出入口」が指す施設が実在するのか、東関東自動車道側の湾岸市川IC（下り方面のみのハーフIC、Mapion調べで座標35.69133945,139.95422609、本エントリの座標から約2.4km離れている）と誤って同一視されたものかは、今回の調査だけでは断定できなかった。施設の同定に関わる問題のため、座標・entranceSelectable/exitSelectableとも変更せず現状維持とし、次回は東関道側との関係を含めた再確認が必要。"
-            },
             { order: -4, displayName: "新木場（首都高）", googleName: "首都高速湾岸線 新木場出入口", lat: 35.645, lng: 139.827, experimental: true, roadType: "首都高",
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.645, entranceLng: 139.827, exitLat: 35.645, exitLng: 139.827,
                 note: "Wikipedia「新木場出入口」記事および首都高ドライバーズサイトで、西行き・東行きとも入口・出口が存在するフルインターチェンジであること（2022年4月から両方向とも入口ETC専用）を確認した。entranceSelectable/exitSelectableは現状のtrue/trueのまま変更なし。座標はMapFan等一次情報の個別ページに今回到達できず未確認のため、既存値(35.645,139.827)を変更していない。"
@@ -8360,9 +8353,6 @@ const IC_MASTER = {
             },
             { order: -6, displayName: "葛西（首都高）", googleName: "首都高速湾岸線 葛西出入口", lat: 35.652, lng: 139.870, experimental: true, roadType: "首都高",
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.652, entranceLng: 139.870, exitLat: 35.652, exitLng: 139.870
-            },
-            { order: -5, displayName: "湾岸市川（首都高）", googleName: "首都高速湾岸線 湾岸市川出入口", lat: 35.672, lng: 139.938, experimental: true, roadType: "首都高",
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.672, entranceLng: 139.938, exitLat: 35.672, exitLng: 139.938
             },
             { order: -4, displayName: "新木場（首都高）", googleName: "首都高速湾岸線 新木場出入口", lat: 35.645, lng: 139.827, experimental: true, roadType: "首都高",
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.645, entranceLng: 139.827, exitLat: 35.645, exitLng: 139.827

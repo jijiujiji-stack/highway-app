@@ -6653,9 +6653,9 @@ const IC_MASTER = {
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.5385722, entranceLng: 139.0492941, exitLat: 36.5385722, exitLng: 139.0492941,
                 note: "【2026-07-17調査・座標のみ修正】MapFan「赤城ＩＣ【入口】」(36.5385722,139.0492941)を確認。未確認（推定フル）。出口側の個別ページは未特定のため、entranceLat/Lng・exitLat/Lngとも入口側の座標を暫定使用した。従来座標(36.558,139.069)から約2.8km修正。次回、出口側の個別座標が確認できた場合は再検証が必要。"
             },
-            { order: 18, displayName: "昭和IC", googleName: "関越自動車道 昭和インターチェンジ", lat: 36.6127896, lng: 139.0665319,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.6127896, entranceLng: 139.0665319, exitLat: 36.6127728, exitLng: 139.0666025,
-                note: "【2026-07-17調査・座標のみ修正】MapFan「昭和ＩＣ【入口】」(36.6127896,139.0665319)「【出口】」(36.6127728,139.0666025)を確認。「開発IC」区分のみでフルIC/ハーフICの明記なし（未確認）。entranceSelectable/exitSelectableは変更なし（trueのまま）。従来座標(36.634,139.101)から約3.9km修正。"
+            { order: 18, displayName: "昭和IC", googleName: "関越自動車道 昭和インターチェンジ", lat: 36.617401, lng: 139.068207,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.617401, entranceLng: 139.068207, exitLat: 36.613226, exitLng: 139.065652,
+                note: "【2026-07-25再照合・座標修正】従来の登録座標（entrance/exitとも36.6127896,139.0665319付近、MapFan由来）について、NAVITIMEで追加確認したところ、昭和ICは「森下地区」（IC南側）と「橡久保地区」（IC北側、約470m離れる）の2地区にランプが分かれた構造であることが判明した。従来の登録値は森下地区（上り入口・下り出口）に近く、Wikipedia座標テンプレート（換算36.615303,139.067056）・Yahoo!地図（36.6155522,139.067593）はいずれも橡久保地区（下り入口）付近を示していた。今回、entranceLat/Lngを橡久保地区の下り入口（36.617401,139.068207）、exitLat/Lngを森下地区の下り出口（36.613226,139.065652）に修正した。「開発IC」区分のみでフルIC/ハーフICの明記なしという点は変更なし（未確認）。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
             { order: 19, displayName: "沼田IC", googleName: "関越自動車道 沼田インターチェンジ", lat: 36.6542705, lng: 139.0707428,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.6542705, entranceLng: 139.0707428, exitLat: 36.654136, exitLng: 139.0710797,

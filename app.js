@@ -6482,21 +6482,21 @@ const IC_MASTER = {
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.1271446, entranceLng: 139.6318021, exitLat: 36.1272656, exitLng: 139.6315307,
                 note: "【2026-07-17調査・座標新規追加】従来lat/lng等の座標フィールドが一切未設定だったため新規確定。MapFan「加須ＩＣ【入口】」(36.1271446,139.6318021)「【出口】」(36.1272656,139.6315307)を確認。入口・出口の個別ページが存在することからフルICと推定（NEXCO公式・Wikipediaに明記なし）。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
-            { order: 6, displayName: "羽生IC", googleName: "東北自動車道 羽生インターチェンジ", lat: 36.1668255, lng: 139.5840919,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.1668255, entranceLng: 139.5840919, exitLat: 36.1667772, exitLng: 139.5841774,
-                note: "【2026-07-17調査・座標新規追加】従来lat/lng等の座標フィールドが一切未設定だったため新規確定。MapFan「羽生ＩＣ【入口】」(36.1668255,139.5840919)「【出口】」(36.1667772,139.5841774)を確認。入口・出口の個別ページが存在することからフルICと推定（NEXCO公式・Wikipediaに明記なし）。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
+            { order: 6, displayName: "羽生IC", googleName: "東北自動車道 羽生インターチェンジ", lat: 36.170012, lng: 139.588068,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.170012, entranceLng: 139.588068, exitLat: 36.167347, exitLng: 139.589068,
+                note: "【2026-07-25再照合・座標修正】NAVITIME上り入口（36.169679,139.588795）が、Wikipedia座標テンプレート（換算36.169389,139.588639）・Yahoo!地図（36.1690603,139.5870443）と約20〜40mで完全一致することを確認した。従来のMapFan由来の座標（entrance 36.1668255,139.5840919／exit 36.1667772,139.5841774）はこれらから約360〜500m系統的にズレていた（特に経度方向）ため、NAVITIME・Wikipedia・Yahoo!地図が一致する側の値に修正した。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
-            { order: 7, displayName: "館林IC", googleName: "東北自動車道 館林インターチェンジ", lat: 36.2273545, lng: 139.5741615,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.2273545, entranceLng: 139.5741615, exitLat: 36.227488299431, exitLng: 139.57386181402,
-                note: "【2026-07-17調査・座標新規追加】従来lat/lng等の座標フィールドが一切未設定だったため新規確定。MapFan「館林ＩＣ【入口】」(36.2273545,139.5741615)「【出口】」(36.227488299431,139.57386181402)を確認。入口・出口の個別ページが存在することからフルICと推定（NEXCO公式・Wikipediaに明記なし）。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
+            { order: 7, displayName: "館林IC", googleName: "東北自動車道 館林インターチェンジ", lat: 36.2254, lng: 139.5714,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.2254, entranceLng: 139.5714, exitLat: 36.2254, exitLng: 139.5714,
+                note: "【2026-07-25再照合・座標修正】Wikipedia座標テンプレート（換算36.225500,139.571083）・Yahoo!地図（36.2253183,139.5717746）が互いに約65mで近接一致していることを確認した。従来のMapFan由来の座標（entrance 36.2273545,139.5741615／exit 36.227488299431,139.57386181402）はこれらから約312〜345m離れていたため、収束点付近の値（36.2254,139.5714）に修正した。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
             { order: 8, displayName: "佐野藤岡IC", googleName: "東北自動車道 佐野藤岡インターチェンジ", lat: 36.2941087, lng: 139.6158843,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.2941087, entranceLng: 139.6158843, exitLat: 36.2941087, exitLng: 139.6158843,
                 note: "【2026-07-17調査・座標新規追加】従来lat/lng等の座標フィールドが一切未設定だったため新規確定。MapFan「佐野藤岡ＩＣ【出口】」(36.2941087,139.6158843)を確認。入口側の個別ページは検索で特定できなかったため、entranceLat/Lng・exitLat/Lngとも出口座標を暫定使用した。入口・出口いずれかの個別ページが存在することからフルICと推定（NEXCO公式・Wikipediaに明記なし）。entranceSelectable/exitSelectableは変更なし（trueのまま）。次回、入口の個別座標が確認できた場合は再検証が必要。"
             },
-            { order: 9, displayName: "栃木IC", googleName: "東北自動車道 栃木インターチェンジ", lat: 36.4027283, lng: 139.7120006,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.4027283, entranceLng: 139.7120006, exitLat: 36.4028591, exitLng: 139.7116076,
-                note: "【2026-07-17調査・座標新規追加】従来lat/lng等の座標フィールドが一切未設定だったため新規確定。MapFan「栃木ＩＣ【入口】」(36.4027283,139.7120006)「【出口】」(36.4028591,139.7116076)を確認。入口・出口の個別ページが存在することからフルICと推定（NEXCO公式・Wikipediaに明記なし）。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
+            { order: 9, displayName: "栃木IC", googleName: "東北自動車道 栃木インターチェンジ", lat: 36.4024, lng: 139.7084,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.4024, entranceLng: 139.7084, exitLat: 36.4024, exitLng: 139.7084,
+                note: "【2026-07-25再照合・座標修正】Wikipedia座標テンプレート（換算36.402444,139.708444）・Yahoo!地図（36.4023572,139.7083078）が互いに約16mで極めて近接一致していることを確認した。従来のMapFan由来の座標（entrance 36.4027283,139.7120006／exit 36.4028591,139.7116076）はこれらから約320〜334m離れていたため、収束点付近の値（36.4024,139.7084）に修正した。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
             { order: 10, displayName: "鹿沼IC", googleName: "東北自動車道 鹿沼インターチェンジ", lat: 36.5354901, lng: 139.8023191,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.5354901, entranceLng: 139.8023191, exitLat: 36.5355532, exitLng: 139.8024622,
@@ -6526,9 +6526,9 @@ const IC_MASTER = {
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.962049, entranceLng: 139.9854459, exitLat: 36.962071, exitLng: 139.985313,
                 note: "【2026-07-17調査・座標新規追加】新規区間のため新規追加。MapFan「黒磯板室ＩＣ【入口】」(36.962049,139.9854459)「【出口】」(36.962071,139.985313)を確認。フルICと推定（NEXCO公式・Wikipediaに明記なし）。2009年3月29日開通、信号機付き平面交差構造。Wikipediaによると2025年4月26日にY字交差点での進路誤認による逆走多重事故（死亡3人・重傷2人・軽傷8人、計13人死傷）が発生し、2025年6月に矢印信号機・指定方向外通行禁止標識の大型化等の安全対策が実施された。entranceSelectable/exitSelectableは変更せずtrueとした。"
             },
-            { order: 16, displayName: "那須IC", googleName: "東北自動車道 那須インターチェンジ", lat: 37.0024635, lng: 140.0382438,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 37.0024635, entranceLng: 140.0382438, exitLat: 37.0024199, exitLng: 140.0383253,
-                note: "【2026-07-17調査・座標新規追加】新規区間のため新規追加。MapFan「那須ＩＣ【入口】」(37.0024635,140.0382438)「【出口】」(37.0024199,140.0383253)を確認。フルICと推定（NEXCO公式・Wikipediaに明記なし）。1974年12月20日開通。entranceSelectable/exitSelectableはtrueとした。"
+            { order: 16, displayName: "那須IC", googleName: "東北自動車道 那須インターチェンジ", lat: 37.0053, lng: 140.0399,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 37.0053, entranceLng: 140.0399, exitLat: 37.0053, exitLng: 140.0399,
+                note: "【2026-07-25再照合・座標修正】Wikipedia座標テンプレート（換算37.005472,140.04）・Yahoo!地図（37.0050949,140.0398831）が互いに約43mで近接一致していることを確認した。従来のMapFan由来の座標（entrance 37.0024635,140.0382438／exit 37.0024199,140.0383253）はこれらから約327〜370m離れていたため、収束点付近の値（37.0053,140.0399）に修正した。1974年12月20日開通という点は変更なし。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
             { order: 17, displayName: "那須高原SIC", googleName: "東北自動車道 那須高原スマートインターチェンジ", lat: 37.0547427, lng: 140.1004103,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 37.0547427, entranceLng: 140.1004103, exitLat: 37.0567907, exitLng: 140.0983925,
@@ -6550,13 +6550,13 @@ const IC_MASTER = {
                 entranceSelectable: true, exitSelectable: true, entranceLat: 37.2550158, entranceLng: 140.3358209, exitLat: 37.2550158, exitLng: 140.3358209,
                 note: "【2026-07-17調査・座標新規追加】新規区間のため新規追加。MapFan「鏡石スマートＩＣ【入口（上り）】」(37.2550158,140.3358209)を確認。出口の個別ページは検索で特定できなかったため、entranceLat/Lng・exitLat/Lngとも入口座標を暫定使用した。各種情報源で「利用可能方向：全方向」と明記されておりフルIC。2009年4月1日開通。entranceSelectable/exitSelectableはtrueとした。次回、出口の個別座標が確認できた場合は再検証が必要。"
             },
-            { order: 22, displayName: "須賀川IC", googleName: "東北自動車道 須賀川インターチェンジ", lat: 37.2918561, lng: 140.3550815,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 37.2918561, entranceLng: 140.3550815, exitLat: 37.2919156, exitLng: 140.3551178,
-                note: "【2026-07-17調査・座標新規追加】新規区間のため新規追加。MapFan「須賀川ＩＣ【入口】」(37.2918561,140.3550815)「【出口】」(37.2919156,140.3551178)を確認。フルICと推定（NEXCO公式・Wikipediaに明記なし）。entranceSelectable/exitSelectableはtrueとした。"
+            { order: 22, displayName: "須賀川IC", googleName: "東北自動車道 須賀川インターチェンジ", lat: 37.29, lng: 140.3514,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 37.29, entranceLng: 140.3514, exitLat: 37.29, exitLng: 140.3514,
+                note: "【2026-07-25再照合・座標修正】Wikipedia座標テンプレート（換算37.290083,140.351167）・Yahoo!地図（37.2899655,140.3516642）が互いに約46mで近接一致していることを確認した。従来のMapFan由来の座標（entrance 37.2918561,140.3550815／exit 37.2919156,140.3551178）はこれらから約369〜399m離れていたため、収束点付近の値（37.2900,140.3514）に修正した。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
-            { order: 23, displayName: "郡山南IC", googleName: "東北自動車道 郡山南インターチェンジ", lat: 37.3623208, lng: 140.3140083,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 37.3623208, entranceLng: 140.3140083, exitLat: 37.3623508, exitLng: 140.3141053,
-                note: "【2026-07-17調査・座標新規追加】新規区間のため新規追加。MapFan「郡山南ＩＣ【入口】」(37.3623208,140.3140083)「【出口】」(37.3623508,140.3141053)を確認。フルICと推定（NEXCO公式・Wikipediaに明記なし）。entranceSelectable/exitSelectableはtrueとした。"
+            { order: 23, displayName: "郡山南IC", googleName: "東北自動車道 郡山南インターチェンジ", lat: 37.3666, lng: 140.3123,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 37.3666, entranceLng: 140.3123, exitLat: 37.3666, exitLng: 140.3123,
+                note: "【2026-07-25再照合・座標修正】Wikipedia座標テンプレート（換算37.366750,140.311167）・Yahoo!地図（37.3664642,140.3135286）は互いに約211mとやや広めだが、従来のMapFan由来の座標（entrance 37.3623208,140.3140083／exit 37.3623508,140.3141053）からの距離（約463〜554m）よりは大幅に近いため、収束点付近の値（37.3666,140.3123）に修正した。今回の一連の再照合の中では、Wikipedia・Yahoo!地図間の一致度が最も低く、他ICよりやや確信度が低い点に留意。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
             { order: 24, displayName: "郡山中央SIC", googleName: "東北自動車道 郡山中央スマートインターチェンジ", lat: 37.4021063, lng: 140.3137506,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 37.4021063, entranceLng: 140.3137506, exitLat: 37.4021063, exitLng: 140.3137506,

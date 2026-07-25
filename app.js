@@ -8143,41 +8143,6 @@ const IC_MASTER = {
                 note: "tateyama側の蘇我ICと同一施設・同一検証結果（上り入口・下り出口のみ、MapFan確認）。詳細はtateyama側のnote参照。従来座標(35.568,140.158)から約1.8km修正。【2026-07-14訂正】Wikipedia「蘇我インターチェンジ」記事で「かつては上り方面への出入口のみであったが、2007年5月30日に下り方面出入口が供用開始され、フルインターチェンジとなった」ことを確認。NAVITIMEでも京葉道路側（上り入口・下り出口）・館山自動車道側（下り入口・上り出口）の双方のランプが存在することを確認しており、2007年の下り出口供用開始によりexitSelectable:falseは誤りと判断し、falseからtrueに訂正した。entranceSelectable/座標は変更していない。tateyama側の蘇我ICと同一訂正内容。"
             },
             {
-                order: 11,
-                displayName: "市原IC",
-                googleName: "館山自動車道 市原インターチェンジ",
-                lat: 35.498328,
-                lng: 140.091534,
-                connection: true,
-                connectedRoads: ["keiyo", "tateyama"],
-                routeBranch: "keiyo",
-                branchOrder: 11,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.498328, entranceLng: 140.091534, exitLat: 35.498328, exitLng: 140.091534,
-                note: "tateyama側の市原ICと同一施設・同一検証結果（フルIC）。詳細はtateyama側のnote参照。従来座標(35.498,140.104)から約1.1km修正。"
-            },
-            {
-                order: 12,
-                displayName: "姉崎袖ケ浦IC",
-                googleName: "館山自動車道 姉崎袖ケ浦インターチェンジ",
-                lat: 35.431120,
-                lng: 140.043380,
-                routeBranch: "keiyo",
-                branchOrder: 12,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.431120, entranceLng: 140.043380, exitLat: 35.431120, exitLng: 140.043380,
-                note: "tateyama側の姉崎袖ケ浦ICと同一施設・同一検証結果（フルIC、2025年3月ETC専用化）。詳細はtateyama側のnote参照。従来座標(35.432,140.043)からごくわずかな修正。"
-            },
-            {
-                order: 13,
-                displayName: "木更津北IC",
-                googleName: "館山自動車道 木更津北インターチェンジ",
-                lat: 35.385951,
-                lng: 140.001856,
-                routeBranch: "keiyo",
-                branchOrder: 13,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.385951, entranceLng: 140.001856, exitLat: 35.385951, exitLng: 140.001856,
-                note: "tateyama側の木更津北ICと同一施設・同一検証結果（フルIC）。詳細はtateyama側のnote参照。従来座標(35.394,139.967)から約3.2km修正。"
-            },
-            {
                 order: 14,
                 displayName: "木更津南IC",
                 googleName: "館山自動車道 木更津南インターチェンジ",
@@ -8200,17 +8165,6 @@ const IC_MASTER = {
                 branchOrder: 14.5,
                 entranceSelectable: false, exitSelectable: true, entranceLat: 35.350226, entranceLng: 139.924807, exitLat: 35.350226, exitLng: 139.924807,
                 note: "【Phase 2・方向判定ミラー】tateyama側の木更津南IC（branchOrder:5.5）ミラーレコードと同一施設・同一検証結果。詳細はtateyama側のミラーレコードのnote参照。"
-            },
-            {
-                order: 15,
-                displayName: "君津IC",
-                googleName: "館山自動車道 君津インターチェンジ",
-                lat: 35.318046,
-                lng: 139.941582,
-                routeBranch: "keiyo",
-                branchOrder: 15,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.318046, entranceLng: 139.941582, exitLat: 35.3179543, exitLng: 139.9416659,
-                note: "tateyama側の君津ICと同一施設・同一検証結果（フルIC）。詳細はtateyama側のnote参照。従来座標(35.333,139.902)から約4km修正（誤差が特に大きかった）。"
             }
         ]
     },

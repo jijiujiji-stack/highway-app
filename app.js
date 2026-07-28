@@ -349,6 +349,13 @@ const TOLL_SECTION_IC_MATCH_THRESHOLD_METERS = 500;
 // TOLL_SECTION_IC_MATCH_THRESHOLD_METERS（500m）のまま変更していない。
 const TOLL_SECTION_ROUTE_DISTANCE_MATCH_THRESHOLD_METERS = 700;
 
+// 【パイロット・入谷ICのみ】物理的な終点ICのリスト。ここに登録したICの
+// 座標をルートが通過した場合、それより後ろのstepは「有料区間」タグの
+// 有無に関わらず強制的に非課金区間として扱う（既知の保留事項27・28の
+// タグ残留対策）。boundaryIcNamesとは別の仕組みであり、区間の途中の
+// カテゴリ判定には一切影響しない。
+const TOLL_SECTION_TERMINUS_IC_NAMES = ["入谷"];
+
 // entranceIc/exitIcが両方ともIC不明（未登録・座標精度不足等）だった場合の、
 // 首都高/NEXCO判定フォールバックに使う文言。
 const TOLL_SECTION_SHUTO_INSTRUCTION_TEXT = "首都高";
@@ -1219,6 +1226,57 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
             )
             : null;
 
+    // 【既知の保留事項27・28対応・終端IC打ち切り、パイロット】
+    // TOLL_SECTION_TERMINUS_IC_NAMESに登録されたICの道のり距離
+    // （ルート先頭からの累積距離）を求める。座標解決は、boundaryIcNames
+    // が使うresolveIcObjectByDisplayName（IC_MASTERのみ探索、Uchimawari
+    // 方向別ミラーテーブルを誤って拾う可能性がある）ではなく、既に
+    // 重複除去済みのicDefinitions（getAllRouteAnalysisIcDefinitions、
+    // SHUTO_IC_MASTER優先）をdisplayNameでフィルタして使う。複数件
+    // 登録された場合は、ルート上で最も手前（距離が最小）の1件を採用する。
+    // sampledPoints・cumulativeDistancesが無い場合はnullのままとなり、
+    // 後段のtollSectionRuns構築ループでは何もしない（既存のガードと
+    // 同じ考え方）。
+    const terminusRouteDistanceMeters =
+        cumulativeDistances
+            ? TOLL_SECTION_TERMINUS_IC_NAMES
+                .map(name =>
+                    icDefinitions.find(
+                        ic => ic.displayName === name
+                    )
+                )
+                .filter(Boolean)
+                .map(ic => {
+                    const position =
+                        findClosestPositionOnPolylineForIc(
+                            ic.lat,
+                            ic.lng,
+                            sampledPoints
+                        );
+
+                    if (
+                        !position ||
+                        position.distanceMeters >
+                            TOLL_SECTION_ROUTE_DISTANCE_MATCH_THRESHOLD_METERS
+                    ) {
+                        return null;
+                    }
+
+                    const [withRouteDistance] =
+                        attachRouteDistanceToOrderedIcs(
+                            [{
+                                segmentIndex: position.segmentIndex,
+                                projectionRatio: position.projectionRatio
+                            }],
+                            cumulativeDistances
+                        );
+
+                    return withRouteDistance.routeDistanceMeters;
+                })
+                .filter(value => value !== null)
+                .sort((a, b) => a - b)[0] ?? null
+            : null;
+
     // 【既知の保留事項26対応・方式B統一、2026-07-22追記】区間の入口・
     // 出口IC名は、sampledPointsが利用できる場合は方式B（点と線、
     // findNearestIcByRouteDistance）のみを使う。首都高のようにICが
@@ -1266,7 +1324,18 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
     let currentRun = null;
 
     taggedSteps.forEach(({ step, isTollStep }) => {
-        if (isTollStep) {
+        // 【既知の保留事項27・28対応・終端IC打ち切り、パイロット】
+        // 終端IC（TOLL_SECTION_TERMINUS_IC_NAMES）の道のり距離を過ぎた
+        // stepは、「有料区間」タグが残っていても強制的に非課金区間扱い
+        // にする。それより手前のstepの判定には一切影響しない。
+        const isPastTerminus =
+            terminusRouteDistanceMeters !== null &&
+            (
+                stepDistanceRangesByStep.get(step)
+                    ?.startDistanceMeters ?? 0
+            ) >= terminusRouteDistanceMeters;
+
+        if (isTollStep && !isPastTerminus) {
             if (!currentRun) {
                 currentRun = { steps: [] };
                 tollSectionRuns.push(currentRun);

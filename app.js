@@ -1341,7 +1341,43 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
     // うちkeywordsが空でないルール（shuto・aqualine等）をステップ単位で
     // 照合するように変更し、splitRunByRoadType（本体は変更していない）
     // 側で正しく区間分割できるようにする。
+    // 既存のsticky補完（曖昧なstepを、前方パス・後方パスの2回で直前/
+    // 直後の確定値まで遡って埋める）を、そのまま再利用可能な形に切り出す。
+    // ロジック自体は変更していない。
+    const applyStickyFill = categories => {
+        const filled = [...categories];
+
+        for (
+            let index = 1;
+            index < filled.length;
+            index++
+        ) {
+            if (filled[index] === null) {
+                filled[index] = filled[index - 1];
+            }
+        }
+
+        for (
+            let index = filled.length - 2;
+            index >= 0;
+            index--
+        ) {
+            if (filled[index] === null) {
+                filled[index] = filled[index + 1];
+            }
+        }
+
+        return filled;
+    };
+
     const classifyStepsByRoadType = stepsToClassify => {
+        // 【NAME_CHANGE誤判定ガード対応】maneuver === "NAME_CHANGE"の
+        // みを根拠に"nexco"と仮判定したstepの位置をtrueで記録する
+        // （nexcoRouteLabelKeywordsにも一致した場合はfalseのまま。
+        // 「東京湾アクアライン/国道409号を進む」のような、キーワード
+        // 一致で確定するケースはこの追跡・ガードの対象にならない）。
+        const isNameChangeOnlyNexco = [];
+
         const rawCategories =
             stepsToClassify.map(step => {
                 const instructions =
@@ -1369,45 +1405,57 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
                     );
 
                 if (matchedCategoryRule) {
+                    isNameChangeOnlyNexco.push(false);
                     return matchedCategoryRule.id;
                 }
 
+                const maneuver =
+                    step.navigationInstruction?.maneuver;
+
+                const hasKeywordNexcoSignal =
+                    nexcoRouteLabelKeywords.some(keyword =>
+                        instructions.includes(keyword)
+                    );
+
                 if (
-                    hasExplicitNexcoSignal(
-                        instructions,
-                        step.navigationInstruction
-                            ?.maneuver
-                    )
+                    hasExplicitNexcoSignal(instructions, maneuver)
                 ) {
+                    isNameChangeOnlyNexco.push(
+                        !hasKeywordNexcoSignal
+                    );
                     return "nexco";
                 }
 
+                isNameChangeOnlyNexco.push(false);
                 return null;
             });
 
-        const filledCategories = [...rawCategories];
+        // 【NAME_CHANGE誤判定ガード対応】NAME_CHANGEのみを根拠にした
+        // "nexco"仮判定を一旦null（曖昧）に戻した状態でsticky補完を
+        // 適用し、「その位置の周辺文脈が本当は何色に確定しているか」を
+        // 求める。
+        const contextCategories =
+            applyStickyFill(
+                rawCategories.map((category, index) =>
+                    isNameChangeOnlyNexco[index] ? null : category
+                )
+            );
 
-        for (
-            let index = 1;
-            index < filledCategories.length;
-            index++
-        ) {
-            if (filledCategories[index] === null) {
-                filledCategories[index] =
-                    filledCategories[index - 1];
-            }
-        }
+        // 周辺文脈が"shuto"で確定している場合のみ、NAME_CHANGE由来の
+        // "nexco"仮判定を打ち消す（null=曖昧に戻す）。文脈が不明(null)・
+        // "nexco"自身の場合はガードしない（確定済みカテゴリが1つも
+        // 無いルート先頭等では、従来通りNAME_CHANGEのみでnexcoとする）。
+        const guardedCategories =
+            rawCategories.map((category, index) =>
+                isNameChangeOnlyNexco[index] &&
+                    contextCategories[index] === "shuto"
+                    ? null
+                    : category
+            );
 
-        for (
-            let index = filledCategories.length - 2;
-            index >= 0;
-            index--
-        ) {
-            if (filledCategories[index] === null) {
-                filledCategories[index] =
-                    filledCategories[index + 1];
-            }
-        }
+        // ガード適用後の配列に、既存のsticky補完をもう一度適用する。
+        const filledCategories =
+            applyStickyFill(guardedCategories);
 
         return filledCategories.map(
             category => category || "shuto"

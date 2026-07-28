@@ -6626,10 +6626,6 @@ const IC_MASTER = {
             { order: 21, displayName: "水上IC", googleName: "関越自動車道 水上インターチェンジ", lat: 36.7489782, lng: 138.9743213,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.7489782, entranceLng: 138.9743213, exitLat: 36.748893, exitLng: 138.974176,
                 note: "【2026-07-17調査・座標のみ修正】MapFan「水上ＩＣ【出口】」(36.748893,138.974176)を確認。4方向ランプありのフルIC（T型信号交差点は構造上の特徴で方向制限ではない）。上り側の個別座標は未確認のため、entranceLat/Lngは出口側に近い座標を暫定使用した。従来座標(36.801,138.964)から約5.8km修正。次回、上り側の個別座標が確認できた場合は再検証が必要。"
-            },
-            { order: 22, displayName: "藤岡IC", googleName: "上信越自動車道 藤岡インターチェンジ", lat: 36.2710485, lng: 139.0729449,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.2710485, entranceLng: 139.0729449, exitLat: 36.2709647, exitLng: 139.0731461,
-                note: "【2026-07-17調査・構造修正】関越道と上信越道の実際の接続点は藤岡JCT（現状IC_MASTER未登録）であり、当ICは藤岡JCTから約1.7km離れた単独路線のICであるため、connection/connectedRoadsを削除した。藤岡JCTの新規登録は別途座標調査のうえ検討する。なお、座標もMapFan実測値（entrance 36.2710485,139.0729449／exit 36.2709647,139.0731461）に修正した。従来座標(36.269,139.074)から約246m修正。"
             }
         ]
     },
@@ -6637,10 +6633,6 @@ const IC_MASTER = {
     joshinetsu: {
         label: "上信越道方面",
         exits: [
-            { order: 0, displayName: "高崎IC", googleName: "関越自動車道 高崎インターチェンジ", lat: 36.3401779, lng: 139.0594012,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.3401779, entranceLng: 139.0594012, exitLat: 36.3402546, exitLng: 139.0590909,
-                note: "【2026-07-17調査・構造修正】関越道と上信越道の実際の接続点は藤岡JCT（現状IC_MASTER未登録）であり、当ICは藤岡JCTから約2.4km離れた単独路線のICであるため、connection/connectedRoadsを削除した。藤岡JCTの新規登録は別途座標調査のうえ検討する。なお、座標もMapFan実測値（entrance 36.3401779,139.0594012／exit 36.3402546,139.0590909）に修正した。従来座標(36.308,139.063)から約3.6km修正。"
-            },
             { order: 1, displayName: "藤岡IC", googleName: "上信越自動車道 藤岡インターチェンジ", lat: 36.2710485, lng: 139.0729449,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.2710485, entranceLng: 139.0729449, exitLat: 36.2709647, exitLng: 139.0731461,
                 note: "【2026-07-17調査・構造修正】関越道と上信越道の実際の接続点は藤岡JCT（現状IC_MASTER未登録）であり、当ICは藤岡JCTから約1.7km離れた単独路線のICであるため、connection/connectedRoadsを削除した。藤岡JCTの新規登録は別途座標調査のうえ検討する。なお、座標もMapFan実測値（entrance 36.2710485,139.0729449／exit 36.2709647,139.0731461）に修正した。従来座標(36.269,139.074)から約246m修正。"

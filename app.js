@@ -3330,34 +3330,85 @@ function resolveTollSectionRoadLabel(section) {
 // buildTollUsageSummaryHtmlが、旧判定・新判定の併記表示を含めて
 // 一元的に処理するため、ここでは「有料道路なし」相当のメッセージは
 // 持たない）。
+//
+// 【tollSection境界の末尾フォールバック・既知の保留事項27・28対応】
+// entranceIc/exitIcが同一IC（buildIcDefinitionIdentityで判定）になった
+// 退化区間（applyTailFallbackToTollSectionsが実質移動距離ゼロと判定した
+// 区間）に付ける注記。「NEXCO 入谷 → 入谷」のような無意味な区間表示を
+// 避け、直前の区間の末尾IC名にこの注記を付け足すだけにする。
+const TAIL_FALLBACK_NOTE_HTML = "（ここで降車）";
+
 function buildAssumedRouteHtmlFromTollSections(tollSections) {
-    return (tollSections || [])
-        .map(section => {
-            const pillLabel =
-                resolveTollSectionRoadLabel(section);
+    const pieces = [];
 
-            const entranceText =
-                section.entranceIc
-                    ? formatAssumedRouteIcName(
-                        section.entranceIc
-                    )
-                    : "IC不明";
+    (tollSections || []).forEach(section => {
+        // 【tollSection境界の末尾フォールバック・既知の保留事項27・28
+        // 対応】退化区間は単独の「pill 入口→出口」として描画せず、
+        // 直前のpieceに注記フラグを立てるだけにする。
+        const isDegenerateFallbackSection =
+            Boolean(section.entranceIc) &&
+            Boolean(section.exitIc) &&
+            buildIcDefinitionIdentity(section.entranceIc) ===
+                buildIcDefinitionIdentity(section.exitIc);
 
-            const exitText =
-                section.exitIc
-                    ? formatAssumedRouteIcName(
-                        section.exitIc
-                    )
-                    : "IC不明";
+        if (isDegenerateFallbackSection) {
+            const lastPiece = pieces[pieces.length - 1];
 
-            return (
+            if (lastPiece) {
+                lastPiece.hasTailNote = true;
+            }
+            else {
+                // 先頭がいきなり退化区間になる場合（通常起こりにくい）：
+                // 道路名pillなしで、IC名だけのpieceを新規作成する。
+                pieces.push({
+                    baseHtml:
+                        escapeHtml(
+                            formatAssumedRouteIcName(section.exitIc)
+                        ),
+                    hasTailNote: true
+                });
+            }
+
+            return;
+        }
+
+        const pillLabel =
+            resolveTollSectionRoadLabel(section);
+
+        const entranceText =
+            section.entranceIc
+                ? formatAssumedRouteIcName(
+                    section.entranceIc
+                )
+                : "IC不明";
+
+        const exitText =
+            section.exitIc
+                ? formatAssumedRouteIcName(
+                    section.exitIc
+                )
+                : "IC不明";
+
+        pieces.push({
+            baseHtml:
                 createAssumedRouteRoadHtml(pillLabel) +
                 " " +
                 escapeHtml(entranceText) +
                 " → " +
-                escapeHtml(exitText)
-            );
-        })
+                escapeHtml(exitText),
+            hasTailNote: false
+        });
+    });
+
+    return pieces
+        .map(piece =>
+            piece.baseHtml +
+            (
+                piece.hasTailNote
+                    ? TAIL_FALLBACK_NOTE_HTML
+                    : ""
+            )
+        )
         .join(" → ");
 }
 

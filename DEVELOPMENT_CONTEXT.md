@@ -474,14 +474,15 @@ Routes API の tollInfo を使うとAPIコストやSKUの問題が出るため�
 
 ---
 
-## 重複IC登録の削除可否判断基準（2026-07-25確立）
+## 重複IC登録の削除可否判断基準（2026-07-25確立・同日改訂）
 
 IC_MASTER・SHUTO_IC_MASTER内に、同一施設が複数エリアに重複登録されているケースが多数見つかっている（初期開発時の仮登録や、NEXCO⇔首都高の接続がうまく解決できなかった際の名残）。これらの削除可否は、以下の基準で判断する。
 
 - **判断基準**：通常検索のメイン経路（TOLL TAG方式、`findNearestIcByRouteDistance`・`dedupeIcDefinitionsByIdentity`を経由する経路）が、実際にそのデータへ依存しているかどうかだけを見る
 - **考慮しないもの**：入口比較・出口比較の候補選定（`appendAreasContainingIc`・`buildSurroundingCandidates`等、dedupeを経由しない経路）への影響は、現時点では考慮しない。これらの機能は将来的に作り直す前提のため、精度が落ちても許容する
 - **削除してよい例**：同一名称・同一座標で複数エリアに登録されており、`dedupeIcDefinitionsByIdentity`の重複除去ロジックにより、通常検索では常に特定の1件だけが使われていることが確認できる場合
-- **削除してはいけない例**：`connection: true`・`connectedRoads`を伴う、道路接続部を表現する意図的な重複（候補エリア拡張ロジックの前提になっている）。方向判定ミラー（`isMirror`、`resolveEffectiveNexcoExit`等の本番ロジックが直接参照するもの）。Uchimawari方向別ミラーテーブル（上り/下りの方向別データとして意図的に分離されているもの）
+- **`connection: true`・`connectedRoads`について（2026-07-25改訂）**：このフィールドが付いているかどうかだけで即座に「削除してはいけない」と判断してはならない。実際にこのフィールドを読んでいるコードを呼び出し元まで遡り、通常検索の主要フロー（TOLL TAG方式の料金計算・道路ラベル表示）に影響するか、入口比較・出口比較専用（`appendAreasContainingIc`のフォールバック・`connectsToLaterRoadSection`・JCT名regex除外処理等）に留まるかを都度確認する。後者に留まることが確認できれば、削除してよい（2026-07-25、蘇我IC・木更津金田IC・袖ケ浦ICで確認・実施済み。詳細はapp.js内の各ICのnote・IC_MASTER冒頭コメント参照）
+- **削除してはいけない例**：方向判定ミラー（`isMirror`、`resolveEffectiveNexcoExit`等の本番ロジックが直接参照するもの）。Uchimawari方向別ミラーテーブル（上り/下りの方向別データとして意図的に分離されているもの）
 
 ---
 

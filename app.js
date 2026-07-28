@@ -6175,8 +6175,17 @@ const SHUTO_IC_MASTER = [
 ];
 
 const IC_MASTER = {
-    // 接続道路のICは重複登録を許可する。
-    // 例: 木更津金田ICをアクアライン・館山道双方へ保持する。
+    // 接続道路のICは、connection:true・connectedRoadsによって「複数道路の
+    // 接続点である」ことを表現する。ただし、この表現のために同一IC名を
+    // 複数エリアへ物理的に重複登録することまでは必須ではない。
+    // 【2026-07-25追記】従来は木更津金田IC（アクアライン・館山道）等を重複
+    // 登録の代表例としていたが、この重複の唯一の実質的な消費者が入口比較・
+    // 出口比較専用の候補選定（appendAreasContainingIcのフォールバック等）
+    // であり、通常検索の主要フロー（TOLL TAG方式の料金計算・表示）には
+    // 影響しないことが確認できたため、蘇我IC・木更津金田IC・袖ケ浦ICの
+    // 重複コピーは削除し、各道路につき1エリアの登録に統一した
+    // （connection/connectedRoadsフィールド自体は履歴情報として残している）。
+    // 判断基準の詳細はDEVELOPMENT_CONTEXT.md「重複IC登録の削除可否判断基準」参照。
     joban: {
         label: "常磐道方面",
         exits: [
@@ -7750,7 +7759,7 @@ const IC_MASTER = {
                 routeBranch: "aqualine",
                 branchOrder: 2,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.4335959, entranceLng: 139.9216386, exitLat: 35.4335959, exitLng: 139.9216386,
-                note: "【確認不可・複雑につき変更保留】MapFan調査で、木更津金田ICには「木更津金田ＩＣ（東京湾アクアライン）」（入口(上り)+出口(下り)）と「木更津金田ＩＣ（東京湾アクアライン連絡道）」（出口(上り)+入口(下り)）という2つの別名称の施設が存在し、合わせると上下線とも入口・出口が利用可能であることを確認した。ただし本アプリのgoogleNameは「東京湾アクアライン 木更津金田インターチェンジ」（連絡道を含まない）であり、Google Routes APIが実際にどちらの施設・方向で経路を解決するか確認できなかったため、entranceSelectable/exitSelectableは変更せず現状維持（true/true）とした。座標はMapFan「木更津金田ＩＣ（東京湾アクアライン）【入口（上り）】」個別ページで確認(35.4335959,139.9216386)。従来座標(35.435,139.921)から約200m修正。次回、Google Maps上での実際の経路解決結果を確認したうえで再検証が必要。"
+                note: "【確認不可・複雑につき変更保留】MapFan調査で、木更津金田ICには「木更津金田ＩＣ（東京湾アクアライン）」（入口(上り)+出口(下り)）と「木更津金田ＩＣ（東京湾アクアライン連絡道）」（出口(上り)+入口(下り)）という2つの別名称の施設が存在し、合わせると上下線とも入口・出口が利用可能であることを確認した。ただし本アプリのgoogleNameは「東京湾アクアライン 木更津金田インターチェンジ」（連絡道を含まない）であり、Google Routes APIが実際にどちらの施設・方向で経路を解決するか確認できなかったため、entranceSelectable/exitSelectableは変更せず現状維持（true/true）とした。座標はMapFan「木更津金田ＩＣ（東京湾アクアライン）【入口（上り）】」個別ページで確認(35.4335959,139.9216386)。従来座標(35.435,139.921)から約200m修正。次回、Google Maps上での実際の経路解決結果を確認したうえで再検証が必要。【2026-07-25追記・tateyama側複製削除】tateyama側にあった同一施設の重複コピー（order:-2）を削除した。通常検索の主要フロー（TOLL TAG方式のIC境界名解決・料金計算・表示）は`dedupeIcDefinitionsByIdentity`のgoogleNameパターン判定によりaqualine側1件のみで機能しており、重複は入口比較・出口比較専用の候補選定（`appendAreasContainingIc`のフォールバック等）にのみ影響することを確認済み。判断基準の詳細はDEVELOPMENT_CONTEXT.md「重複IC登録の削除可否判断基準」参照。connection/connectedRoadsフィールドは、他エリアが物理的に接続していた履歴情報としてそのまま残している。"
             },
             {
                 order: 4,
@@ -7763,7 +7772,7 @@ const IC_MASTER = {
                 routeBranch: "aqualine",
                 branchOrder: 3,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.4139093, entranceLng: 139.9538054, exitLat: 35.4140821, exitLng: 139.9538333,
-                note: "MapFanで「袖ヶ浦ＩＣ（東京湾アクアライン連絡道）」の入口（上り・下り）・出口（上り・下り）の4個別ページ全てを確認し、上下線とも入口・出口が利用可能なフルICと判断（NEXCO東日本プレスリリース「上り線 出口ランプ夜間閉鎖」でも運用実態を確認）。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(35.4139093,139.9538054)、exitLat/Lngを出口(下り)(35.4140821,139.9538333)に設定。従来座標(35.418,139.980)から約2.4km修正。"
+                note: "MapFanで「袖ヶ浦ＩＣ（東京湾アクアライン連絡道）」の入口（上り・下り）・出口（上り・下り）の4個別ページ全てを確認し、上下線とも入口・出口が利用可能なフルICと判断（NEXCO東日本プレスリリース「上り線 出口ランプ夜間閉鎖」でも運用実態を確認）。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(35.4139093,139.9538054)、exitLat/Lngを出口(下り)(35.4140821,139.9538333)に設定。従来座標(35.418,139.980)から約2.4km修正。【2026-07-25追記・tateyama側複製削除】tateyama側にあった同一施設の重複コピー（order:-1）を削除した。通常検索の主要フロー（TOLL TAG方式のIC境界名解決・料金計算・表示）は`dedupeIcDefinitionsByIdentity`のgoogleNameパターン判定によりaqualine側1件のみで機能しており、重複は入口比較・出口比較専用の候補選定（`appendAreasContainingIc`のフォールバック等）にのみ影響することを確認済み。判断基準の詳細はDEVELOPMENT_CONTEXT.md「重複IC登録の削除可否判断基準」参照。connection/connectedRoadsフィールドは、他エリアが物理的に接続していた履歴情報としてそのまま残している。"
             }
         ]
     },
@@ -7784,45 +7793,6 @@ const IC_MASTER = {
                 branchOrder: 1,
                 entranceSelectable: true, exitSelectable: false, entranceLat: 35.520593, entranceLng: 139.787833, exitLat: 35.520593, exitLng: 139.787833,
                 note: "aqualine側の浮島ICと同一施設・同一検証結果（下り入口・上り出口のみ、MapFan確認）。詳細はaqualine側のnote参照。従来座標(35.521,139.788)からごくわずかな修正。"
-            },
-            {
-                order: -2,
-                displayName: "木更津金田IC",
-                googleName: "東京湾アクアライン 木更津金田インターチェンジ",
-                lat: 35.4335959,
-                lng: 139.9216386,
-                connection: true,
-                connectedRoads: ["aqualine", "tateyama"],
-                routeBranch: "aqualine",
-                branchOrder: 2,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.4335959, entranceLng: 139.9216386, exitLat: 35.4335959, exitLng: 139.9216386,
-                note: "aqualine側の木更津金田ICと同一施設。【確認不可・複雑につき変更保留】2つの別名称施設（アクアライン本体／連絡道）が存在するため、entranceSelectable/exitSelectableは変更していない。詳細はaqualine側のnote参照。従来座標(35.435,139.921)から約200m修正。"
-            },
-            {
-                order: -1,
-                displayName: "袖ケ浦IC",
-                googleName: "東京湾アクアライン連絡道 袖ケ浦インターチェンジ",
-                lat: 35.413996,
-                lng: 139.953819,
-                connection: true,
-                connectedRoads: ["aqualine", "tateyama"],
-                routeBranch: "aqualine",
-                branchOrder: 3,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.4139093, entranceLng: 139.9538054, exitLat: 35.4140821, exitLng: 139.9538333,
-                note: "aqualine側の袖ケ浦ICと同一施設・同一検証結果（フルIC、MapFan4個別ページ確認）。詳細はaqualine側のnote参照。従来座標(35.418,139.980)から約2.4km修正。"
-            },
-            {
-                order: 0,
-                displayName: "蘇我IC",
-                googleName: "京葉道路 蘇我インターチェンジ",
-                lat: 35.568778,
-                lng: 140.137740,
-                connection: true,
-                connectedRoads: ["keiyo", "tateyama", "tokan"],
-                routeBranch: "keiyo",
-                branchOrder: 10,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.568778, entranceLng: 140.137740, exitLat: 35.5686381, exitLng: 140.1382367,
-                note: "MapFanで「蘇我ＩＣ（京葉道路）【入口（上り）】」「【出口（下り）】」の個別ページを確認したが、「【入口（下り）】」「【出口（上り）】」に相当するページは無く、上り線入口・下り線出口のみと判断。なお別途「蘇我ＩＣ（館山自動車道）」という異なる道路名の施設（出口(上り)+入口(下り)）も存在するが、本アプリのgoogleNameは「京葉道路 蘇我インターチェンジ」（keiyo側と同一）のため、京葉道路側の検証結果を採用した。本アプリは走行方向を区別できないため、入口方向（上り）を代表方向として採用し、下り出口はexitSelectable:falseとした。座標はentranceLat/Lngを入口(上り)(35.568778,140.13774)、exitLat/Lngを出口(下り)(35.5686381,140.1382367)に設定。従来座標(35.568,140.158)から約1.8km修正。keiyo側の蘇我ICと同一検証結果。【2026-07-14訂正】Wikipedia「蘇我インターチェンジ」記事で「かつては上り方面への出入口のみであったが、2007年5月30日に下り方面出入口が供用開始され、フルインターチェンジとなった」ことを確認。NAVITIMEでも京葉道路側（上り入口・下り出口）・館山自動車道側（下り入口・上り出口）の双方のランプが存在することを確認しており、2007年の下り出口供用開始によりexitSelectable:falseは誤りと判断し、falseからtrueに訂正した。entranceSelectable/座標は変更していない。"
             },
             {
                 order: 1,
@@ -8132,7 +8102,7 @@ const IC_MASTER = {
                 routeBranch: "keiyo",
                 branchOrder: 10,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.568778, entranceLng: 140.137740, exitLat: 35.5686381, exitLng: 140.1382367,
-                note: "tateyama側の蘇我ICと同一施設・同一検証結果（上り入口・下り出口のみ、MapFan確認）。詳細はtateyama側のnote参照。従来座標(35.568,140.158)から約1.8km修正。【2026-07-14訂正】Wikipedia「蘇我インターチェンジ」記事で「かつては上り方面への出入口のみであったが、2007年5月30日に下り方面出入口が供用開始され、フルインターチェンジとなった」ことを確認。NAVITIMEでも京葉道路側（上り入口・下り出口）・館山自動車道側（下り入口・上り出口）の双方のランプが存在することを確認しており、2007年の下り出口供用開始によりexitSelectable:falseは誤りと判断し、falseからtrueに訂正した。entranceSelectable/座標は変更していない。tateyama側の蘇我ICと同一訂正内容。"
+                note: "tateyama側の蘇我ICと同一施設・同一検証結果（上り入口・下り出口のみ、MapFan確認）。詳細はtateyama側のnote参照。従来座標(35.568,140.158)から約1.8km修正。【2026-07-14訂正】Wikipedia「蘇我インターチェンジ」記事で「かつては上り方面への出入口のみであったが、2007年5月30日に下り方面出入口が供用開始され、フルインターチェンジとなった」ことを確認。NAVITIMEでも京葉道路側（上り入口・下り出口）・館山自動車道側（下り入口・上り出口）の双方のランプが存在することを確認しており、2007年の下り出口供用開始によりexitSelectable:falseは誤りと判断し、falseからtrueに訂正した。entranceSelectable/座標は変更していない。tateyama側の蘇我ICと同一訂正内容。【2026-07-25追記・tateyama/tokan側複製削除】tateyama側（旧order:0）・tokan側（旧order:0）にあった同一施設の重複コピーを削除した。通常検索の主要フロー（TOLL TAG方式のIC境界名解決・料金計算・表示）は`dedupeIcDefinitionsByIdentity`のgoogleNameパターン判定によりkeiyo側1件のみで機能しており、重複は入口比較・出口比較専用の候補選定（`appendAreasContainingIc`のフォールバック等）にのみ影響することを確認済み。判断基準の詳細はDEVELOPMENT_CONTEXT.md「重複IC登録の削除可否判断基準」参照。connection/connectedRoadsフィールドは、他エリアが物理的に接続していた履歴情報としてそのまま残している。"
             },
             {
                 order: 14,
@@ -8186,19 +8156,6 @@ const IC_MASTER = {
                 branchOrder: 2,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.692086, entranceLng: 139.955341, exitLat: 35.692187, exitLng: 139.957033,
                 note: "【2026-07-25再照合・座標修正】従来の登録座標（35.672,139.938）は、同エリア内の「湾岸市川（首都高）」スタブ（首都高速湾岸線側の施設）と完全に同一であり、東関東自動車道の実在施設ではなく別路線の施設が誤って登録されていたことが判明した。NAVITIME・MapFan・Wikipedia・Yahoo!地図の4ソースが東関東道側の実施設（下り入口35.692086,139.955341／上り出口35.692187,139.957033付近）で一致していることを確認し、修正した。なお、京葉道路側に別途「京葉市川IC」（35.708〜35.710,139.925〜139.930付近）という似た名称の別施設が存在するが、これとの混同ではないことも確認済み。ハーフIC（下り線への流入・上り線からの流出のみ）。entranceSelectable/exitSelectableは変更なし。"
-            },
-            {
-                order: 0,
-                displayName: "蘇我IC",
-                googleName: "京葉道路 蘇我インターチェンジ",
-                lat: 35.568778,
-                lng: 140.137740,
-                connection: true,
-                connectedRoads: ["keiyo", "tokan", "tateyama"],
-                routeBranch: "keiyo",
-                branchOrder: 10,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.568778, entranceLng: 140.137740, exitLat: 35.5686381, exitLng: 140.1382367,
-                note: "【2026-07-15調査・keiyo/tateyama側と統一】tokan側の3件目の重複登録であり、keiyo/tateyama側の蘇我ICと同一施設・同一検証結果（上り入口・下り出口のみ、MapFan確認）。詳細はkeiyo側のnote参照。従来座標(35.568,140.158)から約1.8km修正。Wikipedia「蘇我インターチェンジ」記事で2007年5月30日にフルインターチェンジ化したことを確認済みのため、entranceSelectable/exitSelectableはtrue/trueで変更なし。keiyo/tateyama側と同一の座標・値に統一した。"
             },
             {
                 order: 1,
@@ -9182,9 +9139,9 @@ function buildIcDefinitionIdentity(ic) {
     );
 }
 
-// IC_MASTER冒頭のコメント（「接続道路のICは重複登録を許可する。例:
-// 木更津金田ICをアクアライン・館山道双方へ保持する。」）の通り、接続道路の
-// ICはIC_MASTER内で意図的に複数エリアに重複登録されている。
+// 接続道路のICは、IC_MASTER内で複数エリアに重複登録されることがある
+// （【2026-07-25追記】ただし現在は、通常検索の主要フローに影響しないことが
+// 確認できた重複は削除済み。詳細はIC_MASTER冒頭コメント参照）。
 // dedupeIcDefinitionsByIdentityは、この重複の中から候補選定・道路ラベル判定用の
 // 代表1件を選ぶ役割を持つが、従来は「Object.entries(IC_MASTER)の記述順で
 // 先に処理された方」という、記述順という偶然に依存した優先順位だった

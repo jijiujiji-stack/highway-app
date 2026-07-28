@@ -1516,6 +1516,13 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
                 exitIc: exitLabel.ic,
                 exitIcName: exitLabel.icName,
                 exitDistanceMeters: exitLabel.distanceMeters,
+                // 【tollSection境界の末尾フォールバック・既知の保留事項27・28
+                // 対応】applyTailFallbackToTollSectionsがentranceIc/exitIcを
+                // フォールバックで決定した場合のみtrueになる。表示側の色分け
+                // （検索条件パネルの首都高入口/出口・NEXCO入口/出口）にのみ
+                // 使う。デフォルトはfalse。
+                entranceIcResolvedByTailFallback: false,
+                exitIcResolvedByTailFallback: false,
                 rawFirstStartLocation:
                     firstStep.startLocation,
                 rawLastEndLocation: lastStep.endLocation,
@@ -1555,6 +1562,19 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
     const tollSectionsWithBoundarySplits =
         applyBoundaryCategorySplitsToTollSections(tollSections);
 
+    // 【tollSection境界の末尾フォールバック・既知の保留事項27・28対応】
+    // 境界ICベースの再分割が完了した後の最終的な区間配列に対して、
+    // entranceIc/exitIcが未解決（IC不明）の区間だけにフォールバックを
+    // 適用する。boundaryIcNamesベースの分割（アクアライン等）とは独立
+    // した、別の後処理として最後に実行する。
+    const tollSectionsWithTailFallback =
+        applyTailFallbackToTollSections(
+            tollSectionsWithBoundarySplits,
+            sampledPoints,
+            cumulativeDistances,
+            routeDistanceCandidateIcs
+        );
+
     return {
         // legs.steps自体が取得できているかどうか（trueなら、
         // tollEntryCount:0は「stepsを見た上で有料区間が無かった」という
@@ -1562,8 +1582,8 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
         // 全く別の意味であり、呼び出し側はこれを区別してフォールバック
         // するかどうかを判断する）。
         hasStepsData: steps.length > 0,
-        tollSections: tollSectionsWithBoundarySplits,
-        tollEntryCount: tollSectionsWithBoundarySplits.length,
+        tollSections: tollSectionsWithTailFallback,
+        tollEntryCount: tollSectionsWithTailFallback.length,
         // 【全通過IC表示機能】呼び出し元（buildFullPassedIcSequence
         // FromTollSectionRange）が、tollSectionsの範囲内にある候補ICを
         // 道のり順に抽出するために必要。ここでは既に計算済みの値を
@@ -2033,6 +2053,206 @@ function applyBoundaryCategorySplitsToTollSections(sections) {
             ),
         sections
     );
+}
+
+// 【tollSection境界の末尾フォールバック・既知の保留事項27・28対応】
+// 任意の緯度経度から、道のり距離（routeDistanceMeters）を求める。
+// findNearestIcByRouteDistance内部の問い合わせ座標処理・
+// buildFullPassedIcSequenceFromTollSectionRange内のfindBoundaryRoute
+// DistanceMeters（app.js内、既存・未変更）と全く同じ組み合わせ
+// （findClosestPositionOnPolylineForIc→attachRouteDistanceToOrdered
+// Ics）を再利用するだけで、新しい距離計算式は追加していない。
+function resolveRouteDistanceForLatLng(
+    latLng,
+    sampledPoints,
+    cumulativeDistances
+) {
+    if (
+        !latLng ||
+        !Array.isArray(sampledPoints) ||
+        !Array.isArray(cumulativeDistances)
+    ) {
+        return null;
+    }
+
+    const position =
+        findClosestPositionOnPolylineForIc(
+            latLng.lat,
+            latLng.lng,
+            sampledPoints
+        );
+
+    if (!position) {
+        return null;
+    }
+
+    const [withRouteDistance] =
+        attachRouteDistanceToOrderedIcs(
+            [{
+                segmentIndex: position.segmentIndex,
+                projectionRatio: position.projectionRatio
+            }],
+            cumulativeDistances
+        );
+
+    return withRouteDistance.routeDistanceMeters;
+}
+
+// 【tollSection境界の末尾フォールバック・既知の保留事項27・28対応】
+// Googleの「有料区間」タグが実際の課金区間終了後にも残留する問題
+// （既知の保留事項27・28）への対策。entranceIc/exitIcがnull（IC不明）
+// になった区間についてのみ、そのrun自身のentranceLatLng〜exitLatLng
+// という道のり距離の範囲内に限り、routeDistanceCandidateIcsから
+// 「解決できなかった側に最も近い、実在する既知IC」を探し、フォール
+// バックとして採用する。範囲をそのrun自身に限定しているため、前後の
+// 別区間の既知ICを誤って拾うことはない。
+//
+// 出口側が未解決なら、範囲内で最もroute距離が大きい（＝最も手前の）
+// 既知ICを採用し、totalDistanceMeters（steps距離合計、既存の距離軸）
+// から、はみ出した分（exitBoundaryDistanceMeters -
+// fallbackCandidate.routeDistanceMeters）だけを差し引く。入口側は
+// 対称的に、範囲内で最もroute距離が小さい（＝最も先の）既知ICを採用し、
+// 同様にはみ出した分を差し引く。両方が正常に解決済みの区間は一切
+// 変更しない。
+//
+// 入口側・出口側の両方が未解決で、フォールバック候補の順序が逆転する
+// 場合（entranceFallbackCandidateの方がexitFallbackCandidateより
+// route距離が大きい・同じ場合）は、totalDistanceMetersが負になる
+// 不具合を避けるため、両方ともフォールバックを見送る。
+//
+// sampledPoints・cumulativeDistancesが無い呼び出し元では何もしない
+// （既存のガードと同じ考え方）。boundaryIcNames・trySplitNexcoSection
+// ByBoundaryCategoryとは別の仕組みであり、変更していない。
+function applyTailFallbackToTollSections(
+    sections,
+    sampledPoints,
+    cumulativeDistances,
+    routeDistanceCandidateIcs
+) {
+    if (
+        !Array.isArray(sections) ||
+        !Array.isArray(routeDistanceCandidateIcs) ||
+        routeDistanceCandidateIcs.length === 0 ||
+        !cumulativeDistances
+    ) {
+        return sections;
+    }
+
+    return sections.map(section => {
+        if (section.entranceIc && section.exitIc) {
+            return section;
+        }
+
+        const entranceBoundaryDistanceMeters =
+            resolveRouteDistanceForLatLng(
+                section.entranceLatLng,
+                sampledPoints,
+                cumulativeDistances
+            );
+        const exitBoundaryDistanceMeters =
+            resolveRouteDistanceForLatLng(
+                section.exitLatLng,
+                sampledPoints,
+                cumulativeDistances
+            );
+
+        if (
+            entranceBoundaryDistanceMeters === null ||
+            exitBoundaryDistanceMeters === null
+        ) {
+            return section;
+        }
+
+        const findCandidateInRange = pickFarthest => {
+            const candidatesInRange =
+                routeDistanceCandidateIcs.filter(candidate =>
+                    candidate.routeDistanceMeters >=
+                        entranceBoundaryDistanceMeters &&
+                    candidate.routeDistanceMeters <=
+                        exitBoundaryDistanceMeters
+                );
+
+            if (candidatesInRange.length === 0) {
+                return null;
+            }
+
+            return candidatesInRange.reduce((best, candidate) =>
+                (
+                    pickFarthest
+                        ? candidate.routeDistanceMeters >
+                            best.routeDistanceMeters
+                        : candidate.routeDistanceMeters <
+                            best.routeDistanceMeters
+                )
+                    ? candidate
+                    : best
+            );
+        };
+
+        const exitFallbackCandidate =
+            section.exitIc
+                ? null
+                : findCandidateInRange(true);
+
+        const entranceFallbackCandidate =
+            section.entranceIc
+                ? null
+                : findCandidateInRange(false);
+
+        if (!exitFallbackCandidate && !entranceFallbackCandidate) {
+            return section;
+        }
+
+        // 逆転ガード：両方未解決で、候補の順序が逆転する（または同一
+        // 候補になり順序が付かない）場合は、両方とも見送る。
+        if (
+            entranceFallbackCandidate &&
+            exitFallbackCandidate &&
+            entranceFallbackCandidate.routeDistanceMeters >=
+                exitFallbackCandidate.routeDistanceMeters
+        ) {
+            return section;
+        }
+
+        const updatedSection = { ...section };
+        let excessMeters = 0;
+
+        if (exitFallbackCandidate) {
+            excessMeters +=
+                exitBoundaryDistanceMeters -
+                exitFallbackCandidate.routeDistanceMeters;
+
+            updatedSection.exitIc = exitFallbackCandidate.ic;
+            updatedSection.exitIcName =
+                exitFallbackCandidate.ic.displayName;
+            updatedSection.exitDistanceMeters =
+                exitBoundaryDistanceMeters -
+                exitFallbackCandidate.routeDistanceMeters;
+            updatedSection.exitIcResolvedByTailFallback = true;
+        }
+
+        if (entranceFallbackCandidate) {
+            excessMeters +=
+                entranceFallbackCandidate.routeDistanceMeters -
+                entranceBoundaryDistanceMeters;
+
+            updatedSection.entranceIc = entranceFallbackCandidate.ic;
+            updatedSection.entranceIcName =
+                entranceFallbackCandidate.ic.displayName;
+            updatedSection.entranceDistanceMeters =
+                entranceFallbackCandidate.routeDistanceMeters -
+                entranceBoundaryDistanceMeters;
+            updatedSection.entranceIcResolvedByTailFallback = true;
+        }
+
+        updatedSection.totalDistanceMeters =
+            Math.max(
+                0,
+                section.totalDistanceMeters - excessMeters
+            );
+
+        return updatedSection;
+    });
 }
 
 // 【Step 1・新規追加のみ】tollSections（detectTollSectionsFromStepsの
@@ -24636,13 +24856,24 @@ function shortenIcName(name) {
 
 // 【検索条件パネル・新旧方式の視覚区別】値の部分だけを、必要なら
 // dashboard側の道路名pill（.assumed-route-road）と同じ配色
-// （--color-info）で強調するヘルパー。isNewPipeline:trueのときだけ
-// 色付きspanで包む。escapeHtmlはどちらの場合も必ず通す（この関数の
-// 呼び出し側では、以後lines配列の要素を二重エスケープしないこと）。
-function wrapIcAreaReasonValue(text, isNewPipeline) {
+// （--color-info）で強調するヘルパー。第2引数variantは、true（＝
+// "newPipeline"扱い）・false・"tailFallback"のいずれかを受け取る。
+// 【tollSection境界の末尾フォールバック・既知の保留事項27・28対応】
+// variant:"tailFallback"のときは、既存のic-area-reason-new-pipeline
+// （薄紫）ではなく、新しいic-area-reason-tail-fallback（黄色系）で
+// 包む。既存の呼び出し元（true/falseのみを渡す）は挙動を変えない。
+// escapeHtmlはどの場合も必ず通す（この関数の呼び出し側では、以後
+// lines配列の要素を二重エスケープしないこと）。
+function wrapIcAreaReasonValue(text, variant) {
     const escapedText = escapeHtml(text);
 
-    return isNewPipeline
+    if (variant === "tailFallback") {
+        return "<span class=\"ic-area-reason-tail-fallback\">" +
+            escapedText +
+            "</span>";
+    }
+
+    return variant
         ? "<span class=\"ic-area-reason-new-pipeline\">" +
             escapedText +
             "</span>"
@@ -24754,6 +24985,23 @@ function buildPolylineComparisonSummaryHtml(
                 ? " ほか計" + sections.length + "区間"
                 : "";
 
+        // 【tollSection境界の末尾フォールバック・既知の保留事項27・28
+        // 対応】表示対象の区間自身のentranceIcResolvedByTailFallback/
+        // exitIcResolvedByTailFallbackを見て、通常の"newPipeline"（薄紫）
+        // ではなく"tailFallback"（黄色系）を使うかどうかを決める。
+        const resolveSectionIcVariant = (section, role) => {
+            if (!section) {
+                return true;
+            }
+
+            const isTailFallback =
+                role === "entrance"
+                    ? section.entranceIcResolvedByTailFallback
+                    : section.exitIcResolvedByTailFallback;
+
+            return isTailFallback ? "tailFallback" : true;
+        };
+
         lines.push(
             "首都高入口：" +
             wrapIcAreaReasonValue(
@@ -24762,7 +25010,7 @@ function buildPolylineComparisonSummaryHtml(
                     "entrance"
                 ) +
                 formatMultiSectionSuffix(shutoSections),
-                true
+                resolveSectionIcVariant(shutoSections[0], "entrance")
             )
         );
 
@@ -24774,7 +25022,10 @@ function buildPolylineComparisonSummaryHtml(
                     "exit"
                 ) +
                 formatMultiSectionSuffix(shutoSections),
-                true
+                resolveSectionIcVariant(
+                    shutoSections[shutoSections.length - 1],
+                    "exit"
+                )
             )
         );
 
@@ -24786,7 +25037,7 @@ function buildPolylineComparisonSummaryHtml(
                     "entrance"
                 ) +
                 formatMultiSectionSuffix(nexcoSections),
-                true
+                resolveSectionIcVariant(nexcoSections[0], "entrance")
             )
         );
 
@@ -24798,7 +25049,10 @@ function buildPolylineComparisonSummaryHtml(
                     "exit"
                 ) +
                 formatMultiSectionSuffix(nexcoSections),
-                true
+                resolveSectionIcVariant(
+                    nexcoSections[nexcoSections.length - 1],
+                    "exit"
+                )
             )
         );
     }

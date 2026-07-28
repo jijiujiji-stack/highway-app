@@ -811,6 +811,15 @@ button {
     font-size: 11px;
 }
 
+/* 【tollSection境界の末尾フォールバック・既知の保留事項27・28対応】
+   Googleの「有料区間」タグ残留により未解決になった境界を、run内の
+   既知ICでフォールバック解決した場合の強調色。ic-area-reason-new-
+   pipeline（薄紫）とは別の色にして、検索条件パネル上で区別できる
+   ようにする。 */
+.ic-area-reason-tail-fallback {
+    color: #f9a825;
+}
+
 .multi-best {
     padding: 16px;
     border-radius: 12px;

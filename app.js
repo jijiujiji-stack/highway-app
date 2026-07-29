@@ -9432,6 +9432,95 @@ const IC_MASTER = {
                 note: "SHUTO_IC_MASTERの「新井宿」（上り入口を代表方向として採用）に対する下り方向のミラーレコード。座標は本体側で既に確認済みのexitLat/Lngをそのまま転用(35.847266,139.737857)。上り方向(入口)は本ミラーでは使用しないためentranceSelectable:falseとし、entranceLat/Lngは出口座標にフォールバック。"
             }
         ]
+    },
+
+    // kitakanto: 北関東自動車道。東側区間（桜川筑西IC〜水戸南IC）のみ登録。
+    // 西側区間（高崎JCT〜真岡IC）は未登録（次回以降の対応予定）。
+    // 【2026-07-29新規追加】筑波山→いわき実車確認で、北関東道区間（石岡小美玉SIC付近〜友部JCT、
+    // 約40km）がIC_MASTER未登録のため候補IC 0件となり、末尾フォールバックで遠方の水戸北SICまで
+    // 区間が切り詰められETC概算が欠落した問題（PROJECT_HANDOFF.md参照）への対応。
+    kitakanto: {
+        label: "北関東道方面",
+        exits: [
+            {
+                order: 1,
+                displayName: "桜川筑西IC",
+                googleName: "北関東自動車道 桜川筑西インターチェンジ",
+                lat: 36.3584409,
+                lng: 140.08158,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.3584689, entranceLng: 140.0815273, exitLat: 36.3584129, exitLng: 140.0816327,
+                note: "【2026-07-29調査・新規登録】MapFanで「桜川筑西ＩＣ（北関東自動車道（栃木茨城区間））【入口】」(36.3584689,140.0815273)・【出口】(36.3584129,140.0816327)を確認。Yahoo!地図(36.3586844,140.0816964)もこのクラスタから半径30m程度で近接一致し裏取りができた。Wikipedia記載座標(36.3600583,140.0824639)は上記クラスタから北へ約180mズレるが、フルIC（料金所5ブース：入口2・出口3）である旨の記述は構造確認に有用なため参考として残す。entranceSelectable/exitSelectableはフルICのためtrue/true。座標はentranceLat/Lngを入口(36.3584689,140.0815273)、exitLat/Lngを出口(36.3584129,140.0816327)に設定、lat/lngはその中間点(36.3584409,140.08158)。"
+            },
+            {
+                order: 2,
+                displayName: "笠間西IC",
+                googleName: "北関東自動車道 笠間西インターチェンジ",
+                lat: 36.3450605,
+                lng: 140.1774652,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.345491, entranceLng: 140.1775443, exitLat: 36.34463, exitLng: 140.177386,
+                note: "【2026-07-29調査・新規登録】MapFanで「笠間西ＩＣ（北関東自動車道（栃木茨城区間））【入口】」(36.345491,140.1775443)を確認。ユーザーが追加確認したNAVITIME「西行き出口」(36.34463,140.177386)は経度がMapFanと約10mで近接一致しており、この2ソースの収束点を採用。前回調査時点のWikipedia(36.345730,140.174261)・Yahoo!地図(36.3460266,140.1741278)はこのMapFan/NAVITIMEクラスタから経度で約290m西にズレて孤立していると判断し、今回は不採用（参考記録として残す）。Wikipediaによればフルインターチェンジ（入口2ブース、出口2ブース）。entranceSelectable/exitSelectableはtrue/true。座標はentranceLat/Lngを入口(36.345491,140.1775443)、exitLat/Lngを出口(36.34463,140.177386)に設定、lat/lngはその中間点(36.3450605,140.1774652)。"
+            },
+            {
+                order: 3,
+                displayName: "友部IC",
+                googleName: "北関東自動車道 友部インターチェンジ",
+                lat: 36.340095,
+                lng: 140.272535,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.340095, entranceLng: 140.272535, exitLat: 36.340095, exitLng: 140.272535,
+                note: "【2026-07-29調査・新規登録・未確認あり】ユーザーが追加確認したNAVITIME値(36.340308,140.271503)とWikipedia記載値(36.339881,140.273567)が比較的近接（経度差約185m、緯度差約47m）していたため、この2ソースの中間値(36.340095,140.272535)を採用。一方MapFan「友部ＩＣ（北関東自動車道（栃木茨城区間））【入口】」(36.3419582,140.2753653)およびYahoo!地図(36.3411193,140.2744988)は上記とは別クラスタ（相互には約110mで近接、NAVITIME/Wikipediaクラスタとは約200m離れる）を形成しており、今回は不採用とした。フル/ハーフIC構造はWikipedia上に明記がなく未確認のため、entranceSelectable/exitSelectableはtrue/trueとした（要実車確認）。entranceLat/Lng・exitLat/Lngともに上記中間値、lat/lngも同値。"
+            },
+            {
+                order: 4,
+                displayName: "友部JCT",
+                googleName: "北関東自動車道 友部ジャンクション",
+                lat: 36.319945,
+                lng: 140.346122,
+                isSelectable: false,
+                connection: true,
+                connectedRoads: ["kitakanto", "joban"],
+                entranceSelectable: false, exitSelectable: false, entranceLat: 36.319945, entranceLng: 140.346122, exitLat: 36.319945, exitLng: 140.346122,
+                note: "【2026-07-29調査・新規登録】常磐自動車道と北関東自動車道を接続する本線同士のJCT。MapFan「友部ＪＣＴ（北関東自動車道（栃木茨城区間））【東京方面】」(36.3196811,140.3453504)、ユーザーが追加確認したNAVITIME「下り」(36.318729,140.344714)、Wikipedia(36.320875,140.345814)、Yahoo!地図(36.3204947,140.348608)の4ソースが概ね半径300m程度の範囲に収まったため、4ソース平均値(36.319945,140.346122)を採用。JCT（本線同士の接続点）のためisSelectable:false、connection:true、connectedRoads:[\"kitakanto\",\"joban\"]に設定。entranceSelectable/exitSelectableもfalse/false。"
+            },
+            {
+                order: 5,
+                displayName: "茨城町西IC",
+                googleName: "北関東自動車道 茨城町西インターチェンジ",
+                lat: 36.306182,
+                lng: 140.385999,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.306182, entranceLng: 140.385999, exitLat: 36.306182, exitLng: 140.385999,
+                note: "【2026-07-29調査・新規登録・未確認あり】NAVITIMEの個別ページを特定できなかったため、MapFan・Wikipedia・Yahoo!地図の3ソースで判断。Wikipedia(36.306211,140.385650)とYahoo!地図(36.3061531,140.3863469)は緯度がほぼ一致し経度差も約66mと近接していたため、この2ソースの中間値(36.306182,140.385999)を採用。MapFan「茨城町西ＩＣ（北関東自動車道（栃木茨城区間））【出口】」(36.3053038,140.3833657)はこのクラスタから経度で約300m西・緯度で約100m南にズレる外れ値のため今回は不採用（MapFan入口ページは今回未取得、将来的な再確認対象）。Wikipediaによればフルインターチェンジ（入口2ブース、出口3ブース）、高速バス停「茨城町西インター」併設。entranceSelectable/exitSelectableはtrue/true。entranceLat/Lng・exitLat/Lngともに上記中間値、lat/lngも同値。"
+            },
+            {
+                order: 6,
+                displayName: "茨城町JCT",
+                googleName: "北関東自動車道 茨城町ジャンクション",
+                lat: 36.302893,
+                lng: 140.411608,
+                isSelectable: false,
+                connection: true,
+                connectedRoads: ["kitakanto", "tokan"],
+                entranceSelectable: false, exitSelectable: false, entranceLat: 36.302893, entranceLng: 140.411608, exitLat: 36.302893, exitLng: 140.411608,
+                note: "【2026-07-29調査・新規登録】東関東自動車道と北関東自動車道を接続する本線同士のJCT。NAVITIMEの個別ページを特定できなかったため、MapFan「茨城町ＪＣＴ（北関東自動車道（栃木茨城区間））【鉾田市方面】」(36.3013443,140.4116239)、Wikipedia(36.30408,140.41144)、Yahoo!地図(36.3032539,140.4117589)の3ソースを確認。経度は3ソースともほぼ一致（140.4116〜140.4118）、緯度に約310m幅があるが、JCTという構造上、本線・複数ランプの座標が混在している可能性があるため許容範囲と判断し、3ソース平均値(36.302893,140.411608)を採用。isSelectable:false、connection:true、connectedRoads:[\"kitakanto\",\"tokan\"]に設定。entranceSelectable/exitSelectableもfalse/false。"
+            },
+            {
+                order: 7,
+                displayName: "茨城町東IC",
+                googleName: "北関東自動車道 茨城町東インターチェンジ",
+                lat: 36.316445,
+                lng: 140.454989,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.316445, entranceLng: 140.454989, exitLat: 36.316445, exitLng: 140.454989,
+                note: "【2026-07-29調査・新規登録・未確認あり】MapFan「茨城町東ＩＣ（北関東自動車道（栃木茨城区間））【出口】」(36.3164732,140.4548087)とYahoo!地図(36.3164169,140.4551684)が半径30m程度で近接一致したため、この2ソースの中間値(36.316445,140.454989)を採用。Wikipedia(36.314944,140.456997)はこのクラスタから南東へ約200mズレるが、フルインターチェンジ（入口3ブース：ETC専用1・ETC/一般1・一般1、出口3ブース同構成）である旨の構造情報は有用なため参考として残す。entranceSelectable/exitSelectableはフルICのためtrue/true。MapFan出口ページのみ取得し入口個別ページは今回未取得のため、entranceLat/Lng・exitLat/Lngともに上記中間値を暫定採用（将来的な再確認対象）、lat/lngも同値。"
+            },
+            {
+                order: 8,
+                displayName: "水戸南IC",
+                googleName: "北関東自動車道 水戸南インターチェンジ",
+                lat: 36.330412,
+                lng: 140.487599,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.330412, entranceLng: 140.487599, exitLat: 36.330412, exitLng: 140.487599,
+                note: "【2026-07-29調査・新規登録】北関東自動車道の終点（東側）、東水戸道路の起点を兼ねるIC。MapFan「水戸南ＩＣ（北関東自動車道（栃木茨城区間））【入口（上り）】」(36.3325435,140.4881631)、ユーザーが追加確認したNAVITIME「東行き出口/西行き入口」(36.328788,140.486462)、Wikipedia(36.329561,140.488208)、Yahoo!地図(36.3307543,140.487562)の4ソースが経度でほぼ一致（140.4865〜140.4882）、緯度に約370m幅で収まったため、4ソース平均値(36.330412,140.487599)を採用。Wikipediaによれば当ICを境に西側が高速自動車国道（北関東道終点）、東側が一般有料道路（東水戸道路起点）となる複合構造で、フルIC（入口2ブース、出口3ブース）。entranceSelectable/exitSelectableはtrue/true。entranceLat/Lng・exitLat/Lngともに上記平均値を暫定採用、lat/lngも同値。北関東道／東水戸道路境界という特殊構造のため、実車確認時に上り・下り・東水戸道路側それぞれの挙動を要確認。"
+            }
+        ]
     }
 
 };

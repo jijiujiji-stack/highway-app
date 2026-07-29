@@ -1610,6 +1610,29 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
     const tollSectionsWithBoundarySplits =
         applyBoundaryCategorySplitsToTollSections(tollSections);
 
+    // 【DEBUG-KITAKANTO-TAILFALLBACK調査・一時的】大洗海岸→伊香保温泉
+    // ルートで「NEXCO入口：栃木IC」という、本来の入口（水戸南IC付近）から
+    // 大きく離れたフォールバック結果が採用される原因を調査するための
+    // 一時ログ。末尾フォールバック適用前のtollSectionsを区間ごとに出力
+    // するだけで、判定ロジック・戻り値には一切影響しない。調査完了後、
+    // このブロックごと削除すること。
+    console.group(
+        "[DEBUG-KITAKANTO-TAILFALLBACK調査・一時的] " +
+            "フォールバック適用前のtollSections"
+    );
+    tollSectionsWithBoundarySplits.forEach((section, index) => {
+        console.log(
+            "区間", index,
+            "／道路カテゴリ:", section.tollCategoryId,
+            "／entranceIcName:", section.entranceIcName,
+            "／entranceLatLng:", section.entranceLatLng,
+            "／exitIcName:", section.exitIcName,
+            "／exitLatLng:", section.exitLatLng,
+            "／totalDistanceMeters:", section.totalDistanceMeters
+        );
+    });
+    console.groupEnd();
+
     // 【tollSection境界の末尾フォールバック・既知の保留事項27・28対応】
     // 境界ICベースの再分割が完了した後の最終的な区間配列に対して、
     // entranceIc/exitIcが未解決（IC不明）の区間だけにフォールバックを
@@ -2209,6 +2232,77 @@ function applyTailFallbackToTollSections(
             exitBoundaryDistanceMeters === null
         ) {
             return section;
+        }
+
+        // 【DEBUG-KITAKANTO-TAILFALLBACK調査・一時的】この区間
+        // （entranceIc/exitIcの少なくとも一方が未解決）について、
+        // フォールバック探索範囲（entranceBoundaryDistanceMeters〜
+        // exitBoundaryDistanceMeters）の実際の距離幅と、その範囲内に
+        // 実在する候補ICの一覧、および候補プール全体でsourceAreaKeyが
+        // "kitakanto"の件数を出力する。既存のfindCandidateInRangeと同じ
+        // フィルタ条件を読み取り専用で再計算するだけで、判定ロジック・
+        // 戻り値には一切影響しない。調査完了後、このブロックごと
+        // 削除すること。
+        {
+            const debugCandidatesInRange = routeDistanceCandidateIcs
+                .filter(candidate =>
+                    candidate.routeDistanceMeters >=
+                        entranceBoundaryDistanceMeters &&
+                    candidate.routeDistanceMeters <=
+                        exitBoundaryDistanceMeters
+                )
+                .sort(
+                    (a, b) =>
+                        a.routeDistanceMeters - b.routeDistanceMeters
+                );
+
+            console.group(
+                "[DEBUG-KITAKANTO-TAILFALLBACK調査・一時的] " +
+                    "フォールバック探索範囲"
+            );
+            console.log(
+                "entranceIcName(未解決前):", section.entranceIcName,
+                "／exitIcName(未解決前):", section.exitIcName,
+                "／entranceBoundaryDistanceMeters:",
+                entranceBoundaryDistanceMeters,
+                "／exitBoundaryDistanceMeters:",
+                exitBoundaryDistanceMeters,
+                "／範囲の距離幅(km):",
+                (
+                    (
+                        exitBoundaryDistanceMeters -
+                        entranceBoundaryDistanceMeters
+                    ) / 1000
+                ).toFixed(1)
+            );
+            console.log(
+                "範囲内の候補IC数:", debugCandidatesInRange.length
+            );
+            debugCandidatesInRange.forEach(candidate => {
+                console.log(
+                    "候補:", candidate.ic?.displayName,
+                    "／sourceAreaKey:", candidate.ic?.sourceAreaKey,
+                    "／routeDistanceMeters:",
+                    candidate.routeDistanceMeters,
+                    "／entranceBoundaryDistanceMetersからの差(km):",
+                    (
+                        (
+                            candidate.routeDistanceMeters -
+                            entranceBoundaryDistanceMeters
+                        ) / 1000
+                    ).toFixed(1)
+                );
+            });
+            const debugKitakantoCandidates =
+                routeDistanceCandidateIcs.filter(
+                    candidate =>
+                        candidate.ic?.sourceAreaKey === "kitakanto"
+                );
+            console.log(
+                "候補プール全体でsourceAreaKey===\"kitakanto\"の件数:",
+                debugKitakantoCandidates.length
+            );
+            console.groupEnd();
         }
 
         const findCandidateInRange = pickFarthest => {
@@ -8752,6 +8846,271 @@ const IC_MASTER = {
         ]
     },
 
+    // kitakanto: 北関東自動車道。高崎JCT〜水戸南IC間の全区間を登録。
+    // 【2026-07-29新規追加】筑波山→いわき実車確認で、北関東道区間（石岡小美玉SIC付近〜友部JCT、
+    // 約40km）がIC_MASTER未登録のため候補IC 0件となり、末尾フォールバックで遠方の水戸北SICまで
+    // 区間が切り詰められETC概算が欠落した問題（PROJECT_HANDOFF.md参照）への対応として、
+    // まず東側区間（桜川筑西IC〜水戸南IC、order:19〜26）を登録・実車確認済み。
+    // 【2026-07-29西側区間追加】西側区間（高崎JCT〜真岡IC、order:1〜18）を追加登録。
+    // order番号は西→東の走行順（1〜26）に振り直したのみで、東側区間の座標・note内容自体は
+    // 変更していない（findNearestIcByRouteDistance等は座標・道のり距離で判定しorderに依存しないが、
+    // 同一エリア内の入口/出口比較ロジックの一部はorderの単調増加を前提にしているため、
+    // 西側区間を「手前」に挿入するにあたり既存分もorder再採番が必要だった）。
+    kitakanto: {
+        label: "北関東道方面",
+        exits: [
+            {
+                order: 1,
+                displayName: "高崎JCT",
+                googleName: "北関東自動車道 高崎ジャンクション",
+                lat: 36.321342,
+                lng: 139.07548,
+                isSelectable: false,
+                connection: true,
+                connectedRoads: ["kitakanto", "kanetsu"],
+                entranceSelectable: false, exitSelectable: false, entranceLat: 36.321342, entranceLng: 139.07548, exitLat: 36.321342, exitLng: 139.07548,
+                note: "【2026-07-29調査・新規登録】西側区間（高崎JCT〜真岡IC）の起点。関越自動車道と北関東自動車道を接続する本線同士のJCT。Wikipedia(36.321081,139.075253)とYahoo!地図(36.3216027,139.0757067)が緯度差約55m・経度差約7mで近接一致したため、この2ソースの収束点(36.321342,139.07548)を採用。NAVITIME上り(36.324086,139.076723)・下り(36.326463,139.077185)はいずれもこのクラスタから300〜600m北に離れる外れ値のため不採用。既存kanetsuエリアには高崎JCTの登録がなく（高崎IC・高崎玉村SICのみ）、重複登録には該当しないことを確認済み。JCT（本線同士の接続点）のためisSelectable:false、connection:true、connectedRoads:[\"kitakanto\",\"kanetsu\"]に設定。entranceSelectable/exitSelectableもfalse/false。"
+            },
+            {
+                order: 2,
+                displayName: "前橋南IC",
+                googleName: "北関東自動車道 前橋南インターチェンジ",
+                lat: 36.333322,
+                lng: 139.099333,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.333322, entranceLng: 139.099333, exitLat: 36.333322, exitLng: 139.099333,
+                note: "【2026-07-29調査・新規登録・未確認あり】Wikipedia(36.333778,139.0992833)とYahoo!地図(36.3328661,139.0993834)が緯度差約50m・経度差約10mで近接一致したため、この2ソースの収束点(36.333322,139.099333)を採用。MapFan「前橋南ＩＣ（北関東自動車道（群馬栃木区間））【入口】」(36.3305488,139.1018546)はこのクラスタから約300m南・230m東にズレる外れ値のため不採用。フル/ハーフIC構造はWikipedia上に明記がなく未確認のため、entranceSelectable/exitSelectableはtrue/trueとした（要実車確認）。entranceLat/Lng・exitLat/Lngともに上記収束点、lat/lngも同値。"
+            },
+            {
+                order: 3,
+                displayName: "駒形IC",
+                googleName: "北関東自動車道 駒形インターチェンジ",
+                lat: 36.347563,
+                lng: 139.14385,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.347563, entranceLng: 139.14385, exitLat: 36.347563, exitLng: 139.14385,
+                note: "【2026-07-29調査・新規登録】Wikipedia(36.3480028,139.1432194)とYahoo!地図(36.347124,139.1444797)が緯度差約100m・経度差約110mで近接一致したため、この2ソースの収束点(36.347563,139.14385)を採用。MapFan「駒形ＩＣ（北関東自動車道（群馬栃木区間））【出口】」(36.3439702,139.1465955)はこのクラスタから約350m離れる外れ値のため不採用。Wikipediaによれば入口2ブース・出口3ブースの構成でフルIC相当。entranceSelectable/exitSelectableはtrue/true。entranceLat/Lng・exitLat/Lngともに上記収束点、lat/lngも同値。"
+            },
+            {
+                order: 4,
+                displayName: "波志江PA SIC",
+                googleName: "北関東自動車道 波志江スマートインターチェンジ",
+                lat: 36.354159,
+                lng: 139.189169,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.354159, entranceLng: 139.189169, exitLat: 36.354159, exitLng: 139.189169,
+                note: "【2026-07-29調査・新規登録】MapFan「波志江スマートＩＣ【入口（下り）】」(36.3551974,139.1883181)・「波志江ＰＡ【上り】」(36.3534078,139.1897929)とWikipedia(36.3538722,139.1893972)の3点がいずれも半径250m以内に収まったため、3点平均(36.354159,139.189169)を採用。全方向対応スマートIC（ETC専用、24時間、大型車含む全車種利用可、2009年4月1日本格運用開始）。entranceSelectable/exitSelectableはtrue/true。entranceLat/Lng・exitLat/Lngともに上記平均値、lat/lngも同値。"
+            },
+            {
+                order: 5,
+                displayName: "伊勢崎IC",
+                googleName: "北関東自動車道 伊勢崎インターチェンジ",
+                lat: 36.3525757,
+                lng: 139.2197171,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.3525807, entranceLng: 139.2196593, exitLat: 36.3525706, exitLng: 139.2197749,
+                note: "【2026-07-29調査・新規登録】MapFan「伊勢崎ＩＣ（北関東自動車道（群馬栃木区間））【入口】」(36.3525807,139.2196593)・【出口】(36.3525706,139.2197749)を確認。Yahoo!地図(36.3527846,139.2197154)も半径25m以内で近接一致し裏取りができた。Wikipedia(36.3547611,139.2198861)はこのクラスタから約240m北の外れ値だが、フルIC（入口3ブース、出口5ブース）である旨の記述は構造確認に有用なため参考として残す。entranceSelectable/exitSelectableはフルICのためtrue/true。座標はentranceLat/Lngを入口(36.3525807,139.2196593)、exitLat/Lngを出口(36.3525706,139.2197749)に設定、lat/lngはその中間点(36.3525757,139.2197171)。"
+            },
+            {
+                order: 6,
+                displayName: "太田藪塚IC",
+                googleName: "北関東自動車道 太田藪塚インターチェンジ",
+                lat: 36.347612,
+                lng: 139.278911,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.347612, entranceLng: 139.278911, exitLat: 36.347612, exitLng: 139.278911,
+                note: "【2026-07-29調査・新規登録・未確認あり】MapFan「太田藪塚ＩＣ（北関東自動車道（群馬栃木区間））【入口】」(36.3481716,139.2808027)とWikipedia(36.347053,139.277019)の中間値(36.347612,139.278911)を採用（両者約350m差、確信度中）。Wikipediaによればフルインターチェンジ（入口2ブース、出口2ブース）。裏取りとなる第3ソース（Yahoo!地図・NAVITIME）は今回特定できなかったため、実車確認時の再検証を推奨。entranceSelectable/exitSelectableはtrue/true。entranceLat/Lng・exitLat/Lngともに上記中間値、lat/lngも同値。"
+            },
+            {
+                order: 7,
+                displayName: "太田強戸PA SIC",
+                googleName: "北関東自動車道 太田強戸スマートインターチェンジ",
+                lat: 36.341587,
+                lng: 139.347597,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.341587, entranceLng: 139.347597, exitLat: 36.341587, exitLng: 139.347597,
+                note: "【2026-07-29調査・新規登録・未確認あり】MapFan「太田強戸スマートＩＣ【出口】」(36.3431418,139.3470252)とYahoo!地図(36.3400327,139.348169)の中間値(36.341587,139.347597)を採用（両者約380m差、確信度低〜中）。Wikipediaには座標記載がなく、全方向対応スマートIC（ETC専用、24時間、2018年7月28日開通）である旨のみ確認。裏取りとなる第3ソースが得られていないため、実車確認時の再検証を強く推奨。entranceSelectable/exitSelectableはtrue/true。entranceLat/Lng・exitLat/Lngともに上記中間値、lat/lngも同値。"
+            },
+            {
+                order: 8,
+                displayName: "太田桐生IC",
+                googleName: "北関東自動車道 太田桐生インターチェンジ",
+                lat: 36.329256,
+                lng: 139.389129,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.329256, entranceLng: 139.389129, exitLat: 36.329256, exitLng: 139.389129,
+                note: "【2026-07-29調査・新規登録】MapFan「太田桐生ＩＣ（北関東自動車道（群馬栃木区間））【入口】」(36.3284929,139.3905613)とWikipedia(36.330019,139.387697)の中間値(36.329256,139.389129)を採用（両者約320m差、確信度中）。Wikipedia記載のブース数（入口3ブース、出口5ブース）からフルIC相当と判断。entranceSelectable/exitSelectableはtrue/true。entranceLat/Lng・exitLat/Lngともに上記中間値、lat/lngも同値。"
+            },
+            {
+                order: 9,
+                displayName: "足利IC",
+                googleName: "北関東自動車道 足利インターチェンジ",
+                lat: 36.360161,
+                lng: 139.484518,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.360161, entranceLng: 139.484518, exitLat: 36.360161, exitLng: 139.484518,
+                note: "【2026-07-29調査・新規登録】MapFan「足利ＩＣ（北関東自動車道（群馬栃木区間））【入口】」(36.3601481,139.484507)とYahoo!地図(36.3601751,139.4845281)がほぼ完全一致（約3m差）したため、この2ソースの平均値(36.360161,139.484518)を採用。Wikipedia(36.36231,139.48422)はこのクラスタから約245m北の外れ値だが、フルIC（入口2ブース、出口2ブース）で太陽光発電設備を備えた「ECOインター」である旨の記述は構造確認に有用なため参考として残す。entranceSelectable/exitSelectableはフルICのためtrue/true。entranceLat/Lng・exitLat/Lngともに上記平均値、lat/lngも同値。"
+            },
+            {
+                order: 10,
+                displayName: "出流原PA SIC",
+                googleName: "北関東自動車道 出流原スマートインターチェンジ",
+                lat: 36.367222,
+                lng: 139.5475,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.367222, entranceLng: 139.5475, exitLat: 36.367222, exitLng: 139.5475,
+                note: "【2026-07-29調査・新規登録・低確信度】Wikipedia(36.367222,139.5475)単独ソースのみで確認（MapFan・Yahoo!地図・NAVITIMEの個別ページは今回特定できず、裏取りができていない）。全方向対応スマートIC（両方向とも出入可、2022年9月19日15時開通済み）。「スマートICの有無を要確認」との依頼に対し、既に開通済みであることを確認した。entranceSelectable/exitSelectableはtrue/trueとしたが、単独ソースのため確信度は低い。実車確認時、または追加ソースでの裏取りを強く推奨。entranceLat/Lng・exitLat/Lngともに上記座標、lat/lngも同値。"
+            },
+            {
+                order: 11,
+                displayName: "佐野田沼IC",
+                googleName: "北関東自動車道 佐野田沼インターチェンジ",
+                lat: 36.359722,
+                lng: 139.569961,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.359722, entranceLng: 139.569961, exitLat: 36.359722, exitLng: 139.569961,
+                note: "【2026-07-29調査・新規登録・未確認あり】MapFan「佐野田沼ＩＣ（北関東自動車道（群馬栃木区間））【入口】」(36.3596944,139.5713657)とWikipedia(36.359750,139.568556)の中間値(36.359722,139.569961)を採用（両者約280m差、確信度中）。フル/ハーフIC構造の明記はなく、入口・出口とも2ブースの記載のみで未確認。裏取りとなる第3ソースは今回特定できなかったため、実車確認時の再検証を推奨。entranceSelectable/exitSelectableはtrue/true。entranceLat/Lng・exitLat/Lngともに上記中間値、lat/lngも同値。"
+            },
+            {
+                order: 12,
+                displayName: "岩舟JCT",
+                googleName: "北関東自動車道 岩舟ジャンクション",
+                lat: 36.348645,
+                lng: 139.624687,
+                isSelectable: false,
+                connection: true,
+                connectedRoads: ["kitakanto", "tohoku"],
+                entranceSelectable: false, exitSelectable: false, entranceLat: 36.348645, entranceLng: 139.624687, exitLat: 36.348645, exitLng: 139.624687,
+                note: "【2026-07-29調査・新規登録】東北自動車道と北関東自動車道を接続する本線同士のJCT。MapFan「岩舟ＪＣＴ（東北自動車道）【東京方面】」(36.3431095,139.6242832、北関東道側【東京方面】も同一座標)・「岩舟ＪＣＴ（北関東自動車道）【福島方面】」(36.353935,139.6256098)とWikipedia(36.348889,139.624167)の3点平均(36.348645,139.624687)を採用。JCT規模が大きく（東京方面〜福島方面で約1.2km幅）、代表点の取り方には限界がある。既存tohokuエリアには岩舟JCTの登録がなく、重複登録には該当しないことを確認済み。isSelectable:false、connection:true、connectedRoads:[\"kitakanto\",\"tohoku\"]に設定。entranceSelectable/exitSelectableもfalse/false。"
+            },
+            {
+                order: 13,
+                displayName: "栃木都賀JCT",
+                googleName: "北関東自動車道 栃木都賀ジャンクション",
+                lat: 36.425501,
+                lng: 139.719997,
+                isSelectable: false,
+                connection: true,
+                connectedRoads: ["kitakanto", "tohoku"],
+                entranceSelectable: false, exitSelectable: false, entranceLat: 36.425501, entranceLng: 139.719997, exitLat: 36.425501, exitLng: 139.719997,
+                note: "【2026-07-29調査・新規登録】東北自動車道と北関東自動車道を接続する本線同士のJCT。MapFan「栃木都賀ＪＣＴ（北関東自動車道）【常磐道方面】」(36.4267008,139.7222087)・「栃木都賀ＪＣＴ（東北自動車道）【福島方面】」(36.4265788,139.7182888)、Wikipedia(36.424167,139.719444)、Yahoo!地図(36.4245573,139.7200473)の4ソース平均(36.425501,139.719997)を採用。Wikipedia・Yahooは緯度差約40m・経度差約56mで近接一致する一方、MapFan2点はそこから北寄りに約230〜290mズレる。既存tohokuエリアには栃木都賀JCTの登録がなく、重複登録には該当しないことを確認済み。isSelectable:false、connection:true、connectedRoads:[\"kitakanto\",\"tohoku\"]に設定。entranceSelectable/exitSelectableもfalse/false。"
+            },
+            {
+                order: 14,
+                displayName: "都賀IC",
+                googleName: "北関東自動車道 都賀インターチェンジ",
+                lat: 36.438452,
+                lng: 139.755159,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.438452, entranceLng: 139.755159, exitLat: 36.438452, exitLng: 139.755159,
+                note: "【2026-07-29調査・新規登録】MapFan「都賀ＩＣ（北関東自動車道（栃木茨城区間））【出口】」(36.4383852,139.7545313)とYahoo!地図(36.43851941820255,139.75578647782763)が約110mで近接一致したため、この2ソースの平均値(36.438452,139.755159)を採用。Wikipedia(36.4394889,139.756556)はこのクラスタから約230m北東の外れ値。入口3ブース・出口3ブースの構成からフルIC相当と判断。entranceSelectable/exitSelectableはtrue/true。entranceLat/Lng・exitLat/Lngともに上記平均値、lat/lngも同値。"
+            },
+            {
+                order: 15,
+                displayName: "壬生PA",
+                googleName: "北関東自動車道 壬生パーキングエリア",
+                lat: 36.454205,
+                lng: 139.806601,
+                entranceSelectable: false, exitSelectable: false, entranceLat: 36.454205, entranceLng: 139.806601, exitLat: 36.454205, exitLng: 139.806601,
+                note: "【2026-07-29調査・新規登録・SIC未開通】Wikipedia(36.453694,139.806767)とYahoo!地図「壬生ＰＡ【西行き】」(36.4547156,139.8064339)の中間値(36.454205,139.806601)を採用（両者約210m差、確信度中）。当PAへの併設が計画されているスマートICは、2023年9月8日に国土交通省の新規事業として採択された段階であり、2026年7月現在は未開通（事業中）。IC機能が存在しないため、entranceSelectable/exitSelectableはfalse/falseとした。スマートIC開通後、改めて座標調査のうえentranceSelectable/exitSelectableの変更・再検証が必要。entranceLat/Lng・exitLat/Lngともに上記中間値、lat/lngも同値。"
+            },
+            {
+                order: 16,
+                displayName: "壬生IC",
+                googleName: "北関東自動車道 壬生インターチェンジ",
+                lat: 36.459763,
+                lng: 139.822904,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.459763, entranceLng: 139.822904, exitLat: 36.459763, exitLng: 139.822904,
+                note: "【2026-07-29調査・新規登録】MapFan「壬生ＩＣ（北関東自動車道（栃木茨城区間））【出口】」(36.4601014,139.8228646)とYahoo!地図(36.459424,139.8229433)が約74mで近接一致したため、この2ソースの平均値(36.459763,139.822904)を採用。Wikipedia(36.457481,139.822825)はこのクラスタから約220〜294m南の外れ値だが、フルIC（入口3ブース、出口4ブース）である旨の記述は構造確認に有用なため参考として残す。entranceSelectable/exitSelectableはフルICのためtrue/true。entranceLat/Lng・exitLat/Lngともに上記平均値、lat/lngも同値。"
+            },
+            {
+                order: 17,
+                displayName: "宇都宮上三川IC",
+                googleName: "北関東自動車道 宇都宮上三川インターチェンジ",
+                lat: 36.485954,
+                lng: 139.90716,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.485954, entranceLng: 139.90716, exitLat: 36.485954, exitLng: 139.90716,
+                note: "【2026-07-29調査・新規登録・未確認あり】MapFan「宇都宮上三川ＩＣ（北関東自動車道（栃木茨城区間））【出口】」(36.4865667,139.9077423)、Wikipedia(36.484944,139.906833)、Yahoo!地図(36.4863508,139.9069046)の3ソース平均(36.485954,139.90716)を採用。3ソースはいずれも相互に170〜190m以内に収まるが、きれいな2点クラスタは形成していない。フル/ハーフIC構造の明記はなく、新4号国道・インターパーク宇都宮南ランプ接続の複合構造との記載あり。entranceSelectable/exitSelectableはtrue/true。entranceLat/Lng・exitLat/Lngともに上記平均値、lat/lngも同値。"
+            },
+            {
+                order: 18,
+                displayName: "真岡IC",
+                googleName: "北関東自動車道 真岡インターチェンジ",
+                lat: 36.44713,
+                lng: 139.972282,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.44713, entranceLng: 139.972282, exitLat: 36.44713, exitLng: 139.972282,
+                note: "【2026-07-29調査・新規登録】MapFan「真岡ＩＣ（北関東自動車道（栃木茨城区間））【入口】」(36.4470858,139.9727108)とYahoo!地図(36.4471745,139.9718534)が10〜86mで高精度に近接一致したため、この2ソースの平均値(36.44713,139.972282)を採用。Wikipedia(36.446694,139.9686528)はこのクラスタから約400〜460m西の外れ値。入口2ブース・出口3ブースの構成からフルIC相当と判断。西側区間の終点で、前回登録済みの桜川筑西IC（東側区間）へつながる。entranceSelectable/exitSelectableはtrue/true。entranceLat/Lng・exitLat/Lngともに上記平均値、lat/lngも同値。"
+            },
+            {
+                order: 19,
+                displayName: "桜川筑西IC",
+                googleName: "北関東自動車道 桜川筑西インターチェンジ",
+                lat: 36.3584409,
+                lng: 140.08158,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.3584689, entranceLng: 140.0815273, exitLat: 36.3584129, exitLng: 140.0816327,
+                note: "【2026-07-29調査・新規登録】MapFanで「桜川筑西ＩＣ（北関東自動車道（栃木茨城区間））【入口】」(36.3584689,140.0815273)・【出口】(36.3584129,140.0816327)を確認。Yahoo!地図(36.3586844,140.0816964)もこのクラスタから半径30m程度で近接一致し裏取りができた。Wikipedia記載座標(36.3600583,140.0824639)は上記クラスタから北へ約180mズレるが、フルIC（料金所5ブース：入口2・出口3）である旨の記述は構造確認に有用なため参考として残す。entranceSelectable/exitSelectableはフルICのためtrue/true。座標はentranceLat/Lngを入口(36.3584689,140.0815273)、exitLat/Lngを出口(36.3584129,140.0816327)に設定、lat/lngはその中間点(36.3584409,140.08158)。"
+            },
+            {
+                order: 20,
+                displayName: "笠間西IC",
+                googleName: "北関東自動車道 笠間西インターチェンジ",
+                lat: 36.3450605,
+                lng: 140.1774652,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.345491, entranceLng: 140.1775443, exitLat: 36.34463, exitLng: 140.177386,
+                note: "【2026-07-29調査・新規登録】MapFanで「笠間西ＩＣ（北関東自動車道（栃木茨城区間））【入口】」(36.345491,140.1775443)を確認。ユーザーが追加確認したNAVITIME「西行き出口」(36.34463,140.177386)は経度がMapFanと約10mで近接一致しており、この2ソースの収束点を採用。前回調査時点のWikipedia(36.345730,140.174261)・Yahoo!地図(36.3460266,140.1741278)はこのMapFan/NAVITIMEクラスタから経度で約290m西にズレて孤立していると判断し、今回は不採用（参考記録として残す）。Wikipediaによればフルインターチェンジ（入口2ブース、出口2ブース）。entranceSelectable/exitSelectableはtrue/true。座標はentranceLat/Lngを入口(36.345491,140.1775443)、exitLat/Lngを出口(36.34463,140.177386)に設定、lat/lngはその中間点(36.3450605,140.1774652)。"
+            },
+            {
+                order: 21,
+                displayName: "友部IC",
+                googleName: "北関東自動車道 友部インターチェンジ",
+                lat: 36.340095,
+                lng: 140.272535,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.340095, entranceLng: 140.272535, exitLat: 36.340095, exitLng: 140.272535,
+                note: "【2026-07-29調査・新規登録・未確認あり】ユーザーが追加確認したNAVITIME値(36.340308,140.271503)とWikipedia記載値(36.339881,140.273567)が比較的近接（経度差約185m、緯度差約47m）していたため、この2ソースの中間値(36.340095,140.272535)を採用。一方MapFan「友部ＩＣ（北関東自動車道（栃木茨城区間））【入口】」(36.3419582,140.2753653)およびYahoo!地図(36.3411193,140.2744988)は上記とは別クラスタ（相互には約110mで近接、NAVITIME/Wikipediaクラスタとは約200m離れる）を形成しており、今回は不採用とした。フル/ハーフIC構造はWikipedia上に明記がなく未確認のため、entranceSelectable/exitSelectableはtrue/trueとした（要実車確認）。entranceLat/Lng・exitLat/Lngともに上記中間値、lat/lngも同値。"
+            },
+            {
+                order: 22,
+                displayName: "友部JCT",
+                googleName: "北関東自動車道 友部ジャンクション",
+                lat: 36.319945,
+                lng: 140.346122,
+                isSelectable: false,
+                connection: true,
+                connectedRoads: ["kitakanto", "joban"],
+                entranceSelectable: false, exitSelectable: false, entranceLat: 36.319945, entranceLng: 140.346122, exitLat: 36.319945, exitLng: 140.346122,
+                note: "【2026-07-29調査・新規登録】常磐自動車道と北関東自動車道を接続する本線同士のJCT。MapFan「友部ＪＣＴ（北関東自動車道（栃木茨城区間））【東京方面】」(36.3196811,140.3453504)、ユーザーが追加確認したNAVITIME「下り」(36.318729,140.344714)、Wikipedia(36.320875,140.345814)、Yahoo!地図(36.3204947,140.348608)の4ソースが概ね半径300m程度の範囲に収まったため、4ソース平均値(36.319945,140.346122)を採用。JCT（本線同士の接続点）のためisSelectable:false、connection:true、connectedRoads:[\"kitakanto\",\"joban\"]に設定。entranceSelectable/exitSelectableもfalse/false。"
+            },
+            {
+                order: 23,
+                displayName: "茨城町西IC",
+                googleName: "北関東自動車道 茨城町西インターチェンジ",
+                lat: 36.306182,
+                lng: 140.385999,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.306182, entranceLng: 140.385999, exitLat: 36.306182, exitLng: 140.385999,
+                note: "【2026-07-29調査・新規登録・未確認あり】NAVITIMEの個別ページを特定できなかったため、MapFan・Wikipedia・Yahoo!地図の3ソースで判断。Wikipedia(36.306211,140.385650)とYahoo!地図(36.3061531,140.3863469)は緯度がほぼ一致し経度差も約66mと近接していたため、この2ソースの中間値(36.306182,140.385999)を採用。MapFan「茨城町西ＩＣ（北関東自動車道（栃木茨城区間））【出口】」(36.3053038,140.3833657)はこのクラスタから経度で約300m西・緯度で約100m南にズレる外れ値のため今回は不採用（MapFan入口ページは今回未取得、将来的な再確認対象）。Wikipediaによればフルインターチェンジ（入口2ブース、出口3ブース）、高速バス停「茨城町西インター」併設。entranceSelectable/exitSelectableはtrue/true。entranceLat/Lng・exitLat/Lngともに上記中間値、lat/lngも同値。"
+            },
+            {
+                order: 24,
+                displayName: "茨城町JCT",
+                googleName: "北関東自動車道 茨城町ジャンクション",
+                lat: 36.302893,
+                lng: 140.411608,
+                isSelectable: false,
+                connection: true,
+                connectedRoads: ["kitakanto", "tokan"],
+                entranceSelectable: false, exitSelectable: false, entranceLat: 36.302893, entranceLng: 140.411608, exitLat: 36.302893, exitLng: 140.411608,
+                note: "【2026-07-29調査・新規登録】東関東自動車道と北関東自動車道を接続する本線同士のJCT。NAVITIMEの個別ページを特定できなかったため、MapFan「茨城町ＪＣＴ（北関東自動車道（栃木茨城区間））【鉾田市方面】」(36.3013443,140.4116239)、Wikipedia(36.30408,140.41144)、Yahoo!地図(36.3032539,140.4117589)の3ソースを確認。経度は3ソースともほぼ一致（140.4116〜140.4118）、緯度に約310m幅があるが、JCTという構造上、本線・複数ランプの座標が混在している可能性があるため許容範囲と判断し、3ソース平均値(36.302893,140.411608)を採用。isSelectable:false、connection:true、connectedRoads:[\"kitakanto\",\"tokan\"]に設定。entranceSelectable/exitSelectableもfalse/false。"
+            },
+            {
+                order: 25,
+                displayName: "茨城町東IC",
+                googleName: "北関東自動車道 茨城町東インターチェンジ",
+                lat: 36.316445,
+                lng: 140.454989,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.316445, entranceLng: 140.454989, exitLat: 36.316445, exitLng: 140.454989,
+                note: "【2026-07-29調査・新規登録・未確認あり】MapFan「茨城町東ＩＣ（北関東自動車道（栃木茨城区間））【出口】」(36.3164732,140.4548087)とYahoo!地図(36.3164169,140.4551684)が半径30m程度で近接一致したため、この2ソースの中間値(36.316445,140.454989)を採用。Wikipedia(36.314944,140.456997)はこのクラスタから南東へ約200mズレるが、フルインターチェンジ（入口3ブース：ETC専用1・ETC/一般1・一般1、出口3ブース同構成）である旨の構造情報は有用なため参考として残す。entranceSelectable/exitSelectableはフルICのためtrue/true。MapFan出口ページのみ取得し入口個別ページは今回未取得のため、entranceLat/Lng・exitLat/Lngともに上記中間値を暫定採用（将来的な再確認対象）、lat/lngも同値。"
+            },
+            {
+                order: 26,
+                displayName: "水戸南IC",
+                googleName: "北関東自動車道 水戸南インターチェンジ",
+                lat: 36.330412,
+                lng: 140.487599,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.330412, entranceLng: 140.487599, exitLat: 36.330412, exitLng: 140.487599,
+                note: "【2026-07-29調査・新規登録】北関東自動車道の終点（東側）、東水戸道路の起点を兼ねるIC。MapFan「水戸南ＩＣ（北関東自動車道（栃木茨城区間））【入口（上り）】」(36.3325435,140.4881631)、ユーザーが追加確認したNAVITIME「東行き出口/西行き入口」(36.328788,140.486462)、Wikipedia(36.329561,140.488208)、Yahoo!地図(36.3307543,140.487562)の4ソースが経度でほぼ一致（140.4865〜140.4882）、緯度に約370m幅で収まったため、4ソース平均値(36.330412,140.487599)を採用。Wikipediaによれば当ICを境に西側が高速自動車国道（北関東道終点）、東側が一般有料道路（東水戸道路起点）となる複合構造で、フルIC（入口2ブース、出口3ブース）。entranceSelectable/exitSelectableはtrue/true。entranceLat/Lng・exitLat/Lngともに上記平均値を暫定採用、lat/lngも同値。北関東道／東水戸道路境界という特殊構造のため、実車確認時に上り・下り・東水戸道路側それぞれの挙動を要確認。"
+            }
+        ]
+    }
+
 };
 
 function buildIcDefinitionIdentity(ic) {
@@ -12483,6 +12842,58 @@ function detectIcsOrderedAlongPolyline(
                 )
             );
             console.groupEnd();
+        }
+
+        // 【DEBUG-KITAKANTO-WEST調査・一時的】大洗海岸→伊香保温泉ルートで
+        // 北関東道西側区間のICが「通過IC：」一覧に1件も出なかった問題の
+        // 調査用ログ。通過IC一覧（buildFullPassedIcSequenceFromTollSection
+        // Range→pushCandidatesInRange）が参照するrouteDistanceCandidateIcs
+        // は、この関数（detectIcsOrderedAlongPolyline）がTOLL_SECTION_IC_
+        // MATCH_THRESHOLD_METERS（500m、点と線）でフィルタした後の配列
+        // であり、ここで弾かれたICは以降のどの段階（700mしきい値を使う
+        // findNearestIcByRouteDistance等）にも一切現れない。そのため、
+        // 西側区間の対象IC（高崎JCT〜佐野田沼IC）について、この500m
+        // フィルタの通過・不通過と実際の点と線の距離を確認する。
+        // 既存のposition計算結果をそのまま出力するだけで、候補選定
+        // ロジックには一切影響しない。調査完了後、このブロックごと
+        // 削除すること。
+        if (
+            [
+                "高崎JCT",
+                "前橋南IC",
+                "駒形IC",
+                "波志江PA SIC",
+                "伊勢崎IC",
+                "太田藪塚IC",
+                "太田強戸PA SIC",
+                "太田桐生IC",
+                "足利IC",
+                "出流原PA SIC",
+                "佐野田沼IC"
+            ].includes(ic.displayName)
+        ) {
+            console.log(
+                "[DEBUG-KITAKANTO-WEST調査・一時的]",
+                ic.displayName,
+                "／テーブル座標:",
+                ic.lat,
+                ic.lng,
+                "／点と線の距離(m):",
+                position ? position.distanceMeters.toFixed(1) : "position計算不可",
+                "／しきい値(m):",
+                thresholdMeters,
+                "／候補プール採用:",
+                Boolean(
+                    position &&
+                    position.distanceMeters <= thresholdMeters
+                )
+                    ? "OK"
+                    : "NG（除外）",
+                "／超過量(m):",
+                position && position.distanceMeters > thresholdMeters
+                    ? (position.distanceMeters - thresholdMeters).toFixed(1)
+                    : "-"
+            );
         }
 
         if (

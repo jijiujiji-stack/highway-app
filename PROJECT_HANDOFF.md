@@ -909,6 +909,34 @@ API呼び出し数への影響：
 
 ---
 
+### 30. アクアラインの汎用ロジック統合、境界位置のズレを発見（2026-07-30調査・保留）
+
+**背景**：項目28・29でkeiyoエリア限定に本番接続した汎用カテゴリ分割ロジック（`trySplitTollSectionByIcCategoryForArea`）について、アクアライン専用ロジック（`trySplitNexcoSectionByBoundaryCategory`）をこちらに統合できないか、診断ログのみで比較検証した（本番接続はしていない、`targetAreaKey: "aqualine"`での試験呼び出しのみ）。
+
+**方針**：将来的にはアクアラインも汎用ロジックへ統合し、`trySplitNexcoSectionByBoundaryCategory`（アクアライン専用）は廃止する方向で進めたい。アクアラインだけ別方式のまま残す理由は無いという判断。ただし、下記の境界位置のズレを解消してからでないと安全に切り替えられない。
+
+**検証結果（実車確認2ルート：荒川区役所→鴨川シーワールド、荒川区役所→館山）**：
+
+1. **浮島JCTのループ構造による道のり距離の重複・混同は発生していなかった**。`routeDistanceCandidateIcs`内で「浮島IC」は常に1件のみ検出され、道のり距離も1つの妥当な値だった。既知の保留事項24で過去に問題になった「粗い案内ステップ座標によるカーブの誤近似」は、Step1〜7が使う密なサンプリング座標（`sampledPoints`）では再現しなかった。
+
+2. **アクアライン→NEXCOの境界位置が、既存ロジックと新方式で一致しない**。首都高→アクアラインの境界（浮島IC）は両ロジックで一致するが、アクアライン→NEXCOの境界が異なる。
+
+   - 既存ロジック（`trySplitNexcoSectionByBoundaryCategory`、`boundaryIcNames: ["浮島IC", "木更津金田IC"]`）：木更津金田ICでアクアラインを終える
+   - 新方式（`trySplitTollSectionByIcCategoryForArea`、IC_MASTER登録の`sourceAreaKey`をそのまま参照）：木更津金田ICより先（袖ケ浦IC〜木更津JCT付近）までアクアラインとして扱う
+
+   この差は2ルートとも同じ傾向で再現しており、偶然のブレではないと考えられる。既存ロジックが木更津金田ICを終端としているのは、既知の保留事項27「木更津金田IC出口ランプがアクアライン料金として二重計上される」への対応の経緯が関係している可能性が高い（未確認）。新方式はIC_MASTER登録上の`sourceAreaKey`（袖ケ浦IC・木更津JCTがそれぞれaqualine・kenoに登録されている）をそのまま読んでいるだけなので、この経緯を踏まえていない可能性がある。
+
+**次回やること（申し送り）**：
+
+- 既知の保留事項27の詳細を再確認し、木更津金田IC・袖ケ浦IC・木更津JCT付近で、なぜ既存ロジックが木更津金田ICを終端に選んだのか（IC_MASTER登録上の理由か、二重計上を避けるための意図的な設計か）を特定する
+- その上で、(a) IC_MASTERの`sourceAreaKey`側を見直すべきか、(b) 新方式のカテゴリ解決ロジック側に何か補正が必要か、(c) 単純にIC_MASTER登録通りで問題ないのか（境界がズレて見えるだけで実害があるか）を判断する
+- 実害（二重計上・距離計算のズレ等）の有無を、既存ロジックと新方式それぞれのETC概算金額を比較して確認する
+- 上記が解決した後、アクアラインも`trySplitTollSectionByIcCategoryForArea`側へ本番接続し、`trySplitNexcoSectionByBoundaryCategory`（専用ロジック）を廃止する
+
+**現状**：診断ログのみ（`[DEBUG-AQUALINE-NEWPIPELINE調査・一時的]`・`[DEBUG-UKISHIMA-LOOP調査・一時的]`、`analyzeHighwayRoutePolyline`内）は残したまま。本番接続はまだ行っていない。commit・pushは今回のドキュメント追記分のみ行う。
+
+---
+
 ## 最近の手動確認例
 
 ### 荒川区役所 → 東京ディズニーランド

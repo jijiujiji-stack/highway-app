@@ -1633,6 +1633,24 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
     });
     console.groupEnd();
 
+    // 【既知の保留事項22・段階移行の試験導入（keiyoエリア限定）、
+    // 2026-07-30実装】テキストキーワード判定（classifyStepsByRoadType）
+    // だけでは首都高→NEXCOの初回遷移を検出できないルートがあることが
+    // 既知の保留事項22の実車確認で判明したため、まずkeiyoエリア
+    // （京葉道路）に限定し、Step1〜7（IC境界ベースの新パイプライン、
+    // 既知の保留事項23）による区間内カテゴリ再判定を試験導入する。
+    // 区間内にkeiyoエリアのICが1件も検出されない場合は何もしないため、
+    // keiyo以外のエリアの挙動（classifyStepsByRoadType・NAME_CHANGEガード・
+    // trySplitNexcoSectionByBoundaryCategoryによる従来の判定）は変更しない。
+    const tollSectionsWithAreaCategorySplits =
+        applyAreaCategorySplitsToTollSections(
+            tollSectionsWithBoundarySplits,
+            routeDistanceCandidateIcs,
+            sampledPoints,
+            cumulativeDistances,
+            "keiyo"
+        );
+
     // 【tollSection境界の末尾フォールバック・既知の保留事項27・28対応】
     // 境界ICベースの再分割が完了した後の最終的な区間配列に対して、
     // entranceIc/exitIcが未解決（IC不明）の区間だけにフォールバックを
@@ -1640,7 +1658,7 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
     // した、別の後処理として最後に実行する。
     const tollSectionsWithTailFallback =
         applyTailFallbackToTollSections(
-            tollSectionsWithBoundarySplits,
+            tollSectionsWithAreaCategorySplits,
             sampledPoints,
             cumulativeDistances,
             routeDistanceCandidateIcs
@@ -2167,6 +2185,239 @@ function resolveRouteDistanceForLatLng(
         );
 
     return withRouteDistance.routeDistanceMeters;
+}
+
+// 【既知の保留事項22・段階移行の試験導入（keiyoエリア限定）、2026-07-30
+// 実装】1つのtollSection（TOLL TAGテキスト判定＋境界IC区間再分割まで
+// 完了した後の区間）について、その区間の道のり距離範囲
+// （entranceLatLng〜exitLatLngをresolveRouteDistanceForLatLngで道のり
+// 距離に変換した範囲）内にある、Step1〜7で検出済みの走行順IC一覧
+// （routeDistanceCandidateIcs）を取り出し、resolveIcTollCategoryId
+// （IC_MASTER登録情報のみで完結する、テキストを一切見ない判定）で
+// IC単位のカテゴリを再判定する。
+//
+// テキストキーワード判定（classifyStepsByRoadType・nexcoRouteLabel
+// Keywords・NAME_CHANGEガード）は、Googleの実際の案内テキストとほぼ
+// 一致しない・首都高→NEXCOの初回遷移を検出できない、という限界がある
+// ことが既知の保留事項22で判明している。この関数は、その限界を
+// IC_MASTER登録情報ベースの判定で補うためのもの。
+//
+// 【他エリアへの影響を避けるための限定】区間内の候補ICに、targetAreaKey
+// （今回は"keiyo"固定）のICが1件も含まれない場合は、他エリアの判定に
+// 一切影響を与えないよう、何もせず元のsectionをそのまま返す。
+//
+// カテゴリの切り替わり境界は、切り替わり前後の候補IC同士の道のり距離の
+// 中点とする（analyzeHighwayRoutePolyline内のroadSwitches算出で既に
+// 使われているのと同じ考え方を踏襲）。区間の先頭・末尾だけは、候補ICの
+// 位置ではなくsection自身のentranceLatLng/exitLatLngの道のり距離を
+// そのまま使うことで、区間の実移動距離を取りこぼさない／余分に含めない
+// ようにする。
+//
+// 【境界フォールバックとの関係】ここで生成するサブ区間のentranceIc/
+// exitIcは、必ずrouteDistanceCandidateIcs由来の実在ICか、既に解決済みの
+// section.entranceIc/exitIcのいずれかになるため、常に非null（IC不明に
+// ならない）。これは、既知の保留事項27で実装したapplyTailFallbackTo
+// TollSections（区間範囲内で最も近い実在ICを採用する）と同じ
+// routeDistanceCandidateIcsを同じ考え方で参照しているためであり、
+// ロジックを複製する必要はない。この関数の後段でapplyTailFallbackTo
+// TollSectionsを実行しても、生成したサブ区間はentranceIc/exitIcが
+// 両方解決済みのため素通りするだけで、二重にフォールバックが走ることは
+// ない。
+function trySplitTollSectionByIcCategoryForArea(
+    section,
+    routeDistanceCandidateIcs,
+    sampledPoints,
+    cumulativeDistances,
+    targetAreaKey
+) {
+    if (
+        !Array.isArray(routeDistanceCandidateIcs) ||
+        routeDistanceCandidateIcs.length === 0
+    ) {
+        return [section];
+    }
+
+    const entranceRouteDistanceMeters =
+        resolveRouteDistanceForLatLng(
+            section.entranceLatLng,
+            sampledPoints,
+            cumulativeDistances
+        );
+    const exitRouteDistanceMeters =
+        resolveRouteDistanceForLatLng(
+            section.exitLatLng,
+            sampledPoints,
+            cumulativeDistances
+        );
+
+    if (
+        entranceRouteDistanceMeters === null ||
+        exitRouteDistanceMeters === null
+    ) {
+        return [section];
+    }
+
+    const candidatesInRange =
+        routeDistanceCandidateIcs
+            .filter(candidate =>
+                candidate.routeDistanceMeters >=
+                    entranceRouteDistanceMeters &&
+                candidate.routeDistanceMeters <=
+                    exitRouteDistanceMeters
+            )
+            .sort((a, b) =>
+                a.routeDistanceMeters - b.routeDistanceMeters
+            );
+
+    // 【DEBUG-KEIYOGATE調査・修正】sourceAreaKeys（複数形）は
+    // SHUTO_IC_MASTER側で「入口候補としてどのNEXCO方面への経路として
+    // 有効か」という別目的のヒント値であり、そのIC自身の所属エリアでは
+    // ない（堤通等、複数のNEXCO方面をsourceAreaKeysに持つ首都高ICが
+    // 該当）。誤ってこちらにフォールバックしていたため、keiyoが絡まない
+    // ルートでも堤通等が候補に入るとゲートが誤って発動していた。
+    // sourceAreaKey（単数形、IC_MASTER側の各ICに割り当てられる本来の
+    // 所属エリア）のみで判定する。
+    const isTargetAreaIc = ic =>
+        ic?.sourceAreaKey === targetAreaKey;
+
+    const hasTargetAreaCandidate =
+        candidatesInRange.some(candidate =>
+            isTargetAreaIc(candidate.ic)
+        );
+
+    if (!hasTargetAreaCandidate) {
+        return [section];
+    }
+
+    const categoryGroups = [];
+
+    candidatesInRange.forEach(candidate => {
+        const tollCategoryId =
+            resolveIcTollCategoryId(candidate.ic);
+
+        const currentGroup =
+            categoryGroups[categoryGroups.length - 1];
+
+        if (
+            currentGroup &&
+            currentGroup.tollCategoryId === tollCategoryId
+        ) {
+            currentGroup.lastCandidate = candidate;
+        }
+        else {
+            categoryGroups.push({
+                tollCategoryId,
+                firstCandidate: candidate,
+                lastCandidate: candidate
+            });
+        }
+    });
+
+    // カテゴリの切り替わりが1回も検出できなかった場合（範囲内の候補ICが
+    // 全て同一カテゴリだった場合）は、分割する意味が無いため元のsection
+    // をそのまま返す。区間丸ごとのカテゴリ再判定（分割を伴わない再ラベル
+    // 付け）は今回のスコープ外とする。
+    if (categoryGroups.length < 2) {
+        return [section];
+    }
+
+    return categoryGroups.map((group, index) => {
+        const previousGroup = categoryGroups[index - 1];
+        const nextGroup = categoryGroups[index + 1];
+
+        const startDistanceMeters =
+            index === 0
+                ? entranceRouteDistanceMeters
+                : (
+                    previousGroup.lastCandidate.routeDistanceMeters +
+                    group.firstCandidate.routeDistanceMeters
+                ) / 2;
+
+        const endDistanceMeters =
+            index === categoryGroups.length - 1
+                ? exitRouteDistanceMeters
+                : (
+                    group.lastCandidate.routeDistanceMeters +
+                    nextGroup.firstCandidate.routeDistanceMeters
+                ) / 2;
+
+        const entranceIc =
+            index === 0 && section.entranceIc
+                ? section.entranceIc
+                : group.firstCandidate.ic;
+
+        const exitIc =
+            index === categoryGroups.length - 1 && section.exitIc
+                ? section.exitIc
+                : group.lastCandidate.ic;
+
+        return {
+            ...section,
+            tollCategoryId: group.tollCategoryId,
+            isShutoSection: group.tollCategoryId === "shuto",
+            totalDistanceMeters:
+                Math.max(0, endDistanceMeters - startDistanceMeters),
+            entranceIc,
+            entranceIcName: entranceIc.displayName,
+            entranceLatLng: {
+                lat: entranceIc.lat,
+                lng: entranceIc.lng
+            },
+            entranceDistanceMeters:
+                index === 0 && section.entranceIc
+                    ? section.entranceDistanceMeters
+                    : group.firstCandidate.distanceMeters,
+            exitIc,
+            exitIcName: exitIc.displayName,
+            exitLatLng: {
+                lat: exitIc.lat,
+                lng: exitIc.lng
+            },
+            exitDistanceMeters:
+                index === categoryGroups.length - 1 && section.exitIc
+                    ? section.exitDistanceMeters
+                    : group.lastCandidate.distanceMeters,
+            entranceIcResolvedByTailFallback:
+                index === 0
+                    ? Boolean(section.entranceIcResolvedByTailFallback)
+                    : false,
+            exitIcResolvedByTailFallback:
+                index === categoryGroups.length - 1
+                    ? Boolean(section.exitIcResolvedByTailFallback)
+                    : false,
+            stepCount: null
+        };
+    });
+}
+
+// 【既知の保留事項22・段階移行の試験導入（keiyoエリア限定）】区間配列に
+// 対して順番にtrySplitTollSectionByIcCategoryForAreaを適用する。
+// applyBoundaryCategorySplitsToTollSections（アクアライン境界分割）と
+// 同じ「1区間→複数区間」のflatMapパターンを踏襲している。
+function applyAreaCategorySplitsToTollSections(
+    sections,
+    routeDistanceCandidateIcs,
+    sampledPoints,
+    cumulativeDistances,
+    targetAreaKey
+) {
+    if (
+        !Array.isArray(sections) ||
+        !Array.isArray(routeDistanceCandidateIcs) ||
+        routeDistanceCandidateIcs.length === 0
+    ) {
+        return sections;
+    }
+
+    return sections.flatMap(section =>
+        trySplitTollSectionByIcCategoryForArea(
+            section,
+            routeDistanceCandidateIcs,
+            sampledPoints,
+            cumulativeDistances,
+            targetAreaKey
+        )
+    );
 }
 
 // 【tollSection境界の末尾フォールバック・既知の保留事項27・28対応】

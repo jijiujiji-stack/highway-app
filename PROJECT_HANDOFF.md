@@ -869,6 +869,46 @@ API呼び出し数への影響：
 
 ---
 
+### 28. 有料道路カテゴリ判定を、テキストキーワードからStep1〜7（IC境界ベース）へ段階移行する方針決定（2026-07-30合意）
+
+**背景**：`classifyStepsByRoadType`によるテキストキーワード判定（`nexcoRouteLabelKeywords`がGoogleの実際の案内テキストとほとんど一致しない、かつ`NAME_CHANGE`ガードが首都高→NEXCOの初回遷移まで握り潰してしまう）が原因で、京葉道路・常磐道・中央道等、多くのエリアで「NEXCOカテゴリが一度も検出されず、ルート全体が首都高のまま」という誤判定が発生することを実車確認で確認した。
+
+**検証**：既知の保留事項23に記録されているStep1〜7パイプライン（座標とIC_MASTER登録情報のみで完結し、Googleテキストを一切見ない設計、それまでは診断ログとしてのみ動作）を、問題が発生していた2ルートに実際にかけたところ、いずれも正しくshuto→nexcoの境界を検出できることを確認した。
+
+- 荒川区役所→船橋駅（京葉道路経由）：本番はshuto 1区間・17.9kmのまま。Step1〜7はshuto 7IC・11.8km → nexco 4IC・6kmと正しく分割
+- 荒川区役所→スパリゾートハワイアンズ（常磐道経由）：本番はshuto 1区間・180.9kmのまま。Step1〜7はshuto 8IC・12.5km → nexco 23IC・167.5kmと正しく分割
+
+**採用する役割分担（合意済み設計）**：
+
+1. 「有料区間」タグ方式（TOLL TAGタグ）は、「今、有料道路の上にいるか、無料道路の上にいるか」の判定にのみ使う。下道と高速が並走している区間はGoogleのテキストが無いと区別できないため、ここだけはテキスト依存を維持する。
+2. 有料区間と判定された区間の中身（首都高／NEXCO／アクアラインのどのカテゴリか、複数にまたがるなら境界はどこか）は、Step1〜7（`detectIcsOrderedAlongPolyline`・`resolveIcTollCategoryId`等）で決定する。`classifyStepsByRoadType`のNEXCO/アクアラインキーワード判定・`NAME_CHANGE`ガードは、将来的にこの役割からは丸ごと不要になる（有料/無料の境目の検出という役割自体は引き続き必要）。
+3. 粒度の使い分け：料金計算（tollSections、ETC概算）には`resolveIcTollCategoryId`ベースのカテゴリID粒度（shuto/aqualine/nexcoの3値）を使う。「想定道路」表示には、IC_MASTERエリアlabelベースの粒度（"常磐道方面"等）を使う。
+4. 境界ICが解決できない場合のフォールバックは1本化する。既知の保留事項27で実装した`applyTailFallbackToTollSections`（区間の範囲内で、解決できなかった側に最も近い実在ICを採用し、はみ出した距離を差し引く）と同じ考え方を、Step1〜7が検出したIC順序リストに対して適用する。専用の終点フラグは追加しない方針とする。
+
+**今回のスコープ**：まずkeiyoエリア（京葉道路）の首都高⇔京葉道路の境界にのみ、この新しい判定を適用した（詳細は次項29）。他のエリア（chuo・tomei・joban等）は、今回は`classifyStepsByRoadType`による従来の判定のままとし、keiyoでの実装・実車確認が済んでから順次拡大する予定。
+
+---
+
+### 29. keiyoエリア限定でIC境界ベースのカテゴリ判定を本番接続（2026-07-30実装）
+
+項目28の方針決定を受け、keiyoエリア（京葉道路）に限定して実装・本番接続した。
+
+**実装内容（すべてapp.js）：**
+
+- `trySplitTollSectionByIcCategoryForArea(section, routeDistanceCandidateIcs, sampledPoints, cumulativeDistances, targetAreaKey)`：1つのtollSectionについて、その区間の道のり距離範囲内にあるrouteDistanceCandidateIcs（Step1〜7で検出済みの走行順IC一覧、`detectTollSectionsFromSteps`内で既に1回だけ計算済みのものを再利用）を`resolveIcTollCategoryId`でカテゴリ再判定し、カテゴリが変わる箇所でサブ区間に分割する。区間内にtargetAreaKey（"keiyo"）のICが1件も含まれない場合は何もせず元のsectionをそのまま返すため、keiyo以外のエリアには影響しない
+- `applyAreaCategorySplitsToTollSections(...)`：区間配列全体に上記を適用する、`applyBoundaryCategorySplitsToTollSections`（アクアライン境界分割）と同じflatMapパターンのラッパー
+- `detectTollSectionsFromSteps`内で、`applyBoundaryCategorySplitsToTollSections`（アクアライン境界分割）の後・`applyTailFallbackToTollSections`（末尾フォールバック）の前に、`applyAreaCategorySplitsToTollSections(..., "keiyo")`を挿入した
+
+**境界フォールバックとの関係**：新規に作る関数を用意する代わりに、`applyTailFallbackToTollSections`が使っているのと同じ`routeDistanceCandidateIcs`（区間範囲内で検出済みの実在IC一覧）をそのまま参照する設計にした。これにより、生成されるサブ区間のentranceIc/exitIcは常に実在ICで確定し（IC不明にならない）、後段の`applyTailFallbackToTollSections`は素通りするだけで二重にフォールバックが走ることはない。ロジックの複製は行っていない。
+
+**表示・料金計算への反映**：`estimateMainHighwayTollFromTollSections`・`buildPolylineComparisonSummaryHtml`（検索条件パネル）・`buildAssumedRouteHtmlFromTollSections`（トップパネル参考ルート）は、いずれも`tollSections`配列の`tollCategoryId`/`entranceIc`/`exitIc`/`totalDistanceMeters`等の既存フィールドだけを参照する設計だったため、変更不要だった。「想定道路」表示のラベル解決（IC_MASTERエリアlabelベース）も、既存の`resolveTollSectionRoadLabel`→`resolveTollSectionNexcoRoadLabel`（entranceIc/exitIcの`sourceAreaKey`からIC_MASTER[key].labelを引く、既存の仕組み）がそのまま使えたため、新しいラベル解決関数は追加していない。
+
+**スコープ限定の徹底**：`applyAreaCategorySplitsToTollSections`の`targetAreaKey`引数は"keiyo"固定で1箇所から呼んでいるだけなので、区間内にkeiyoエリアのICが検出されないルート（chuo・tomei・joban等）は、常に元のtollSectionsがそのまま返り、従来通り`classifyStepsByRoadType`・`NAME_CHANGE`ガード・`trySplitNexcoSectionByBoundaryCategory`（アクアライン専用）の判定結果のみで確定する。既存のこれらの関数自体は変更していない。
+
+**実車確認待ち**：荒川区役所→船橋駅（京葉道路経由）で、検索条件パネルの「想定道路」が「首都高 → 京葉道路」に分かれ、NEXCO入口/出口に篠崎IC等が表示されることの確認。ETC概算に京葉道路分の距離料金が新たに計上されることの確認。keiyoが絡まないルート（例：常磐道経由）の挙動が変わっていないことの確認。
+
+---
+
 ## 最近の手動確認例
 
 ### 荒川区役所 → 東京ディズニーランド

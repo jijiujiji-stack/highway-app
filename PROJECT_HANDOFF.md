@@ -965,6 +965,44 @@ API呼び出し数への影響：
 
 ---
 
+### 33. 【総括】IC境界ベースのカテゴリ判定への全面移行が完了（2026-08-01）
+
+既知の保留事項22（`classifyStepsByRoadType`によるテキストキーワード判定が、首都高→NEXCOの遷移を検出できない問題）から始まった一連の作業が、本日で完了した。経緯を総括して記録する。
+
+**発端**：京葉道路・常磐道等、多くのルートで「想定道路：首都高のみ」「NEXCO入口/出口：なし」という誤判定が発生し、ETC概算が実際より大幅に低い金額になっていた。
+
+**採用した設計方針**：「有料道路の上にいるか」の判定にはGoogleのテキスト（TOLL TAGタグ）を引き続き使うが、「有料区間の中身がどのカテゴリ（首都高／NEXCO／アクアライン）か」の判定は、IC_MASTER登録情報（座標・`sourceAreaKey`）のみで完結する、既存のStep1〜7パイプライン（既知の保留事項23で実装・検証済みだったが本番未接続だった）を土台にしたロジックに置き換える。
+
+**段階的な移行の経緯**（直近の大きな変更・項目28〜32参照）：
+
+1. keiyoエリア（京葉道路）限定で試験導入（項目28・29）
+2. aqualineエリアにも拡張（項目30）。この過程で、IC_MASTERの`aqualine`エリアに東京湾アクアライン連絡道区間（本来はNEXCO距離料金扱いすべき区間）の袖ケ浦ICが誤登録されていたことが発覚し、修正した（項目31）
+3. アクアライン専用の境界分割ロジック（`trySplitNexcoSectionByBoundaryCategory`）との併用を試みたが、区間境界ICの二重判定による回帰（区間の行き来）が発生したため、専用ロジックの呼び出しを完全に撤去し、新ロジックのみに一本化した（項目31）
+4. 想定道路の表示ラベルが、複数のIC_MASTERエリアにまたがる区間で単一ラベルしか表示できない問題を修正し、「圏央道 → 館山道」のように通過順に連結表示できるようにした
+5. `targetAreaKey`をエリアごとに指定する設計から、「区間内の候補ICに`sourceAreaKey`が定義されているもの（＝首都高以外）が1件でもあれば発動する」という汎用条件に置き換え、keiyo・aqualineに限らず、joban・chuo・tomei・kanetsu・joshinetsu・tohoku・keno・kitakanto・tateyama・gaikan・tokan・hodogayaBypass・odawaraAtsugi等、残り全エリアを一括で対象にした（項目32）
+
+**実車確認結果**：joban（常磐道）・chuo（中央道）・keno（圏央道）・kanetsu（関越道）・joshinetsu（上信越道）・tomei（東名）・odawaraAtsugi（小田原厚木道路）・gaikan（外環）・tateyama（館山道）が絡む複数ルートで、いずれも追加の個別対応なしに正しく区間分割・料金計算・表示ラベル生成が機能することを確認した。keiyo・aqualine単体ルートでも、これまでの結果から変化が無いことを確認済み（回帰なし）。
+
+**現在の構成**：
+
+```
+tollSections（TOLL TAGタグ方式で検出）
+  → applyIcCategorySplitsToTollSections（IC境界ベースの汎用カテゴリ判定）
+  → applyTailFallbackToTollSections（末尾フォールバック）
+```
+
+`classifyStepsByRoadType`・`NAME_CHANGE`ガード・アクアライン専用ロジック（`trySplitNexcoSectionByBoundaryCategory`）は、CLAUDE.mdの「旧関数を安易に削除しない」方針に従い、コード上には残っているが、本番のメイン解析パス（`sampledPoints`あり）では実質的に使われなくなった。
+
+**既知の制約（今回許容した仕様）**：`estimateComparisonCandidateToll`（入口/出口比較の料金見積り、`sampledPoints`無しで`detectTollSectionsFromSteps`を呼ぶ経路）では、IC境界ベースの判定が必要とする`routeDistanceCandidateIcs`が計算されないため、この経路では区間分割が機能しない。入口/出口比較機能は今後作り直す予定であり、現時点でこの経路の精度改善は優先度を下げる方針で合意している。
+
+**今後の残タスク**：
+
+- IC_MASTER全体の`sourceAreaKey`整合性の確認（今回aqualineで見つかった袖ケ浦ICのような誤登録が、他エリアにも無いか）はまだ全面的には行っていない。実車確認で不自然な区間分割・ラベル表示に気づいた場合は、同様の誤登録を疑う
+- `estimateComparisonCandidateToll`経路（入口/出口比較）へのIC境界ベース判定の適用は、当該機能の作り直しと合わせて将来的に検討する
+- IC_MASTER未検証の残り約190件（既知の保留事項、Phase 3・スマートIC30件等）、kitakantoエリアの座標確信度が低い箇所、東水戸道路の未登録等、以前から記録されている個別のデータ整備タスクは、本件とは独立して引き続き残っている
+
+---
+
 ## 最近の手動確認例
 
 ### 荒川区役所 → 東京ディズニーランド

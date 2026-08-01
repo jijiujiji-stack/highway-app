@@ -1627,52 +1627,29 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
     });
     console.groupEnd();
 
-    // 【既知の保留事項22・段階移行の試験導入（keiyoエリア限定）、
-    // 2026-07-30実装】テキストキーワード判定（classifyStepsByRoadType）
-    // だけでは首都高→NEXCOの初回遷移を検出できないルートがあることが
-    // 既知の保留事項22の実車確認で判明したため、まずkeiyoエリア
-    // （京葉道路）に限定し、Step1〜7（IC境界ベースの新パイプライン、
-    // 既知の保留事項23）による区間内カテゴリ再判定を試験導入する。
-    // 区間内にkeiyoエリアのICが1件も検出されない場合は何もしないため、
-    // keiyo以外のエリアの挙動（classifyStepsByRoadType・NAME_CHANGEガード）
-    // は変更しない。
-    const tollSectionsWithKeiyoSplits =
-        applyAreaCategorySplitsToTollSections(
+    // 【既知の保留事項22・28〜31の集大成、2026-08-01全エリア汎用化】
+    // テキストキーワード判定（classifyStepsByRoadType）だけでは首都高→
+    // NEXCOの初回遷移を検出できないルートがあることが既知の保留事項22の
+    // 実車確認で判明し、Step1〜7（IC境界ベースの新パイプライン、既知の
+    // 保留事項23）による区間内カテゴリ再判定を導入した。当初はkeiyoエリア
+    // 限定（2026-07-30実装）→aqualineエリアにも適用（既知の保留事項30・
+    // 31）と、targetAreaKeyを1つずつ指定してエリアごとに呼び出しを重ねる
+    // 構成だったが、trySplitTollSectionByIcCategory側の判定条件を
+    // 「sourceAreaKeyが定義されているIC（＝SHUTO_IC_MASTER以外の、何らか
+    // のNEXCO系エリアに属するIC）が区間内に1件でもあるか」という汎用条件に
+    // 変更したことで、targetAreaKeyの指定自体が不要になり、keiyo・
+    // aqualineを含む全エリア（joban・chuo・tomei・kanetsu・joshinetsu・
+    // tohoku・keno・kitakanto・tateyama・gaikan・tokan等）を1回の呼び出し
+    // でまとめて処理できるようになった。区間内にIC_MASTER由来の候補ICが
+    // 1件も検出されない場合は何もしないため、影響が及ぶのはNEXCO系ICが
+    // 絡む区間のみであり、classifyStepsByRoadType・NAME_CHANGEガード等の
+    // テキストキーワード判定側のロジックは変更していない（削除もしていない）。
+    const tollSectionsWithIcCategorySplits =
+        applyIcCategorySplitsToTollSections(
             tollSections,
             routeDistanceCandidateIcs,
             sampledPoints,
-            cumulativeDistances,
-            "keiyo"
-        );
-
-    // 【既知の保留事項30・31対応・2026-08-01本番切り替え】アクアライン専用の
-    // 境界ICベース分割（trySplitNexcoSectionByBoundaryCategory、
-    // applyBoundaryCategorySplitsToTollSections）の呼び出しは外し、keiyoと
-    // 同じ汎用ロジック（trySplitTollSectionByIcCategoryForArea、
-    // applyAreaCategorySplitsToTollSections経由）のみでaqualineも判定する。
-    // 【専用ロジックとの併用をやめた理由・保留事項31で発見した回帰】
-    // 一時的に専用ロジックを先に適用し、その後に汎用ロジックを重ねる構成を
-    // 試したが、実車確認（荒川区役所→鴨川シーワールド）で、木更津金田IC・
-    // 袖ケ浦ICを行き来する不自然な区間分割とETC概算の増加（2,590円→
-    // 3,860円）が発生した。原因は、専用ロジックが分割した後続区間
-    // （木更津金田IC〜君津IC、tollCategoryId:"nexco"）の候補IC範囲判定に、
-    // 区間境界そのものである木更津金田IC自身（sourceAreaKeyはaqualineの
-    // まま）が含まれてしまい、境界IC1件だけカテゴリが異なると判定されて
-    // 汎用ロジックが意図しない再分割を行ったため。専用ロジックの呼び出しを
-    // 完全に外すことでこの二重適用が起きなくなり、解消した。
-    // 【許容する仕様変更】estimateComparisonCandidateToll等、sampledPoints
-    // を渡さずdetectTollSectionsFromStepsを呼ぶ経路（routeDistanceCandidateIcs
-    // が常にnullになる）では、汎用ロジックが何もせず素通りするため、
-    // アクアライン境界分割が機能しなくなる。これは、keiyoが元々専用ロジック
-    // を持たず同じ経路で分割されなかったのと同じ制約として許容する
-    // （合意済み）。
-    const tollSectionsWithAreaCategorySplits =
-        applyAreaCategorySplitsToTollSections(
-            tollSectionsWithKeiyoSplits,
-            routeDistanceCandidateIcs,
-            sampledPoints,
-            cumulativeDistances,
-            "aqualine"
+            cumulativeDistances
         );
 
     // 【tollSection境界の末尾フォールバック・既知の保留事項27・28対応】
@@ -1682,7 +1659,7 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
     // した、別の後処理として最後に実行する。
     const tollSectionsWithTailFallback =
         applyTailFallbackToTollSections(
-            tollSectionsWithAreaCategorySplits,
+            tollSectionsWithIcCategorySplits,
             sampledPoints,
             cumulativeDistances,
             routeDistanceCandidateIcs
@@ -2211,14 +2188,13 @@ function resolveRouteDistanceForLatLng(
     return withRouteDistance.routeDistanceMeters;
 }
 
-// 【既知の保留事項22・段階移行の試験導入（keiyoエリア限定）、2026-07-30
-// 実装】1つのtollSection（TOLL TAGテキスト判定＋境界IC区間再分割まで
-// 完了した後の区間）について、その区間の道のり距離範囲
-// （entranceLatLng〜exitLatLngをresolveRouteDistanceForLatLngで道のり
-// 距離に変換した範囲）内にある、Step1〜7で検出済みの走行順IC一覧
-// （routeDistanceCandidateIcs）を取り出し、resolveIcTollCategoryId
-// （IC_MASTER登録情報のみで完結する、テキストを一切見ない判定）で
-// IC単位のカテゴリを再判定する。
+// 【既知の保留事項22・28〜31の集大成、2026-08-01全エリア汎用化】
+// 1つのtollSection（TOLL TAGテキスト判定＋境界IC区間再分割まで完了した
+// 後の区間）について、その区間の道のり距離範囲（entranceLatLng〜
+// exitLatLngをresolveRouteDistanceForLatLngで道のり距離に変換した範囲）
+// 内にある、Step1〜7で検出済みの走行順IC一覧（routeDistanceCandidateIcs）
+// を取り出し、resolveIcTollCategoryId（IC_MASTER登録情報のみで完結する、
+// テキストを一切見ない判定）でIC単位のカテゴリを再判定する。
 //
 // テキストキーワード判定（classifyStepsByRoadType・nexcoRouteLabel
 // Keywords・NAME_CHANGEガード）は、Googleの実際の案内テキストとほぼ
@@ -2226,9 +2202,18 @@ function resolveRouteDistanceForLatLng(
 // ことが既知の保留事項22で判明している。この関数は、その限界を
 // IC_MASTER登録情報ベースの判定で補うためのもの。
 //
-// 【他エリアへの影響を避けるための限定】区間内の候補ICに、targetAreaKey
-// （今回は"keiyo"固定）のICが1件も含まれない場合は、他エリアの判定に
-// 一切影響を与えないよう、何もせず元のsectionをそのまま返す。
+// 【経緯・2026-08-01改訂】当初はkeiyoエリア限定（既知の保留事項22・
+// 2026-07-30実装）、続いてaqualineエリアにも適用（既知の保留事項30・31、
+// targetAreaKeyを1つずつ指定する設計）していたが、joban・chuo・tomei等
+// 残り全エリアに同じ仕組みを広げるにあたり、エリアの数だけ呼び出しを
+// 追加し続ける必要が無いことに気づいた。resolveIcTollCategoryIdは
+// shuto・aqualine以外の全sourceAreaKeyを一律nexcoに丸めるため、
+// 「区間内の候補ICにsourceAreaKeyが定義されているもの（＝SHUTO_IC_MASTER
+// 由来ではなく、何らかのNEXCO系エリアに属するIC）が1件でもあれば発動する」
+// という汎用条件に置き換えることで、targetAreaKeyの指定自体が不要になり、
+// keiyo・aqualineを含む全エリアを1回の呼び出しでまとめて処理できる。
+// カテゴリのグルーピング（resolveIcTollCategoryIdによる分類、
+// categoryGroupsの組み立て）自体は変更していない。
 //
 // カテゴリの切り替わり境界は、切り替わり前後の候補IC同士の道のり距離の
 // 中点とする（analyzeHighwayRoutePolyline内のroadSwitches算出で既に
@@ -2247,12 +2232,11 @@ function resolveRouteDistanceForLatLng(
 // TollSectionsを実行しても、生成したサブ区間はentranceIc/exitIcが
 // 両方解決済みのため素通りするだけで、二重にフォールバックが走ることは
 // ない。
-function trySplitTollSectionByIcCategoryForArea(
+function trySplitTollSectionByIcCategory(
     section,
     routeDistanceCandidateIcs,
     sampledPoints,
-    cumulativeDistances,
-    targetAreaKey
+    cumulativeDistances
 ) {
     if (
         !Array.isArray(routeDistanceCandidateIcs) ||
@@ -2293,23 +2277,28 @@ function trySplitTollSectionByIcCategoryForArea(
                 a.routeDistanceMeters - b.routeDistanceMeters
             );
 
-    // 【DEBUG-KEIYOGATE調査・修正】sourceAreaKeys（複数形）は
-    // SHUTO_IC_MASTER側で「入口候補としてどのNEXCO方面への経路として
-    // 有効か」という別目的のヒント値であり、そのIC自身の所属エリアでは
-    // ない（堤通等、複数のNEXCO方面をsourceAreaKeysに持つ首都高ICが
-    // 該当）。誤ってこちらにフォールバックしていたため、keiyoが絡まない
-    // ルートでも堤通等が候補に入るとゲートが誤って発動していた。
-    // sourceAreaKey（単数形、IC_MASTER側の各ICに割り当てられる本来の
-    // 所属エリア）のみで判定する。
-    const isTargetAreaIc = ic =>
-        ic?.sourceAreaKey === targetAreaKey;
+    // 【DEBUG-KEIYOGATE調査・修正、2026-08-01全エリア汎用化で条件変更】
+    // sourceAreaKeys（複数形）はSHUTO_IC_MASTER側で「入口候補として
+    // どのNEXCO方面への経路として有効か」という別目的のヒント値であり、
+    // そのIC自身の所属エリアではない（堤通等、複数のNEXCO方面を
+    // sourceAreaKeysに持つ首都高ICが該当）。誤ってこちらにフォール
+    // バックすると、NEXCO系ICが1件も絡まないルートでも堤通等が候補に
+    // 入っただけでゲートが誤って発動してしまうため、sourceAreaKey
+    // （単数形、IC_MASTER側の各ICに割り当てられる本来の所属エリア）の
+    // 有無だけで判定する。SHUTO_IC_MASTER由来のICはsourceAreaKeyが
+    // 常にundefinedのため、この条件は実質的に「区間内にIC_MASTER
+    // （NEXCO系・aqualine含む）由来の候補ICが1件でもあるか」と同じ意味に
+    // なる。特定のエリア名との一致判定ではないため、keiyo・aqualineに
+    // 限らず、joban・chuo・tomei等どのエリアにも同じ条件でそのまま働く。
+    const isNexcoAreaIc = ic =>
+        ic?.sourceAreaKey !== undefined;
 
-    const hasTargetAreaCandidate =
+    const hasNexcoAreaCandidate =
         candidatesInRange.some(candidate =>
-            isTargetAreaIc(candidate.ic)
+            isNexcoAreaIc(candidate.ic)
         );
 
-    if (!hasTargetAreaCandidate) {
+    if (!hasNexcoAreaCandidate) {
         return [section];
     }
 
@@ -2414,16 +2403,17 @@ function trySplitTollSectionByIcCategoryForArea(
     });
 }
 
-// 【既知の保留事項22・段階移行の試験導入（keiyoエリア限定）】区間配列に
-// 対して順番にtrySplitTollSectionByIcCategoryForAreaを適用する。
-// applyBoundaryCategorySplitsToTollSections（アクアライン境界分割）と
+// 【既知の保留事項22・28〜31の集大成、2026-08-01全エリア汎用化】区間
+// 配列に対して順番にtrySplitTollSectionByIcCategoryを適用する。
+// targetAreaKeyの指定は不要になったため、keiyo・aqualineに限らず全エリア
+// を対象に1回呼び出すだけでよい。applyBoundaryCategorySplitsToTollSections
+// （アクアライン境界分割、現在は呼び出し元から外れている専用ロジック）と
 // 同じ「1区間→複数区間」のflatMapパターンを踏襲している。
-function applyAreaCategorySplitsToTollSections(
+function applyIcCategorySplitsToTollSections(
     sections,
     routeDistanceCandidateIcs,
     sampledPoints,
-    cumulativeDistances,
-    targetAreaKey
+    cumulativeDistances
 ) {
     if (
         !Array.isArray(sections) ||
@@ -2434,12 +2424,11 @@ function applyAreaCategorySplitsToTollSections(
     }
 
     return sections.flatMap(section =>
-        trySplitTollSectionByIcCategoryForArea(
+        trySplitTollSectionByIcCategory(
             section,
             routeDistanceCandidateIcs,
             sampledPoints,
-            cumulativeDistances,
-            targetAreaKey
+            cumulativeDistances
         )
     );
 }
@@ -3709,7 +3698,7 @@ function resolveTollSectionNexcoRoadLabel(section) {
 }
 
 // 【想定道路の複数エリア対応】1つの"nexco"区間が、IC境界ベースの
-// カテゴリ分割（trySplitTollSectionByIcCategoryForArea等）により、
+// カテゴリ分割（trySplitTollSectionByIcCategory等）により、
 // 複数のIC_MASTERエリア（例：keno「圏央道方面」→tateyama「館山道方面」）
 // にまたがる場合、resolveTollSectionNexcoRoadLabel（entranceIc/exitIc
 // のどちらか一方だけを見る）では、区間の一部にしか該当しないラベル1つ

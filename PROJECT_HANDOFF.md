@@ -955,6 +955,16 @@ API呼び出し数への影響：
 
 ---
 
+### 32. IC境界ベースのカテゴリ判定を全エリアへ汎用化（既知の保留事項22・28〜31の集大成、2026-08-01実施）
+
+項目28（keiyo限定導入）・30・31（aqualineへの拡張）で、`targetAreaKey`を1つずつ指定してエリアごとに`applyAreaCategorySplitsToTollSections`を呼び出す設計だったため、残りの全エリア（joban・chuo・tomei・kanetsu・joshinetsu・tohoku・keno・kitakanto・tateyama・gaikan・tokan等）に同じ仕組みを広げるには、エリアの数だけ呼び出しを追加し続ける必要があった。
+
+**汎用化の要点**：`resolveIcTollCategoryId`は、`shuto`・`aqualine`以外の`sourceAreaKey`をすべて`nexco`という同じ料金カテゴリに丸める設計であり、また、SHUTO_IC_MASTER由来のICは`sourceAreaKey`が常に`undefined`、IC_MASTER由来のIC（NEXCO側、aqualineを含む）は`sourceAreaKey`に実際のエリア名が入る。この性質を利用し、`trySplitTollSectionByIcCategoryForArea`内の判定条件（`isTargetAreaIc`：特定の`targetAreaKey`との一致）を、「区間内の候補ICに`sourceAreaKey`が定義されているもの（＝SHUTO_IC_MASTER以外の、何らかのNEXCO系エリアに属するIC）が1件でもあるか」という汎用条件（`isNexcoAreaIc`）に置き換えた。これにより`targetAreaKey`引数自体が不要になったため、関数名を`trySplitTollSectionByIcCategory`・`applyIcCategorySplitsToTollSections`にリネームし、`detectTollSectionsFromSteps`内の呼び出しも、keiyo・aqualine個別の2回呼び出しから、エリア指定なしの1回の呼び出しにまとめた。カテゴリのグルーピング（`resolveIcTollCategoryId`による分類、`categoryGroups`の組み立て）自体は変更していない。
+
+**影響**：keiyo・aqualineは従来通り機能する一方、joban（常磐道）等、これまでこの仕組みが及んでいなかった残りの全エリアにも、既知の保留事項22の恩恵（テキストキーワード判定だけでは検出できない首都高→NEXCOの遷移を、IC境界ベースで補う）が及ぶようになった。`classifyStepsByRoadType`・`NAME_CHANGE`ガード等のテキストキーワード判定側のロジックは変更・削除していない（区間内にIC_MASTER由来の候補ICが検出されないルートでは、引き続きテキスト判定の結果がそのまま使われる）。
+
+---
+
 ## 最近の手動確認例
 
 ### 荒川区役所 → 東京ディズニーランド

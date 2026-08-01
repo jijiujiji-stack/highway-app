@@ -937,6 +937,24 @@ API呼び出し数への影響：
 
 ---
 
+### 31. アクアライン境界ズレの解消（袖ケ浦ICのエリア移動）を実車確認、汎用ロジックへ本番切り替え（2026-08-01実施）
+
+項目30で発見した、アクアライン→NEXCOの境界位置のズレ（既存の専用ロジックは木更津金田IC、新方式（汎用ロジック）は袖ケ浦IC〜木更津JCT付近で境界を引いていた食い違い）について、原因調査・修正・実車確認まで完了した。
+
+**原因**：東京湾アクアラインの正式区間定義は、川崎浮島JCT - 木更津金田IC間が「東京湾アクアライン」（固定/割引料金）、木更津金田IC - 木更津JCT間が「東京湾アクアライン連絡道」（木更津金田ICの本線料金所で精算後、通常のNEXCO距離料金区間）である。IC_MASTERの`aqualine`エリアに、連絡道区間にある袖ケ浦IC（googleName:「東京湾アクアライン連絡道 袖ケ浦インターチェンジ」）が誤って登録されていたことが原因だった。
+
+**対応**：袖ケ浦ICの登録を、IC_MASTERの`aqualine`エリアから`keno`エリアへ移動した（order/branchOrderは、移動先での既存IC（相模原愛川IC、order:4）との衝突を避けるため、木更津東IC（order:44）と木更津JCT（order:45）の間の44.5に変更）。
+
+**実車確認結果**（荒川区役所→鴨川シーワールド、荒川区役所→館山、往復含む）：`[DEBUG-AQUALINE-NEWPIPELINE調査・一時的]`ログで、既存の専用ロジック（`trySplitNexcoSectionByBoundaryCategory`）と新方式（`trySplitTollSectionByIcCategoryForArea`、`targetAreaKey: "aqualine"`）の区間分割結果が完全に一致することを確認した（区間数3・各区間のtollCategoryId/entranceIc/exitIc/距離が一致）。浮島JCTのループ構造による道のり距離の重複・混同も発生していないことを確認済み（項目30参照）。
+
+**本番切り替え**：上記の検証結果を受け、今回`detectTollSectionsFromSteps`内で、keiyoで既に本番接続済みの汎用ロジック（`applyAreaCategorySplitsToTollSections`、`targetAreaKey: "aqualine"`）をaqualineにも適用するようにした。
+
+**専用ロジックとの併用を試みたが回帰が発生（2026-08-01発見・当日中に修正）**：当初、`estimateComparisonCandidateToll`（`sampledPoints`無しで`detectTollSectionsFromSteps`を呼ぶため、汎用ロジックが必要とする`routeDistanceCandidateIcs`が常に`null`になる）でもアクアライン境界分割が機能し続けるよう、専用ロジック（`trySplitNexcoSectionByBoundaryCategory`）を安全網として残し、`専用ロジック→汎用ロジック（keiyo）→汎用ロジック（aqualine）`の順に両方適用する構成を試した。しかし実車確認（荒川区役所→鴨川シーワールド）で、木更津金田IC・袖ケ浦ICを行き来する不自然な区間分割とETC概算の増加（2,590円→3,860円）が発生した。原因は、専用ロジックが分割した後続区間（木更津金田IC〜君津IC、`tollCategoryId:"nexco"`）の候補IC範囲判定に、区間境界そのものである木更津金田IC自身（`sourceAreaKey`は`aqualine`のまま）が含まれてしまい、境界IC1件だけカテゴリが異なると判定されて汎用ロジックが意図しない再分割を行ったため。
+
+**最終対応**：専用ロジック（`applyBoundaryCategorySplitsToTollSections`）の呼び出しを完全に外し、汎用ロジックのみで`keiyo`・`aqualine`両方を判定する構成（`tollSections → 汎用ロジック（keiyo）→ 汎用ロジック（aqualine）→ 末尾フォールバック`）に統一した。これにより二重適用による境界IC混入は解消したが、`estimateComparisonCandidateToll`経由（`sampledPoints`無し）の料金計算パスでは、keiyo・aqualineともに境界分割が機能しなくなる（`routeDistanceCandidateIcs`が`null`のため汎用ロジックが素通りする）。これは、keiyoが元々専用ロジックを持たず同じ制約を受け入れていたのと同等の仕様として、今回aqualineにも適用することで合意し、許容した。専用ロジックの関数自体（`trySplitNexcoSectionByBoundaryCategory`・`applyBoundaryCategorySplitsToTollSections`）は、CLAUDE.mdの「旧関数を安易に削除しない」方針に従い、呼び出し元からのみ外し、コード上には残している。他のエリア（chuo・tomei・joban等）は引き続き`classifyStepsByRoadType`による従来の判定のまま。
+
+---
+
 ## 最近の手動確認例
 
 ### 荒川区役所 → 東京ディズニーランド

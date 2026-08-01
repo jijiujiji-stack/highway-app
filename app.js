@@ -1604,23 +1604,17 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
             };
         });
 
-    // 【IC境界ベース区間再分割・Step 3】組み立てが完了した区間配列
-    // （tollSections、判定ロジック自体は変更していない）に対して、
-    // 境界ICベースの再分割（アクアライン等）を適用してから返す。
-    const tollSectionsWithBoundarySplits =
-        applyBoundaryCategorySplitsToTollSections(tollSections);
-
     // 【DEBUG-KITAKANTO-TAILFALLBACK調査・一時的】大洗海岸→伊香保温泉
     // ルートで「NEXCO入口：栃木IC」という、本来の入口（水戸南IC付近）から
     // 大きく離れたフォールバック結果が採用される原因を調査するための
-    // 一時ログ。末尾フォールバック適用前のtollSectionsを区間ごとに出力
+    // 一時ログ。区間カテゴリ再分割適用前のtollSectionsを区間ごとに出力
     // するだけで、判定ロジック・戻り値には一切影響しない。調査完了後、
     // このブロックごと削除すること。
     console.group(
         "[DEBUG-KITAKANTO-TAILFALLBACK調査・一時的] " +
             "フォールバック適用前のtollSections"
     );
-    tollSectionsWithBoundarySplits.forEach((section, index) => {
+    tollSections.forEach((section, index) => {
         console.log(
             "区間", index,
             "／道路カテゴリ:", section.tollCategoryId,
@@ -1640,15 +1634,45 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
     // （京葉道路）に限定し、Step1〜7（IC境界ベースの新パイプライン、
     // 既知の保留事項23）による区間内カテゴリ再判定を試験導入する。
     // 区間内にkeiyoエリアのICが1件も検出されない場合は何もしないため、
-    // keiyo以外のエリアの挙動（classifyStepsByRoadType・NAME_CHANGEガード・
-    // trySplitNexcoSectionByBoundaryCategoryによる従来の判定）は変更しない。
-    const tollSectionsWithAreaCategorySplits =
+    // keiyo以外のエリアの挙動（classifyStepsByRoadType・NAME_CHANGEガード）
+    // は変更しない。
+    const tollSectionsWithKeiyoSplits =
         applyAreaCategorySplitsToTollSections(
-            tollSectionsWithBoundarySplits,
+            tollSections,
             routeDistanceCandidateIcs,
             sampledPoints,
             cumulativeDistances,
             "keiyo"
+        );
+
+    // 【既知の保留事項30・31対応・2026-08-01本番切り替え】アクアライン専用の
+    // 境界ICベース分割（trySplitNexcoSectionByBoundaryCategory、
+    // applyBoundaryCategorySplitsToTollSections）の呼び出しは外し、keiyoと
+    // 同じ汎用ロジック（trySplitTollSectionByIcCategoryForArea、
+    // applyAreaCategorySplitsToTollSections経由）のみでaqualineも判定する。
+    // 【専用ロジックとの併用をやめた理由・保留事項31で発見した回帰】
+    // 一時的に専用ロジックを先に適用し、その後に汎用ロジックを重ねる構成を
+    // 試したが、実車確認（荒川区役所→鴨川シーワールド）で、木更津金田IC・
+    // 袖ケ浦ICを行き来する不自然な区間分割とETC概算の増加（2,590円→
+    // 3,860円）が発生した。原因は、専用ロジックが分割した後続区間
+    // （木更津金田IC〜君津IC、tollCategoryId:"nexco"）の候補IC範囲判定に、
+    // 区間境界そのものである木更津金田IC自身（sourceAreaKeyはaqualineの
+    // まま）が含まれてしまい、境界IC1件だけカテゴリが異なると判定されて
+    // 汎用ロジックが意図しない再分割を行ったため。専用ロジックの呼び出しを
+    // 完全に外すことでこの二重適用が起きなくなり、解消した。
+    // 【許容する仕様変更】estimateComparisonCandidateToll等、sampledPoints
+    // を渡さずdetectTollSectionsFromStepsを呼ぶ経路（routeDistanceCandidateIcs
+    // が常にnullになる）では、汎用ロジックが何もせず素通りするため、
+    // アクアライン境界分割が機能しなくなる。これは、keiyoが元々専用ロジック
+    // を持たず同じ経路で分割されなかったのと同じ制約として許容する
+    // （合意済み）。
+    const tollSectionsWithAreaCategorySplits =
+        applyAreaCategorySplitsToTollSections(
+            tollSectionsWithKeiyoSplits,
+            routeDistanceCandidateIcs,
+            sampledPoints,
+            cumulativeDistances,
+            "aqualine"
         );
 
     // 【tollSection境界の末尾フォールバック・既知の保留事項27・28対応】
@@ -3684,13 +3708,90 @@ function resolveTollSectionNexcoRoadLabel(section) {
         : "NEXCO";
 }
 
+// 【想定道路の複数エリア対応】1つの"nexco"区間が、IC境界ベースの
+// カテゴリ分割（trySplitTollSectionByIcCategoryForArea等）により、
+// 複数のIC_MASTERエリア（例：keno「圏央道方面」→tateyama「館山道方面」）
+// にまたがる場合、resolveTollSectionNexcoRoadLabel（entranceIc/exitIc
+// のどちらか一方だけを見る）では、区間の一部にしか該当しないラベル1つ
+// しか返せない。ここでは、区間の道のり距離範囲（entranceLatLng〜
+// exitLatLng）内にあるroute DistanceCandidateIcsを、既存の
+// buildRoadCategorySequenceFromOrderedIcs・resolveIcCategoryLabel
+// （診断ログ「新方式想定道路順」で使われているエリアlabel粒度の仕組み、
+// 判定ロジック自体は変更していない）にそのまま渡し、区間内で実際に
+// 通過するエリアラベルを、連続する同じラベルをまとめた上で出現順の
+// 配列として返す。routeDistanceCandidateIcs/sampledPoints/
+// cumulativeDistancesが利用できない呼び出し元（引数省略時）や、範囲内に
+// 候補ICが1件も見つからない場合は、従来通りresolveTollSectionNexco
+// RoadLabel（entranceIc/exitIc優先の単一ラベル判定）1件だけの配列に
+// フォールバックする。tollCategoryId・料金計算には一切関与しない。
+function resolveTollSectionNexcoRoadLabelSequence(
+    section,
+    routeDistanceCandidateIcs = null,
+    sampledPoints = null,
+    cumulativeDistances = null
+) {
+    if (
+        Array.isArray(routeDistanceCandidateIcs) &&
+        routeDistanceCandidateIcs.length > 0 &&
+        Array.isArray(sampledPoints) &&
+        Array.isArray(cumulativeDistances)
+    ) {
+        const entranceRouteDistanceMeters =
+            resolveRouteDistanceForLatLng(
+                section.entranceLatLng,
+                sampledPoints,
+                cumulativeDistances
+            );
+        const exitRouteDistanceMeters =
+            resolveRouteDistanceForLatLng(
+                section.exitLatLng,
+                sampledPoints,
+                cumulativeDistances
+            );
+
+        if (
+            entranceRouteDistanceMeters !== null &&
+            exitRouteDistanceMeters !== null
+        ) {
+            const candidatesInRange =
+                routeDistanceCandidateIcs
+                    .filter(candidate =>
+                        candidate.routeDistanceMeters >=
+                            entranceRouteDistanceMeters &&
+                        candidate.routeDistanceMeters <=
+                            exitRouteDistanceMeters
+                    )
+                    .sort((a, b) =>
+                        a.routeDistanceMeters - b.routeDistanceMeters
+                    );
+
+            const labelSequence =
+                buildRoadCategorySequenceFromOrderedIcs(
+                    candidatesInRange
+                ).map(item => item.label);
+
+            if (labelSequence.length > 0) {
+                return labelSequence;
+            }
+        }
+    }
+
+    return [resolveTollSectionNexcoRoadLabel(section)];
+}
+
 // 区間の道路名ラベルを決定する。tollCategoryId（Step Bで追加）が
 // "shuto"でも汎用"nexco"でもない個別カテゴリ（例："aqualine"）の場合は、
 // TOLL_ROAD_CATEGORY_RULESのlabel（「アクアライン」）を優先する。
-// それ以外（汎用NEXCO＝東名・中央道等）は、既存のresolveTollSection
-// NexcoRoadLabel（IC経由の実際の道路名解決）をそのまま使う。
-// resolveTollSectionNexcoRoadLabel本体は変更していない。
-function resolveTollSectionRoadLabel(section) {
+// それ以外（汎用NEXCO＝東名・中央道等）は、resolveTollSectionNexcoRoad
+// LabelSequenceが返すエリアラベル列を" → "で連結する。routeDistance
+// CandidateIcs等を渡さない呼び出し元では、従来と同じ単一ラベルが
+// そのまま返る（resolveTollSectionNexcoRoadLabel本体は変更していない）。
+function resolveTollSectionRoadLabel(
+    section,
+    routeDistanceCandidateIcs = null,
+    sampledPoints = null,
+    cumulativeDistances = null
+) {
     if (section.isShutoSection) {
         return "首都高";
     }
@@ -3709,7 +3810,12 @@ function resolveTollSectionRoadLabel(section) {
         }
     }
 
-    return resolveTollSectionNexcoRoadLabel(section);
+    return resolveTollSectionNexcoRoadLabelSequence(
+        section,
+        routeDistanceCandidateIcs,
+        sampledPoints,
+        cumulativeDistances
+    ).join(" → ");
 }
 
 // buildAssumedRouteHtml用：TOLL TAG方式（tollSections）から表示HTMLを
@@ -3731,7 +3837,12 @@ function resolveTollSectionRoadLabel(section) {
 // 避け、直前の区間の末尾IC名にこの注記を付け足すだけにする。
 const TAIL_FALLBACK_NOTE_HTML = "（ここで降車）";
 
-function buildAssumedRouteHtmlFromTollSections(tollSections) {
+function buildAssumedRouteHtmlFromTollSections(
+    tollSections,
+    routeDistanceCandidateIcs = null,
+    sampledPoints = null,
+    cumulativeDistances = null
+) {
     const pieces = [];
 
     (tollSections || []).forEach(section => {
@@ -3766,7 +3877,12 @@ function buildAssumedRouteHtmlFromTollSections(tollSections) {
         }
 
         const pillLabel =
-            resolveTollSectionRoadLabel(section);
+            resolveTollSectionRoadLabel(
+                section,
+                routeDistanceCandidateIcs,
+                sampledPoints,
+                cumulativeDistances
+            );
 
         const entranceText =
             section.entranceIc
@@ -3818,7 +3934,10 @@ function buildAssumedRouteHtml(polylineAnalysis) {
     // コード自体は削除せず、以下にそのまま残している。
     if (polylineAnalysis.hasTollSectionStepsData === true) {
         return buildAssumedRouteHtmlFromTollSections(
-            polylineAnalysis.tollSections
+            polylineAnalysis.tollSections,
+            polylineAnalysis.routeDistanceCandidateIcs,
+            polylineAnalysis.sampledPoints,
+            polylineAnalysis.cumulativeDistances
         );
     }
 
@@ -7872,6 +7991,19 @@ const IC_MASTER = {
                 note: "【2026-07-18調査・座標修正】MapFan「木更津東ＩＣ（圏央道（千葉区間））【入口】」座標を採用（旧座標との誤差約60m、今回検証10件中最小）。フルIC/ハーフIC判定は断定できず不明。出口個別座標は未取得のため入口座標をフォールバック使用。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
             {
+                order: 44.5,
+                displayName: "袖ケ浦IC",
+                googleName: "東京湾アクアライン連絡道 袖ケ浦インターチェンジ",
+                lat: 35.413996,
+                lng: 139.953819,
+                connection: true,
+                connectedRoads: ["aqualine", "tateyama"],
+                routeBranch: "aqualine",
+                branchOrder: 44.5,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 35.4139093, entranceLng: 139.9538054, exitLat: 35.4140821, exitLng: 139.9538333,
+                note: "MapFanで「袖ヶ浦ＩＣ（東京湾アクアライン連絡道）」の入口（上り・下り）・出口（上り・下り）の4個別ページ全てを確認し、上下線とも入口・出口が利用可能なフルICと判断（NEXCO東日本プレスリリース「上り線 出口ランプ夜間閉鎖」でも運用実態を確認）。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(35.4139093,139.9538054)、exitLat/Lngを出口(下り)(35.4140821,139.9538333)に設定。従来座標(35.418,139.980)から約2.4km修正。【2026-07-25追記・tateyama側複製削除】tateyama側にあった同一施設の重複コピー（order:-1）を削除した。通常検索の主要フロー（TOLL TAG方式のIC境界名解決・料金計算・表示）は`dedupeIcDefinitionsByIdentity`のgoogleNameパターン判定によりaqualine側1件のみで機能しており、重複は入口比較・出口比較専用の候補選定（`appendAreasContainingIc`のフォールバック等）にのみ影響することを確認済み。判断基準の詳細はDEVELOPMENT_CONTEXT.md「重複IC登録の削除可否判断基準」参照。connection/connectedRoadsフィールドは、他エリアが物理的に接続していた履歴情報としてそのまま残している。【2026-08-01追記・aqualineエリアからkenoエリアへ移動】既知の保留事項30（アクアライン汎用ロジック統合の境界位置ズレ）の調査により、袖ケ浦ICは東京湾アクアライン連絡道（木更津金田ICの本線料金所で精算後、通常のNEXCO距離料金区間として扱われるべき区間）に位置し、sourceAreaKeyがaqualine（固定800円カテゴリ）のままでは`resolveIcTollCategoryId`が誤ってaqualine区間として判定してしまうことが判明したため、IC_MASTERの登録エリアをaqualineからkenoへ変更した（直後に接続する木更津JCTが既にkenoエリアに登録されているため）。order/branchOrderは、aqualine側での値（4/3）のままではkenoエリア内の相模原愛川IC（order:4、west方面、神奈川県）と衝突し、`selectForwardComparisonIcCandidates`等の候補選定ロジック内のorderベースのフォールバック比較（routeBranchでフィルタされない経路）で意図しない候補混在を招く懸念があったため、木更津東IC（order:44）と木更津JCT（order:45）の間の44.5に変更した。routeBranch:\"aqualine\"・connection/connectedRoadsフィールドは、他エリアとの物理的な接続関係を示す情報としてそのまま維持している。緯度経度・googleName・entranceSelectable/exitSelectable等、上記以外のフィールドは変更していない。"
+            },
+            {
                 order: 45,
                 displayName: "木更津JCT",
                 googleName: "首都圏中央連絡自動車道 木更津ジャンクション",
@@ -8424,19 +8556,6 @@ const IC_MASTER = {
                 branchOrder: 2,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 35.4335959, entranceLng: 139.9216386, exitLat: 35.4335959, exitLng: 139.9216386,
                 note: "【確認不可・複雑につき変更保留】MapFan調査で、木更津金田ICには「木更津金田ＩＣ（東京湾アクアライン）」（入口(上り)+出口(下り)）と「木更津金田ＩＣ（東京湾アクアライン連絡道）」（出口(上り)+入口(下り)）という2つの別名称の施設が存在し、合わせると上下線とも入口・出口が利用可能であることを確認した。ただし本アプリのgoogleNameは「東京湾アクアライン 木更津金田インターチェンジ」（連絡道を含まない）であり、Google Routes APIが実際にどちらの施設・方向で経路を解決するか確認できなかったため、entranceSelectable/exitSelectableは変更せず現状維持（true/true）とした。座標はMapFan「木更津金田ＩＣ（東京湾アクアライン）【入口（上り）】」個別ページで確認(35.4335959,139.9216386)。従来座標(35.435,139.921)から約200m修正。次回、Google Maps上での実際の経路解決結果を確認したうえで再検証が必要。【2026-07-25追記・tateyama側複製削除】tateyama側にあった同一施設の重複コピー（order:-2）を削除した。通常検索の主要フロー（TOLL TAG方式のIC境界名解決・料金計算・表示）は`dedupeIcDefinitionsByIdentity`のgoogleNameパターン判定によりaqualine側1件のみで機能しており、重複は入口比較・出口比較専用の候補選定（`appendAreasContainingIc`のフォールバック等）にのみ影響することを確認済み。判断基準の詳細はDEVELOPMENT_CONTEXT.md「重複IC登録の削除可否判断基準」参照。connection/connectedRoadsフィールドは、他エリアが物理的に接続していた履歴情報としてそのまま残している。"
-            },
-            {
-                order: 4,
-                displayName: "袖ケ浦IC",
-                googleName: "東京湾アクアライン連絡道 袖ケ浦インターチェンジ",
-                lat: 35.413996,
-                lng: 139.953819,
-                connection: true,
-                connectedRoads: ["aqualine", "tateyama"],
-                routeBranch: "aqualine",
-                branchOrder: 3,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 35.4139093, entranceLng: 139.9538054, exitLat: 35.4140821, exitLng: 139.9538333,
-                note: "MapFanで「袖ヶ浦ＩＣ（東京湾アクアライン連絡道）」の入口（上り・下り）・出口（上り・下り）の4個別ページ全てを確認し、上下線とも入口・出口が利用可能なフルICと判断（NEXCO東日本プレスリリース「上り線 出口ランプ夜間閉鎖」でも運用実態を確認）。entranceSelectable/exitSelectableは変更なし（trueのまま）。座標はentranceLat/Lngを入口(上り)(35.4139093,139.9538054)、exitLat/Lngを出口(下り)(35.4140821,139.9538333)に設定。従来座標(35.418,139.980)から約2.4km修正。【2026-07-25追記・tateyama側複製削除】tateyama側にあった同一施設の重複コピー（order:-1）を削除した。通常検索の主要フロー（TOLL TAG方式のIC境界名解決・料金計算・表示）は`dedupeIcDefinitionsByIdentity`のgoogleNameパターン判定によりaqualine側1件のみで機能しており、重複は入口比較・出口比較専用の候補選定（`appendAreasContainingIc`のフォールバック等）にのみ影響することを確認済み。判断基準の詳細はDEVELOPMENT_CONTEXT.md「重複IC登録の削除可否判断基準」参照。connection/connectedRoadsフィールドは、他エリアが物理的に接続していた履歴情報としてそのまま残している。"
             }
         ]
     },
@@ -25027,7 +25146,14 @@ function buildPolylineComparisonSummaryHtml(
             ? [
                 ...new Set(
                     tollSections
-                        .map(resolveTollSectionRoadLabel)
+                        .map(section =>
+                            resolveTollSectionRoadLabel(
+                                section,
+                                polylineAnalysis.routeDistanceCandidateIcs,
+                                polylineAnalysis.sampledPoints,
+                                polylineAnalysis.cumulativeDistances
+                            )
+                        )
                         .filter(Boolean)
                 )
             ]

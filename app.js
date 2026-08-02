@@ -11287,7 +11287,8 @@ async function getHighwayRoute(
         );
 
         throw new Error(
-            "高速ルートが見つかりません：" +
+            "Googleから高速ルートの情報を取得できませんでした。\n" +
+            "目的地が車で行けない場所（山道・登山道等）である可能性があります。\n\n" +
             origin +
             " → " +
             destination
@@ -11453,7 +11454,8 @@ async function getLocalRoute(
         );
 
         throw new Error(
-            "下道ルートが見つかりません：" +
+            "Googleから下道ルートの情報を取得できませんでした。\n" +
+            "目的地が車で行けない場所（山道・登山道等）である可能性があります。\n\n" +
             origin +
             " → " +
             destination
@@ -12808,7 +12810,14 @@ async function searchFromCurrentLocation(
             "data-update-error"
         );
 
-
+        // shouldClosePanelは自動再検索（GPS移動等）ではfalseで呼ばれるため、
+        // ここでのalertは手動の「現在地から再検索」ボタン押下時のみに限定する。
+        if (shouldClosePanel) {
+            alert(
+                "ルート取得エラー\n\n" +
+                error.message
+            );
+        }
 
     }
 
@@ -12909,7 +12918,9 @@ async function getHighwayRouteFromGps(
         data.routes.length === 0
     ) {
         throw new Error(
-            "高速ルートが見つかりません：" +
+            "Googleから高速ルートの情報を取得できませんでした。\n" +
+            "目的地が車で行けない場所（山道・登山道等）である可能性があります。\n\n" +
+            "目的地：" +
             destination
         );
     }
@@ -13014,7 +13025,9 @@ async function getLocalRouteFromGps(
         data.routes.length === 0
     ) {
         throw new Error(
-            "GPS下道ルートが見つかりません：" +
+            "Googleから下道ルートの情報を取得できませんでした。\n" +
+            "目的地が車で行けない場所（山道・登山道等）である可能性があります。\n\n" +
+            "目的地：" +
             destination
         );
     }

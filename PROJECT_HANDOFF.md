@@ -1750,6 +1750,28 @@ CLAUDE.mdの「通常検索パイプライン統合プロジェクトにおけ�
 
 ---
 
+### 31. 「宇都宮IC（ここで降車）」誤表示の真の原因は末尾フォールバックではなく、テキストベースの区間事前分割が生む"退化区間"（2026-08-02調査）
+
+項目34〜37で、区間の**カテゴリID決定**（`tollCategoryId`）は座標ベースに置き換えたが、区間そのものを**どこで区切るか**（`entranceLatLng`/`exitLatLng`の決定、`splitRunByRoadType`が呼ぶ`classifyStepsByRoadType`のキーワードマッチ）は、依然としてGoogleの案内テキストに依存したままだったことが判明した。
+
+実車ログで確認したところ、「宇都宮IC（ここで降車）」は末尾フォールバック（`applyTailFallbackToTollSections`）の発動によるものではなかった（`entranceIcResolvedByTailFallback: false`・`exitIcResolvedByTailFallback: false`を確認済み）。実際の原因は以下の通り：
+
+- テキストベースの区間分割が決める境界座標が、宇都宮IC(JCT)の実際の物理座標から微妙にズレている
+- この境界の前後、それぞれ独立して「一番近い実在IC」で名前解決すると、両方とも同じ「宇都宮IC」に行き着く
+- 結果として、「浦和IC→宇都宮IC」の区間の直後に、「宇都宮IC→宇都宮IC」という中身のない退化区間（`isDegenerateFallbackSection: true`）が生成され、これがそのまま「ここで降車」として表示されている
+
+**次回の対応方針（合意済み・未着手）**：テキストキーワードによる区間の事前分割（`splitRunByRoadType`／`classifyStepsByRoadType`）自体をやめ、座標ベースの再分割（`trySplitTollSectionByIcCategory`）だけに区間分割を任せる。これにより、項目28で最初に掲げていた「Googleのテキストは有料/無料の境目検出のみに使う」という設計が、区間の分割位置についても完全に実現する。
+
+**注意点**：この変更は、首都高・アクアラインを含む、区間分割全体に影響する大きめの変更になる見込み。以下を事前に確認する必要がある。
+
+- `trySplitTollSectionByIcCategory`は、候補ICの`sourceAreaKey`の有無で分割要否を判定する設計だが、区間の一番最初（首都高からどこかのNEXCO系エリアへの最初の遷移）の検出に、テキストベースの事前分割が今も何らかの役割を果たしていないか
+- アクアライン（`aqualine`、既知の保留事項30・31で座標ベース化済み）・keiyo等、既に座標ベースで正しく動いているエリアに、今回の変更が悪影響を与えないか
+- shutoエリアの最初の検出（`TOLL_ROAD_CATEGORY_RULES`の`shuto`ルール、"首都高速"キーワード）が、区間の分割にどう関わっているか
+
+**前回の調査で追加した一時ログ**（`[DEBUG-UTSUNOMIYA調査・一時的]`、`splitRunByRoadType`・`detectIcsOrderedAlongPolyline`・`trySplitTollSectionByIcCategory`・`buildAssumedRouteHtmlFromTollSections`の4箇所）は、次回セッションでも引き続き参考になる可能性があるため、削除せず残っている。
+
+---
+
 ## GitHub Pages / デプロイ
 
 現在の運用：

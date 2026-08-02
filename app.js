@@ -1123,18 +1123,21 @@ function findNearestIcByRouteDistance(
     return buildUnmatchedResult(nearestRouteDistanceDiffMeters);
 }
 
-// 【区間事前分割のテキスト依存排除・事前検証用スイッチ、2026-08-03追加】
+// 【区間事前分割のテキスト依存排除・2026-08-03追加、2026-08-03本採用】
 // trueにすると、splitRunByRoadType（classifyStepsByRoadTypeによる
 // テキストキーワードベースのsubRun細分割）を素通りにし、tollSectionRun
 // （TOLL TAGの連続run）1件をそのまま1つのtollSubRunとして扱う。区間の
 // カテゴリ判定・分割は、IC境界ベースの座標判定（trySplitTollSectionBy
 // IcCategory、applyIcCategorySplitsToTollSections経由）だけに任せる形に
 // なる。既知の保留事項31（「宇都宮IC（ここで降車）」誤表示の真因調査）を
-// 踏まえた比較検証用のフラグであり、本採用の判断はまだしていない。
-// classifyStepsByRoadType・splitRunByRoadType自体の定義は削除せず、
-// この呼び出し元の分岐だけで挙動を切り替える。デフォルトはfalse
-// （現状維持＝テキスト分割あり）。
-const BYPASS_TEXT_BASED_ROAD_TYPE_SPLIT = false;
+// 踏まえて追加した比較検証用のフラグだったが、荒川区役所→日光東照宮
+// （退化区間解消を確認）・荒川区役所↔鴨川シーワールド（アクアライン、
+// 往復・異常なし）・荒川区役所→船橋駅（keiyo、ETC概算が既知の保留事項29
+// の実車確認結果と完全一致・回帰なし）の3ルートの実車確認により、本採用
+// 済み。classifyStepsByRoadType・splitRunByRoadType自体の定義は削除せず、
+// この呼び出し元の分岐だけで挙動を切り替える。デフォルトはtrue（IC境界
+// ベースの分割）。falseに戻すと、従来のテキストベース分割に戻せる。
+const BYPASS_TEXT_BASED_ROAD_TYPE_SPLIT = true;
 
 // 【sampledPoints統一・2026-07-22】第2引数sampledPointsは省略可能
 // （デフォルトnull）。analyzeHighwayRoutePolyline以外の既存呼び出し元

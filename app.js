@@ -1525,47 +1525,6 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
         run.steps.forEach((step, index) => {
             const category = categories[index];
 
-            // 【DEBUG-UTSUNOMIYA調査・一時的】classifyStepsByRoadType
-            // （テキストベース）が、subRun境界（＝tollSectionの
-            // entranceLatLng/exitLatLngの元になる座標）をどこで切って
-            // いるかを確認するための一時ログ。案内文に「宇都宮」または
-            // 「日光」を含むstepについてのみ、そのstepの座標・分類結果・
-            // 直前カテゴリとの異同を出力する。判定ロジックには一切影響
-            // しない。調査完了後、このブロックごと削除すること。
-            {
-                const instructionsText =
-                    String(
-                        step.navigationInstruction
-                            ?.instructions || ""
-                    );
-                if (
-                    instructionsText.includes("宇都宮") ||
-                    instructionsText.includes("日光")
-                ) {
-                    const startLl =
-                        extractLatLngFromRouteLocation(
-                            step.startLocation
-                        );
-                    const endLl =
-                        extractLatLngFromRouteLocation(
-                            step.endLocation
-                        );
-                    console.log(
-                        "[DEBUG-UTSUNOMIYA調査・一時的] step分類",
-                        "／index:", index,
-                        "／instructions:", instructionsText,
-                        "／maneuver:",
-                        step.navigationInstruction?.maneuver,
-                        "／分類カテゴリ:", category,
-                        "／直前カテゴリ:", currentCategory,
-                        "／境界になるか:",
-                        (!currentSubRun || category !== currentCategory),
-                        "／startLocation:", startLl,
-                        "／endLocation:", endLl
-                    );
-                }
-            }
-
             if (
                 !currentSubRun ||
                 category !== currentCategory
@@ -1795,43 +1754,6 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
             cumulativeDistances,
             routeDistanceCandidateIcs
         );
-
-    // 【DEBUG-SPLIT比較・一時的】BYPASS_TEXT_BASED_ROAD_TYPE_SPLITの
-    // true/false切り替えによる、tollSectionsの生成結果を比較するための
-    // 一時ログ。最終的なtollSections（末尾フォールバック適用後）の件数・
-    // 各区間のカテゴリ・入口/出口IC・距離・退化区間有無を出力するだけで、
-    // 判定ロジック・戻り値には一切影響しない。調査完了後、このブロック
-    // ごと削除すること。
-    console.group(
-        "[DEBUG-SPLIT比較・一時的] tollSections（BYPASS_TEXT_BASED_ROAD_" +
-            "TYPE_SPLIT=" + BYPASS_TEXT_BASED_ROAD_TYPE_SPLIT + "）"
-    );
-    console.log(
-        "区間数:", tollSectionsWithTailFallback.length
-    );
-    tollSectionsWithTailFallback.forEach((section, index) => {
-        const isDegenerate =
-            Boolean(section.entranceIc) &&
-            Boolean(section.exitIc) &&
-            buildIcDefinitionIdentity(section.entranceIc) ===
-                buildIcDefinitionIdentity(section.exitIc);
-
-        console.log(
-            "区間", index,
-            "／tollCategoryId:", section.tollCategoryId,
-            "／entranceIcName:", section.entranceIcName,
-            "／exitIcName:", section.exitIcName,
-            "／距離(km):",
-            (section.totalDistanceMeters / 1000).toFixed(1),
-            "／entranceIcResolvedByTailFallback:",
-            section.entranceIcResolvedByTailFallback,
-            "／exitIcResolvedByTailFallback:",
-            section.exitIcResolvedByTailFallback,
-            "／退化区間（IC不明の連結ではなく実際にentranceIc===exitIc):",
-            isDegenerate
-        );
-    });
-    console.groupEnd();
 
     return {
         // legs.steps自体が取得できているかどうか（trueなら、
@@ -2557,52 +2479,6 @@ function trySplitTollSectionByIcCategory(
             });
         }
     });
-
-    // 【DEBUG-UTSUNOMIYA調査・一時的】この区間の道のり距離範囲内に
-    // 宇都宮IC(JCT)またはnikkoUtsunomiyaエリアのICが含まれる場合のみ、
-    // candidatesInRangeとcategoryGroupsの中身をそのまま出力する。
-    // 判定ロジックには一切影響しない。調査完了後、このブロックごと
-    // 削除すること。
-    if (
-        candidatesInRange.some(candidate =>
-            candidate.ic?.displayName === "宇都宮IC" ||
-            candidate.ic?.sourceAreaKey === "nikkoUtsunomiya"
-        )
-    ) {
-        console.group(
-            "[DEBUG-UTSUNOMIYA調査・一時的] trySplitTollSectionByIcCategory"
-        );
-        console.log(
-            "section.entranceLatLng:", section.entranceLatLng,
-            "／section.exitLatLng:", section.exitLatLng,
-            "／section.entranceIcName:", section.entranceIcName,
-            "／section.exitIcName:", section.exitIcName,
-            "／entranceRouteDistanceMeters:", entranceRouteDistanceMeters,
-            "／exitRouteDistanceMeters:", exitRouteDistanceMeters
-        );
-        console.log(
-            "candidatesInRange:",
-            candidatesInRange.map(c => ({
-                name: c.ic?.displayName,
-                sourceAreaKey: c.ic?.sourceAreaKey,
-                routeDistanceMeters: c.routeDistanceMeters,
-                tollCategoryId: resolveIcTollCategoryId(c.ic)
-            }))
-        );
-        console.log(
-            "categoryGroups:",
-            categoryGroups.map(g => ({
-                tollCategoryId: g.tollCategoryId,
-                firstCandidate: g.firstCandidate.ic?.displayName,
-                lastCandidate: g.lastCandidate.ic?.displayName
-            }))
-        );
-        console.log(
-            "分割するか（categoryGroups.length >= 2):",
-            categoryGroups.length >= 2
-        );
-        console.groupEnd();
-    }
 
     // カテゴリの切り替わりが1回も検出できなかった場合（範囲内の候補ICが
     // 全て同一カテゴリだった場合）は、分割する意味が無いため元のsection
@@ -4121,30 +3997,6 @@ function buildAssumedRouteHtmlFromTollSections(
             Boolean(section.exitIc) &&
             buildIcDefinitionIdentity(section.entranceIc) ===
                 buildIcDefinitionIdentity(section.exitIc);
-
-        // 【DEBUG-UTSUNOMIYA調査・一時的】entranceIc/exitIcのいずれかが
-        // 宇都宮ICに関わる区間について、退化区間判定の入力値をそのまま
-        // 出力する。判定ロジックには一切影響しない。調査完了後、この
-        // ブロックごと削除すること。
-        if (
-            section.entranceIc?.displayName === "宇都宮IC" ||
-            section.exitIc?.displayName === "宇都宮IC" ||
-            String(section.entranceIcName || "").includes("宇都宮") ||
-            String(section.exitIcName || "").includes("宇都宮")
-        ) {
-            console.log(
-                "[DEBUG-UTSUNOMIYA調査・一時的] 退化区間判定",
-                "／entranceIcName:", section.entranceIcName,
-                "／exitIcName:", section.exitIcName,
-                "／entranceIcResolvedByTailFallback:",
-                section.entranceIcResolvedByTailFallback,
-                "／exitIcResolvedByTailFallback:",
-                section.exitIcResolvedByTailFallback,
-                "／tollCategoryId:", section.tollCategoryId,
-                "／isDegenerateFallbackSection:",
-                isDegenerateFallbackSection
-            );
-        }
 
         if (isDegenerateFallbackSection) {
             const lastPiece = pieces[pieces.length - 1];
@@ -13931,33 +13783,6 @@ function detectIcsOrderedAlongPolyline(
                 position && position.distanceMeters > thresholdMeters
                     ? (position.distanceMeters - thresholdMeters).toFixed(1)
                     : "-"
-            );
-        }
-
-        // 【DEBUG-UTSUNOMIYA調査・一時的】宇都宮IC(JCT)（tohoku/
-        // nikkoUtsunomiya統合済みエントリ）が、Step2の点と線の500m
-        // フィルタ（候補プールの入口）を通過できているかを確認する
-        // ための一時ログ。既存のposition計算結果をそのまま出力する
-        // だけで、候補選定ロジックには一切影響しない。調査完了後、
-        // このブロックごと削除すること。
-        if (ic.displayName === "宇都宮IC") {
-            console.log(
-                "[DEBUG-UTSUNOMIYA調査・一時的] 候補プール採用判定",
-                "／テーブル座標(lat/lng):", ic.lat, ic.lng,
-                "／entranceLat/Lng:", ic.entranceLat, ic.entranceLng,
-                "／exitLat/Lng:", ic.exitLat, ic.exitLng,
-                "／sourceAreaKey:", ic.sourceAreaKey,
-                "／connectedRoads:", ic.connectedRoads,
-                "／点と線の距離(m):",
-                position ? position.distanceMeters.toFixed(1) : "position計算不可",
-                "／しきい値(m):", thresholdMeters,
-                "／候補プール採用:",
-                Boolean(
-                    position &&
-                    position.distanceMeters <= thresholdMeters
-                )
-                    ? "OK"
-                    : "NG（除外）"
             );
         }
 

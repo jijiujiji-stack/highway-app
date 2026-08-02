@@ -1770,6 +1770,14 @@ CLAUDE.mdの「通常検索パイプライン統合プロジェクトにおけ�
 
 **前回の調査で追加した一時ログ**（`[DEBUG-UTSUNOMIYA調査・一時的]`、`splitRunByRoadType`・`detectIcsOrderedAlongPolyline`・`trySplitTollSectionByIcCategory`・`buildAssumedRouteHtmlFromTollSections`の4箇所）は、次回セッションでも引き続き参考になる可能性があるため、削除せず残っている。
 
+**2026-08-03追記・解決**：合意していた対応方針（テキストキーワードによる区間事前分割`splitRunByRoadType`をやめ、座標ベースの再分割`trySplitTollSectionByIcCategory`だけに区間分割を任せる）を実施した。
+
+- 実装は、`splitRunByRoadType`の呼び出しを迂回する`BYPASS_TEXT_BASED_ROAD_TYPE_SPLIT`スイッチ（デフォルトtrue）として行った。`classifyStepsByRoadType`・`splitRunByRoadType`自体の関数定義は削除せず、`false`に戻せば従来の挙動に戻せる設計。
+- 事前調査で、区間の一番最初の検出（首都高→NEXCO系エリアへの最初の遷移）・shutoエリアの検出は、いずれも座標ベースの`trySplitTollSectionByIcCategory`／`resolveIcTollCategoryId`のみで完結する設計であることを確認した上で実施した。
+- 実車確認（荒川区役所→日光東照宮・荒川区役所↔鴨川シーワールド往復・荒川区役所→船橋駅の3ルート）で、宇都宮ICの退化区間解消、aqualine・keiyoへの回帰なし（keiyoはETC概算が既知の保留事項29の実車確認結果と完全一致）を確認済み。
+- 「有料道路の上にいるか、下道にいるか」の判定（TOLL TAGテキストタグ方式）自体には変更が及んでいないことも確認済み。
+- 調査用に追加していた一時ログ（`[DEBUG-UTSUNOMIYA調査・一時的]`4箇所・`[DEBUG-SPLIT比較・一時的]`1箇所）は、本採用確認後に削除済み。`BYPASS_TEXT_BASED_ROAD_TYPE_SPLIT`スイッチ自体はロールバック手段として温存している。
+
 ---
 
 ## GitHub Pages / デプロイ

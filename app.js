@@ -4055,8 +4055,7 @@ function updateDashboardAssumedRouteForComparisonMode() {
 
     dashboardAssumedRouteValue.innerHTML =
         buildTollUsageSummaryHtml(
-            lastHighwayRoutePolylineAnalysis,
-            lastProbablyNoTollRouteByPolylineComparison
+            lastHighwayRoutePolylineAnalysis
         );
 }
 
@@ -4095,27 +4094,18 @@ function buildNoTollRouteNoteHtml(polylineAnalysis) {
 }
 
 // 「（有料道路を使用していません）」に関する表示を一本化する。
-// 旧判定（isProbablyNoTollRouteByPolylineComparison、ルート形状比較）と
-// 新判定（TOLL TAG方式、tollSectionsの有無）を、常に「形状判定：◯◯ /
-// TOLLTAG：◯◯」という1行で併記する。
-// 判定ロジック自体（isProbablyNoTollRouteByPolylineComparison・
-// tollSectionsの算出方法）はここでは変更しない。
-//
-// 表示方針：
-// - 両判定とも「未使用」の場合：この判定行だけを表示する
-//   （実際に高速利用ルートが無いため、通常のルート表示は行わない）
-// - どちらかが「使用」の場合：通常のルート表示（buildAssumedRouteHtml）
-//   に加えて、この判定行を小さく併記する
-// - 新旧の判定が食い違う場合は、既存の.assumed-route-no-toll-mismatch
-//   （警告色）で強調する
+// 表示は常にTOLL TAG方式（tollSectionsの有無）による判定結果のみに基づく。
+// 以前はisProbablyNoTollRouteByPolylineComparison（旧判定、ルート形状比較）
+// との食い違いを「⚠一致していません」で警告表示していたが、TOLL TAG方式の
+// 精度で十分と判断されたため、この比較・警告表示は廃止した。
+// isProbablyNoTollRouteByPolylineComparison関数自体は削除せず残しているが、
+// この表示では呼び出さない。
+// 判定ロジック自体（tollSectionsの算出方法）はここでは変更しない。
 //
 // なお、旧「新判定」（shutoSegments/isProbablyNoTollRouteByShutoSegments）
 // は、より精度の高いTOLL TAG方式（tollSections）に置き換えられたため、
 // この表示では使用しない。関数自体は削除せず残している。
-function buildTollUsageSummaryHtml(
-    polylineAnalysis,
-    isOldNoToll
-) {
+function buildTollUsageSummaryHtml(polylineAnalysis) {
     const hasTollTagData =
         polylineAnalysis?.hasTollSectionStepsData === true;
 
@@ -4127,50 +4117,33 @@ function buildTollUsageSummaryHtml(
             )
             : null;
 
-    const oldText =
-        isOldNoToll ? "有料未使用" : "有料使用";
-
     const newText =
         isNewNoToll === null
             ? "不明"
             : (isNewNoToll ? "有料未使用" : "有料使用");
 
-    const isMismatch =
-        isNewNoToll !== null &&
-        isOldNoToll !== isNewNoToll;
-
     const summaryText =
-        "形状判定：" + oldText +
-        " / TOLLTAG：" + newText +
-        (
-            isMismatch
-                ? "　⚠一致していません"
-                : ""
-        );
-
-    const bothNoToll =
-        isOldNoToll && isNewNoToll === true;
-
-    if (bothNoToll) {
-        return (
-            "<span class=\"assumed-route-toll-sections-empty\">" +
-            escapeHtml(summaryText) +
-            "</span>"
-        );
-    }
+        "TOLLTAG：" + newText;
 
     const assumedRouteHtml =
         buildAssumedRouteHtml(polylineAnalysis);
 
+    // 道路名がある場合のみ.assumed-route-road-line（左寄せ・1行省略）で
+    // 囲む。「ルート情報なし」は省略の必要が無い固定の短い文言なので、
+    // このクラスで囲まず、親要素（.dashboard-assumed-route-value）の
+    // text-align: centerをそのまま継承させる。
+    const routeLineHtml =
+        assumedRouteHtml
+            ? (
+                "<span class=\"assumed-route-road-line\">" +
+                assumedRouteHtml +
+                "</span>"
+            )
+            : "ルート情報なし";
+
     return (
-        (assumedRouteHtml || "ルート情報なし") +
-        "<small class=\"assumed-route-no-toll-detail" +
-            (
-                isMismatch
-                    ? " assumed-route-no-toll-mismatch"
-                    : ""
-            ) +
-            "\">" +
+        routeLineHtml +
+        "<small class=\"assumed-route-no-toll-detail\">" +
             escapeHtml(summaryText) +
         "</small>"
     );
@@ -9947,7 +9920,6 @@ let lastResolvedIcArea = null;
 let lastSearchMode = "";
 let lastLocalRouteMinutes = null;
 let lastProbablyNoTollRoute = false;
-let lastProbablyNoTollRouteByPolylineComparison = false;
 
 let invalidIcResults = [];
 
@@ -11271,16 +11243,6 @@ async function displayRouteComparison(
     lastHighwayRoutePolylineAnalysis =
         polylineAnalysis;
 
-    // 高速利用ルート・有料回避ルートの実際の経路形状（Polyline）を直接
-    // 比較し、ほぼ同一経路なら「有料道路を実質使っていない」とみなす。
-    // 「参考：高速利用ルート」欄への表示にのみ使う（トップパネルの
-    // isProbablyNoTollRoute／updateProbablyNoTollRouteNoteとは別系統）。
-    lastProbablyNoTollRouteByPolylineComparison =
-        isProbablyNoTollRouteByPolylineComparison(
-            polylineAnalysis,
-            local
-        );
-
     lastHighwayRoutePolylineAnalysisKey =
         polylineAnalysis
             ? buildRouteAnalysisKey(origin, destination)
@@ -11539,8 +11501,7 @@ async function displayRouteComparison(
             .getElementById("dashboardAssumedRouteValue")
             .innerHTML =
             buildTollUsageSummaryHtml(
-                lastHighwayRoutePolylineAnalysis,
-                lastProbablyNoTollRouteByPolylineComparison
+                lastHighwayRoutePolylineAnalysis
             );
     }
 

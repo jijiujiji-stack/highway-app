@@ -256,14 +256,32 @@ button {
 }
 
 .dashboard-assumed-route-value {
-    display: -webkit-box;
+    display: block;
     width: 100%;
     min-width: 0;
     overflow: hidden;
     font-weight: bold;
     text-align: center;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+}
+
+/* 道路名部分（例：「首都高 堤通 → 三郷 → 外環 → ...」）を1行に固定し、
+   収まらない場合は行末を「…」で省略する。以前はこの要素の親
+   （.dashboard-assumed-route-value）側で-webkit-line-clampによる
+   最大2行までの複数行省略を行っていたが、その場合、道路名だけで2行を
+   使い切ると、直後のTOLLTAG行（.assumed-route-no-toll-detail）が
+   欄の高さ内に収まらず見えなくなる問題があった。道路名を1行専用の
+   省略にすることで、欄の高さ（見た目のサイズ）は変えずに、常に
+   TOLLTAG行が表示されるようにしている。
+   text-alignはleftに固定：center指定のまま1行省略すると、はみ出した
+   先頭側が「…」表示なしに見切れてしまう（末尾側だけ省略される保証が
+   ないため）ため、省略が右端に出るようleftにしている。 */
+.assumed-route-road-line {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: left;
 }
 
 .dashboard-assumed-route-label {
@@ -291,8 +309,16 @@ button {
     font-weight: bold;
 }
 
+/* display:inlineにしている理由：.assumed-route-road-line側の1行省略
+   （white-space:nowrap; text-overflow:ellipsis;）と組み合わせた場合、
+   このpillがdisplay:inline-blockだと「分割できないひとつの箱」として
+   扱われ、pill全体が幅に収まりきらない時点でpillごと丸ごと非表示になり、
+   実際の表示欄の右端よりかなり手前で「…」が入ってしまう（右側に余白が
+   残ったまま省略される）不具合があった。display:inlineにすることで、
+   このpillの文字部分でも省略位置を決められるようになり、表示欄の幅を
+   最後まで使い切ってから省略されるようになる。 */
 .assumed-route-road {
-    display: inline-block;
+    display: inline;
     margin: 0 2px;
     padding: 0 4px;
     border-radius: 999px;

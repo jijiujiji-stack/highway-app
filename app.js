@@ -391,6 +391,36 @@ const TOLL_ROAD_CATEGORY_RULES = [
         boundaryIcNames: ["浮島IC", "木更津金田IC"]
     },
     {
+        // 【日光宇都宮道路・専用カテゴリ新設】栃木県道路公社が運営する
+        // 一般有料道路で、NEXCOではない。実料金（2026年4月1日改定後、
+        // 普通車、宇都宮IC発着4区間）を距離(km)に対して線形近似した結果、
+        // NEXCO距離計算式（150+24.6*km）*1.1に比べて実際の料金が
+        // 一貫して45〜85%低いことが判明したため、既存nexcoルールの
+        // 使い回しではなく専用ルールを新設した（詳細はPROJECT_HANDOFF.md・
+        // ユーザーとの調査結果参照）。
+        // idは、IC_MASTERの対応エリアキー（nikkoUtsunomiya）と完全一致させて
+        // いる。resolveIcTollCategoryIdはic.sourceAreaKeyとrule.idの一致だけで
+        // カテゴリを解決するため、この一致以外にコード変更は不要（aqualineと
+        // 同じ既存の仕組みをそのまま踏襲）。
+        // 計算式14.5+21.35*kmは、以下4区間の実料金（2026-08-02時点、Web調査、
+        // 確信度：高、複数の二次情報源で一致確認済み）に対する線形近似：
+        //   宇都宮IC→大沢IC(11.5km)：260円　宇都宮IC→今市IC(20.2km)：440円
+        //   宇都宮IC→日光IC(25.0km)：550円　宇都宮IC→清滝IC(30.7km・全線)：670円
+        // taxRate:1（既に税込み実料金から逆算した値のため、nexcoのような
+        // 別途1.1倍は行わない）。roundToYenは既存nexcoと同じ10円単位。
+        // 土沢IC〜今市IC間が無料区間である特殊構造への対応（この区間を
+        // またぐ場合の精度劣化）は、今回は未対応（既知の制約として許容、
+        // IC_MASTER側のnoteに記録）。
+        id: "nikkoUtsunomiya",
+        label: "日光宇都宮道路",
+        keywords: ["日光宇都宮道路"],
+        tollType: "distanceFormula",
+        baseYen: 14.5,
+        perKmYen: 21.35,
+        taxRate: 1,
+        roundToYen: 10
+    },
+    {
         id: "nexco",
         label: "NEXCO",
         keywords: [],
@@ -441,7 +471,13 @@ function calculateTollAmountForRule(rule, totalDistanceMeters) {
 // combinedInstructions（有料区間のGoogle案内テキスト連結文字列）から、
 // TOLL_ROAD_CATEGORY_RULESを上から順に照合し、最初に一致したルールを返す。
 // keywordsが空のルール（nexco、フォールバック）は無条件で一致する。
-// 現時点では既存のどの関数からも呼び出さない。
+// 【2026-08-03・Step B座標ベース化】以前はdetectTollSectionsFromSteps
+// のStep Bから区間の初期カテゴリ判定として呼ばれていたが、区間内の
+// テキストにたまたま他エリアの道路名が含まれるだけで区間全体が誤判定
+// される問題が見つかったため、Step Bは座標ベースの判定
+// （resolveIcTollCategoryId、区間の入口ICのsourceAreaKeyを使う）に
+// 置き換えた。CLAUDE.mdの「旧関数を安易に削除しない」方針に従い関数自体は
+// 削除していないが、本番のカテゴリ判定経路からは外れている。
 function determineTollRoadCategory(combinedInstructions) {
 
     const text = combinedInstructions || "";
@@ -1520,9 +1556,10 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
                     0
                 );
 
-            // 区間内の全stepsのinstructionsを連結したもの。entranceIc/
-            // exitIcが両方ともIC不明の場合の、首都高/NEXCO判定フォール
-            // バックに使う。
+            // 区間内の全stepsのinstructionsを連結したもの。表示・
+            // resolveTollSectionNexcoRoadLabel側の補助的なテキスト
+            // フォールバックにのみ使う（区間の初期カテゴリ判定自体には
+            // 2026-08-03以降使わない、下記Step B参照）。
             const combinedInstructions =
                 run.steps
                     .map(step =>
@@ -1531,15 +1568,50 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
                     )
                     .join(" / ");
 
-            // 【Step B】区間の道路カテゴリ判定。座標ベースのicBasedIsShuto
-            // （最寄りIC判定、距離無制限でアクアラインのような首都高接続部が
-            // 近い区間を誤判定していた）は廃止し、Googleの案内テキストのみで
-            // 判定するdetermineTollRoadCategory（Step Aで追加済み）に一本化。
-            // entranceLabel/exitLabel（IC名前解決）自体は変更していない。
-            const tollRoadCategory =
-                determineTollRoadCategory(combinedInstructions);
+            const entranceLatLng =
+                extractLatLngFromRouteLocation(
+                    firstStep.startLocation
+                );
+            const exitLatLng =
+                extractLatLngFromRouteLocation(
+                    lastStep.endLocation
+                );
 
-            const tollCategoryId = tollRoadCategory.id;
+            // 【Step B座標ベース化・2026-08-03】区間の道路カテゴリ判定。
+            // 従来はGoogleの案内テキストのみで判定するdetermineTollRoad
+            // Category（combinedInstructions丸ごとのキーワード一致）に
+            // 一本化していたが、たまたま区間内の案内テキストに他エリアの
+            // 道路名（例：「日光宇都宮道路」）が含まれているだけで、区間
+            // 全体が誤ったカテゴリに初期化されてしまう問題が見つかった
+            // （日光宇都宮道路エリア新規登録時の実車確認で発覚）。
+            // 区間の入口IC（entranceLabel.ic、findNearestIcLabelによる
+            // 既存の座標ベース近傍探索・方式Bの結果）自身のsourceAreaKeyを
+            // resolveIcTollCategoryIdに渡してカテゴリを決めるように変更し、
+            // Googleのテキストは「有料区間タグの有無」（tollSectionRunsの
+            // 検出）にのみ使う、という当初の理想形に揃えた。
+            // entranceLabel.icがnull（IC不明）の場合のみ、
+            // resolveSectionEntranceIcForCategoryで区間範囲内の最も入口に
+            // 近い実在ICを探す（applyTailFallbackToTollSectionsのentrance側
+            // フォールバックと同じ考え方、テキストへは頼らない）。それでも
+            // 1件も見つからない場合はtollCategoryIdをnull（不明）のままにし、
+            // 既存の「IC不明」表示（entranceIc/exitIcがnullの場合の表示）に
+            // 委ねる。determineTollRoadCategory・classifyStepsByRoadType・
+            // NAME_CHANGEガードの関数定義自体は削除していないが、本番の
+            // カテゴリ判定経路からは外れた。
+            const categoryEntranceIc =
+                entranceLabel.ic ||
+                resolveSectionEntranceIcForCategory(
+                    entranceLatLng,
+                    exitLatLng,
+                    routeDistanceCandidateIcs,
+                    sampledPoints,
+                    cumulativeDistances
+                );
+
+            const tollCategoryId =
+                categoryEntranceIc
+                    ? resolveIcTollCategoryId(categoryEntranceIc)
+                    : null;
 
             const isShutoSection = tollCategoryId === "shuto";
 
@@ -1549,14 +1621,8 @@ function detectTollSectionsFromSteps(highwayRoute, sampledPoints = null) {
                 combinedInstructions,
                 isShutoSection,
                 tollCategoryId,
-                entranceLatLng:
-                    extractLatLngFromRouteLocation(
-                        firstStep.startLocation
-                    ),
-                exitLatLng:
-                    extractLatLngFromRouteLocation(
-                        lastStep.endLocation
-                    ),
+                entranceLatLng,
+                exitLatLng,
                 entranceIc: entranceLabel.ic,
                 entranceIcName: entranceLabel.icName,
                 entranceDistanceMeters:
@@ -2186,6 +2252,70 @@ function resolveRouteDistanceForLatLng(
         );
 
     return withRouteDistance.routeDistanceMeters;
+}
+
+// 【Step B座標ベース化・日光宇都宮道路調査対応】区間の初期カテゴリ判定
+// （detectTollSectionsFromSteps・Step B）用に、区間の入口地点に最も近い
+// 候補ICを求める。findNearestIcLabel（Step 8、方式B）が区間の入口ICを
+// 解決できなかった場合にのみ呼ばれるフォールバックで、考え方は
+// applyTailFallbackToTollSections内のfindCandidateInRange（entrance側、
+// pickFarthest:false＝区間範囲内で最も入口に近い実在ICを採用する）と
+// 同じもの。ただし別関数として新規に切り出しており、既存の
+// applyTailFallbackToTollSections自体（IC名の解決・表示用フォールバック）
+// は一切変更していない。Googleの案内テキストは一切参照しない。
+// 該当ICが1件も見つからない場合はnullを返す（呼び出し元でtollCategoryId
+// をnull＝不明として扱う）。
+function resolveSectionEntranceIcForCategory(
+    entranceLatLng,
+    exitLatLng,
+    routeDistanceCandidateIcs,
+    sampledPoints,
+    cumulativeDistances
+) {
+    if (
+        !Array.isArray(routeDistanceCandidateIcs) ||
+        routeDistanceCandidateIcs.length === 0
+    ) {
+        return null;
+    }
+
+    const entranceRouteDistanceMeters =
+        resolveRouteDistanceForLatLng(
+            entranceLatLng,
+            sampledPoints,
+            cumulativeDistances
+        );
+    const exitRouteDistanceMeters =
+        resolveRouteDistanceForLatLng(
+            exitLatLng,
+            sampledPoints,
+            cumulativeDistances
+        );
+
+    if (
+        entranceRouteDistanceMeters === null ||
+        exitRouteDistanceMeters === null
+    ) {
+        return null;
+    }
+
+    const candidatesInRange =
+        routeDistanceCandidateIcs.filter(candidate =>
+            candidate.routeDistanceMeters >=
+                entranceRouteDistanceMeters &&
+            candidate.routeDistanceMeters <=
+                exitRouteDistanceMeters
+        );
+
+    if (candidatesInRange.length === 0) {
+        return null;
+    }
+
+    return candidatesInRange.reduce((nearest, candidate) =>
+        candidate.routeDistanceMeters < nearest.routeDistanceMeters
+            ? candidate
+            : nearest
+    ).ic;
 }
 
 // 【既知の保留事項22・28〜31の集大成、2026-08-01全エリア汎用化】
@@ -7214,9 +7344,11 @@ const IC_MASTER = {
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.5354901, entranceLng: 139.8023191, exitLat: 36.5355532, exitLng: 139.8024622,
                 note: "【2026-07-17調査・座標新規追加】従来lat/lng等の座標フィールドが一切未設定だったため新規確定。MapFan「鹿沼ＩＣ【入口】」(36.5354901,139.8023191)「【出口】」(36.5355532,139.8024622)を確認。入口・出口の個別ページが存在することからフルICと推定（NEXCO公式・Wikipediaに明記なし）。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
             },
-            { order: 11, displayName: "宇都宮IC", googleName: "東北自動車道 宇都宮インターチェンジ", lat: 36.6344803, lng: 139.8451272,
-                entranceSelectable: true, exitSelectable: true, entranceLat: 36.6344803, entranceLng: 139.8451272, exitLat: 36.6344704, exitLng: 139.844862,
-                note: "【2026-07-17調査・座標新規追加】従来lat/lng等の座標フィールドが一切未設定だったため新規確定。MapFan「宇都宮ＩＣ【入口】」(36.6344803,139.8451272)「【出口】」(36.6344704,139.844862)を確認。入口・出口の個別ページが存在することからフルICと推定（NEXCO公式・Wikipediaに明記なし）。日光宇都宮道路との接続点でもある複合IC構造だが、今回は東北自動車道側の座標追加のみで複合IC化は対象外。entranceSelectable/exitSelectableは変更なし（trueのまま）。"
+            { order: 11, displayName: "宇都宮IC", googleName: "東北自動車道 宇都宮インターチェンジ", lat: 36.6342314, lng: 139.8459796,
+                connection: true,
+                connectedRoads: ["tohoku", "nikkoUtsunomiya"],
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.6341657, entranceLng: 139.8460308, exitLat: 36.6342972, exitLng: 139.8459284,
+                note: "【2026-07-17調査・座標新規追加】従来lat/lng等の座標フィールドが一切未設定だったため新規確定。MapFan「宇都宮ＩＣ【入口】」(36.6344803,139.8451272)「【出口】」(36.6344704,139.844862)を確認。入口・出口の個別ページが存在することからフルICと推定（NEXCO公式・Wikipediaに明記なし）。日光宇都宮道路との接続点でもある複合IC構造だが、今回は東北自動車道側の座標追加のみで複合IC化は対象外。entranceSelectable/exitSelectableは変更なし（trueのまま）。【2026-08-03統合・座標調整】日光宇都宮道路エリア（nikkoUtsunomiya）新規登録時に、本ICを日光宇都宮道路側の別施設として約170m離れた座標で重複登録していたが（MapFan「宇都宮ＩＣ（日光宇都宮道路）【入口（下り）】」36.633851,139.8469343・「【出口（上り）】」36.634124,139.8469948）、座標がわずかに異なるだけの重複登録が、routeDistanceCandidateIcsの並び順を乱し、区間カテゴリ判定（trySplitTollSectionByIcCategory）が誤動作する実害（「日光宇都宮道路 浦和IC→宇都宮IC(JCT)」という誤表示）を引き起こすことが実車確認で判明した。既存の高崎JCT（kitakanto⇔kanetsu、1件のみ登録しconnectedRoadsで両方を示すパターン）に合わせ、日光宇都宮道路側の重複登録は削除し、本エントリ1件に統合した。座標は、上記2つの登録（東北道側の元座標と日光宇都宮道路側の座標）の入口同士・出口同士の単純な中間点（entranceLat/Lng・exitLat/Lng）、およびその平均（lat/lng）に暫定的に調整した。衛星写真等による実際のランプ構造の確認は行っておらず、あくまで両登録の中間点という機械的な処理であるため、精度は暫定・要再検証（次回、Google Maps実経路でのpolyline投影結果を実車確認した上で、必要なら座標の微調整を検討）。connection:true・connectedRoads:[\"tohoku\",\"nikkoUtsunomiya\"]は高崎JCTと同じパターン。"
             },
             { order: 11.5, displayName: "上河内SIC", googleName: "東北自動車道 上河内スマートインターチェンジ", lat: 36.6917388, lng: 139.8929558,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.6917388, entranceLng: 139.8929558, exitLat: 36.6917908, exitLng: 139.8929707,
@@ -9439,6 +9571,107 @@ const IC_MASTER = {
                 lng: 140.487599,
                 entranceSelectable: true, exitSelectable: true, entranceLat: 36.330412, entranceLng: 140.487599, exitLat: 36.330412, exitLng: 140.487599,
                 note: "【2026-07-29調査・新規登録】北関東自動車道の終点（東側）、東水戸道路の起点を兼ねるIC。MapFan「水戸南ＩＣ（北関東自動車道（栃木茨城区間））【入口（上り）】」(36.3325435,140.4881631)、ユーザーが追加確認したNAVITIME「東行き出口/西行き入口」(36.328788,140.486462)、Wikipedia(36.329561,140.488208)、Yahoo!地図(36.3307543,140.487562)の4ソースが経度でほぼ一致（140.4865〜140.4882）、緯度に約370m幅で収まったため、4ソース平均値(36.330412,140.487599)を採用。Wikipediaによれば当ICを境に西側が高速自動車国道（北関東道終点）、東側が一般有料道路（東水戸道路起点）となる複合構造で、フルIC（入口2ブース、出口3ブース）。entranceSelectable/exitSelectableはtrue/true。entranceLat/Lng・exitLat/Lngともに上記平均値を暫定採用、lat/lngも同値。北関東道／東水戸道路境界という特殊構造のため、実車確認時に上り・下り・東水戸道路側それぞれの挙動を要確認。"
+            }
+        ]
+    },
+
+    // nikkoUtsunomiya: 日光宇都宮道路。栃木県道路公社が運営する一般有料道路
+    // （東北自動車道 宇都宮ICジャンクション〜清滝IC、30.7km）。NEXCOではなく、
+    // 距離比例のnexco料金式を適用すると実料金より45〜85%高く見積もってしまう
+    // ことが調査で判明したため、専用カテゴリ"nikkoUtsunomiya"（TOLL_ROAD_
+    // CATEGORY_RULES参照）を新設した。
+    // 座標はMapFan個別ページ（施設名に「日光宇都宮道路」を含むページ）を
+    // 一次ソースとし、可能な範囲でNAVITIME・Wikipedia座標テンプレート・
+    // Yahoo!地図と突き合わせて確認した（各ICのnote参照）。
+    // 【特殊構造】土沢IC〜今市IC間には料金所が無く、この区間のみの通行は
+    // 無料（Wikipedia「今市インターチェンジ」記事で「上り線については…
+    // 次の土沢ICまでは無料で通行できる」と明記されており、確信度：高）。
+    // 距離計算・料金計算は通常のIC境界方式のまま行い、この無料区間への
+    // 個別対応（無料区間をまたぐ場合の按分等）は今回は実装していない
+    // （既知の制約として許容、ユーザー合意済み）。
+    // 【2026-08-03統合】宇都宮IC(JCT)は、当初このエリアにも
+    // （tohoku側と約170m離れた別座標で）重複登録していたが、この重複が
+    // routeDistanceCandidateIcsの並び順を乱し、区間カテゴリ判定が誤動作
+    // する実害を引き起こすことが実車確認で判明したため、既存の高崎JCT
+    // （kitakanto⇔kanetsu）と同じパターンに合わせ、tohokuエリア側の
+    // 登録1件（connectedRoads:["tohoku","nikkoUtsunomiya"]）に統合し、
+    // このエリア側の重複登録は削除した。詳細はtohoku側の宇都宮ICのnote
+    // 参照。
+    nikkoUtsunomiya: {
+        label: "日光宇都宮道路",
+        exits: [
+            {
+                order: 2,
+                displayName: "徳次郎IC",
+                googleName: "日光宇都宮道路 徳次郎インターチェンジ",
+                lat: 36.6482585,
+                lng: 139.8377059,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 36.6482585, entranceLng: 139.8377059, exitLat: 36.6484506, exitLng: 139.8382828,
+                note: "【2026-08-02調査・新規登録】MapFan「徳次郎ＩＣ（日光宇都宮道路）【入口（下り）】」(36.6482585,139.8377059)「【出口（上り）】」(36.6484506,139.8382828)を確認。Web検索で「日光方向のみの出入口のハーフインターチェンジ（下り入口・上り出口）」との情報を複数件確認（確信度：中、Wikipedia「徳次郎インターチェンジ」記事に基づく二次情報）。1976年12月25日開通、開通当初は「とくじら」表記、2008年に「とくじろー」、2021年に「とくじら」表記へ再変更（Wikipedia）。入口方向（下り）を代表方向として採用し、entranceSelectable:true・exitSelectable:falseとした（上り出口は逆方向のため対象外）。他ソース（NAVITIME・Yahoo!地図）でのクロスチェックは今回未実施、要再確認。"
+            },
+            {
+                order: 3,
+                displayName: "篠井IC",
+                googleName: "日光宇都宮道路 篠井インターチェンジ",
+                lat: 36.6681784,
+                lng: 139.8165541,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 36.6681784, entranceLng: 139.8165541, exitLat: 36.6676025, exitLng: 139.8149072,
+                note: "【2026-08-02調査・新規登録】MapFan「篠井ＩＣ（日光宇都宮道路）【入口（上り）】」(36.6681784,139.8165541)「【出口（下り）】」(36.6676025,139.8149072)を確認。栃木県公式ページ（2019年開通式案内）により「宇都宮方向のみの出入口のハーフインターチェンジ」であることを確信度：高で確認（2019年6月29日開通）。入口方向（上り＝宇都宮方向）を代表方向として採用し、entranceSelectable:true・exitSelectable:falseとした（下り出口は逆方向のため対象外）。徳次郎ICとは逆に「宇都宮方向のみ」である点に注意（徳次郎ICは「日光方向のみ」）。他ソース（NAVITIME・Yahoo!地図）でのクロスチェックは今回未実施、要再確認。"
+            },
+            {
+                order: 4,
+                displayName: "大沢IC",
+                googleName: "日光宇都宮道路 大沢インターチェンジ",
+                lat: 36.68937105,
+                lng: 139.7554713,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.6893957, entranceLng: 139.7555111, exitLat: 36.6893464, exitLng: 139.7554315,
+                note: "【2026-08-02調査・新規登録】MapFan「大沢ＩＣ（日光宇都宮道路）【入口】」(36.6893957,139.7555111)「【出口】」(36.6893464,139.7554315)を確認（上り/下りの方向区別なし＝フルIC）。entranceSelectable/exitSelectableはtrue/true。lat/lngは入口・出口の中間点(36.68937105,139.7554713)。前回のWeb調査で判明した通り、当ICには本線料金所（大沢本線）とランプ料金所の2種があるオープン式料金所構造だが、IC自体の入口・出口機能はフルICであることに変わりない。他ソース（NAVITIME・Wikipedia・Yahoo!地図）でのクロスチェックは今回未実施、要再確認。"
+            },
+            {
+                order: 5,
+                displayName: "土沢IC",
+                googleName: "日光宇都宮道路 土沢インターチェンジ",
+                lat: 36.69809335,
+                lng: 139.71720215,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.6980541, entranceLng: 139.7172039, exitLat: 36.6981326, exitLng: 139.7172004,
+                note: "【2026-08-02調査・新規登録】MapFan「土沢ＩＣ（日光宇都宮道路）【入口】」(36.6980541,139.7172039)「【出口】」(36.6981326,139.7172004)を確認（上り/下りの方向区別なし＝フルIC）。entranceSelectable/exitSelectableはtrue/true。lat/lngは入口・出口の中間点(36.69809335,139.71720215)。【無料区間の北側境界】次の今市ICとの間には料金所が無く、この区間のみの通行は無料（Wikipedia「今市インターチェンジ」記事で確認、確信度：高）。本アプリの距離・料金計算はこの特殊構造に個別対応していないため、この区間をまたぐ経路では簡易計算式の精度がやや落ちる可能性がある（既知の制約）。他ソース（NAVITIME・Wikipedia・Yahoo!地図）でのクロスチェックは今回未実施、要再確認。"
+            },
+            {
+                order: 6,
+                displayName: "今市IC",
+                googleName: "日光宇都宮道路 今市インターチェンジ",
+                lat: 36.719694,
+                lng: 139.67475,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.719694, entranceLng: 139.67475, exitLat: 36.719694, exitLng: 139.67475,
+                note: "【2026-08-02調査・新規登録】Wikipedia「今市インターチェンジ」記事の座標テンプレート(36.719694,139.674750)と、Yahoo!地図(36.7197068,139.6747425)が約1〜2mで極めて近接一致することを確認し、この収束値を採用。NAVITIME経由の二次情報(36.721221,139.670504)はこのクラスタから約400m離れる外れ値のため不採用（既存の他IC再照合と同じ判断基準）。Wikipediaにより「上り線・下り線双方に出口・入口があるフルIC」「今市ICと土沢IC間は通年無料」と明記されており確信度：高。entranceSelectable/exitSelectableはtrue/true。MapFanの入口・出口個別ページは検索で特定できなかったため、entranceLat/Lng・exitLat/Lngとも上記収束値を暫定使用（要再確認）。1976年12月25日開通（Wikipedia）。"
+            },
+            {
+                order: 7,
+                displayName: "日光口PA",
+                googleName: "日光宇都宮道路 日光口パーキングエリア",
+                lat: 36.7296557,
+                lng: 139.6514442,
+                isSelectable: false,
+                entranceSelectable: false, exitSelectable: false, entranceLat: 36.7296557, entranceLng: 139.6514442, exitLat: 36.7296557, exitLng: 139.6514442,
+                note: "【2026-08-02調査・新規登録】日光宇都宮道路唯一のPA。MapFan「日光口ＰＡ（日光宇都宮道路）【下り】」(36.7296557,139.6514442)を確認。上り側の個別ページは検索で特定できなかったため、下り側座標を暫定使用。PAのため他エリアのPA登録（海ほたるPA等）と同様にisSelectable:false・entranceSelectable:false・exitSelectable:falseとした。"
+            },
+            {
+                order: 8,
+                displayName: "日光IC",
+                googleName: "日光宇都宮道路 日光インターチェンジ",
+                lat: 36.74378945,
+                lng: 139.6254107,
+                entranceSelectable: true, exitSelectable: true, entranceLat: 36.7437783, entranceLng: 139.6254556, exitLat: 36.7438006, exitLng: 139.6253658,
+                note: "【2026-08-02調査・新規登録】MapFan「日光ＩＣ（日光宇都宮道路）【入口】」(36.7437783,139.6254556)「【出口】」(36.7438006,139.6253658)を確認（上り/下りの方向区別なし＝フルIC）。entranceSelectable/exitSelectableはtrue/true。lat/lngは入口・出口の中間点(36.74378945,139.6254107)。日光東照宮・日光市街への最寄りIC。他ソース（NAVITIME・Wikipedia・Yahoo!地図）でのクロスチェックは今回未実施、要再確認。"
+            },
+            {
+                order: 9,
+                displayName: "清滝IC",
+                googleName: "日光宇都宮道路 清滝インターチェンジ",
+                lat: 36.7426977,
+                lng: 139.5682379,
+                entranceSelectable: true, exitSelectable: false, entranceLat: 36.7426977, entranceLng: 139.5682379, exitLat: 36.7412208, exitLng: 139.5668317,
+                note: "【2026-08-02調査・新規登録】日光宇都宮道路の終点（日光市側）。MapFan「清滝ＩＣ（日光宇都宮道路）【入口（上り）】」(36.7426977,139.5682379)「【出口（下り）】」(36.7412208,139.5668317)を確認。終点特有の構造（浮島IC・富浦IC等と同様、入口は一方向・出口は反対方向のみ）と判断し、入口方向（上り＝宇都宮方向へ向かう方向）を代表方向として採用、entranceSelectable:true・exitSelectable:falseとした（下り出口は終点到達方向のため対象外）。既存の富浦IC等で導入されているPhase 2方向判定ミラーレコードは、今回は新設していない（実車確認前の新規エリアのため、まず単純な登録に留めた。将来的に必要であれば追加を検討）。他ソース（NAVITIME・Wikipedia・Yahoo!地図）でのクロスチェックは今回未実施、要再確認。"
             }
         ]
     }

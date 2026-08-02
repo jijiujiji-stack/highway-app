@@ -1401,6 +1401,48 @@ details#searchPanel .origin-row input {
     width: 100%;
 }
 
+/* 出発地・目的地の履歴候補（独自UI）。Google Places Autocompleteの
+   候補ドロップダウン（pac-container、document.body直下に追加される）
+   より前面に表示するため、z-indexを大きめにしている。 */
+.place-history-list {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    margin-top: 2px;
+    background: #222;
+    border: 1px solid #555;
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 9999;
+}
+
+.place-history-item {
+    padding: 10px 12px;
+    font-size: 14px;
+    color: #fff;
+    cursor: pointer;
+    border-bottom: 1px solid #3a3a3a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.place-history-item:last-child {
+    border-bottom: none;
+}
+
+.place-history-item:hover,
+.place-history-item:active {
+    background: #333;
+}
+
+.place-history-icon {
+    margin-right: 6px;
+    opacity: 0.8;
+}
+
 .active-search {
     background: #27ae60 !important;
 }

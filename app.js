@@ -10390,6 +10390,7 @@ window.addEventListener("load", () => {
     initializeRealDriveTestToggle();
     initializeWakeLockToggle();
     initializeMultiIcModeSwitch();
+    initializePlaceHistoryUi();
 
     document
         .getElementById("gpsSearchButton")
@@ -10609,6 +10610,289 @@ function loadGoogleMaps() {
 }
 
 
+// 出発地・目的地の入力履歴（localStorage保存）。
+// google.maps.places.Autocompleteは候補の中身を編集・追加できない
+// ブラックボックスのため、履歴専用の候補は別枠の独自UIとして表示する
+// （.place-history-list、initializePlaceHistoryUi参照）。
+const PLACE_HISTORY_STORAGE_KEY =
+    "highwayCospaNavi.placeHistory.v1";
+
+const PLACE_HISTORY_MAX_COUNT = 20;
+
+function loadPlaceHistory() {
+    try {
+        const raw =
+            window.localStorage.getItem(
+                PLACE_HISTORY_STORAGE_KEY
+            );
+
+        const parsed =
+            raw ? JSON.parse(raw) : [];
+
+        return Array.isArray(parsed) ? parsed : [];
+    }
+    catch (error) {
+        return [];
+    }
+}
+
+function savePlaceHistory(historyList) {
+    try {
+        window.localStorage.setItem(
+            PLACE_HISTORY_STORAGE_KEY,
+            JSON.stringify(historyList)
+        );
+    }
+    catch (error) {
+        // プライベートブラウジング等でlocalStorageが使えない場合は、
+        // 履歴機能自体を諦めるだけにし、検索本体には影響させない。
+    }
+}
+
+// 同じ場所とみなす識別子。place_idがあればそれを優先し、無い場合
+// （手入力確定等）は住所文字列を使う。
+function buildPlaceHistoryIdentityKey(entry) {
+    return (
+        entry?.placeId
+            ? ("placeId:" + entry.placeId)
+            : ("address:" + String(entry?.address || "").trim())
+    );
+}
+
+function addPlaceToHistory(place) {
+    const address =
+        String(place?.address || "").trim();
+
+    if (!address) {
+        return;
+    }
+
+    const newEntry = {
+        address: address,
+        displayName:
+            String(place?.displayName || address).trim(),
+        placeId: place?.placeId || "",
+        lat:
+            typeof place?.lat === "number"
+                ? place.lat
+                : null,
+        lng:
+            typeof place?.lng === "number"
+                ? place.lng
+                : null,
+        updatedAt: Date.now()
+    };
+
+    const identityKey =
+        buildPlaceHistoryIdentityKey(newEntry);
+
+    const filteredHistory =
+        loadPlaceHistory().filter(entry =>
+            buildPlaceHistoryIdentityKey(entry) !== identityKey
+        );
+
+    filteredHistory.unshift(newEntry);
+
+    savePlaceHistory(
+        filteredHistory.slice(0, PLACE_HISTORY_MAX_COUNT)
+    );
+}
+
+// 入力中の文字列にマッチする履歴を検索する（部分一致）。
+function searchPlaceHistory(query) {
+    const trimmedQuery =
+        String(query || "").trim();
+
+    if (!trimmedQuery) {
+        return [];
+    }
+
+    return loadPlaceHistory().filter(entry =>
+        (entry.displayName || "").includes(trimmedQuery) ||
+        (entry.address || "").includes(trimmedQuery)
+    );
+}
+
+function renderPlaceHistorySuggestions(
+    listElement,
+    matchedEntries,
+    onSelectEntry
+) {
+    if (!listElement) {
+        return;
+    }
+
+    if (!matchedEntries.length) {
+        listElement.innerHTML = "";
+        listElement.style.display = "none";
+        return;
+    }
+
+    listElement.innerHTML =
+        matchedEntries
+            .map((entry, index) =>
+                "<div class=\"place-history-item\" data-index=\"" +
+                index + "\">" +
+                    "<span class=\"place-history-icon\">🕒</span>" +
+                    escapeHtml(entry.displayName || entry.address) +
+                "</div>"
+            )
+            .join("");
+
+    listElement.style.display = "block";
+
+    Array.from(listElement.children).forEach((itemElement, index) => {
+        itemElement.addEventListener("click", () => {
+            onSelectEntry(matchedEntries[index]);
+
+            listElement.innerHTML = "";
+            listElement.style.display = "none";
+        });
+    });
+}
+
+// 出発地・目的地の履歴候補UIを初期化する。Google Autocompleteの
+// 初期化（initializeAutocomplete）とは独立しており、Google Maps
+// APIの読み込みを待たずに動作する。
+function initializePlaceHistoryUi() {
+    const originInput =
+        document.getElementById("origin");
+
+    const destinationInput =
+        document.getElementById("destination");
+
+    const originHistoryList =
+        document.getElementById("originHistoryList");
+
+    const destinationHistoryList =
+        document.getElementById("destinationHistoryList");
+
+    if (
+        !originInput ||
+        !destinationInput ||
+        !originHistoryList ||
+        !destinationHistoryList
+    ) {
+        return;
+    }
+
+    const clearOriginButton =
+        document.getElementById("clearOrigin");
+
+    const clearDestinationButton =
+        document.getElementById("clearDestination");
+
+    function selectOriginFromHistory(entry) {
+        clearLastHighwayRoutePolylineAnalysis(
+            "出発地履歴選択"
+        );
+
+        originInput.value = entry.address;
+
+        selectedOriginAddress = entry.address;
+        selectedOriginPlaceId = entry.placeId || "";
+
+        selectedOriginLatLng =
+            typeof entry.lat === "number" &&
+            typeof entry.lng === "number"
+                ? { lat: entry.lat, lng: entry.lng }
+                : null;
+
+        if (clearOriginButton) {
+            clearOriginButton.style.display = "block";
+        }
+
+        console.log(
+            "出発地履歴選択",
+            selectedOriginAddress,
+            selectedOriginPlaceId,
+            selectedOriginLatLng
+        );
+    }
+
+    function selectDestinationFromHistory(entry) {
+        clearLastHighwayRoutePolylineAnalysis(
+            "目的地履歴選択"
+        );
+
+        destinationInput.value = entry.address;
+
+        selectedDestinationAddress = entry.address;
+        selectedDestinationDisplayName =
+            entry.displayName || entry.address;
+        lastDestinationTypedValue = entry.address;
+        selectedDestinationPlaceId = entry.placeId || "";
+
+        selectedDestinationLatLng =
+            typeof entry.lat === "number" &&
+            typeof entry.lng === "number"
+                ? { lat: entry.lat, lng: entry.lng }
+                : null;
+
+        if (clearDestinationButton) {
+            clearDestinationButton.style.display = "block";
+        }
+
+        console.log(
+            "目的地履歴選択",
+            selectedDestinationAddress,
+            selectedDestinationDisplayName,
+            selectedDestinationPlaceId,
+            selectedDestinationLatLng
+        );
+    }
+
+    function refreshOriginHistorySuggestions() {
+        renderPlaceHistorySuggestions(
+            originHistoryList,
+            searchPlaceHistory(originInput.value),
+            selectOriginFromHistory
+        );
+    }
+
+    function refreshDestinationHistorySuggestions() {
+        renderPlaceHistorySuggestions(
+            destinationHistoryList,
+            searchPlaceHistory(destinationInput.value),
+            selectDestinationFromHistory
+        );
+    }
+
+    originInput.addEventListener(
+        "input",
+        refreshOriginHistorySuggestions
+    );
+
+    originInput.addEventListener(
+        "focus",
+        refreshOriginHistorySuggestions
+    );
+
+    originInput.addEventListener("blur", () => {
+        setTimeout(() => {
+            originHistoryList.innerHTML = "";
+            originHistoryList.style.display = "none";
+        }, 150);
+    });
+
+    destinationInput.addEventListener(
+        "input",
+        refreshDestinationHistorySuggestions
+    );
+
+    destinationInput.addEventListener(
+        "focus",
+        refreshDestinationHistorySuggestions
+    );
+
+    destinationInput.addEventListener("blur", () => {
+        setTimeout(() => {
+            destinationHistoryList.innerHTML = "";
+            destinationHistoryList.style.display = "none";
+        }, 150);
+    });
+}
+
 function initializeAutocomplete() {
 
     const originInput =
@@ -10677,6 +10961,14 @@ function initializeAutocomplete() {
             selectedOriginLatLng
         );
 
+        addPlaceToHistory({
+            address: selectedOriginAddress,
+            displayName: selectedOriginAddress,
+            placeId: selectedOriginPlaceId,
+            lat: selectedOriginLatLng?.lat ?? null,
+            lng: selectedOriginLatLng?.lng ?? null
+        });
+
     });
 
     destinationAutocomplete.addListener("place_changed", () => {
@@ -10718,6 +11010,14 @@ function initializeAutocomplete() {
             selectedDestinationPlaceId,
             selectedDestinationLatLng
         );
+
+        addPlaceToHistory({
+            address: selectedDestinationAddress,
+            displayName: selectedDestinationDisplayName,
+            placeId: selectedDestinationPlaceId,
+            lat: selectedDestinationLatLng?.lat ?? null,
+            lng: selectedDestinationLatLng?.lng ?? null
+        });
 
     });
 

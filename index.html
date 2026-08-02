@@ -219,11 +219,13 @@
 
                     <div class="origin-wrapper">
 
-                        <input type="text" id="origin" placeholder="例：東京都荒川区">
+                        <input type="text" id="origin" placeholder="例：東京都荒川区" autocomplete="off">
 
                         <button id="clearOrigin" class="clear-button" type="button">
                             ×
                         </button>
+
+                        <div id="originHistoryList" class="place-history-list"></div>
 
                     </div>
 
@@ -241,11 +243,13 @@
 
                     <div class="destination-wrapper">
 
-                        <input type="text" id="destination" placeholder="例：スパリゾートハワイアンズ">
+                        <input type="text" id="destination" placeholder="例：スパリゾートハワイアンズ" autocomplete="off">
 
                         <button id="clearDestination" class="clear-button" type="button">
                             ×
                         </button>
+
+                        <div id="destinationHistoryList" class="place-history-list"></div>
 
                     </div>
 
